@@ -1,71 +1,73 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="el">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="tl">
 <context>
     <name>AboutDialog</name>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="20"/>
         <source>About LMMS</source>
-        <translation>Σχετικά με το LMMS</translation>
+        <translation>Tungkol sa LMMS</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="43"/>
         <source>LMMS</source>
-        <translation>LMMS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="50"/>
         <source>Version %1 (%2/%3, Qt %4, %5).</source>
-        <translation>Έκδοση %1 (%2/%3, Qt %4, %5).</translation>
+        <translation>Bersyon %1 (%2/%3, Qt %4, %5).</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="78"/>
         <source>About</source>
-        <translation>Σχετικά</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="100"/>
         <source>LMMS - easy music production for everyone.</source>
-        <translation>LMMS - εύκολη μουσική παραγωγή για όλους</translation>
+        <translation>LMMS - madaling paggawa ng musika para sa lahat.</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="126"/>
         <source>Copyright © %1.</source>
-        <translation>Πνευματική ιδιοκτησία © %1. </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="152"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#33cc33;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#33cc33;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="176"/>
         <source>Authors</source>
-        <translation type="unfinished"/>
+        <translation>Mga May-akda</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="190"/>
         <source>Involved</source>
-        <translation type="unfinished"/>
+        <translation>Kasali</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="196"/>
         <source>Contributors ordered by number of commits:</source>
-        <translation type="unfinished"/>
+        <translation>Mga kontribyutor ayon sa bilang ng commits:</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="211"/>
         <source>Translation</source>
-        <translation>Μετάφραση</translation>
+        <translation>Pagsasalin</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="220"/>
         <source>Current language not translated (or native English).
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation type="unfinished"/>
+        <translation>Kasalukuyang wika ay hindi isinalin (o orihinal na Ingles).
+Kung interesado kang magsalin ng LMMS sa ibang wika o pagandahin ang kasalukuyang salin, malugod ka naming tinatanggap! Kontakin lamang ang tagapangalaga!
+        </translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="229"/>
         <source>License</source>
-        <translation>Άδεια</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -167,7 +169,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="55"/>
         <source>6</source>
-        <translation>6</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="56"/>
@@ -192,7 +194,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="61"/>
         <source>7</source>
-        <translation>7</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="62"/>
@@ -317,7 +319,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="87"/>
         <source>9</source>
-        <translation>9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="88"/>
@@ -392,7 +394,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="103"/>
         <source>11</source>
-        <translation>11</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="104"/>
@@ -402,12 +404,12 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="105"/>
         <source>Maj11</source>
-        <translation>Maj11</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="106"/>
         <source>m11</source>
-        <translation>m11</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="107"/>
@@ -417,12 +419,12 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="109"/>
         <source>13</source>
-        <translation>13</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="110"/>
         <source>13#9</source>
-        <translation>13#9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="111"/>
@@ -572,7 +574,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="143"/>
         <source>5</source>
-        <translation>5</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="144"/>
@@ -657,13 +659,13 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="128"/>
         <source>Name</source>
-        <translation>Ονομα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="173"/>
         <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="146"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="192"/>
@@ -1026,7 +1028,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/gui/Lv2ViewBase.cpp" line="179"/>
         <source>Help</source>
-        <translation>βοήθεια</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaWidgetFactory.cpp" line="77"/>
@@ -1097,7 +1099,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="186"/>
         <source>File: %1</source>
-        <translation>Αρχείο: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="233"/>
@@ -1110,12 +1112,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/VstEffect/VstSubPluginFeatures.cpp" line="49"/>
         <source>Name: </source>
-        <translation>Ονομα:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/VstEffect/VstSubPluginFeatures.cpp" line="50"/>
         <source>File: </source>
-        <translation>Αρχείο:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="76"/>
@@ -1192,7 +1194,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControls.cpp" line="36"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControls.cpp" line="37"/>
@@ -1202,12 +1204,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControls.cpp" line="38"/>
         <source>Left gain</source>
-        <translation type="unfinished"/>
+        <translation>Lakas sa kaliwa</translation>
     </message>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControls.cpp" line="39"/>
         <source>Right gain</source>
-        <translation type="unfinished"/>
+        <translation>Lakas sa kanan</translation>
     </message>
 </context>
 <context>
@@ -1215,7 +1217,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="71"/>
         <source>Amplify</source>
-        <translation>Ενίσχυση</translation>
+        <translation>Palakasin</translation>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="72"/>
@@ -1255,12 +1257,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="96"/>
         <source>None</source>
-        <translation>Τίποτα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="97"/>
         <source>Linear</source>
-        <translation>Γραμμικό</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="98"/>
@@ -1278,27 +1280,27 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/audio/AudioJack.cpp" line="141"/>
         <source>JACK client restarted</source>
-        <translation type="unfinished"/>
+        <translation>Na-restart ang JACK client</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioJack.cpp" line="142"/>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
-        <translation type="unfinished"/>
+        <translation>Na-kick ang LMMS ng JACK. Na-restart ang JACK backend. Kailangang muling ikonekta.</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioJack.cpp" line="149"/>
         <source>JACK server down</source>
-        <translation type="unfinished"/>
+        <translation>Naka-shutdown ang JACK server</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioJack.cpp" line="150"/>
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
-        <translation type="unfinished"/>
+        <translation>Naka-shutdown ang JACK server at hindi ma-restart. I-save ang project at restart ang JACK at LMMS.</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioJack.cpp" line="480"/>
         <source>Client name</source>
-        <translation type="unfinished"/>
+        <translation>Pangalan ng client</translation>
     </message>
 </context>
 <context>
@@ -1306,12 +1308,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/audio/AudioPulseAudio.cpp" line="260"/>
         <source>Device</source>
-        <translation>Συσκευή</translation>
+        <translation>Kagamitan</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioPulseAudio.cpp" line="271"/>
         <source>Channels</source>
-        <translation>Κανάλια</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1332,12 +1334,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/audio/AudioSndio.cpp" line="163"/>
         <source>Device</source>
-        <translation>Συσκευή</translation>
+        <translation>Kagamitan</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioSndio.cpp" line="174"/>
         <source>Channels</source>
-        <translation>Κανάλια</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1355,42 +1357,42 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/gui/AutomatableModelView.cpp" line="77"/>
         <source>&amp;Paste value (%1%2)</source>
-        <translation type="unfinished"/>
+        <translation>I-paste value (%1%2)</translation>
     </message>
     <message>
         <location filename="../../src/gui/AutomatableModelView.cpp" line="80"/>
         <source>&amp;Paste value</source>
-        <translation type="unfinished"/>
+        <translation>I-paste value</translation>
     </message>
     <message>
         <location filename="../../src/gui/AutomatableModelView.cpp" line="90"/>
         <source>Remove all linked controls</source>
-        <translation type="unfinished"/>
+        <translation>Alisin lahat ng linked controls</translation>
     </message>
     <message>
         <location filename="../../src/gui/AutomatableModelView.cpp" line="101"/>
         <source>Connected to %1</source>
-        <translation type="unfinished"/>
+        <translation>Nakakonekta sa %1</translation>
     </message>
     <message>
         <location filename="../../src/gui/AutomatableModelView.cpp" line="105"/>
         <source>Connected to controller</source>
-        <translation type="unfinished"/>
+        <translation>Nakakonekta sa controller</translation>
     </message>
     <message>
         <location filename="../../src/gui/AutomatableModelView.cpp" line="111"/>
         <source>Edit connection...</source>
-        <translation type="unfinished"/>
+        <translation>I-edit ang connection...</translation>
     </message>
     <message>
         <location filename="../../src/gui/AutomatableModelView.cpp" line="114"/>
         <source>Remove connection</source>
-        <translation type="unfinished"/>
+        <translation>Alisin ang connection</translation>
     </message>
     <message>
         <location filename="../../src/gui/AutomatableModelView.cpp" line="120"/>
         <source>Connect to controller...</source>
-        <translation type="unfinished"/>
+        <translation>Kumonekta sa controller...</translation>
     </message>
 </context>
 <context>
@@ -1414,17 +1416,17 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControls.cpp" line="37"/>
         <source>Frequency</source>
-        <translation>Συχνότητα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControls.cpp" line="38"/>
         <source>Gain</source>
-        <translation>Απολαβή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControls.cpp" line="39"/>
         <source>Ratio</source>
-        <translation>Αναλογία</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1442,7 +1444,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/BitInvader/BitInvader.cpp" line="140"/>
         <source>Normalize</source>
-        <translation>Κανονικοποίηση</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1460,7 +1462,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControls.cpp" line="41"/>
         <source>Output gain</source>
-        <translation>Απολαβή εξόδου</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControls.cpp" line="42"/>
@@ -1499,7 +1501,7 @@ This chip was used in the Commodore 64 computer.</source>
         <location filename="../../src/core/Clip.cpp" line="46"/>
         <location filename="../../src/core/Clip.cpp" line="67"/>
         <source>Mute</source>
-        <translation>Σίγαση</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1512,7 +1514,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="38"/>
         <source>Ratio</source>
-        <translation>Αναλογία</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="39"/>
@@ -1577,7 +1579,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="51"/>
         <source>Output Gain</source>
-        <translation>Απολαβή Εξόδου</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="52"/>
@@ -1607,7 +1609,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="57"/>
         <source>Feedback</source>
-        <translation>Ανάδραση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="58"/>
@@ -1642,7 +1644,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="64"/>
         <source>Mix</source>
-        <translation>Μείξη</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1663,7 +1665,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Delay/DelayControls.cpp" line="37"/>
         <source>Feedback</source>
-        <translation>Ανάδραση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Delay/DelayControls.cpp" line="38"/>
@@ -1678,7 +1680,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Delay/DelayControls.cpp" line="40"/>
         <source>Output gain</source>
-        <translation>Απολαβή εξόδου</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1699,7 +1701,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControls.cpp" line="37"/>
         <source>Frequency</source>
-        <translation>Συχνότητα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControls.cpp" line="38"/>
@@ -1709,7 +1711,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControls.cpp" line="39"/>
         <source>Feedback</source>
-        <translation>Ανάδραση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControls.cpp" line="40"/>
@@ -1742,12 +1744,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="46"/>
         <source>Gain 1</source>
-        <translation>Απολαβή 1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="48"/>
         <source>Mix</source>
-        <translation>Μείξη</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="50"/>
@@ -1772,7 +1774,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="54"/>
         <source>Gain 2</source>
-        <translation>Απολαβή 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="56"/>
@@ -1925,17 +1927,17 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="46"/>
         <source>Output gain</source>
-        <translation>Απολαβή εξόδου</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="47"/>
         <source>Attack time</source>
-        <translation>Διάρκεια εισαγωγής</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="48"/>
         <source>Release time</source>
-        <translation>Διάρκεια αποδέσμευσης</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="50"/>
@@ -2080,7 +2082,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Eq/EqControls.cpp" line="40"/>
         <source>Output gain</source>
-        <translation>Απολαβή εξόδου</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Eq/EqControls.cpp" line="41"/>
@@ -2308,17 +2310,17 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Flanger/FlangerControls.cpp" line="42"/>
         <source>Feedback</source>
-        <translation>Ανάδραση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Flanger/FlangerControls.cpp" line="43"/>
         <source>Noise</source>
-        <translation>Θόρυβος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Flanger/FlangerControls.cpp" line="44"/>
         <source>Invert</source>
-        <translation>Αντιστροφή</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2436,12 +2438,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="122"/>
         <source>Treble</source>
-        <translation>Πρίμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="123"/>
         <source>Bass</source>
-        <translation>Μπάσα</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2459,7 +2461,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/GigPlayer/GigPlayer.cpp" line="88"/>
         <source>Gain</source>
-        <translation>Απολαβή</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2467,7 +2469,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="35"/>
         <source>Pitch</source>
-        <translation>Τονικό ύψος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="36"/>
@@ -2512,7 +2514,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="44"/>
         <source>Feedback</source>
-        <translation>Ανάδραση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="45"/>
@@ -2625,27 +2627,27 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="322"/>
         <source>Up</source>
-        <translation>Πάνω</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="323"/>
         <source>Down</source>
-        <translation>Κάτω</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="324"/>
         <source>Up and down</source>
-        <translation>Πάνω και κάτω</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="325"/>
         <source>Down and up</source>
-        <translation>Κάτω και πάνω</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="326"/>
         <source>Random</source>
-        <translation>Τυχαίος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="329"/>
@@ -2707,7 +2709,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/InstrumentSoundShaping.cpp" line="57"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/InstrumentSoundShaping.cpp" line="59"/>
@@ -2857,7 +2859,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="61"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="62"/>
@@ -2867,7 +2869,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="64"/>
         <source>Pitch</source>
-        <translation>Τονικό ύψος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="65"/>
@@ -2933,7 +2935,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="73"/>
         <source>Gain</source>
-        <translation>Απολαβή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="74"/>
@@ -2943,7 +2945,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="75"/>
         <source>Noise</source>
-        <translation>Θόρυβος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="76"/>
@@ -3191,12 +3193,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="81"/>
         <source>Mix</source>
-        <translation>Μείξη</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="82"/>
         <source>Feedback</source>
-        <translation>Ανάδραση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="83"/>
@@ -3260,12 +3262,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Lb302/Lb302.cpp" line="222"/>
         <source>Distortion</source>
-        <translation>Παραμόρφωση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Lb302/Lb302.cpp" line="223"/>
         <source>Waveform</source>
-        <translation>Κυματομορφή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Lb302/Lb302.cpp" line="224"/>
@@ -3590,7 +3592,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/MidiImport/MidiImport.cpp" line="367"/>
         <source>Track</source>
-        <translation>Κομμάτι</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3599,7 +3601,7 @@ This chip was used in the Commodore 64 computer.</source>
         <location filename="../../src/core/midi/MidiJack.cpp" line="58"/>
         <source>JACK server down</source>
         <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
-        <translation type="unfinished"/>
+        <translation>Naka-shutdown ang JACK server</translation>
     </message>
     <message>
         <location filename="../../src/core/midi/MidiJack.cpp" line="60"/>
@@ -3683,17 +3685,17 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/Mixer.cpp" line="767"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/Mixer.cpp" line="768"/>
         <source>Mute</source>
-        <translation>Σίγαση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/Mixer.cpp" line="769"/>
         <source>Solo</source>
-        <translation>Σόλο</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4233,7 +4235,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Monstro/Monstro.h" line="308"/>
         <source>White noise</source>
-        <translation>Λευκός θόρυβος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Monstro/Monstro.h" line="309"/>
@@ -4278,7 +4280,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Monstro/Monstro.h" line="321"/>
         <source>Square wave</source>
-        <translation>Τετραγωνικό κύμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Monstro/Monstro.h" line="322"/>
@@ -4293,7 +4295,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Monstro/Monstro.h" line="326"/>
         <source>Random</source>
-        <translation>Τυχαίος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Monstro/Monstro.h" line="327"/>
@@ -4632,12 +4634,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Organic/Organic.cpp" line="79"/>
         <source>Distortion</source>
-        <translation>Παραμόρφωση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Organic/Organic.cpp" line="80"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4730,7 +4732,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Oscilloscope/OscilloscopeControls.cpp" line="40"/>
         <source>Stereo</source>
-        <translation>Στερεοφωνικά</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4761,7 +4763,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/PeakController.cpp" line="214"/>
         <source>Due to a bug in older version of LMMS, the peak controllers may not be connect properly. Please ensure that peak controllers are connected properly and re-save this file. Sorry for any inconvenience caused.</source>
-        <translation type="unfinished"/>
+        <translation>Dahil sa isang bug sa mas lumang bersyon ng LMMS, maaaring hindi maayos na nakakonekta ang peak controllers. Siguraduhing maayos na nakakonekta ang peak controllers at i-save muli ang file na ito. Paumanhin sa anumang abalang naidulot.</translation>
     </message>
 </context>
 <context>
@@ -4846,12 +4848,12 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="40"/>
         <source>Color</source>
-        <translation>Χρώμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/ReverbSC/ReverbSCControls.cpp" line="41"/>
         <source>Output gain</source>
-        <translation>Απολαβή εξόδου</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4879,7 +4881,7 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../plugins/SpectrumAnalyzer/SaControls.cpp" line="46"/>
         <source>Stereo</source>
-        <translation>Στερεοφωνικά</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/SpectrumAnalyzer/SaControls.cpp" line="47"/>
@@ -4972,7 +4974,7 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../plugins/SpectrumAnalyzer/SaControls.cpp" line="72"/>
         <source>Bass</source>
-        <translation>Μπάσα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/SpectrumAnalyzer/SaControls.cpp" line="73"/>
@@ -5044,7 +5046,7 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../src/tracks/SampleTrack.cpp" line="49"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/tracks/SampleTrack.cpp" line="50"/>
@@ -5086,12 +5088,12 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="145"/>
         <source>Gain</source>
-        <translation>Απολαβή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="146"/>
         <source>Reverb</source>
-        <translation>Αντήχηση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="147"/>
@@ -5177,7 +5179,7 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="127"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="128"/>
@@ -5525,12 +5527,12 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../src/core/Track.cpp" line="54"/>
         <source>Mute</source>
-        <translation>Σίγαση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/Track.cpp" line="55"/>
         <source>Solo</source>
-        <translation>Σόλο</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5550,7 +5552,7 @@ Reason: &quot;%2&quot;</source>
         <location filename="../../plugins/MidiImport/MidiImport.cpp" line="270"/>
         <location filename="../../src/core/TrackContainer.cpp" line="103"/>
         <source>Please wait...</source>
-        <translation>Παρακαλώ περιμένετε...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/ImportFilter.cpp" line="80"/>
@@ -5756,7 +5758,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/VstBase/VstPlugin.cpp" line="629"/>
         <source>: default</source>
-        <translation>: προεπιλογή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/VstBase/VstPlugin.cpp" line="632"/>
@@ -5766,22 +5768,22 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/VstBase/VstPlugin.cpp" line="632"/>
         <source>.fxp</source>
-        <translation>.fxp</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/VstBase/VstPlugin.cpp" line="647"/>
         <source>.FXP</source>
-        <translation>.FXP</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/VstBase/VstPlugin.cpp" line="647"/>
         <source>.FXB</source>
-        <translation>.FXB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/VstBase/VstPlugin.cpp" line="649"/>
         <source>.fxb</source>
-        <translation>.fxb</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5789,22 +5791,22 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="253"/>
         <source>Volume A1</source>
-        <translation>Ενταση A1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="254"/>
         <source>Volume A2</source>
-        <translation>Ενταση A2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="255"/>
         <source>Volume B1</source>
-        <translation>Ενταση B1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="256"/>
         <source>Volume B2</source>
-        <translation>Ενταση B2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="258"/>
@@ -5942,7 +5944,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/WaveShaper/WaveShaperControls.cpp" line="46"/>
         <source>Output gain</source>
-        <translation>Απολαβή εξόδου</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6018,7 +6020,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="115"/>
         <source>Bandwidth</source>
-        <translation>Εύρος ζώνης</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="116"/>
@@ -6054,17 +6056,17 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="57"/>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="57"/>
         <source>Volume:</source>
-        <translation>Ενταση:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="58"/>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="58"/>
@@ -6074,22 +6076,22 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="59"/>
         <source>LEFT</source>
-        <translation>ΑΡΙΣΤΕΡΑ</translation>
+        <translation>KALIWA</translation>
     </message>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="59"/>
         <source>Left gain:</source>
-        <translation>Αριστερή απολαβή:</translation>
+        <translation>Lakas sa kaliwa:</translation>
     </message>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="60"/>
         <source>RIGHT</source>
-        <translation>ΔΕΞΙΑ</translation>
+        <translation>KANAN</translation>
     </message>
     <message>
         <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="60"/>
         <source>Right gain:</source>
-        <translation>Δεξιά απολαβή:</translation>
+        <translation>Lakas sa kanan:</translation>
     </message>
 </context>
 <context>
@@ -6097,12 +6099,12 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../src/gui/AudioAlsaSetupWidget.cpp" line="71"/>
         <source>Device</source>
-        <translation>Συσκευή</translation>
+        <translation>Kagamitan</translation>
     </message>
     <message>
         <location filename="../../src/gui/AudioAlsaSetupWidget.cpp" line="82"/>
         <source>Channels</source>
-        <translation>Κανάλια</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6110,7 +6112,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="62"/>
         <source>Open sample</source>
-        <translation type="unfinished"/>
+        <translation>Buksan ang sample</translation>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="71"/>
@@ -6120,37 +6122,37 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="82"/>
         <source>Disable loop</source>
-        <translation type="unfinished"/>
+        <translation>I-disable ang loop</translation>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="91"/>
         <source>Enable loop</source>
-        <translation type="unfinished"/>
+        <translation>I-enable ang loop</translation>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="100"/>
         <source>Enable ping-pong loop</source>
-        <translation type="unfinished"/>
+        <translation>I-enable ang ping-pong loop</translation>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="115"/>
         <source>Continue sample playback across notes</source>
-        <translation type="unfinished"/>
+        <translation>Ipagpatuloy ang sample sa mga note</translation>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="119"/>
         <source>Amplify:</source>
-        <translation>Ενίσχυση:</translation>
+        <translation>Palakasin:</translation>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="123"/>
         <source>Start point:</source>
-        <translation>Αρχικό σημείο:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="127"/>
         <source>End point:</source>
-        <translation>Τελικό σημείο:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="131"/>
@@ -6189,7 +6191,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../src/core/audio/AudioPortAudio.cpp" line="224"/>
         <source>Channels</source>
-        <translation>Κανάλια</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6210,7 +6212,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../src/gui/clips/AutomationClipView.cpp" line="163"/>
         <source>Open in Automation editor</source>
-        <translation type="unfinished"/>
+        <translation>Buksan sa Automation editor</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/AutomationClipView.cpp" line="171"/>
@@ -6220,12 +6222,12 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../src/gui/clips/AutomationClipView.cpp" line="174"/>
         <source>Reset name</source>
-        <translation type="unfinished"/>
+        <translation>I-reset ang pangalan</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/AutomationClipView.cpp" line="177"/>
         <source>Change name</source>
-        <translation>Αλλαξε όνομα</translation>
+        <translation>Palitan ang pangalan</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/AutomationClipView.cpp" line="180"/>
@@ -6255,7 +6257,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../src/gui/clips/AutomationClipView.cpp" line="438"/>
         <source>Model is already connected to this clip.</source>
-        <translation type="unfinished"/>
+        <translation>Nakakonekta na ang model sa clip na ito.</translation>
     </message>
 </context>
 <context>
@@ -6321,12 +6323,12 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2036"/>
         <source>Flip vertically</source>
-        <translation>Περιστρέψτε κάθετα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2037"/>
         <source>Flip horizontally</source>
-        <translation>Περιστρέψτε οριζόντια</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2049"/>
@@ -6403,7 +6405,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2235"/>
         <source>Model is already connected to this clip.</source>
-        <translation type="unfinished"/>
+        <translation>Nakakonekta na ang model sa clip na ito.</translation>
     </message>
 </context>
 <context>
@@ -6416,27 +6418,27 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControlDialog.cpp" line="54"/>
         <source>Frequency:</source>
-        <translation>Συχνότητα:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControlDialog.cpp" line="56"/>
         <source>GAIN</source>
-        <translation>ΑΠΟΛΑΒΗ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControlDialog.cpp" line="58"/>
         <source>Gain:</source>
-        <translation>Απολαβή:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControlDialog.cpp" line="60"/>
         <source>RATIO</source>
-        <translation>ΑΝΑΛΟΓΙΑ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/BassBooster/BassBoosterControlDialog.cpp" line="62"/>
         <source>Ratio:</source>
-        <translation>Αναλογία:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6473,13 +6475,13 @@ Please make sure you have read-permission to the file and the directory containi
         <location filename="../../plugins/BitInvader/BitInvader.cpp" line="363"/>
         <location filename="../../plugins/BitInvader/BitInvader.cpp" line="370"/>
         <source>Square wave</source>
-        <translation>Τετραγωνικό κύμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/BitInvader/BitInvader.cpp" line="373"/>
         <location filename="../../plugins/BitInvader/BitInvader.cpp" line="380"/>
         <source>White noise</source>
-        <translation>Λευκός θόρυβος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/BitInvader/BitInvader.cpp" line="382"/>
@@ -6501,7 +6503,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/BitInvader/BitInvader.cpp" line="407"/>
         <source>Normalize</source>
-        <translation>Κανονικοποίηση</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6520,7 +6522,7 @@ Please make sure you have read-permission to the file and the directory containi
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="61"/>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="73"/>
         <source>GAIN</source>
-        <translation>ΑΠΟΛΑΒΗ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="64"/>
@@ -6530,7 +6532,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="66"/>
         <source>NOISE</source>
-        <translation>ΘΟΡΥΒΟΣ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="69"/>
@@ -6540,7 +6542,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="76"/>
         <source>Output gain:</source>
-        <translation>Απολαβή εξόδου:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="78"/>
@@ -6580,12 +6582,12 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="101"/>
         <source>Sample rate:</source>
-        <translation>Ρυθμός δειγματοληψίας:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="103"/>
         <source>STEREO</source>
-        <translation>ΣΤΕΡΕΟΦΩΝΙΚΑ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Bitcrush/BitcrushControlDialog.cpp" line="106"/>
@@ -6719,7 +6721,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="567"/>
         <source>Hint</source>
-        <translation>Ιχνος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="888"/>
@@ -6734,7 +6736,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="897"/>
         <source>Cut</source>
-        <translation>Αποκοπή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="898"/>
@@ -6744,7 +6746,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="905"/>
         <source>Copy</source>
-        <translation>Αντιγραφή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="906"/>
@@ -6754,7 +6756,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="911"/>
         <source>Paste</source>
-        <translation>Επικόλληση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="925"/>
@@ -6812,7 +6814,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="92"/>
         <source>Ratio:</source>
-        <translation>Αναλογία:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="94"/>
@@ -6982,13 +6984,13 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="176"/>
         <source>Output gain</source>
-        <translation>Απολαβή εξόδου</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="179"/>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="185"/>
         <source>Gain</source>
-        <translation>Απολαβή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="180"/>
@@ -7208,7 +7210,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/modals/ControllerConnectionDialog.cpp" line="220"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/ControllerConnectionDialog.cpp" line="224"/>
@@ -7218,7 +7220,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/modals/ControllerConnectionDialog.cpp" line="332"/>
         <source>LMMS</source>
-        <translation>LMMS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/ControllerConnectionDialog.cpp" line="332"/>
@@ -7236,7 +7238,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/ControllerRackView.cpp" line="68"/>
         <source>Add</source>
-        <translation>Προσθήκη</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/ControllerRackView.cpp" line="124"/>
@@ -7269,7 +7271,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/ControllerView.cpp" line="136"/>
         <source>LFO</source>
-        <translation>LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/ControllerView.cpp" line="160"/>
@@ -7400,7 +7402,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="74"/>
         <source>Gain:</source>
-        <translation>Απολαβή:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -7423,12 +7425,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="56"/>
         <source>Frequency:</source>
-        <translation>Συχνότητα:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="56"/>
         <source>Hz</source>
-        <translation>Hz</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="59"/>
@@ -7501,23 +7503,23 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="59"/>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="63"/>
         <source>GAIN</source>
-        <translation>ΑΠΟΛΑΒΗ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="59"/>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="63"/>
         <source>Gain</source>
-        <translation>Απολαβή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="60"/>
         <source>MIX</source>
-        <translation>ΜΕΙΞΗ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="60"/>
         <source>Mix</source>
-        <translation>Μείξη</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="65"/>
@@ -7555,12 +7557,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="68"/>
         <source>OUTPUT</source>
-        <translation>ΕΞΟΔΟΣ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="72"/>
         <source>Output gain:</source>
-        <translation>Απολαβή εξόδου:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="74"/>
@@ -7657,7 +7659,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/editors/Editor.cpp" line="111"/>
         <source>Record</source>
-        <translation>Ηχογράφηση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/Editor.cpp" line="112"/>
@@ -7693,7 +7695,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="81"/>
         <source>Name</source>
-        <translation>Ονομα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="82"/>
@@ -7866,7 +7868,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="172"/>
         <source>Frequency:</source>
-        <translation>Συχνότητα:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="181"/>
@@ -7891,7 +7893,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="274"/>
         <source>Hint</source>
-        <translation>Ιχνος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="275"/>
@@ -7989,17 +7991,17 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="87"/>
         <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="101"/>
         <source>Gain</source>
-        <translation>Απολαβή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="83"/>
         <source>Output gain</source>
-        <translation>Απολαβή εξόδου</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="111"/>
         <source>Bandwidth: </source>
-        <translation>Εύρος ζώνης:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="111"/>
@@ -8014,7 +8016,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="117"/>
         <source>Frequency:</source>
-        <translation>Συχνότητα:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="199"/>
@@ -8062,7 +8064,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="56"/>
         <source>File format:</source>
-        <translation>Μορφή αρχείου:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="58"/>
@@ -8143,12 +8145,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="124"/>
         <source>Mono</source>
-        <translation>Μονοφωνικό</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="127"/>
         <source>Stereo</source>
-        <translation>Στερεοφωνικά</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="130"/>
@@ -8186,7 +8188,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/widgets/Fader.cpp" line="91"/>
         <source>Volume:</source>
-        <translation>Ενταση:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/widgets/Fader.cpp" line="137"/>
@@ -8436,7 +8438,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="72"/>
         <source>NOISE</source>
-        <translation>ΘΟΡΥΒΟΣ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="75"/>
@@ -8446,7 +8448,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="84"/>
         <source>Invert</source>
-        <translation>Αντιστροφή</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -8583,22 +8585,22 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="541"/>
         <source>Treble:</source>
-        <translation>Πρίμα:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="543"/>
         <source>Treble</source>
-        <translation>Πρίμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="546"/>
         <source>Bass:</source>
-        <translation>Μπάσα:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="548"/>
         <source>Bass</source>
-        <translation>Μπάσα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="557"/>
@@ -8695,7 +8697,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="135"/>
         <source>Mute</source>
-        <translation>Σίγαση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="138"/>
@@ -8757,7 +8759,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/GigPlayer/GigPlayer.cpp" line="953"/>
         <source>Gain:</source>
-        <translation>Απολαβή:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/GigPlayer.cpp" line="1031"/>
@@ -8826,7 +8828,7 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="69"/>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="72"/>
         <source>Pitch</source>
-        <translation>Τονικό ύψος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="75"/>
@@ -8914,7 +8916,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="100"/>
         <source>RANGE</source>
-        <translation>ΕΥΡΟΣ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="101"/>
@@ -8986,7 +8988,7 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="124"/>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="126"/>
         <source>%</source>
-        <translation>%</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="124"/>
@@ -9001,7 +9003,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="125"/>
         <source>ms</source>
-        <translation>ms</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="126"/>
@@ -9011,7 +9013,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="128"/>
         <source>Chord:</source>
-        <translation>Συγχορδία:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="131"/>
@@ -9034,12 +9036,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="47"/>
         <source>RANGE</source>
-        <translation>ΕΥΡΟΣ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="59"/>
         <source>Chord:</source>
-        <translation>Συγχορδία:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="62"/>
@@ -9126,7 +9128,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="57"/>
         <source>VOLUME</source>
-        <translation>ΕΝΤΑΣΗ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="58"/>
@@ -9156,7 +9158,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="74"/>
         <source>Hz</source>
-        <translation>Hz</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="77"/>
@@ -9184,17 +9186,17 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="88"/>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="90"/>
         <source>Volume:</source>
-        <translation>Ενταση:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="93"/>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="93"/>
@@ -9209,7 +9211,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="98"/>
         <source>MIDI</source>
-        <translation>MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="130"/>
@@ -9219,7 +9221,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="131"/>
         <source>Output</source>
-        <translation>Έξοδος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="133"/>
@@ -9242,7 +9244,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="138"/>
         <source>Mute</source>
-        <translation>Σίγαση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="142"/>
@@ -9252,7 +9254,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="145"/>
         <source>Solo</source>
-        <translation>Σόλο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="149"/>
@@ -9262,17 +9264,17 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="155"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="156"/>
         <source>Volume:</source>
-        <translation>Ενταση:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="161"/>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="167"/>
@@ -9287,17 +9289,17 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="173"/>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="181"/>
         <source>Pitch</source>
-        <translation>Τονικό ύψος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="182"/>
         <source>Pitch:</source>
-        <translation>Τονικό ύψος:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="182"/>
@@ -9307,7 +9309,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="187"/>
         <source>PITCH</source>
-        <translation>ΤΟΝΙΚΟ ΥΨΟΣ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="193"/>
@@ -9317,7 +9319,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="198"/>
         <source>RANGE</source>
-        <translation>ΕΥΡΟΣ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="206"/>
@@ -9337,7 +9339,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="225"/>
         <source>SAVE</source>
-        <translation>ΑΠΟΘΗΚΕΥΣΗ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="264"/>
@@ -9352,12 +9354,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="266"/>
         <source>Effects</source>
-        <translation>Εφέ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="267"/>
         <source>MIDI</source>
-        <translation>MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="268"/>
@@ -9377,7 +9379,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="467"/>
         <source>Plugin</source>
-        <translation>Plug-in</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -9449,7 +9451,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="298"/>
         <source>Gain:</source>
-        <translation>Απολαβή:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="302"/>
@@ -9469,7 +9471,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="314"/>
         <source>Noise:</source>
-        <translation>Θόρυβος:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="318"/>
@@ -9487,7 +9489,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="50"/>
         <source>Depth:</source>
-        <translation>Βάθος:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="50"/>
@@ -9902,7 +9904,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="108"/>
         <source>Feedback</source>
-        <translation>Ανάδραση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="109"/>
@@ -10021,7 +10023,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="126"/>
         <source>Name: </source>
-        <translation>Ονομα:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="130"/>
@@ -10031,7 +10033,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="134"/>
         <source>Copyright: </source>
-        <translation>Πνευματική ιδιοκτησία:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="138"/>
@@ -10043,14 +10045,14 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="144"/>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="149"/>
         <source>Yes</source>
-        <translation>Ναί</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="139"/>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="144"/>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="149"/>
         <source>No</source>
-        <translation>Οχι</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="143"/>
@@ -10106,7 +10108,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="57"/>
         <source>Name</source>
-        <translation>Ονομα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="58"/>
@@ -10131,7 +10133,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="62"/>
         <source>Logarithmic</source>
-        <translation>Λογαριθμικό</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="63"/>
@@ -10141,7 +10143,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="78"/>
         <source>Audio</source>
-        <translation>Ήχος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="78"/>
@@ -10156,7 +10158,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="80"/>
         <source>Output</source>
-        <translation>Έξοδος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="82"/>
@@ -10177,7 +10179,7 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="152"/>
         <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="158"/>
         <source>Yes</source>
-        <translation>Ναί</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -10240,7 +10242,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/Lb302/Lb302.cpp" line="685"/>
         <source>Square wave</source>
-        <translation>Τετραγωνικό κύμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Lb302/Lb302.cpp" line="689"/>
@@ -10365,22 +10367,22 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="58"/>
         <source>Previous</source>
-        <translation>Προηγούμενος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="59"/>
         <source>Next</source>
-        <translation>Επόμενο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="76"/>
         <source>Previous (%1)</source>
-        <translation>Προηγούμενος (%1)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="77"/>
         <source>Next (%1)</source>
-        <translation>Επόμενο (%1)</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -10388,7 +10390,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="58"/>
         <source>LFO</source>
-        <translation>LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="66"/>
@@ -10453,7 +10455,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="116"/>
         <source>Square wave</source>
-        <translation>Τετραγωνικό κύμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="125"/>
@@ -10468,7 +10470,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="143"/>
         <source>White noise</source>
-        <translation>Λευκός θόρυβος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="155"/>
@@ -10626,17 +10628,17 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="281"/>
         <source>&amp;File</source>
-        <translation>&amp;Αρχείο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="283"/>
         <source>&amp;New</source>
-        <translation>&amp;Νέο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="289"/>
         <source>&amp;Open...</source>
-        <translation>&amp;Άνοιγμα...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="294"/>
@@ -10661,7 +10663,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="308"/>
         <source>Import...</source>
-        <translation>Εισαγωγή...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="311"/>
@@ -10676,7 +10678,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="317"/>
         <source>Export &amp;MIDI...</source>
-        <translation>Εξαγωγή &amp;MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="322"/>
@@ -10691,12 +10693,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="328"/>
         <source>Undo</source>
-        <translation>Αναίρεση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="331"/>
         <source>Redo</source>
-        <translation>Ακύρωση αναίρεσης</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="338"/>
@@ -10706,12 +10708,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="340"/>
         <source>Settings</source>
-        <translation>Ρυθμίσεις</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="346"/>
         <source>&amp;View</source>
-        <translation>&amp;Προβολή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="363"/>
@@ -10721,7 +10723,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="371"/>
         <source>&amp;Help</source>
-        <translation>&amp;βοήθεια</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="376"/>
@@ -10731,12 +10733,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="382"/>
         <source>Help</source>
-        <translation>βοήθεια</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="387"/>
         <source>About</source>
-        <translation>Σχετικά</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="392"/>
@@ -10821,7 +10823,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="574"/>
         <source>Untitled</source>
-        <translation>Χωρίς τίτλο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="589"/>
@@ -10831,7 +10833,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="592"/>
         <source>LMMS %1</source>
-        <translation>LMMS %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="611"/>
@@ -10861,12 +10863,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="749"/>
         <source>LMMS (*.mmp *.mmpz)</source>
-        <translation>LMMS (*.mmp *.mmpz)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="792"/>
         <source>Save Project</source>
-        <translation>Αποθήκευση Εργου</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="793"/>
@@ -10948,7 +10950,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <location filename="../../src/gui/MainWindow.cpp" line="1438"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1495"/>
         <source>untitled</source>
-        <translation>χωρίς τίτλο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1442"/>
@@ -10964,7 +10966,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1529"/>
         <source>Save project</source>
-        <translation>Αποθήκευση έργου</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1548"/>
@@ -11027,7 +11029,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="462"/>
         <source>Random</source>
-        <translation>Τυχαίος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="464"/>
@@ -11595,7 +11597,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="199"/>
         <source>Open in piano-roll</source>
-        <translation type="unfinished"/>
+        <translation>Buksan sa piano-roll</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="204"/>
@@ -11610,7 +11612,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="219"/>
         <source>Clear all notes</source>
-        <translation type="unfinished"/>
+        <translation>Burahin lahat ng nota</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="225"/>
@@ -11625,12 +11627,12 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="238"/>
         <source>Reset name</source>
-        <translation type="unfinished"/>
+        <translation>I-reset ang pangalan</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="241"/>
         <source>Change name</source>
-        <translation>Αλλαξε όνομα</translation>
+        <translation>Palitan ang pangalan</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="249"/>
@@ -11653,7 +11655,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MidiSetupWidget.cpp" line="51"/>
         <source>Device</source>
-        <translation>Συσκευή</translation>
+        <translation>Kagamitan</translation>
     </message>
 </context>
 <context>
@@ -11689,7 +11691,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="120"/>
         <source>Mute</source>
-        <translation>Σίγαση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="122"/>
@@ -11699,7 +11701,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="126"/>
         <source>Solo</source>
-        <translation>Σόλο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="128"/>
@@ -11739,7 +11741,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="188"/>
         <source>Color</source>
-        <translation>Χρώμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="190"/>
@@ -11800,7 +11802,7 @@ Warning: This operation can not be undone.</source>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1689"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1702"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1679"/>
@@ -11821,7 +11823,7 @@ Warning: This operation can not be undone.</source>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1691"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1704"/>
         <source> semitones</source>
-        <translation>ημιτόνια</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1681"/>
@@ -11923,7 +11925,7 @@ Warning: This operation can not be undone.</source>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1731"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1740"/>
         <source>Pre-delay</source>
-        <translation>Προκαθυστέρηση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1733"/>
@@ -12075,7 +12077,7 @@ Warning: This operation can not be undone.</source>
         <location filename="../../plugins/Nes/Nes.cpp" line="810"/>
         <location filename="../../plugins/Nes/Nes.cpp" line="815"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="749"/>
@@ -12255,12 +12257,12 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../plugins/Organic/Organic.cpp" line="411"/>
         <source>Distortion:</source>
-        <translation>Παραμόρφωση:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Organic/Organic.cpp" line="418"/>
         <source>Volume:</source>
-        <translation>Ενταση:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Organic/Organic.cpp" line="422"/>
@@ -12323,7 +12325,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../plugins/Oscilloscope/OscilloscopeControlDialog.cpp" line="64"/>
         <source>Stereo</source>
-        <translation>Στερεοφωνικά</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Oscilloscope/OscilloscopeControlDialog.cpp" line="68"/>
@@ -12351,7 +12353,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="92"/>
         <source>Name</source>
-        <translation>Ονομα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="124"/>
@@ -12412,12 +12414,12 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/clips/PatternClipView.cpp" line="71"/>
         <source>Reset name</source>
-        <translation type="unfinished"/>
+        <translation>I-reset ang pangalan</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/PatternClipView.cpp" line="74"/>
         <source>Change name</source>
-        <translation>Αλλαξε όνομα</translation>
+        <translation>Palitan ang pangalan</translation>
     </message>
 </context>
 <context>
@@ -13034,7 +13036,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="113"/>
         <source>&amp;Undo</source>
-        <translation>&amp;Αναίρεση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="114"/>
@@ -13044,7 +13046,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="118"/>
         <source>&amp;Redo</source>
-        <translation>&amp;Ακύρωση αναίρεσης</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="120"/>
@@ -13054,7 +13056,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="124"/>
         <source>&amp;Copy</source>
-        <translation>&amp;Αντιγραφή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="126"/>
@@ -13074,7 +13076,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="136"/>
         <source>&amp;Paste</source>
-        <translation>&amp;Επικόλληση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="138"/>
@@ -13119,7 +13121,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="195"/>
         <source>&amp;Left</source>
-        <translation>&amp;Αριστερά</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="196"/>
@@ -13139,7 +13141,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="209"/>
         <source>&amp;Right</source>
-        <translation>&amp;Δεξιά</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="211"/>
@@ -13159,7 +13161,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="225"/>
         <source>&amp;Color...</source>
-        <translation>&amp;Χρώμα...</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -13203,22 +13205,22 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="57"/>
         <source>Color</source>
-        <translation>Χρώμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="59"/>
         <source>Color:</source>
-        <translation>Χρώμα:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="61"/>
         <source>Output</source>
-        <translation>Έξοδος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="63"/>
         <source>Output gain:</source>
-        <translation>Απολαβή εξόδου:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -13266,7 +13268,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../plugins/SpectrumAnalyzer/SaControlsDialog.cpp" line="135"/>
         <source>Stereo</source>
-        <translation>Στερεοφωνικά</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/SpectrumAnalyzer/SaControlsDialog.cpp" line="136"/>
@@ -13491,7 +13493,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="71"/>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="71"/>
@@ -13501,12 +13503,12 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="73"/>
         <source>Volume:</source>
-        <translation>Ενταση:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="76"/>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="76"/>
@@ -13534,7 +13536,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="94"/>
         <source>Mute</source>
-        <translation>Σίγαση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="98"/>
@@ -13544,7 +13546,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="101"/>
         <source>Solo</source>
-        <translation>Σόλο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="105"/>
@@ -13559,12 +13561,12 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="112"/>
         <source>Volume:</source>
-        <translation>Ενταση:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="117"/>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="123"/>
@@ -13579,7 +13581,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="129"/>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="138"/>
@@ -13610,7 +13612,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="162"/>
         <source>Settings</source>
-        <translation>Ρυθμίσεις</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="197"/>
@@ -13722,7 +13724,7 @@ Shift-click to open the note in Automation Editor</source>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="285"/>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1165"/>
         <source>Disabled</source>
-        <translation>Απενεργοποιημένο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="286"/>
@@ -13844,7 +13846,7 @@ Shift-click to open the note in Automation Editor</source>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="491"/>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="886"/>
         <source>Audio</source>
-        <translation>Ήχος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="494"/>
@@ -13890,7 +13892,7 @@ Shift-click to open the note in Automation Editor</source>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="667"/>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="889"/>
         <source>MIDI</source>
-        <translation>MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="670"/>
@@ -13971,7 +13973,7 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="916"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="921"/>
@@ -13981,12 +13983,12 @@ Shift-click to open the note in Automation Editor</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1163"/>
         <source>minutes</source>
-        <translation>λεπτά</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1163"/>
         <source>minute</source>
-        <translation>λεπτό</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1167"/>
@@ -14066,7 +14068,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="989"/>
         <source>Gain:</source>
-        <translation>Απολαβή:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1002"/>
@@ -14112,7 +14114,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1053"/>
         <source>Depth:</source>
-        <translation>Βάθος:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1156"/>
@@ -14125,7 +14127,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="477"/>
         <source>Volume:</source>
-        <translation>Ενταση:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="481"/>
@@ -14219,7 +14221,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="590"/>
         <source>Noise</source>
-        <translation>Θόρυβος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="606"/>
@@ -14592,7 +14594,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2166"/>
         <source>project</source>
-        <translation>έργο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2169"/>
@@ -14784,7 +14786,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/editors/StepRecorderWidget.cpp" line="97"/>
         <source>Hint</source>
-        <translation>Ιχνος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/StepRecorderWidget.cpp" line="97"/>
@@ -14877,7 +14879,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="64"/>
         <source>Mute</source>
-        <translation>Σίγαση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="67"/>
@@ -15231,7 +15233,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="312"/>
         <source>Hint</source>
-        <translation>Ιχνος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="313"/>
@@ -15274,7 +15276,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/tracks/TrackContentWidget.cpp" line="604"/>
         <source>Paste</source>
-        <translation>Επικόλληση</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -15293,13 +15295,13 @@ Latency: %2 ms</source>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="89"/>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="91"/>
         <source>Mute</source>
-        <translation>Σίγαση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="93"/>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="95"/>
         <source>Solo</source>
-        <translation>Σόλο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="129"/>
@@ -15334,7 +15336,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="258"/>
         <source>Channel %1: %2</source>
-        <translation>FX %1: %2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="258"/>
@@ -15447,7 +15449,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="569"/>
         <source>semitones</source>
-        <translation>ημιτόνια</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="574"/>
@@ -15499,7 +15501,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="635"/>
         <source>Square wave</source>
-        <translation>Τετραγωνικό κύμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="644"/>
@@ -15514,7 +15516,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="662"/>
         <source>White noise</source>
-        <translation>Λευκός θόρυβος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="670"/>
@@ -15657,7 +15659,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/Vestige/Vestige.cpp" line="881"/>
         <source>Preset</source>
-        <translation>Προκαθορισμένο</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Vestige/Vestige.cpp" line="889"/>
@@ -15711,13 +15713,13 @@ Latency: %2 ms</source>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="287"/>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="423"/>
         <source>Square wave</source>
-        <translation>Τετραγωνικό κύμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="288"/>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="429"/>
         <source>White noise</source>
-        <translation>Λευκός θόρυβος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="289"/>
@@ -15856,7 +15858,7 @@ Latency: %2 ms</source>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="689"/>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="690"/>
         <source>Volume</source>
-        <translation>Ενταση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="692"/>
@@ -16034,13 +16036,13 @@ Latency: %2 ms</source>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="879"/>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="883"/>
         <source>Normalize</source>
-        <translation>Κανονικοποίηση</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="886"/>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="890"/>
         <source>Invert</source>
-        <translation>Αντιστροφή</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="892"/>
@@ -16070,7 +16072,7 @@ Latency: %2 ms</source>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="918"/>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="922"/>
         <source>Square wave</source>
-        <translation>Τετραγωνικό κύμα</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -16088,12 +16090,12 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="69"/>
         <source>OUTPUT</source>
-        <translation>ΕΞΟΔΟΣ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="73"/>
         <source>Output gain:</source>
-        <translation>Απολαβή εξόδου:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="75"/>
@@ -16207,13 +16209,13 @@ Latency: %2 ms</source>
         <location filename="../../plugins/Xpressive/Xpressive.cpp" line="422"/>
         <location filename="../../plugins/Xpressive/Xpressive.cpp" line="427"/>
         <source>Square wave</source>
-        <translation>Τετραγωνικό κύμα</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Xpressive/Xpressive.cpp" line="429"/>
         <location filename="../../plugins/Xpressive/Xpressive.cpp" line="435"/>
         <source>White noise</source>
-        <translation>Λευκός θόρυβος</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/Xpressive/Xpressive.cpp" line="438"/>
@@ -16301,7 +16303,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="521"/>
         <source>Bandwidth:</source>
-        <translation>Εύρος ζώνης:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="523"/>
