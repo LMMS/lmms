@@ -588,7 +588,7 @@ void GigInstrument::loadSample( GigSample& sample, SampleFrame* sampleData, f_cn
 		{
 			// libgig gives 24-bit data as little endian, so we must
 			// convert if on a big endian system
-			int32_t valueLeft = swap32IfBE(
+			int32_t valueLeft = byteswapIfBE<int32_t>(
 						( pInt[ 3 * sample.sample->Channels * i ] << 8 ) |
 						( pInt[ 3 * sample.sample->Channels * i + 1 ] << 16 ) |
 						( pInt[ 3 * sample.sample->Channels * i + 2 ] << 24 ) );
@@ -603,7 +603,7 @@ void GigInstrument::loadSample( GigSample& sample, SampleFrame* sampleData, f_cn
 			}
 			else
 			{
-				int32_t valueRight = swap32IfBE(
+				int32_t valueRight = byteswapIfBE<int32_t>(
 							( pInt[ 3 * sample.sample->Channels * i + 3 ] << 8 ) |
 							( pInt[ 3 * sample.sample->Channels * i + 4 ] << 16 ) |
 							( pInt[ 3 * sample.sample->Channels * i + 5 ] << 24 ) );

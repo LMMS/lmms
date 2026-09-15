@@ -110,14 +110,14 @@ public:
 	{
 	public:
 		//! Constructor
-		explicit Header(int numTracks, tick_t ticksPerBeat = TicksPerBeat);
+		explicit Header(std::size_t numTracks, tick_t ticksPerBeat = TicksPerBeat);
 
 		//! Write header info to buffer
 		void writeToBuffer() override;
 
 	private:
 		//! Number of tracks in MIDI file
-		const int m_numTracks;
+		const std::size_t m_numTracks;
 
 		//! How many ticks each beat has
 		const tick_t m_ticksPerBeat;
@@ -232,7 +232,7 @@ public:
 	//! @brief Open data stream for writing to file and create list of tracks
 	//! @param file The file to be opened
 	//! @param numTracks Number of instrument (pattern and non-pattern) tracks
-	MidiFile(const std::filesystem::path& file, int numTracks);
+	MidiFile(const std::filesystem::path& file, std::size_t numTracks);
 
 	//! Write all data (both header and tracks) to stream
 	void writeAllToStream();

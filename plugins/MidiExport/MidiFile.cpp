@@ -42,7 +42,6 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <iostream>
 #include <stack>
 
 #include "endian_handling.h"
@@ -50,7 +49,7 @@
 namespace lmms
 {
 
-MidiFile::MidiFile(const std::filesystem::path& file, int numTracks)
+MidiFile::MidiFile(const std::filesystem::path& file, std::size_t numTracks)
 	: m_header{numTracks}
 {
 	// Open designated blank MIDI file as a data stream for writing
@@ -109,17 +108,17 @@ void MidiFile::Section::writeVarLength(std::uint32_t val)
 
 void MidiFile::Section::writeBigEndian4(std::uint32_t val)
 {
-	const auto valBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(swap32IfLE(val));
+	const auto valBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(byteswapIfLE(val));
 	writeBytes(valBigEndian);
 }
 
 void MidiFile::Section::writeBigEndian2(std::uint16_t val)
 {
-	const auto valBigEndian = std::bit_cast<std::array<std::uint8_t, 2>>(swap16IfLE(val));
+	const auto valBigEndian = std::bit_cast<std::array<std::uint8_t, 2>>(byteswapIfLE(val));
 	writeBytes(valBigEndian);
 }
 
-MidiFile::Header::Header(int numTracks, tick_t ticksPerBeat)
+MidiFile::Header::Header(std::size_t numTracks, tick_t ticksPerBeat)
 	: m_numTracks{numTracks}
 	, m_ticksPerBeat{ticksPerBeat}
 {}
@@ -136,7 +135,7 @@ void MidiFile::Header::writeToBuffer()
 	writeBytes({0, 0x01});
 
 	// Track and ticks info
-	writeBigEndian2(m_numTracks);
+	writeBigEndian2(static_cast<std::uint16_t>(m_numTracks));
 	writeBigEndian2(static_cast<std::uint16_t>(m_ticksPerBeat));
 }
 
@@ -151,14 +150,14 @@ void MidiFile::Track::addNote(std::uint8_t pitch, std::uint8_t volume,
 	double realTime, double duration)
 {
 	// Add start of note
-	tick_t time = realTime * TicksPerBeat;
+	auto time = static_cast<tick_t>(realTime * TicksPerBeat);
 	addEvent({
 		.type = Event::NoteOn,
 		.note = {.pitch = pitch, .volume = volume}
 	}, time);
 
 	// Add end of note
-	time = (realTime + duration) * TicksPerBeat;
+	time = static_cast<tick_t>((realTime + duration) * TicksPerBeat);
 	addEvent({
 		.type = Event::NoteOff,
 		.note = {.pitch = pitch, .volume = volume}
@@ -196,7 +195,7 @@ void MidiFile::Track::writeToBuffer()
 
 	// Write correct size in placeholder place
 	const auto size = static_cast<std::uint32_t>(m_buffer.size() - idx);
-	const auto sizeBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(swap32IfLE(size));
+	const auto sizeBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(byteswapIfLE(size));
 	for (std::size_t i = 0; i < 4; ++i)
 	{
 		m_buffer[idx - 4 + i] = sizeBigEndian[i];
@@ -219,12 +218,8 @@ void MidiFile::Track::writeEventsToBuffer()
 	tick_t timeLast = 0;
 	for (Event& event : m_events)
 	{
-		// If something went wrong on sorting, maybe?
-		if (event.time < timeLast)
-		{
-			std::cerr << "MidiExport: error: event.time=" << event.time << ", timeLast=" << timeLast << '\n';
-			assert(false);
-		}
+		assert(event.time >= timeLast);
+
 		auto tmp = event.time;
 		event.time -= timeLast;
 		timeLast = tmp;
@@ -266,7 +261,7 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 
 			// Convert to microseconds before writing
 			const auto usec = static_cast<std::uint32_t>(6e7 / event.tempo);
-			const auto usecBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(swap32IfLE(usec));
+			const auto usecBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(byteswapIfLE(usec));
 			writeBytes({usecBigEndian[1], usecBigEndian[2], usecBigEndian[3]});
 			break;
 		}

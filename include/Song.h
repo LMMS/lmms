@@ -26,7 +26,6 @@
 #define LMMS_SONG_H
 
 #include <array>
-#include <filesystem>
 #include <memory>
 
 #include <QString>
@@ -40,6 +39,8 @@
 #include "Timeline.h"
 #include "TrackContainer.h"
 #include "VstSyncController.h"
+
+#include <filesystem> // QTBUG-73263
 
 namespace lmms
 {
