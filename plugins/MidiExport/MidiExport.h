@@ -4,6 +4,7 @@
  * Copyright (c) 2015 Mohamed Abdel Maksoud <mohamed at amaksoud.com>
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
  * Copyright (c) 2020 EmoonX
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -53,15 +54,15 @@ private:
 		std::uint8_t volume = 0;
 
 		//! Absolute time (from song start) when the note starts playing
-		int time = 0;
+		tick_t time = 0;
 
 		//! For how long the note plays
-		int duration = 0;
+		tick_t duration = 0;
 
 		Type type = Type::Regular;
 
 		//! Sort notes by time
-		bool operator<(const Note& b) const
+		bool operator<(const Note& b) const noexcept
 		{
 			return time < b.time;
 		}
@@ -77,17 +78,17 @@ private:
 	public:
 		//! Append notes from root node to clip
 		void write(const QDomNode& root,
-			int basePitch, double baseVolume, int baseTime);
+			int basePitch, double baseVolume, tick_t baseTime);
 
 		//! Adjust special duration pattern clip notes by resizing them accordingly
-		void processPatternNotes(int cutPos);
+		void processPatternNotes(tick_t cutPos);
 
 		//! Add clip notes to MIDI file track
 		void writeToTrack(MidiFile::Track& midiTrack) const;
 
 		//! Write sorted notes to a explicitly repeating pattern clip
 		void writeToPattern(Clip& patternClip,
-			int len, int base, int start, int end);
+			tick_t len, tick_t base, tick_t start, tick_t end);
 	};
 
 	//! Current (incremental) track channel number for non drum tracks
@@ -97,7 +98,7 @@ private:
 	DataFile m_dataFile = DataFile(DataFile::Type::SongProject);
 
 	//! Matrix containing (start, end) pairs for pattern objects
-	std::vector<std::vector<std::pair<int, int>>> m_plists;
+	std::vector<std::vector<std::pair<tick_t, tick_t>>> m_plists;
 
 public:
 	//! Explicit constructor for setting plugin descriptor
@@ -115,15 +116,15 @@ public:
 	static constexpr int DefaultBeatLength = 1500;
 
 	//! @brief Export tracks from a project to a .mid extension MIDI file
-	//! @param tracks Normal instrument tracks
+	//! @param tracks Song tracks
 	//! @param patternStoreTracks PatternStore tracks
 	//! @param tempo Song global tempo
 	//! @param masterPitch Song master pitch
-	//! @param filename Name of file to be saved
+	//! @param filePath The path of the exported file
 	//! @return If operation was successful
 	bool tryExport(const TrackContainer::TrackList& tracks,
 		const TrackContainer::TrackList& patternStoreTracks,
-		int tempo, int masterPitch, const QString& filename) override;
+		int tempo, int masterPitch, const std::filesystem::path& filePath) override;
 
 private:
 	//! Process a given instrument track

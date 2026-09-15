@@ -4,6 +4,7 @@
  * Copyright (c) 2015 Mohamed Abdel Maksoud <mohamed at amaksoud.com>
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
  * Copyright (c) 2020 EmoonX
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -66,7 +67,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
 } // extern "C"
 
 void MidiExport::Clip::write(const QDomNode& root,
-	int basePitch, double baseVolume, int baseTime)
+	int basePitch, double baseVolume, tick_t baseTime)
 {
 	// TODO: interpret steps="12" muted="0" type="1" name="Piano1" len="259"
 	for (QDomNode node = root.firstChild(); !node.isNull();
@@ -85,7 +86,7 @@ void MidiExport::Clip::write(const QDomNode& root,
 		auto note = Note {
 			.pitch = std::clamp<std::uint8_t>(pitch, 0, 127),
 			.volume = std::min<std::uint8_t>(std::lround(volume), 127),
-			.time = baseTime + element.attribute("pos", "0").toInt(),
+			.time = baseTime + std::max(element.attribute("pos", "0").toInt(), 0),
 			.duration = element.attribute("len", "0").toInt(),
 			.type = static_cast<Note::Type>(element.attribute("type", "0").toInt())
 		};
@@ -104,13 +105,13 @@ void MidiExport::Clip::writeToTrack(MidiFile::Track& midiTrack) const
 	}
 }
 
-void MidiExport::Clip::processPatternNotes(int cutPos)
+void MidiExport::Clip::processPatternNotes(tick_t cutPos)
 {
 	// Sort in reverse order
 	std::sort(m_notes.rbegin(), m_notes.rend());
 
-	int cur = INT_MAX;
-	int next = INT_MAX;
+	tick_t cur = std::numeric_limits<tick_t>::max();
+	tick_t next = std::numeric_limits<tick_t>::max();
 	for (Note& note : m_notes)
 	{
 		if (note.time < cur)
@@ -123,13 +124,13 @@ void MidiExport::Clip::processPatternNotes(int cutPos)
 		{
 			// Note should have positive duration that neither
 			// overlaps next one nor exceeds cutPos
-			note.duration = qMin(qMin(DefaultBeatLength, next - cur), cutPos - note.time);
+			note.duration = std::min(std::min(DefaultBeatLength, next - cur), cutPos - note.time);
 		}
 	}
 }
 
 void MidiExport::Clip::writeToPattern(Clip& patternClip,
-	int len, int base, int start, int end)
+	tick_t len, tick_t base, tick_t start, tick_t end)
 {
 	// Avoid misplaced start and end positions
 	if (start >= end) { return; }
@@ -143,8 +144,8 @@ void MidiExport::Clip::writeToPattern(Clip& patternClip,
 	{
 		// Insert periodically repeating notes from <t0> and spaced
 		// by <len> to mimic pattern clip behavior
-		int t0 = note.time + std::ceil((start - note.time) / len) * len;
-		for (int time = t0;	time < end; time += len)
+		tick_t t0 = note.time + std::ceil((start - note.time) / len) * len;
+		for (tick_t time = t0; time < end; time += len)
 		{
 			note.time = base + time;
 			patternClip.m_notes.push_back(note);
@@ -158,7 +159,7 @@ MidiExport::MidiExport()
 
 bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 	const TrackContainer::TrackList& patternStoreTracks,
-	int tempo, int masterPitch, const QString& filename)
+	int tempo, int masterPitch, const std::filesystem::path& filePath)
 {
 	// Count number of instrument (and PatternStore) tracks
 	const auto numTracks = std::ranges::count_if(tracks, [](const Track* t) {
@@ -166,7 +167,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 	}) + patternStoreTracks.size();
 
 	// Write header info
-	auto file = MidiFile(filename, numTracks);
+	auto file = MidiFile(filePath, numTracks);
 	file.m_header.writeToBuffer();
 
 	// Iterate through "normal" tracks
@@ -255,7 +256,7 @@ void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
 		if (!isPattern)
 		{
 			// Base time == initial position
-			int baseTime = clipElem.attribute("pos", "0").toInt();
+			tick_t baseTime = std::max(clipElem.attribute("pos", "0").toInt(), 0);
 
 			// Write track notes to clip
 			clip.write(clipNode, basePitch, baseVolume, baseTime);
@@ -283,15 +284,15 @@ void MidiExport::writePatternClip(Clip& clip, const QDomElement& clipElem,
 	std::uint8_t patternIdx, MidiFile::Track& midiTrack)
 {
 	// Workaround for nested PatternClips
-	int pos = 0;
-	int len = 12 * clipElem.attribute("steps", "1").toInt();
+	tick_t pos = 0;
+	tick_t len = 12 * clipElem.attribute("steps", "1").toInt();
 
 	// Iterate through PatternClip pairs of current list
 	// TODO: This *may* need some corrections?
-	const std::vector<std::pair<int,int>>& plist = m_plists.at(patternIdx);
-	std::stack<std::pair<int, int>> st;
+	const std::vector<std::pair<tick_t, tick_t>>& plist = m_plists.at(patternIdx);
+	std::stack<std::pair<tick_t, tick_t>> st;
 	Clip patternClip;
-	for (const std::pair<int, int>& p : plist)
+	for (const std::pair<tick_t, tick_t>& p : plist)
 	{
 		while (!st.empty() && st.top().second <= p.first)
 		{
@@ -329,14 +330,14 @@ void MidiExport::processPatternTrack(Track& track)
 	QDomElement root = patternTrack.saveState(m_dataFile, m_dataFile.content());
 
 	// Build lists of (start, end) pairs from pattern clip note objects
-	std::vector<std::pair<int, int>> plist;
+	std::vector<std::pair<tick_t, tick_t>> plist;
 	for (QDomNode patternClipNode = root.firstChildElement("patternclip");
 		!patternClipNode.isNull();
 		patternClipNode = patternClipNode.nextSiblingElement("patternclip"))
 	{
 		QDomElement patternClipElem = patternClipNode.toElement();
-		int start = patternClipElem.attribute("pos", "0").toInt();
-		int end = start + patternClipElem.attribute("len", "0").toInt();
+		tick_t start = std::max(patternClipElem.attribute("pos", "0").toInt(), 0);
+		tick_t end = start + patternClipElem.attribute("len", "0").toInt();
 		plist.emplace_back(start, end);
 	}
 

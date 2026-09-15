@@ -26,6 +26,7 @@
 #define LMMS_SONG_H
 
 #include <array>
+#include <filesystem>
 #include <memory>
 
 #include <QString>
@@ -308,7 +309,7 @@ public:
 		return m_tempoModel;
 	}
 
-	void exportProjectMidi(QString const & exportFileName) const;
+	void exportProjectMidi(const std::filesystem::path& filePath) const;
 
 	inline void setLoadOnLaunch(bool value) { m_loadOnLaunch = value; }
 	SaveOptions &getSaveOptions() {

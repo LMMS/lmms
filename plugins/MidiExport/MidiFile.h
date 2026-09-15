@@ -4,6 +4,7 @@
  * Copyright (c) 2009 Mark Conway Wirt <emergentmusics) at (gmail . com>
  * Copyright (c) 2015 Mohamed Abdel Maksoud <mohamed at amaksoud.com>
  * Copyright (c) 2020 EmoonX
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file was originally based on the Python module MidiFile.py from MIDIUtil
  * by Mark Conway Wirt, which was later rewritten in C++ by Mohamed Abdel Maksoud.
@@ -39,14 +40,15 @@
 #ifndef LMMS_MIDI_FILE_H
 #define LMMS_MIDI_FILE_H
 
+#include <cstddef>
+#include <filesystem>
+#include <fstream>
 #include <initializer_list>
 #include <span>
 #include <string>
 #include <vector>
 
-#include <QDataStream>
-#include <QFile>
-#include <QString>
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -56,10 +58,10 @@ class MidiFile
 {
 public:
 	//! Default number of ticks per single beat
-	static constexpr int TICKS_PER_BEAT = 128;
+	static constexpr tick_t TicksPerBeat = 128;
 
 	//! Maximum size of buffers used for each section
-	static constexpr size_t BUFFER_SIZE = 50 * 1024;
+	static constexpr std::size_t BufferSize = 50 * 1024;
 
 private:
 	//! Base class for sections of MIDI file
@@ -73,7 +75,7 @@ private:
 		std::vector<std::uint8_t> m_buffer;
 
 	protected:
-		//! Reserve constant space for @ref BUFFER_SIZE capacity vector
+		//! Reserve constant space for @ref BufferSize capacity vector
 		Section();
 
 		//! @brief Write bytes to vector (or buffer by default)
@@ -112,19 +114,19 @@ public:
 	//! Represents MIDI header info
 	class Header : public Section
 	{
+	public:
+		//! Constructor
+		explicit Header(int numTracks, tick_t ticksPerBeat = TicksPerBeat);
+
+		//! Write header info to buffer
+		void writeToBuffer() override;
+
 	private:
 		//! Number of tracks in MIDI file
 		const int m_numTracks;
 
 		//! How many ticks each beat has
-		const int m_ticksPerBeat;
-
-	public:
-		//! Constructor
-		Header(int numTracks, int ticksPerBeat = TICKS_PER_BEAT);
-
-		//! Write header info to buffer
-		void writeToBuffer() override;
+		const tick_t m_ticksPerBeat;
 	};
 
 private:
@@ -141,7 +143,7 @@ private:
 		Type type = Type::NoteOn;
 
 		//! Time count when event happens
-		int time = 0; // FIXME: was std::uint32_t
+		tick_t time = 0;
 
 		//! Channel number where event is
 		std::uint8_t channel = 0;
@@ -173,7 +175,7 @@ private:
 
 		//! @brief Comparison operator
 		//! Events are sorted by their time (or, in case of tie, type priority)
-		bool operator<(const Event& b) const
+		bool operator<(const Event& b) const noexcept
 		{
 			if (time < b.time) { return true; }
 			return (time == b.time && type > b.type);
@@ -196,20 +198,20 @@ public:
 			double realTime, double duration);
 
 		//! Add a tempo mark
-		void addTempo(std::uint32_t tempo, std::uint32_t time);
+		void addTempo(std::uint32_t tempo, tick_t time);
 
 		//! Add a program (patch) change event
-		void addProgramChange(std::uint8_t prog, std::uint32_t time);
+		void addProgramChange(std::uint8_t prog, tick_t time);
 
 		//! Add a track name event
-		void addName(const std::string& name, std::uint32_t time);
+		void addName(std::string name, tick_t time);
 
 		//! Write MIDI track to buffer
 		void writeToBuffer();
 
 	private:
 		//! Append a single event to vector
-		void addEvent(Event event, std::uint32_t time);
+		void addEvent(Event&& event, tick_t time);
 
 		//! Write the meta data and note data to buffer
 		void writeMIDIToBuffer();
@@ -227,14 +229,6 @@ public:
 		std::uint8_t m_channel = 0;
 	};
 
-private:
-	//! Qt file to be opened
-	QFile m_file;
-
-	//! Write-only Qt data stream
-	QDataStream m_stream;
-
-public:
 	//! The sole file header
 	Header m_header;
 
@@ -242,12 +236,16 @@ public:
 	std::vector<Track> m_tracks;
 
 	//! @brief Open data stream for writing to file and create list of tracks
-	//! @param filename Name of file to be opened
+	//! @param file The file to be opened
 	//! @param numTracks Number of instrument (pattern and non-pattern) tracks
-	MidiFile(const QString& filename, int numTracks);
+	MidiFile(const std::filesystem::path& file, int numTracks);
 
 	//! Write all data (both header and tracks) to stream
 	void writeAllToStream();
+
+private:
+	//! Write-only data stream
+	std::ofstream m_stream;
 };
 
 } // namespace lmms

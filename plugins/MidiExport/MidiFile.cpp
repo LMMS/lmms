@@ -4,6 +4,7 @@
  * Copyright (c) 2009 Mark Conway Wirt <emergentmusics) at (gmail . com>
  * Copyright (c) 2015 Mohamed Abdel Maksoud <mohamed at amaksoud.com>
  * Copyright (c) 2020 EmoonX
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file was originally based on the Python module MidiFile.py from MIDIUtil
  * by Mark Conway Wirt, which was later rewritten in C++ by Mohamed Abdel Maksoud.
@@ -39,25 +40,19 @@
 #include "MidiFile.h"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
+#include <iostream>
 #include <stack>
-#include <string>
-#include <vector>
-
-#include <QDataStream>
-#include <QFile>
-#include <QString>
 
 namespace lmms
 {
 
-MidiFile::MidiFile(const QString& filename, int numTracks)
-	: m_file{filename}
-	, m_header{numTracks}
+MidiFile::MidiFile(const std::filesystem::path& file, int numTracks)
+	: m_header{numTracks}
 {
-	// Open designated blank MIDI file (and data stream) for writing
-	m_file.open(QIODevice::WriteOnly);
-	m_stream.setDevice(&m_file);
+	// Open designated blank MIDI file as a data stream for writing
+	m_stream.open(file, std::ios_base::binary);
 
 	// Resize track list
 	m_tracks.resize(numTracks);
@@ -65,23 +60,17 @@ MidiFile::MidiFile(const QString& filename, int numTracks)
 
 void MidiFile::writeAllToStream()
 {
-	m_stream.writeRawData(
-		reinterpret_cast<char*>(m_header.m_buffer.data()),
-		m_header.m_buffer.size()
-	);
+	m_stream.write(reinterpret_cast<const char*>(m_header.m_buffer.data()), m_header.m_buffer.size());
 
-	for (Track& track : m_tracks)
+	for (const Track& track : m_tracks)
 	{
-		m_stream.writeRawData(
-			reinterpret_cast<char*>(track.m_buffer.data()),
-			track.m_buffer.size()
-		);
+		m_stream.write(reinterpret_cast<const char*>(track.m_buffer.data()), track.m_buffer.size());
 	}
 }
 
 MidiFile::Section::Section()
 {
-	m_buffer.reserve(BUFFER_SIZE);
+	m_buffer.reserve(BufferSize);
 }
 
 void MidiFile::Section::writeBytes(std::span<const std::uint8_t> bytes,
@@ -122,24 +111,28 @@ void MidiFile::Section::writeVarLength(std::uint32_t val)
 void MidiFile::Section::writeBigEndian4(std::uint32_t val,
 	std::vector<std::uint8_t>* v)
 {
-	std::vector<std::uint8_t> bytes;
-	bytes.push_back(val >> 24);
-	bytes.push_back((val >> 16) & 0xff);
-	bytes.push_back((val >> 8) & 0xff);
-	bytes.push_back(val & 0xff);
+	auto bytes = std::array {
+		static_cast<std::uint8_t>(val >> 24),
+		static_cast<std::uint8_t>((val >> 16) & 0xff),
+		static_cast<std::uint8_t>((val >> 8) & 0xff),
+		static_cast<std::uint8_t>(val & 0xff)
+	};
+
 	writeBytes(bytes, v);
 }
 
 void MidiFile::Section::writeBigEndian2(std::uint16_t val,
 	std::vector<std::uint8_t>* v)
 {
-	std::vector<std::uint8_t> bytes;
-	bytes.push_back(val >> 8);
-	bytes.push_back(val & 0xff);
+	auto bytes = std::array {
+		static_cast<std::uint8_t>(val >> 8),
+		static_cast<std::uint8_t>(val & 0xff)
+	};
+
 	writeBytes(bytes, v);
 }
 
-MidiFile::Header::Header(int numTracks, int ticksPerBeat)
+MidiFile::Header::Header(int numTracks, tick_t ticksPerBeat)
 	: m_numTracks{numTracks}
 	, m_ticksPerBeat{ticksPerBeat}
 {}
@@ -157,57 +150,47 @@ void MidiFile::Header::writeToBuffer()
 
 	// Track and ticks info
 	writeBigEndian2(m_numTracks);
-	writeBigEndian2(m_ticksPerBeat);
+	writeBigEndian2(static_cast<std::uint16_t>(m_ticksPerBeat));
 }
 
-void MidiFile::Track::addEvent(Event event, std::uint32_t time)
+void MidiFile::Track::addEvent(Event&& event, tick_t time)
 {
 	event.time = time;
 	event.channel = m_channel;
-	m_events.push_back(event);
+	m_events.push_back(std::move(event));
 }
 
 void MidiFile::Track::addNote(std::uint8_t pitch, std::uint8_t volume,
 	double realTime, double duration)
 {
-	Event event;
-	event.note.volume = volume;
-
 	// Add start of note
-	event.type = Event::NoteOn;
-	event.note.pitch = pitch;
-	std::uint32_t time = realTime * TICKS_PER_BEAT;
-	addEvent(event, time);
+	tick_t time = realTime * TicksPerBeat;
+	addEvent({
+		.type = Event::NoteOn,
+		.note = {.pitch = pitch, .volume = volume}
+	}, time);
 
 	// Add end of note
-	event.type = Event::NoteOff;
-	event.note.pitch = pitch;
-	time = (realTime + duration) * TICKS_PER_BEAT;
-	addEvent(event, time);
+	time = (realTime + duration) * TicksPerBeat;
+	addEvent({
+		.type = Event::NoteOff,
+		.note = {.pitch = pitch, .volume = volume}
+	}, time);
 }
 
-void MidiFile::Track::addTempo(std::uint32_t tempo, std::uint32_t time)
+void MidiFile::Track::addTempo(std::uint32_t tempo, tick_t time)
 {
-	Event event;
-	event.type = Event::Tempo;
-	event.tempo = tempo;
-	addEvent(event, time);
+	addEvent({.type = Event::Tempo, .tempo = tempo}, time);
 }
 
-void MidiFile::Track::addProgramChange(std::uint8_t prog, std::uint32_t time)
+void MidiFile::Track::addProgramChange(std::uint8_t prog, tick_t time)
 {
-	Event event;
-	event.type = Event::ProgramChange;
-	event.programNumber = prog;
-	addEvent(event, time);
+	addEvent({.type = Event::ProgramChange, .programNumber = prog}, time);
 }
 
-void MidiFile::Track::addName(const std::string& name, std::uint32_t time)
+void MidiFile::Track::addName(std::string name, tick_t time)
 {
-	Event event;
-	event.type = Event::TrackName;
-	event.trackName = name;
-	addEvent(event, time);
+	addEvent({.type = Event::TrackName, .trackName = std::move(name)}, time);
 }
 
 void MidiFile::Track::writeToBuffer()
@@ -225,6 +208,7 @@ void MidiFile::Track::writeToBuffer()
 	// Write correct size in placeholder place
 	std::size_t size = m_buffer.size() - idx;
 	std::vector<std::uint8_t> v;
+	v.reserve(4);
 	writeBigEndian4(size, &v);
 	for (std::size_t i = 0; i < 4; ++i)
 	{
@@ -247,13 +231,13 @@ void MidiFile::Track::writeEventsToBuffer()
 	std::vector<Event> eventsSorted = m_events;
 	std::sort(eventsSorted.begin(), eventsSorted.end());
 
-	int timeLast = 0;
+	tick_t timeLast = 0;
 	for (Event& event : eventsSorted)
 	{
 		// If something went wrong on sorting, maybe?
 		if (event.time < timeLast)
 		{
-			std::fprintf(stderr, "error: event.m_time=%d timeLast=%d\n", event.time, timeLast);
+			std::cerr << "MidiExport: error: event.time=" << event.time << ", timeLast=" << timeLast << '\n';
 			assert(false);
 		}
 		auto tmp = event.time;
@@ -264,7 +248,7 @@ void MidiFile::Track::writeEventsToBuffer()
 		writeSingleEventToBuffer(event);
 
 		// In case of exceding maximum size, go away
-		if (m_buffer.size() >= BUFFER_SIZE) { break; }
+		if (m_buffer.size() >= BufferSize) { break; }
 	}
 }
 
@@ -273,7 +257,6 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 	// First of all, write event time
 	writeVarLength(event.time);
 
-	std::vector<std::uint8_t> fourBytes;
 	switch (event.type)
 	{
 		case MidiFile::Event::NoteOn:
@@ -297,6 +280,8 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 			writeBytes({code, 0x51, 0x03});
 
 			// Convert to microseconds before writing
+			std::vector<std::uint8_t> fourBytes;
+			fourBytes.reserve(4);
 			writeBigEndian4(6e7 / event.tempo, &fourBytes);
 			writeBytes({fourBytes[1], fourBytes[2], fourBytes[3]});
 			break;
