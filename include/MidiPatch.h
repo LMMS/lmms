@@ -38,8 +38,18 @@ struct MidiPatch
 	//! 7-bit program
 	std::uint8_t program = 0;
 
-	constexpr auto bankMSB() const -> std::uint8_t { return (bank >> 7) & 0x7F; }
-	constexpr auto bankLSB() const -> std::uint8_t { return bank & 0x7F; }
+	constexpr auto bankMSB() const noexcept -> std::uint8_t { return (bank >> 7) & 0x7F; }
+	constexpr auto bankLSB() const noexcept -> std::uint8_t { return bank & 0x7F; }
+
+	constexpr void setBankMSB(std::uint8_t value) noexcept
+	{
+		bank = ((static_cast<std::uint16_t>(value) & 0x7F) << 7) | (bank & 0x7F);
+	}
+
+	constexpr void setBankLSB(std::uint8_t value) noexcept
+	{
+		bank = (bank & 0x3F80) | (value & 0x7F);
+	}
 };
 
 } // namespace lmms

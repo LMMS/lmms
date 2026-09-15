@@ -39,6 +39,7 @@
 #include "AutomationClip.h"
 #include "ConfigManager.h"
 #include "MidiClip.h"
+#include "MidiPatch.h"
 #include "Instrument.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -194,6 +195,7 @@ public:
 	bool isSF2 = false;
 	bool hasNotes = false;
 	QString trackName;
+	MidiPatch currentPatch;
 
 	smfMidiChannel* create(TrackContainer* tc, QString tn)
 	{
@@ -213,10 +215,12 @@ public:
 				auto bank = it_inst->childModel("bank");
 				assert(bank != nullptr);
 				bank->setValue(0);
+				currentPatch.bank = 0;
 
 				auto patch = it_inst->childModel("patch");
 				assert(patch != nullptr);
 				patch->setValue(0);
+				currentPatch.program = 0;
 			}
 			else { it_inst = it->loadInstrument("patman"); }
 #else
@@ -476,8 +480,9 @@ bool MidiImport::readSMF(TrackContainer* tc)
 								{
 									modelObject = ch->it_inst->childModel("bank");
 									assert(modelObject != nullptr);
-									printf("BANK SELECT %f %d\n", cc, static_cast<int>(cc * 127));
-									cc *= 127.0f;
+									printf("BANK SELECT (MSB) %f %d\n", cc, static_cast<int>(cc * 127));
+									ch->currentPatch.setBankMSB(static_cast<std::uint8_t>(cc * 127));
+									cc = static_cast<double>(ch->currentPatch.bank);
 								}
 								break;
 
@@ -489,6 +494,17 @@ bool MidiImport::readSMF(TrackContainer* tc)
 							case 10:
 								modelObject = ch->it->panningModel();
 								cc = cc * 200.f - 100.0f;
+								break;
+
+							case 32:
+								if (ch->isSF2 && ch->it_inst)
+								{
+									modelObject = ch->it_inst->childModel("bank");
+									assert(modelObject != nullptr);
+									printf("BANK SELECT (LSB) %f %d\n", cc, static_cast<int>(cc * 127));
+									ch->currentPatch.setBankLSB(static_cast<std::uint8_t>(cc * 127));
+									cc = static_cast<double>(ch->currentPatch.bank);
+								}
 								break;
 
 							case 128:
@@ -552,10 +568,12 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			auto bank = c.second.it_inst->childModel("bank");
 			assert(bank != nullptr);
 			bank->setValue(128);
+			c.second.currentPatch.bank = 128;
 
 			auto patch = c.second.it_inst->childModel("patch");
 			assert(patch != nullptr);
 			patch->setValue(0);
+			c.second.currentPatch.program = 0;
 		}
 	}
 

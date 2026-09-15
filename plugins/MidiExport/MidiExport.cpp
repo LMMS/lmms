@@ -210,12 +210,11 @@ void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
 	// Note that this only works decently if the current bank is a GM 1~128 one
 	// (which would be needed as the default either way for successful import).
 	// Pattern tracks are always bank 128 (see MidiImport), patch 0.
-	auto patch = instTrack.instrument()->midiPatch().value_or(MidiPatch{.bank = 0, .program = 0});
+	auto patch = instTrack.instrument()->midiPatch().value_or(MidiPatch{});
 	if (patch.bank == 128)
 	{
 		// Drum track, so set its channel to 10
 		midiTrack.setChannel(9);
-		patch.program = 0;
 	}
 	else
 	{
@@ -227,10 +226,10 @@ void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
 		m_channel %= 16; // TODO: Give user option for how to handle wrap around?
 	}
 
-	// Add info about tempo, track name, and program
+	// Add info about tempo, track name, bank select, and program change
 	midiTrack.addTempo(tempo, 0);
 	midiTrack.addName(track.name().toStdString(), 0);
-	midiTrack.addProgramChange(patch.program, 0);
+	midiTrack.addPatch(patch, 0);
 
 	// ---- Instrument track ---- //
 	QDomNode trackNode = root.firstChildElement("instrumenttrack");

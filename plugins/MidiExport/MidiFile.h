@@ -49,6 +49,7 @@
 #include <vector>
 
 #include "LmmsTypes.h"
+#include "MidiPatch.h"
 
 namespace lmms
 {
@@ -129,7 +130,7 @@ private:
 		//! Possible event types, ordered from most important to least important
 		enum class Type
 		{
-			NoteOn, NoteOff, Tempo, ProgramChange, TrackName
+			NoteOn, NoteOff, Tempo, BankSelectMSB, BankSelectLSB, ProgramChange, TrackName
 		};
 		using enum Type;
 
@@ -156,10 +157,10 @@ private:
 			note;
 
 			//! Tempo of event (in BPM)
-			std::uint32_t tempo;
+			std::uint32_t tempo = 0;
 
-			//! Program (patch) number of instrument
-			std::uint8_t programNumber = 0;
+			//! Bank select and program change
+			MidiPatch patch;
 		};
 
 		//! Name of track where event is
@@ -193,8 +194,8 @@ public:
 		//! Add a tempo mark
 		void addTempo(std::uint32_t tempo, tick_t time);
 
-		//! Add a program (patch) change event
-		void addProgramChange(std::uint8_t prog, tick_t time);
+		//! Add bank select and program change events
+		void addPatch(MidiPatch patch, tick_t time);
 
 		//! Add a track name event
 		void addName(std::string name, tick_t time);

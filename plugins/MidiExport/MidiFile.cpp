@@ -170,9 +170,11 @@ void MidiFile::Track::addTempo(std::uint32_t tempo, tick_t time)
 	addEvent({.type = Event::Tempo, .tempo = tempo}, time);
 }
 
-void MidiFile::Track::addProgramChange(std::uint8_t prog, tick_t time)
+void MidiFile::Track::addPatch(MidiPatch patch, tick_t time)
 {
-	addEvent({.type = Event::ProgramChange, .programNumber = prog}, time);
+	addEvent({.type = Event::BankSelectMSB, .patch = patch}, time);
+	addEvent({.type = Event::BankSelectLSB, .patch = patch}, time);
+	addEvent({.type = Event::ProgramChange, .patch = patch}, time);
 }
 
 void MidiFile::Track::addName(std::string name, tick_t time)
@@ -212,12 +214,10 @@ void MidiFile::Track::writeMIDIToBuffer()
 
 void MidiFile::Track::writeEventsToBuffer()
 {
-	// Create sorted vector of events
-	std::vector<Event> eventsSorted = m_events;
-	std::sort(eventsSorted.begin(), eventsSorted.end());
+	std::sort(m_events.begin(), m_events.end());
 
 	tick_t timeLast = 0;
-	for (Event& event : eventsSorted)
+	for (Event& event : m_events)
 	{
 		// If something went wrong on sorting, maybe?
 		if (event.time < timeLast)
@@ -247,14 +247,14 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 		case MidiFile::Event::NoteOn:
 		{
 			// A note starts playing
-			std::uint8_t code = (0x9 << 4) | m_channel;
+			std::uint8_t code = 0x90 | m_channel;
 			writeBytes({code, event.note.pitch, event.note.volume});
 			break;
 		}
 		case MidiFile::Event::NoteOff:
 		{
 			// A note finishes playing
-			std::uint8_t code = (0x8 << 4) | m_channel;
+			std::uint8_t code = 0x80 | m_channel;
 			writeBytes({code, event.note.pitch, event.note.volume});
 			break;
 		}
@@ -270,11 +270,22 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 			writeBytes({usecBigEndian[1], usecBigEndian[2], usecBigEndian[3]});
 			break;
 		}
+		case MidiFile::Event::BankSelectMSB:
+		{
+			// Bank select (MSB)
+			writeBytes({static_cast<std::uint8_t>(0xB0 | m_channel), 0x00, event.patch.bankMSB()});
+			break;
+		}
+		case MidiFile::Event::BankSelectLSB:
+		{
+			// Bank select (LSB)
+			writeBytes({static_cast<std::uint8_t>(0xB0 | m_channel), 0x20, event.patch.bankLSB()});
+			break;
+		}
 		case MidiFile::Event::ProgramChange:
 		{
-			// Change patch number
-			std::uint8_t code = (0xC << 4) | m_channel;
-			writeBytes({code, event.programNumber});
+			// Program change
+			writeBytes({static_cast<std::uint8_t>(0xC0 | m_channel), event.patch.program});
 			break;
 		}
 		case MidiFile::Event::TrackName:
