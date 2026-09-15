@@ -78,6 +78,9 @@ public:
 		m_okay = _state;
 	}
 
+	//! @returns true if the processing outputted corrupted audio (infs/nans).
+	bool isCorrupted() const { return m_corrupted.load(std::memory_order_relaxed); }
+
 	//! "Awake" means the effect has not been put to sleep by auto-quit
 	bool isAwake() const
 	{
@@ -197,6 +200,7 @@ private:
 	bool m_okay;
 	bool m_noRun;
 	bool m_awake;
+	std::atomic<bool> m_corrupted = false;
 
 	//! The number of consecutive periods where output buffers remain below the silence threshold
 	f_cnt_t m_quietBufferCount = 0;

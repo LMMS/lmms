@@ -65,10 +65,12 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	lfoPhaseKnob->setHintText( tr( "Phase:" ) , " degrees" );
 
 	auto feedbackKnob = new VolumeKnob(KnobType::Bright26, tr("FDBK"), this);
+	feedbackKnob->setZeroDbfsPoint(1.f);
 	feedbackKnob->setModel( &controls->m_feedbackModel );
 	feedbackKnob->setHintText( tr( "Feedback amount:" ) , "" );
 
 	auto whiteNoiseKnob = new VolumeKnob(KnobType::Bright26, tr("NOISE"), this);
+	whiteNoiseKnob->setZeroDbfsPoint(1.f);
 	whiteNoiseKnob->setModel( &controls->m_whiteNoiseAmountModel );
 	whiteNoiseKnob->setHintText( tr( "White noise amount:" ) , "" );
 
