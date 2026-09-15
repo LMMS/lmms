@@ -1395,7 +1395,7 @@ void Song::restoreKeymapStates(const QDomElement &element)
 }
 
 
-void Song::exportProjectMidi(QString const & exportFileName) const
+void Song::exportProjectMidi(const std::filesystem::path& filePath) const
 {
 	// instantiate midi export plugin
 	TrackContainer::TrackList const & tracks = this->tracks();
@@ -1404,7 +1404,7 @@ void Song::exportProjectMidi(QString const & exportFileName) const
 	ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", nullptr, nullptr));
 	if (exf)
 	{
-		exf->tryExport(tracks, patternStoreTracks, getTempo(), m_masterPitchModel.value(), exportFileName);
+		exf->tryExport(tracks, patternStoreTracks, getTempo(), m_masterPitchModel.value(), filePath);
 	}
 	else
 	{
