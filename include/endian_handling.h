@@ -25,34 +25,59 @@
 #ifndef LMMS_ENDIAN_HANDLING_H
 #define LMMS_ENDIAN_HANDLING_H
 
-#include <cstdint>
-#include <QSysInfo>
+#include <bit>
+#include <type_traits>
 
+namespace lmms {
 
-namespace lmms
+constexpr bool isLittleEndian() noexcept
 {
-
-
-inline bool isLittleEndian()
-{
-	return( QSysInfo::ByteOrder == QSysInfo::LittleEndian );
+	return std::endian::native == std::endian::little;
 }
 
-
-inline int16_t swap16IfBE( int16_t i )
+template<typename Int16>
+	requires (sizeof(Int16) == 2 && std::is_integral_v<Int16>)
+constexpr Int16 swap16IfBE(Int16 i) noexcept
 {
-	return( isLittleEndian() ? i : ( ( i & 0xFF ) << 8) | ( ( i >> 8 ) & 0xFF ) );
+	if constexpr (isLittleEndian()) { return i; }
+	else { return ((i & 0xFF) << 8) | ((i >> 8) & 0xFF); }
 }
 
-
-inline int32_t swap32IfBE( int32_t i )
+template<typename Int32>
+	requires (sizeof(Int32) == 4 && std::is_integral_v<Int32>)
+constexpr Int32 swap32IfBE(Int32 i) noexcept
 {
-	return( isLittleEndian() ? i : ( ( i & 0xff000000 ) >> 24 ) |
-					( ( i & 0x00ff0000 ) >> 8 )  |
-					( ( i & 0x0000ff00 ) << 8 )  |
-					( ( i & 0x000000ff ) << 24 ) );
+	if constexpr (isLittleEndian()) { return i; }
+	else
+	{
+		return ((i & 0xff000000) >> 24)
+		     | ((i & 0x00ff0000) >> 8)
+		     | ((i & 0x0000ff00) << 8)
+		     | ((i & 0x000000ff) << 24);
+	}
 }
 
+template<typename Int16>
+	requires (sizeof(Int16) == 2 && std::is_integral_v<Int16>)
+constexpr Int16 swap16IfLE(Int16 i) noexcept
+{
+	if constexpr (!isLittleEndian()) { return i; }
+	else { return ((i & 0xFF) << 8) | ((i >> 8) & 0xFF); }
+}
+
+template<typename Int32>
+	requires (sizeof(Int32) == 4 && std::is_integral_v<Int32>)
+constexpr Int32 swap32IfLE(Int32 i) noexcept
+{
+	if constexpr (!isLittleEndian()) { return i; }
+	else
+	{
+		return ((i & 0xff000000) >> 24)
+		     | ((i & 0x00ff0000) >> 8)
+		     | ((i & 0x0000ff00) << 8)
+		     | ((i & 0x000000ff) << 24);
+	}
+}
 
 } // namespace lmms
 

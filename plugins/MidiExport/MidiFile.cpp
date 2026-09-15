@@ -45,6 +45,8 @@
 #include <iostream>
 #include <stack>
 
+#include "endian_handling.h"
+
 namespace lmms
 {
 
@@ -73,18 +75,15 @@ MidiFile::Section::Section()
 	m_buffer.reserve(BufferSize);
 }
 
-void MidiFile::Section::writeBytes(std::span<const std::uint8_t> bytes,
-	std::vector<std::uint8_t>* v)
+void MidiFile::Section::writeBytes(std::span<const std::uint8_t> bytes)
 {
-	// Append `bytes` content to the end of *v
-	if (!v) { v = &m_buffer; }
-	v->insert(v->end(), bytes.begin(), bytes.end());
+	// Append content to the end of m_buffer
+	m_buffer.insert(m_buffer.end(), bytes.begin(), bytes.end());
 }
 
-void MidiFile::Section::writeBytes(std::initializer_list<std::uint8_t> bytes,
-	std::vector<std::uint8_t>* v)
+void MidiFile::Section::writeBytes(std::initializer_list<std::uint8_t> bytes)
 {
-	writeBytes(std::span{bytes.begin(), bytes.size()}, v);
+	writeBytes(std::span{bytes.begin(), bytes.size()});
 }
 
 void MidiFile::Section::writeVarLength(std::uint32_t val)
@@ -108,28 +107,16 @@ void MidiFile::Section::writeVarLength(std::uint32_t val)
 	}
 }
 
-void MidiFile::Section::writeBigEndian4(std::uint32_t val,
-	std::vector<std::uint8_t>* v)
+void MidiFile::Section::writeBigEndian4(std::uint32_t val)
 {
-	auto bytes = std::array {
-		static_cast<std::uint8_t>(val >> 24),
-		static_cast<std::uint8_t>((val >> 16) & 0xff),
-		static_cast<std::uint8_t>((val >> 8) & 0xff),
-		static_cast<std::uint8_t>(val & 0xff)
-	};
-
-	writeBytes(bytes, v);
+	const auto valBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(swap32IfLE(val));
+	writeBytes(valBigEndian);
 }
 
-void MidiFile::Section::writeBigEndian2(std::uint16_t val,
-	std::vector<std::uint8_t>* v)
+void MidiFile::Section::writeBigEndian2(std::uint16_t val)
 {
-	auto bytes = std::array {
-		static_cast<std::uint8_t>(val >> 8),
-		static_cast<std::uint8_t>(val & 0xff)
-	};
-
-	writeBytes(bytes, v);
+	const auto valBigEndian = std::bit_cast<std::array<std::uint8_t, 2>>(swap16IfLE(val));
+	writeBytes(valBigEndian);
 }
 
 MidiFile::Header::Header(int numTracks, tick_t ticksPerBeat)
@@ -206,13 +193,11 @@ void MidiFile::Track::writeToBuffer()
 	writeMIDIToBuffer();
 
 	// Write correct size in placeholder place
-	std::size_t size = m_buffer.size() - idx;
-	std::vector<std::uint8_t> v;
-	v.reserve(4);
-	writeBigEndian4(size, &v);
+	const auto size = static_cast<std::uint32_t>(m_buffer.size() - idx);
+	const auto sizeBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(swap32IfLE(size));
 	for (std::size_t i = 0; i < 4; ++i)
 	{
-		m_buffer[idx - 4 + i] = v[i];
+		m_buffer[idx - 4 + i] = sizeBigEndian[i];
 	}
 }
 
@@ -280,10 +265,9 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 			writeBytes({code, 0x51, 0x03});
 
 			// Convert to microseconds before writing
-			std::vector<std::uint8_t> fourBytes;
-			fourBytes.reserve(4);
-			writeBigEndian4(6e7 / event.tempo, &fourBytes);
-			writeBytes({fourBytes[1], fourBytes[2], fourBytes[3]});
+			const auto usec = static_cast<std::uint32_t>(6e7 / event.tempo);
+			const auto usecBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(swap32IfLE(usec));
+			writeBytes({usecBigEndian[1], usecBigEndian[2], usecBigEndian[3]});
 			break;
 		}
 		case MidiFile::Event::ProgramChange:

@@ -68,28 +68,21 @@ private:
 	class Section
 	{
 	public:
-		//! @brief Constant-capacity buffer vector to be written to stream
-		//!
-		//! (should be better than `std::array` as it provides
-		//! `size()` and `push_back()` funcionalities)
+		//! Constant-capacity buffer vector to be written to stream
 		std::vector<std::uint8_t> m_buffer;
 
 	protected:
 		//! Reserve constant space for @ref BufferSize capacity vector
 		Section();
 
-		//! @brief Write bytes to vector (or buffer by default)
+		//! @brief Write bytes to buffer
 		//! @param bytes List of bytes to be written
-		//! @param v Pointer to vector (if none, use @ref m_buffer)
-		void writeBytes(std::span<const std::uint8_t> bytes,
-			std::vector<std::uint8_t>* v = nullptr);
+		void writeBytes(std::span<const std::uint8_t> bytes);
 
-		//! @brief Write bytes to vector (or buffer by default)
+		//! @brief Write bytes to buffer
 		//! @param bytes List of bytes to be written
-		//! @param v Pointer to vector (if none, use @ref m_buffer)
 		//! TODO C++26: Remove once std::span supports construction from std::initializer_list
-		void writeBytes(std::initializer_list<std::uint8_t> bytes,
-			std::vector<std::uint8_t>* v = nullptr);
+		void writeBytes(std::initializer_list<std::uint8_t> bytes);
 
 		//! @brief Write a MIDI-compatible variable length stream
 		//! @param val A four-byte value
@@ -101,10 +94,10 @@ private:
 		void writeVarLength(std::uint32_t val);
 
 		//! Buffer gets four 8-bit values from left to right
-		void writeBigEndian4(std::uint32_t val, std::vector<std::uint8_t>* v = nullptr);
+		void writeBigEndian4(std::uint32_t val);
 
 		//! Buffer gets two 8-bit values from left to right
-		void writeBigEndian2(std::uint16_t val, std::vector<std::uint8_t>* v = nullptr);
+		void writeBigEndian2(std::uint16_t val);
 
 		//! Write section info to buffer
 		virtual void writeToBuffer() {}
