@@ -152,18 +152,29 @@ void GigInstrument::loadFile( const QString & _file )
 
 
 
-AutomatableModel * GigInstrument::childModel( const QString & _modelName )
+auto GigInstrument::midiPatch() const -> std::optional<MidiPatch>
 {
-	if( _modelName == "bank" )
+	return MidiPatch {
+		.bank = static_cast<std::uint16_t>(m_bankNum.value()),
+		.program = static_cast<std::uint8_t>(m_patchNum.value())
+	};
+}
+
+
+
+
+AutomatableModel* GigInstrument::childModel(std::string_view modelName)
+{
+	if (modelName == "bank")
 	{
 		return &m_bankNum;
 	}
-	else if( _modelName == "patch" )
+	else if (modelName == "patch")
 	{
 		return &m_patchNum;
 	}
 
-	qCritical() << "requested unknown model " << _modelName;
+	qCritical() << "requested unknown model " << QString::fromUtf8(modelName.data(), modelName.size());
 
 	return nullptr;
 }
@@ -577,7 +588,7 @@ void GigInstrument::loadSample( GigSample& sample, SampleFrame* sampleData, f_cn
 		{
 			// libgig gives 24-bit data as little endian, so we must
 			// convert if on a big endian system
-			int32_t valueLeft = swap32IfBE(
+			int32_t valueLeft = byteswapIfBE<int32_t>(
 						( pInt[ 3 * sample.sample->Channels * i ] << 8 ) |
 						( pInt[ 3 * sample.sample->Channels * i + 1 ] << 16 ) |
 						( pInt[ 3 * sample.sample->Channels * i + 2 ] << 24 ) );
@@ -592,7 +603,7 @@ void GigInstrument::loadSample( GigSample& sample, SampleFrame* sampleData, f_cn
 			}
 			else
 			{
-				int32_t valueRight = swap32IfBE(
+				int32_t valueRight = byteswapIfBE<int32_t>(
 							( pInt[ 3 * sample.sample->Channels * i + 3 ] << 8 ) |
 							( pInt[ 3 * sample.sample->Channels * i + 4 ] << 16 ) |
 							( pInt[ 3 * sample.sample->Channels * i + 5 ] << 24 ) );

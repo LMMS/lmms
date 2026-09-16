@@ -255,7 +255,8 @@ public:
 
 	void loadFile( const QString & _file ) override;
 
-	AutomatableModel * childModel( const QString & _modelName ) override;
+	auto midiPatch() const -> std::optional<MidiPatch> override;
+	AutomatableModel* childModel(std::string_view modelName) override;
 
 	QString nodeName() const override;
 
