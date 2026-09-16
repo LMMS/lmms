@@ -256,7 +256,7 @@ void AudioFileProcessorView::sampleUpdated()
 
 void AudioFileProcessorView::openAudioFile()
 {
-	QString af = FileDialog::openAudioFile();
+	QString af = FileDialog::openAudioFile(castModel<AudioFileProcessor>()->sample().sampleFile());
 	if (af.isEmpty()) { return; }
 
 	castModel<AudioFileProcessor>()->setAudioFile(af);

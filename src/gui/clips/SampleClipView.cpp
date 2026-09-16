@@ -188,7 +188,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	if (m_trackView->trackContainerView()->knifeMode()) { return; }
 
-	const QString selectedAudioFile = FileDialog::openAudioFile();
+	const QString selectedAudioFile = FileDialog::openAudioFile(m_clip->sampleFile());
 
 	if (selectedAudioFile.isEmpty()) { return; }
 	

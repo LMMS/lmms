@@ -158,7 +158,7 @@ void SlicerTView::exportMidi()
 
 void SlicerTView::openFiles()
 {
-	const auto audioFile = FileDialog::openAudioFile();
+	const auto audioFile = FileDialog::openAudioFile(m_slicerTParent->getSampleName());
 	if (audioFile.isEmpty()) { return; }
 	m_slicerTParent->updateFile(audioFile);
 }

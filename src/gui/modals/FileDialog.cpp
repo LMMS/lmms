@@ -37,7 +37,6 @@
 namespace lmms::gui
 {
 
-
 FileDialog::FileDialog( QWidget *parent, const QString &caption,
 					   const QString &directory, const QString &filter ) :
 	QFileDialog( parent, caption, directory, filter )
@@ -102,6 +101,18 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 #endif
 
 	setSidebarUrls(urls);
+
+	QStringList recentDirectories;
+	for (auto dir : ConfigManager::inst()->recentlyOpenedDirectories())
+	{
+		QFileInfo recentDir(dir);
+		if (recentDir.exists()) { recentDirectories.push_back(dir); }
+
+		if (recentDirectories.size() >= 10) { break; }
+	}
+	setHistory(recentDirectories);
+
+	connect(this, &QFileDialog::fileSelected, this, &FileDialog::fileSelected);
 }
 
 
@@ -196,5 +207,10 @@ QString FileDialog::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
+void FileDialog::fileSelected(const QString &file)
+{
+	QString directoryPath = directory().absolutePath();
+	ConfigManager::inst()->addRecentlyOpenedDirectory(directoryPath);
+}
 
 } // namespace lmms::gui
