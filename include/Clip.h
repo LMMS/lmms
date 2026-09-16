@@ -102,6 +102,11 @@ public:
 
 	bool manuallyResizable() const;
 
+	//! @brief Whether the clip is empty.
+	//
+	// Classes that inherit this one should override if they want to signal a clip is empty.
+	virtual bool isEmpty() const = 0;
+
 	//! @brief Set whether a clip has been resized yet by the user or the knife tool.
 	//!
 	//! If a clip has been resized previously, it will not automatically resize when editing it.

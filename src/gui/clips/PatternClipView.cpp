@@ -110,8 +110,8 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c = getColorForDisplay( painter.background().color() );
 	
-	lingrad.setColorAt( 0, c.lighter( 130 ) );
-	lingrad.setColorAt( 1, c.lighter( 70 ) );
+	lingrad.setColorAt(0, lighter(c, 130));
+	lingrad.setColorAt(1, lighter(c, 70));
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
@@ -213,7 +213,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	paintTextLabel(m_patternClip->name(), p);
 
 	// inner border
-	p.setPen( c.lighter( 130 ) );
+	p.setPen(lighter(c, 130));
 	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
 		rect().bottom() - BORDER_WIDTH );	
 
