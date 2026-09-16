@@ -22,12 +22,12 @@ jobs:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
       - name: Clone fltk
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: fltk/fltk
           path: fltk
@@ -50,7 +50,7 @@ jobs:
           sudo apt-get install -y --install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
@@ -113,12 +113,12 @@ jobs:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
       - name: Clone fltk
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: fltk/fltk
           path: fltk
@@ -132,7 +132,7 @@ jobs:
           sudo apt-get install -y --install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
@@ -206,7 +206,7 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -214,14 +214,14 @@ jobs:
         run: rm -rf ~/Library/Caches/Homebrew/downloads
       - name: Restore Homebrew download cache
         id: cache-homebrew
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v6
         with:
           key: n/a - only restore from restore-keys
           restore-keys: |
             homebrew-${{ matrix.arch }}-
           path: ~/Library/Caches/Homebrew/downloads
       - name: Cache ccache data
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
             -${{ github.run_id }}"
@@ -272,7 +272,7 @@ jobs:
           CCACHE_MAXSIZE: 500MB
       - name: Save Homebrew download cache
         if: ${{ steps.cache-homebrew.outputs.cache-matched-key != env.key }}
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v6
         with:
           key: ${{ env.key }} 
           path: ~/Library/Caches/Homebrew/downloads
@@ -296,20 +296,20 @@ jobs:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
       - name: Cache vcpkg dependencies
         id: cache-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: vcpkg-mingw${{ matrix.arch }}-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             vcpkg-mingw${{ matrix.arch }}-
           path: build/vcpkg_installed
       - name: Cache ccache data
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: "ccache-${{ github.job }}-64-${{ github.ref }}\
             -${{ github.run_id }}"
@@ -361,20 +361,20 @@ jobs:
       CCACHE_NOCOMPRESS: 1
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
       - name: Cache vcpkg dependencies
         id: cache-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
             vcpkg-msvc-x86_64-
           path: build\vcpkg_installed
       - name: Cache ccache data
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           # yamllint disable rule:line-length
           key: "ccache-${{ github.job }}-x64-${{ github.ref }}\
@@ -387,7 +387,7 @@ jobs:
       - name: Install tools
         run: choco install ccache nsis
       - name: Install Qt
-        uses: jurplel/install-qt-action@d325aaf2a8baeeda41ad0b5d39f84a6af9bcf005
+        uses: jurplel/install-qt-action@bcb88e3bed2e992f5f9e24c0f9e364a231d278eb
         with:
           version: '6.8.*'
           arch: "win64_msvc2022_64"
@@ -457,27 +457,27 @@ jobs:
       MAKEFLAGS: -j2
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
       - name: Cache msys2 dependencies
         id: cache-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: windows-arm64-${{ hashFiles('.github/workflows/deps-msys2-clangarm64.txt') }}
           restore-keys: |
             windows-arm64-
           path: \msys64\var\cache\pacman\pkg
       - name: Install msys2
-        uses: msys2/setup-msys2@v2
+        uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884
         with:
           msystem: CLANGARM64
           update: true
       - name: Install dependencies
         run: pacman --needed --noconfirm -S - < .github/workflows/deps-msys2-clangarm64.txt
       - name: Cache ccache data
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
