@@ -15,6 +15,7 @@ jobs:
         -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
         -DWANT_DEBUG_CPACK=ON
+      CCACHE_DIR: ~/.cache/ccache
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
@@ -56,7 +57,7 @@ jobs:
           restore-keys: |
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
-          path: ~/.ccache
+          path: ${{ env.CCACHE_DIR }}
       - name: Configure fltk
         run: |
           cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
@@ -105,6 +106,7 @@ jobs:
         -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
         -DWANT_DEBUG_CPACK=ON
+      CCACHE_DIR: ~/.cache/ccache
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
@@ -138,7 +140,7 @@ jobs:
           restore-keys: |
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
-          path: ~/.ccache
+          path: ${{ env.CCACHE_DIR }}
       - name: Configure fltk
         run: |
           cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
@@ -274,7 +276,7 @@ jobs:
         if: ${{ steps.cache-homebrew.outputs.cache-matched-key != env.key }}
         uses: actions/cache/save@v6
         with:
-          key: ${{ env.key }} 
+          key: ${{ env.key }}
           path: ~/Library/Caches/Homebrew/downloads
         env:
           key: "homebrew-${{ matrix.arch }}\
@@ -289,6 +291,7 @@ jobs:
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
+      CCACHE_DIR: ~/.cache/ccache
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
@@ -316,7 +319,7 @@ jobs:
           restore-keys: |
             ccache-${{ github.job }}-64-${{ github.ref }}-
             ccache-${{ github.job }}-64-
-          path: ~/.ccache
+          path: ${{ env.CCACHE_DIR }}
       - name: Install dependencies
         run: |
           sudo .github/workflows/setup-mingw-packages.sh
