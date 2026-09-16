@@ -89,7 +89,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 
 	// pause and freeze buttons
-	auto pauseButton = new PixmapButton(this, tr("Pause"));
+	auto pauseButton = new PixmapButton(this);
 	pauseButton->setToolTip(tr("Pause data acquisition"));
 	static auto s_pauseOnPixmap
 		= PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -103,7 +103,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	pauseButton->setModel(&controls->m_pauseModel);
 	config_layout->addWidget(pauseButton, 0, 0, 2, 1, Qt::AlignHCenter);
 
-	auto refFreezeButton = new PixmapButton(this, tr("Reference freeze"));
+	auto refFreezeButton = new PixmapButton(this);
 	refFreezeButton->setToolTip(tr("Freeze current input as a reference / disable falloff in peak-hold mode."));
 	static auto s_freezeOnPixmap
 		= PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -147,7 +147,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(peakHoldButton, 3, 1);
 
 	// frequency: linear / log. switch and range selector
-	auto logXButton = new PixmapButton(this, tr("Logarithmic frequency"));
+	auto logXButton = new PixmapButton(this);
 	logXButton->setToolTip(tr("Switch between logarithmic and linear frequency scale"));
 	static auto s_logXOnPixmap
 		= PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -169,7 +169,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	config_layout->addWidget(freqRangeCombo, 0, 3, 2, 1);
 
 	// amplitude: linear / log switch and range selector
-	auto logYButton = new PixmapButton(this, tr("Logarithmic amplitude"));
+	auto logYButton = new PixmapButton(this);
 	logYButton->setToolTip(tr("Switch between logarithmic and linear amplitude scale"));
 	static auto s_logYOnPixmap
 		= PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -299,7 +299,7 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 
 	// Advanced settings button
-	auto advancedButton = new PixmapButton(this, tr("Advanced settings"));
+	auto advancedButton = new PixmapButton(this);
 	advancedButton->setToolTip(tr("Access advanced settings"));
 	static auto s_advancedOnPixmap = PLUGIN_NAME::getIconPixmap("advanced_on")
 											.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);

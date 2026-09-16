@@ -95,7 +95,7 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	stages->setHintText( tr( "Low-pass stages:" ) , "x" );
 	// switch led
 
-	auto swapInputs = new LedCheckBox("Swap inputs", this, tr("Swap inputs"), LedCheckBox::LedColor::Green);
+	auto swapInputs = new LedCheckBox("Swap inputs", this, LedCheckBox::LedColor::Green);
 	swapInputs->move( 20, 275 );
 	swapInputs->setModel( & controls->m_swapInputs );
 	swapInputs->setToolTip(tr("Swap left and right input channels for reflections"));
