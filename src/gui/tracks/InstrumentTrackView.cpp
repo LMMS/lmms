@@ -48,6 +48,7 @@
 #include "MidiClient.h"
 #include "MidiCCRackView.h"
 #include "MidiPortMenu.h"
+#include "TrackContainerView.h"
 #include "Mixer.h"
 #include "MixerChannelLcdSpinBox.h"
 #include "MixerView.h"
@@ -84,6 +85,11 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
+
+	connect(trackContainerView(), &TrackContainerView::trackHeadWidthChanged, this, [this](int width){
+		if (width < COMPACT_TRACK_WIDTH) { m_mixerChannelNumber->hide(); }
+		else { m_mixerChannelNumber->show(); }
+	});
 
 	m_volumeKnob = new VolumeKnob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("VOL"));
 	m_volumeKnob->setModel( &_it->m_volumeModel );
@@ -143,12 +149,13 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	masterLayout->setContentsMargins(0, 1, 0, 0);
 	auto layout = new QHBoxLayout();
 	layout->setContentsMargins(0, 0, 0, 0);
-	layout->setSpacing(0);
+	layout->setSpacing(3);
 	layout->addWidget(m_tlb);
 	layout->addWidget(m_mixerChannelNumber);
 	layout->addWidget(m_activityIndicator);
 	layout->addWidget(m_volumeKnob);
 	layout->addWidget(m_panningKnob);
+	layout->addSpacing(4);
 	masterLayout->addLayout(layout);
 	masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
