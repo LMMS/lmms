@@ -25,6 +25,8 @@
 #ifndef LMMS_THREAD_POOL_H
 #define LMMS_THREAD_POOL_H
 
+#include "lmms_export.h"
+
 #include <atomic>
 #include <queue>
 #include <tuple>
@@ -38,7 +40,7 @@
 
 namespace lmms {
 //! A thread pool that can be used for asynchronous processing.
-class ThreadPool
+class LMMS_EXPORT ThreadPool
 {
 public:
 	//! Destroys the `ThreadPool` object.
