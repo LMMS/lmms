@@ -1249,14 +1249,19 @@ bool ClipView::splitClip(const TimePos pos)
 
 QColor ClipView::lighter(const QColor src, const int factor)
 {
-	double h, s, v, a;
-	src.getHsvF(&h, &s, &v, &a);
+	// NOTE: There is getHsvF, which in theory is easier to use but has different signatures in Qt5 and Qt6.
+	// That made things actually harder to use.
+	int h, s, v, a;
+	src.getHsv(&h, &s, &v, &a);
 
-	v = std::max(0.1, v) * static_cast<float>(factor) / 100.0;
-	v = std::clamp(v, 0.0, 1.0);
+	// update the value
+	float v2 = static_cast<float>(v) / 255.0f;
+	v2 = std::max(0.1f, v2) * static_cast<float>(factor) / 100.0f;
+	v2 = std::clamp(v2, 0.0f, 1.0f);
+	v = static_cast<int>(v2 * 255.0f);
 
 	QColor ret;
-	ret.setHsvF(h, s, v, a);
+	ret.setHsv(h, s, v, a);
 	return ret;
 }
 
