@@ -22,6 +22,7 @@
  *
  */
 
+#include <QDomDocument>
 #include <QDomElement>
 
 #include "SerializingObject.h"
@@ -59,6 +60,13 @@ QDomElement SerializingObject::saveState( QDomDocument& doc, QDomElement& parent
 	{
 		hook()->saveSettings( doc, element );
 	}
+	else
+	{
+		for (auto it = m_deferredHookAttributes.cbegin(); it != m_deferredHookAttributes.cend(); ++it)
+		{
+			element.setAttribute(it.key(), it.value());
+		}
+	}
 
 	return element;
 }
@@ -69,10 +77,21 @@ QDomElement SerializingObject::saveState( QDomDocument& doc, QDomElement& parent
 void SerializingObject::restoreState( const QDomElement& element )
 {
 	loadSettings( element );
+	m_deferredHookAttributes.clear();
 
 	if( hook() )
 	{
 		hook()->loadSettings( element );
+	}
+	else
+	{
+		for (const auto& name : m_hookAttributeNames)
+		{
+			if (element.hasAttribute(name))
+			{
+				m_deferredHookAttributes.insert(name, element.attribute(name));
+			}
+		}
 	}
 }
 
@@ -91,7 +110,36 @@ void SerializingObject::setHook( SerializingObjectHook* hook )
 	if( m_hook )
 	{
 		m_hook->m_hookedIn = this;
+
+		if (!m_deferredHookAttributes.isEmpty())
+		{
+			QDomDocument doc;
+			QDomElement element = doc.createElement(nodeName());
+			doc.appendChild(element);
+			for (auto it = m_deferredHookAttributes.cbegin(); it != m_deferredHookAttributes.cend(); ++it)
+			{
+				element.setAttribute(it.key(), it.value());
+			}
+			m_deferredHookAttributes.clear();
+			m_hook->loadSettings(element);
+		}
 	}
+}
+
+
+
+
+QString SerializingObject::deferredHookAttribute(const QString& name) const
+{
+	return m_deferredHookAttributes.value(name);
+}
+
+
+
+
+void SerializingObject::setHookAttributeNames(const QStringList& names)
+{
+	m_hookAttributeNames = names;
 }
 
 

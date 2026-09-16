@@ -293,6 +293,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	updateSubWindow();
 
 	subWin->hide();
+	m_track->setHook(this);
 }
 
 void InstrumentTrackWindow::resizeEvent(QResizeEvent * event) {
