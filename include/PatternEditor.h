@@ -27,18 +27,23 @@
 
 #include "Editor.h"
 #include "TrackContainerView.h"
+#include "AutomatableModel.h"
+
+class QLabel;
+class QScrollBar;
 
 namespace lmms
 {
 
+class IntModel;
 class PatternStore;
 
 namespace gui
 {
 
+class AutomatableSlider;
 class ComboBox;
 class TimeLineWidget;
-
 
 class PatternEditor : public TrackContainerView
 {
@@ -65,18 +70,44 @@ public slots:
 	void cloneClip();
 	void updateMaxSteps();
 
+signals:
+	void zoomLevelChanged();
+	void offsetValueChanged();
+	void zoomControlsVisibilityChanged(bool show);
+
+protected:
+	double getZoom() const
+	{
+		// The zoom level is calculated such as exactly one bar is visible when the zoom slider is at its maximum value,
+		// and the whole pattern is visible when the zoom slider is at its minimum value.
+		return 1 + m_zoomingModel->value() * (m_maxClipLength / TimePos::ticksPerBar() - 1)
+			/ static_cast<double>(m_zoomingModel->maxValue());
+	}
+
 protected slots:
 	void dropEvent(QDropEvent * de ) override;
 	void resizeEvent(QResizeEvent* de) override;
 	void updatePosition();
 	void updatePixelsPerBar();
+	void updateScrollBar();
 
 private:
+	void wheelEvent(QWheelEvent* we) override;
+
+	IntModel* m_zoomingModel;
+	QScrollBar* m_leftRightScroll;
+
 	PatternStore* m_ps;
 	TimeLineWidget* m_timeLine;
 	int m_trackHeadWidth;
 	tick_t m_maxClipLength;
 	void makeSteps( bool clone );
+
+private slots:
+	void zoomingChanged();
+	void horizontalScrollChanged();
+
+	friend class PatternEditorWindow;
 };
 
 
@@ -89,14 +120,27 @@ public:
 
 	QSize sizeHint() const override;
 
+	double zoomLevel() const
+	{
+		return m_editor->getZoom();
+	}
+
+	double horizontalScrollValue() const;
+
 	PatternEditor* m_editor;
 
 public slots:
 	void play() override;
 	void stop() override;
 
+	void showZoomControls(bool show);
+
 private:
+	AutomatableSlider* m_zoomingSlider;
 	ComboBox* m_patternComboBox;
+
+	QAction* m_zoomIconAction;
+	QAction* m_zoomSliderAction;
 };
 
 
