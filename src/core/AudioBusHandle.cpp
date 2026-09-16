@@ -33,6 +33,7 @@
 #include "Mixer.h"
 #include "Engine.h"
 #include "MixHelpers.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -109,6 +110,7 @@ bool AudioBusHandle::processEffects()
 
 void AudioBusHandle::doProcessing()
 {
+	ZoneScopedN("AudioBusHandle::doProcessing");
 	if (m_mutedModel && m_mutedModel->value())
 	{
 		return;
@@ -122,6 +124,7 @@ void AudioBusHandle::doProcessing()
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	for (PlayHandle* ph : m_playHandles) // now we mix all playhandle buffers into our internal buffer
 	{
+		ZoneScopedN("PlayHandle loop");
 		if (ph->buffer())
 		{
 			if (ph->usesBuffer()
@@ -140,6 +143,8 @@ void AudioBusHandle::doProcessing()
 
 	if (m_bufferUsage)
 	{
+		ZoneScopedN("Processing");
+
 		// PlayHandle buffers were written to the temporary interleaved buffer
 		auto buffer = m_buffer.interleavedBuffer();
 
@@ -147,6 +152,7 @@ void AudioBusHandle::doProcessing()
 		// has both vol and pan models
 		if (m_volumeModel && m_panningModel)
 		{
+			ZoneScopedN("Vol & Pan");
 			ValueBuffer* volBuf = m_volumeModel->valueBuffer();
 			ValueBuffer* panBuf = m_panningModel->valueBuffer();
 
@@ -204,6 +210,7 @@ void AudioBusHandle::doProcessing()
 		// has vol model only
 		else if (m_volumeModel)
 		{
+			ZoneScopedN("Vol");
 			ValueBuffer* volBuf = m_volumeModel->valueBuffer();
 
 			if (volBuf)
