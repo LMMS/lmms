@@ -1,5 +1,5 @@
 /*
- * SimdHelpers.h - Cross-platform SIMD with dynamic dispatch
+ * SimdDispatcher.h - Cross-platform dynamic dispatcher for SIMD
  *
  * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_SIMD_HELPERS_H
-#define LMMS_SIMD_HELPERS_H
+#ifndef LMMS_SIMD_DISPATCHER_H
+#define LMMS_SIMD_DISPATCHER_H
 
 #include <type_traits>
 
@@ -83,41 +83,6 @@
 #endif
 
 namespace lmms {
-
-//////////////////////////////////
-// Lane-generic SIMD intrinsics //
-//////////////////////////////////
-
-#ifndef _MSC_VER
-#	define LMMS_DEFINE_SIMD_GENERIC(name, fn128, fn256, fn512) \
-		template<std::uint8_t lanes> inline constexpr const auto& name = 0; \
-		template<> inline constexpr const auto& name<4>  = fn128; \
-		template<> inline constexpr const auto& name<8>  = fn256; \
-		template<> inline constexpr const auto& name<16> = fn512;
-#else
-#	define LMMS_DEFINE_SIMD_GENERIC(name, fn128, fn256, fn512)  \
-		template<std::uint8_t lanes, class... Args>             \
-		LMMS_INLINE auto name(Args... args) -> decltype(auto)   \
-		{                                                       \
-		    if constexpr (lanes == 4) {                         \
-		        return (fn128)(args...);                        \
-		    } else if constexpr (lanes == 8) {                  \
-		        return (fn256)(args...);                        \
-		    } else if constexpr (lanes == 16) {                 \
-		        return (fn512)(args...);                        \
-		    } else { static_assert(lanes == 4); }               \
-		}
-#endif
-
-#if defined(LMMS_HOST_X86_64)
-
-LMMS_DEFINE_SIMD_GENERIC(_mmX_loadu_ps, _mm_loadu_ps, _mm256_loadu_ps, _mm512_loadu_ps)
-LMMS_DEFINE_SIMD_GENERIC(_mmX_storeu_ps, _mm_storeu_ps, _mm256_storeu_ps, _mm512_storeu_ps)
-LMMS_DEFINE_SIMD_GENERIC(_mmX_add_ps, _mm_add_ps, _mm256_add_ps, _mm512_add_ps)
-
-// NOTE: Can define more generic intrinsics here as needed
-
-#endif // LMMS_HOST_X86_64
 
 //////////////////////
 // Dynamic dispatch //
@@ -329,4 +294,4 @@ SimdDispatcher(SimdDispatchConfig<ne, Ret, Args...>) -> SimdDispatcher<ne, Ret, 
 
 } // namespace lmms
 
-#endif // LMMS_SIMD_HELPERS_H
+#endif // LMMS_SIMD_DISPATCHER_H

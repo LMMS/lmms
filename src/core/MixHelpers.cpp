@@ -29,7 +29,8 @@
 
 #include "ValueBuffer.h"
 #include "SampleFrame.h"
-#include "SimdHelpers.h"
+#include "SimdDispatcher.h"
+#include "SimdIntrinsics.h"
 
 namespace lmms::MixHelpers
 {
@@ -86,14 +87,37 @@ void add( SampleFrame* dst, const SampleFrame* src, int frames )
 
 namespace {
 
-void addScalar(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
+#if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_ARM64)
+LMMS_SIMD_BEGIN_DISPATCH_TARGET_IMPL
+
+template<std::uint8_t lanes>
+void addImpl(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
 	ch_cnt_t channels, f_cnt_t frames) noexcept
 {
+	using S = SimdIntrinsics<float, lanes>;
+
+	const f_cnt_t vecFrames = S::vectorizableCount(frames);
 	for (ch_cnt_t channel = 0; channel < channels; ++channel)
 	{
-		float* const dstPtr = dst[channel];
+		float* const       dstPtr = dst[channel];
 		const float* const srcPtr = src[channel];
-		for (f_cnt_t frame = 0; frame < frames; ++frame)
+
+		// The vectorized part
+		if constexpr (lanes > 1)
+		{
+			for (f_cnt_t frame = 0; frame < vecFrames; frame += lanes)
+			{
+				S::store(dstPtr + frame,
+					S::add(
+						S::load(dstPtr + frame),
+						S::load(srcPtr + frame)
+					)
+				);
+			}
+		}
+
+		// The tail
+		for (f_cnt_t frame = vecFrames; frame < frames; ++frame)
 		{
 			dstPtr[frame] += srcPtr[frame];
 		}
@@ -101,47 +125,23 @@ void addScalar(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRIC
 }
 
 #if defined(LMMS_HOST_X86_64)
-LMMS_SIMD_BEGIN_DISPATCH_TARGET_IMPL
-
-template<std::uint8_t lanes>
-void addSimd(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
-	ch_cnt_t channels, f_cnt_t frames) noexcept
-{
-	constexpr std::size_t mask = lanes - 1;
-
-	const f_cnt_t alignedFrames = frames - (frames & mask);
-	for (ch_cnt_t channel = 0; channel < channels; ++channel)
-	{
-		float* const dstPtr = dst[channel];
-		const float* const srcPtr = src[channel];
-
-		for (f_cnt_t frame = 0; frame < alignedFrames; frame += lanes)
-		{
-			_mmX_storeu_ps<lanes>(dstPtr + frame,
-				_mmX_add_ps<lanes>(
-					_mmX_loadu_ps<lanes>(dstPtr + frame),
-					_mmX_loadu_ps<lanes>(srcPtr + frame)
-				)
-			);
-		}
-
-		for (f_cnt_t frame = alignedFrames; frame < frames; ++frame)
-		{
-			dstPtr[frame] += srcPtr[frame];
-		}
-	}
-}
-
 template LMMS_SIMD_DISPATCH_FOR_AVX
-void addSimd<8>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
+void addImpl<8>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
 	ch_cnt_t channels, f_cnt_t frames) noexcept;
 
 template LMMS_SIMD_DISPATCH_FOR_AVX512F
-void addSimd<16>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
+void addImpl<16>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
 	ch_cnt_t channels, f_cnt_t frames) noexcept;
 
+#elif defined(LMMS_HOST_ARM64)
+template LMMS_SIMD_DISPATCH_FOR_NEON
+void addImpl<4>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
+	ch_cnt_t channels, f_cnt_t frames) noexcept;
+
+#endif
+
 LMMS_SIMD_END_DISPATCH_TARGET_IMPL
-#endif // LMMS_HOST_X86_64
+#endif
 
 } // namespace
 
@@ -153,11 +153,12 @@ void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 	static auto dispatcher = SimdDispatcher {
 			SimdDispatchConfig {
 #if defined(LMMS_HOST_X86_64)
-			.avx512f = addSimd<16>,
-			.avx     = addSimd<8>,
+			.avx512f = addImpl<16>,
+			.avx     = addImpl<8>,
+#elif defined(LMMS_HOST_ARM64)
+			.neon    = addImpl<4>,
 #endif
-			.scalar  = addScalar,
-			.preferAutoVectorization = true
+			.scalar  = addImpl<1>
 		}
 	};
 

@@ -35,7 +35,7 @@
 #include <concepts>
 
 #include "lmms_constants.h"
-#include "SimdHelpers.h"
+#include "SimdIntrinsics.h"
 
 namespace lmms
 {
