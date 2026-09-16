@@ -43,6 +43,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QByteArray>
+#include <QDomElement>
 #include <cassert>
 #include <cmath>
 
@@ -250,14 +251,14 @@ void OpulenzInstrument::setVoiceVelocity(int voice, int vel) {
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
 	theEmulator->write(0x40+adlib_opadd[voice],
-			   ( (int)op1_scale_mdl.value() & 0x03 << 6) +
+			   ((static_cast<int>(op1_scale_mdl.value()) & 0x03) << 6) +
 			   ( vel_adjusted & 0x3f ) );
 
 
 	vel_adjusted = 63 - ( op2_lvl_mdl.value() * vel/127.0 );
 	// vel_adjusted = 63 - op2_lvl_mdl.value();
 	theEmulator->write(0x43+adlib_opadd[voice],
-			   ( (int)op2_scale_mdl.value() & 0x03 << 6) +
+			   ((static_cast<int>(op2_scale_mdl.value()) & 0x03) << 6) +
 			   ( vel_adjusted & 0x3f ) );
 }
 
@@ -394,7 +395,7 @@ void OpulenzInstrument::play( SampleFrame* _working_buffer )
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
 
-	for( fpp_t frame = 0; frame < frameCount; ++frame )
+	for( f_cnt_t frame = 0; frame < frameCount; ++frame )
         {
                 sample_t s = float(renderbuffer[frame]) / 8192.0;
                 for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
@@ -438,16 +439,28 @@ void OpulenzInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	fm_mdl.saveSettings( _doc, _this, "fm" );
 	vib_depth_mdl.saveSettings( _doc, _this, "vib_depth" );
 	trem_depth_mdl.saveSettings( _doc, _this, "trem_depth" );
+
+	_this.setAttribute("version", 1);
 }
 
 void OpulenzInstrument::loadSettings( const QDomElement & _this )
 {
+	if (_this.attribute("version", "0").toInt() < 1)
+	{
+		op1_scale_mdl.setValue(0);
+		op2_scale_mdl.setValue(0);
+	}
+	else
+	{
+		op1_scale_mdl.loadSettings(_this, "op1_scale");
+		op2_scale_mdl.loadSettings(_this, "op2_scale");
+	}
+
 	op1_a_mdl.loadSettings( _this, "op1_a" );
 	op1_d_mdl.loadSettings( _this, "op1_d" );
 	op1_s_mdl.loadSettings( _this, "op1_s" );
 	op1_r_mdl.loadSettings( _this, "op1_r" );
 	op1_lvl_mdl.loadSettings( _this, "op1_lvl" );
-	op1_scale_mdl.loadSettings( _this, "op1_scale" );
 	op1_mul_mdl.loadSettings( _this, "op1_mul" );
 	feedback_mdl.loadSettings( _this, "feedback" );
 	op1_ksr_mdl.loadSettings( _this, "op1_ksr" );
@@ -461,7 +474,6 @@ void OpulenzInstrument::loadSettings( const QDomElement & _this )
 	op2_s_mdl.loadSettings( _this, "op2_s" );
 	op2_r_mdl.loadSettings( _this, "op2_r" );
 	op2_lvl_mdl.loadSettings( _this, "op2_lvl" );
-	op2_scale_mdl.loadSettings( _this, "op2_scale" );
 	op2_mul_mdl.loadSettings( _this, "op2_mul" );
 	op2_ksr_mdl.loadSettings( _this, "op2_ksr" );
 	op2_perc_mdl.loadSettings( _this, "op2_perc" );

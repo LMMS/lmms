@@ -94,7 +94,7 @@ public:
 	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph );
 	virtual ~NesObject() = default;
 	
-	void renderOutput( SampleFrame* buf, fpp_t frames );
+	void renderOutput( SampleFrame* buf, f_cnt_t frames );
 	void updateVibrato( float * freq );
 	void updatePitch();
 	

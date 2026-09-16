@@ -2,7 +2,7 @@
  * Oscilloscope.cpp
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -52,7 +52,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	setFixedSize( m_background.width(), m_background.height() );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 	m_buffer = new SampleFrame[frames];
 
 	zeroSampleFrames(m_buffer, frames);
@@ -77,8 +77,8 @@ void Oscilloscope::updateAudioBuffer(const SampleFrame* buffer)
 {
 	if( !Engine::getSong()->isExporting() )
 	{
-		const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
-		memcpy(m_buffer, buffer, sizeof(SampleFrame) * fpp);
+		const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
+		memcpy(m_buffer, buffer, sizeof(SampleFrame) * frames);
 	}
 }
 
@@ -165,7 +165,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 
 		float masterOutput = audioEngine->masterGain();
 
-		const fpp_t frames = audioEngine->framesPerPeriod();
+		const f_cnt_t frames = audioEngine->framesPerPeriod();
 		SampleFrame peakValues = getAbsPeakValues(m_buffer, frames);
 
 		auto const leftChannelClips = clips(peakValues.left() * masterOutput);

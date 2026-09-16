@@ -41,16 +41,16 @@ public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
 	~EqEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
 
 	EffectControls * controls() override
 	{
 		return &m_eqControls;
 	}
-	inline void gain( SampleFrame* buf, const fpp_t frames, float scale, SampleFrame* peak )
+	inline void gain( SampleFrame* buf, const f_cnt_t frames, float scale, SampleFrame* peak )
 	{
 		peak[0][0] = 0.0f; peak[0][1] = 0.0f;
-		for( fpp_t f = 0; f < frames; ++f )
+		for( f_cnt_t f = 0; f < frames; ++f )
 		{
 			auto & sf = buf[f];
 

@@ -31,7 +31,6 @@
 #include <QStandardItem>
 
 #include "embed.h"
-#include "fluidsynthshims.h"
 
 namespace lmms::gui
 {
@@ -178,13 +177,9 @@ void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& chanN
 			int iBankOffset = ::fluid_synth_get_bank_offset(m_pSynth, fluid_sfont_get_id(pSoundFont));
 #endif
 			fluid_sfont_iteration_start(pSoundFont);
-#if FLUIDSYNTH_VERSION_MAJOR < 2
-			fluid_preset_t preset;
-			fluid_preset_t *pCurPreset = &preset;
-#else
-			fluid_preset_t *pCurPreset = nullptr;
-#endif
-			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset)))
+			fluid_preset_t* pCurPreset = nullptr;
+
+			while ((pCurPreset = fluid_sfont_iteration_next(pSoundFont)))
 			{
 				int iBank = fluid_preset_get_banknum(pCurPreset);
 #ifdef CONFIG_FLUID_BANK_OFFSET
@@ -431,13 +426,9 @@ void PatchesDialog::updatePatchList()
 			int iBankOffset = ::fluid_synth_get_bank_offset(m_pSynth, fluid_sfont_get_id(pSoundFont));
 #endif
 			fluid_sfont_iteration_start(pSoundFont);
-#if FLUIDSYNTH_VERSION_MAJOR < 2
-			fluid_preset_t preset;
-			fluid_preset_t *pCurPreset = &preset;
-#else
 			fluid_preset_t *pCurPreset = nullptr;
-#endif
-			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset)))
+
+			while ((pCurPreset = fluid_sfont_iteration_next(pSoundFont)))
 			{
 				int iBank = fluid_preset_get_banknum(pCurPreset);
 #ifdef CONFIG_FLUID_BANK_OFFSET

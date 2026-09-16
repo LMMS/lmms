@@ -68,8 +68,7 @@ public:
 	constexpr explicit operator UnderlyingType() const { return m_value; } // TODO C++23: explicit(std::is_scoped_enum<T>)
 	constexpr explicit operator bool() const { return m_value != 0; }
 
-	friend constexpr auto operator==(Flags l, Flags r) -> bool { return l.m_value == r.m_value; } // TODO C++20: = default
-	friend constexpr auto operator!=(Flags l, Flags r) -> bool { return l.m_value != r.m_value; } // TODO C++20: Remove
+	friend constexpr auto operator==(Flags l, Flags r) -> bool = default;
 
 private:
 	UnderlyingType m_value = 0;

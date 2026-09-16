@@ -438,7 +438,7 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer
 {
 	float currentSampleRate = Engine::audioEngine()->outputSampleRate();
 
-	fpp_t frameNum = _n->framesLeftForCurrentPeriod();
+	f_cnt_t frameNum = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 	if (!_n->m_pluginData)
 	{
@@ -461,7 +461,7 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer
 
 	auto pitchedBuffer = new SampleFrame[pitchedFrameNum];
 	static_cast<SfxrSynth*>(_n->m_pluginData)->update( pitchedBuffer, pitchedFrameNum );
-	for( fpp_t i=0; i<frameNum; i++ )
+	for( f_cnt_t i=0; i<frameNum; i++ )
 	{
 		for( ch_cnt_t j=0; j<DEFAULT_CHANNELS; j++ )
 		{

@@ -37,23 +37,14 @@
 
 namespace lmms {
 
-namespace detail {
-
-template<typename T, typename = void>
-constexpr bool is_input_iterator_v = false;
-
-template<typename T>
-constexpr bool is_input_iterator_v<T, std::void_t<typename std::iterator_traits<T>::iterator_category>> =
-	std::is_convertible_v<typename std::iterator_traits<T>::iterator_category, std::input_iterator_tag>;
-
-} // namespace detail
-
 /**
  * A container that stores up to a maximum of `N` elements of type `T` directly
  * within itself, rather than separately on the heap. Useful when a dynamically
  * resizeable container is needed for use in real-time code. Can be thought of
  * as a hybrid between `std::array` and `std::vector`. The interface follows
  * that of `std::vector` - see standard C++ documentation.
+ *
+ * TODO C++26: Replace uses of this class with std::inplace_vector
  */
 template<typename T, std::size_t N>
 class ArrayVector
@@ -100,7 +91,7 @@ public:
 		std::uninitialized_value_construct_n(begin(), count);
 	}
 
-	template<typename It, std::enable_if_t<detail::is_input_iterator_v<It>, int> = 0>
+	template<std::input_iterator It>
 	ArrayVector(It first, It last)
 	{
 		// Can't check the size first as the iterator may not be multipass
@@ -173,7 +164,7 @@ public:
 		m_size = count;
 	}
 
-	template<typename It, std::enable_if_t<detail::is_input_iterator_v<It>, int> = 0>
+	template<std::input_iterator It>
 	void assign(It first, It last)
 	{
 		// Can't check the size first as the iterator may not be multipass
@@ -262,7 +253,7 @@ public:
 		return mutPos;
 	}
 
-	template<typename It, std::enable_if_t<detail::is_input_iterator_v<It>, int> = 0>
+	template<std::input_iterator It>
 	iterator insert(const_iterator pos, It first, It last)
 	{
 		// Can't check the size first as the iterator may not be multipass
@@ -306,8 +297,7 @@ public:
 	reference emplace_back(Args&&... args)
 	{
 		assert(!full());
-		// TODO C++20: Use std::construct_at
-		const auto result = new(static_cast<void*>(end())) T(std::forward<Args>(args)...);
+		const auto result = std::construct_at(end(), std::forward<Args>(args)...);
 		++m_size;
 		return *result;
 	}
@@ -362,21 +352,15 @@ public:
 		std::swap(a.m_size, b.m_size);
 	}
 
-	// TODO C++20: Replace with operator<=>
-	friend bool operator<(const ArrayVector& l, const ArrayVector& r)
+	friend constexpr auto operator<=>(const ArrayVector& l, const ArrayVector& r)
 	{
-		return std::lexicographical_compare(l.begin(), l.end(), r.begin(), r.end());
+		return std::lexicographical_compare_three_way(l.begin(), l.end(), r.begin(), r.end());
 	}
-	friend bool operator<=(const ArrayVector& l, const ArrayVector& r) { return !(r < l); }
-	friend bool operator>(const ArrayVector& l, const ArrayVector& r) { return r < l; }
-	friend bool operator>=(const ArrayVector& l, const ArrayVector& r) { return !(l < r); }
 
 	friend bool operator==(const ArrayVector& l, const ArrayVector& r)
 	{
 		return std::equal(l.begin(), l.end(), r.begin(), r.end());
 	}
-	// TODO C++20: Remove
-	friend bool operator!=(const ArrayVector& l, const ArrayVector& r) { return !(l == r); }
 
 private:
 	alignas(T) std::byte m_data[std::max(N * sizeof(T), std::size_t{1})]; // Intentionally a raw array

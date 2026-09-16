@@ -89,7 +89,7 @@ void CrossoverEQEffect::sampleRateChanged()
 }
 
 
-Effect::ProcessStatus CrossoverEQEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus CrossoverEQEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	// filters update
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )

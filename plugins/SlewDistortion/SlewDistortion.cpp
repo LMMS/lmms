@@ -60,7 +60,7 @@ SlewDistortion::SlewDistortion(Model* parent, const Descriptor::SubPluginFeature
 
 
 #ifdef __SSE2__
-Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -136,7 +136,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 		m_hp.setHighpass(split);
 	}
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		// interpolate bias to remove crackling when moving the parameter
 		m_trueBias1 = m_biasInterpCoef * m_trueBias1 + (1.f - m_biasInterpCoef) * bias1;
@@ -239,13 +239,16 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						distOutFull = _mm_max_ps(_mm_min_ps(distInFull, maxVal), minVal);
 						break;
 					}
-					case SlewDistortionType::Tanh: // Tanh => 2 / (1 + exp(-2x)) - 1
+					case SlewDistortionType::Tanh: // Tanh approximation => x * (27 + x^2) / (27 + 9x^2)
 					{
-						// clamp to [-80.0f, 80.0f] since float std::exp breaks outside of those bounds
-						__m128 clampedInput = _mm_max_ps(_mm_min_ps(_mm_mul_ps(_mm_set1_ps(-2.0f),
-							distInFull), _mm_set1_ps(80.0f)), _mm_set1_ps(-80.0f));
-						__m128 expResult = fastExp(clampedInput);
-						distOutFull = _mm_sub_ps(_mm_div_ps(_mm_set1_ps(2.0f), _mm_add_ps(one, expResult)), one);
+						const __m128 temp = _mm_max_ps(_mm_min_ps(distInFull, _mm_set1_ps(3.0f)), _mm_set1_ps(-3.0f));
+						const __m128 temp2 = _mm_mul_ps(temp, temp);
+
+						distOutFull = _mm_div_ps(
+							_mm_mul_ps(temp, _mm_add_ps(_mm_set1_ps(27.0f), temp2)),
+							_mm_add_ps(_mm_set1_ps(27.0f), _mm_mul_ps(_mm_set1_ps(9.0f), temp2)));
+
+						distOutFull = _mm_max_ps(_mm_min_ps(distOutFull, one), _mm_set1_ps(-1.0f));
 						break;
 					}
 					case SlewDistortionType::FastSoftClip1: // Fast Soft Clip 1 => x / (1 + x^2 / 4)
@@ -436,7 +439,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 
 
 #else
-Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -509,7 +512,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 		m_hp.setHighpass(split);
 	}
 	
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		// interpolate bias to remove crackling when moving the parameter
 		m_trueBias1 = m_biasInterpCoef * m_trueBias1 + (1.f - m_biasInterpCoef) * bias1;
@@ -570,8 +573,10 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						break;
 					}
 					case SlewDistortionType::Tanh: {
-						const float temp = std::clamp(distIn, -40.f, 40.f);
-						distOut = 2.f / (1.f + std::exp(-2.f * temp)) - 1;
+						const float temp = std::clamp(distIn, -3.f, 3.f);
+						const float temp2 = temp * temp;
+						distOut = temp * (27.f + temp2) / (27.f + 9.f * temp2);
+						distOut = std::clamp(distOut, -1.f, 1.f);
 						break;
 					}
 					case SlewDistortionType::FastSoftClip1: {

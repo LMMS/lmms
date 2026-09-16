@@ -99,7 +99,7 @@ public:
 			const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2, float rel_trans);
 	virtual ~ExprSynth();
 
-	void renderOutput(fpp_t frames, SampleFrame* buf );
+	void renderOutput(f_cnt_t frames, SampleFrame* buf );
 
 
 private:

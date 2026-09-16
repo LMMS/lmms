@@ -25,6 +25,7 @@
 #ifndef LMMS_TAP_TEMPO_H
 #define LMMS_TAP_TEMPO_H
 
+#include <array>
 #include <chrono>
 
 #include "TapTempoView.h"

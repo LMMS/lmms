@@ -37,21 +37,6 @@
 namespace lmms
 {
 
-
-#define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( KnobType::Styled, this ); 				\
-	name ->move( x, y );								\
-	name ->setHintText( hint, unit );		\
-	name ->setObjectName( oname );						\
-	name ->setFixedSize( 19, 19 );
-
-#define maketsknob( name, x, y, hint, unit, oname ) 		\
-	name = new TempoSyncKnob( KnobType::Styled, this ); 				\
-	name ->move( x, y );								\
-	name ->setHintText( hint, unit );		\
-	name ->setObjectName( oname );						\
-	name ->setFixedSize( 19, 19 );
-
 #define A1ROW 26
 #define A2ROW 49
 #define B1ROW 72
@@ -91,11 +76,11 @@ class WatsynObject
 public:
 	WatsynObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames,
+					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, f_cnt_t _frames,
 					WatsynInstrument * _w );
 	virtual ~WatsynObject();
 
-	void renderOutput( fpp_t _frames );
+	void renderOutput( f_cnt_t _frames );
 
 	inline SampleFrame* abuf() const
 	{
@@ -117,7 +102,7 @@ private:
 	const sample_rate_t m_samplerate;
 	NotePlayHandle * m_nph;
 
-	fpp_t m_fpp;
+	f_cnt_t m_fpp;
 
 	WatsynInstrument * m_parent;
 
@@ -324,6 +309,18 @@ protected slots:
 
 private:
 	void modelChanged() override;
+
+	template<class T = Knob>
+	auto makeKnob(int x, int y, const QString& hint, const QString& unit,
+		const QString& objName) -> T*
+	{
+		T* knob = new T(KnobType::Styled, this);
+		knob->move(x, y);
+		knob->setHintText(hint, unit);
+		knob->setObjectName(objName);
+		knob->setFixedSize(19, 19);
+		return knob;
+	};
 
 // knobs
 	Knob * a1_volKnob;

@@ -67,7 +67,7 @@ public:
 	~InstrumentTrack() override;
 
 	// used by instrument
-	void processAudioBuffer( SampleFrame* _buf, const fpp_t _frames,
+	void processAudioBuffer( SampleFrame* _buf, const f_cnt_t _frames,
 							NotePlayHandle * _n );
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
@@ -122,7 +122,7 @@ public:
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	bool play( const TimePos & _start, const fpp_t _frames,
+	bool play( const TimePos & _start, const f_cnt_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	// create new view for me
 	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;
@@ -174,10 +174,24 @@ public:
 	}
 
 	bool keyRangeImport() const;
+
+	//! @brief Check if there is a valid mapping for the given key and it is within defined of range.
 	bool isKeyMapped(int key) const;
+
+	//! @brief Return first mapped key, based on currently selected keymap or user selection.
+	//! @return Number ranging from 0 to NumKeys -1
 	int firstKey() const;
+
+	//! @brief Return last mapped key, based on currently selected keymap or user selection.
+	//! @return Number ranging from 0 to NumKeys -1
 	int lastKey() const;
+
+	//! @brief Return base key number, based on currently selected keymap or user selection.
+	//! @return Number ranging from 0 to NumKeys -1
 	int baseNote() const;
+
+	//! @brief Return frequency assigned to the base key, based on currently selected keymap.
+	//! @return Frequency in Hz
 	float baseFreq() const;
 
 	Piano *pianoModel()
@@ -237,7 +251,12 @@ public:
 	
 	void replaceInstrument(DataFile dataFile);
 
-	void autoAssignMidiDevice( bool );
+	//! @brief Automatically assign a midi controller to this track, based on the midiautoassign setting
+	//! @param assign Set to true to connect the midi device, set to false to disconnect
+	void autoAssignMidiDevice(bool assign);
+
+	//! Returns a non-owning pointer to the model for the knob at the given index in the track's MIDI CC rack
+	FloatModel* midiCCModel(int index) const { return m_midiCCModel[index].get(); }
 
 signals:
 	void instrumentChanged();

@@ -46,7 +46,7 @@ public:
 	ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~ReverbSCEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
 
 	EffectControls* controls() override
 	{

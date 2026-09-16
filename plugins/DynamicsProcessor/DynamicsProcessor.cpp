@@ -93,7 +93,7 @@ inline void DynProcEffect::calcRelease()
 }
 
 
-Effect::ProcessStatus DynProcEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus DynProcEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	//qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
 
@@ -134,7 +134,7 @@ Effect::ProcessStatus DynProcEffect::processImpl(SampleFrame* buf, const fpp_t f
 		}
 	}
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		auto s = std::array{buf[f][0], buf[f][1]};
 
