@@ -150,8 +150,9 @@ using Vec = detail::Vec<DataType, lanes>::type;
 #	else
 		LMMS_DEFINE_SIMD_GENERIC_ALIGN(load,  vld1q_f32, vld1q_f32)
 		LMMS_DEFINE_SIMD_GENERIC_ALIGN(store, vst1q_f32, vst1q_f32)
-		LMMS_DEFINE_SIMD_GENERIC(      add,   vaddq_f32)
 #	endif
+
+	LMMS_DEFINE_SIMD_GENERIC(add, vaddq_f32)
 #endif
 
 // NOTE: Can define more generic intrinsics here as needed
