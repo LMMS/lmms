@@ -79,7 +79,7 @@ public:
 
 
 public slots:
-	void setFile( const QString & _patch_file, bool _rename = true );
+	void setFile( const QString & _patch_file, bool _rename = true, bool _showErrorDialog = false );
 
 
 private:
