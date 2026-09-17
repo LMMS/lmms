@@ -24,6 +24,7 @@ set(LMMS_SRCS
 	core/EffectChain.cpp
 	core/Engine.cpp
 	core/EnvelopeAndLfoParameters.cpp
+	core/FeatureDetection.cpp
 	core/fft_helpers.cpp
 	core/Mixer.cpp
 	core/ImportFilter.cpp
