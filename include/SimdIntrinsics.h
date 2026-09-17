@@ -37,40 +37,54 @@ namespace lmms {
 
 #if defined(LMMS_HOST_X86_64)
 #	ifndef _MSC_VER
-#		define LMMS_DEFINE_SIMD_GENERIC(name, fn128, fn256, fn512)              \
+#		define LMMS_DEFINE_SIMD_GENERIC(name, fn128, fn256, fn512) \
 			template<std::uint8_t lanes> inline constexpr const auto& name = 0; \
-			template<> inline constexpr const auto& name<4>  = fn128;           \
-			template<> inline constexpr const auto& name<8>  = fn256;           \
+			template<> inline constexpr const auto& name<4>  = fn128; \
+			template<> inline constexpr const auto& name<8>  = fn256; \
 			template<> inline constexpr const auto& name<16> = fn512;
+#		define LMMS_DEFINE_SIMD_GENERIC_ALIGN(name, fn128Aligned, fn256Aligned, fn512Aligned, fn128Unaligned, fn256Unaligned, fn512Unaligned) \
+			template<std::uint8_t lanes, bool aligned = false> inline constexpr const auto& name = 0; \
+			template<> inline constexpr const auto& name<4, true>   = fn128Aligned; \
+			template<> inline constexpr const auto& name<8, true>   = fn256Aligned; \
+			template<> inline constexpr const auto& name<16, true>  = fn512Aligned; \
+			template<> inline constexpr const auto& name<4, false>  = fn128Unaligned; \
+			template<> inline constexpr const auto& name<8, false>  = fn256Unaligned; \
+			template<> inline constexpr const auto& name<16, false> = fn512Unaligned;
 #	else
 #		define LMMS_DEFINE_SIMD_GENERIC(name, fn128, fn256, fn512) \
-			template<std::uint8_t lanes, class... Args>            \
-			LMMS_INLINE auto name(Args... args) -> decltype(auto)  \
-			{                                                      \
-			    if constexpr (lanes == 4) {                        \
-			        return (fn128)(args...);                       \
-			    } else if constexpr (lanes == 8) {                 \
-			        return (fn256)(args...);                       \
-			    } else if constexpr (lanes == 16) {                \
-			        return (fn512)(args...);                       \
-			    } else { static_assert(lanes == 4); }              \
-			}
+			template<std::uint8_t lanes> inline constexpr const auto& name = 0; \
+			template<> inline constexpr const auto& name<4>   = [](auto... args) -> decltype(auto) \
+				{ return fn128(args...); }; \
+			template<> inline constexpr const auto& name<8>   = [](auto... args) -> decltype(auto) \
+				{ return fn256(args...); }; \
+			template<> inline constexpr const auto& name<16>  = [](auto... args) -> decltype(auto) \
+				{ return fn512(args...); };
+#		define LMMS_DEFINE_SIMD_GENERIC_ALIGN(name, fn128Aligned, fn256Aligned, fn512Aligned, fn128Unaligned, fn256Unaligned, fn512Unaligned) \
+			template<std::uint8_t lanes, bool aligned = false> inline constexpr const auto& name = 0; \
+			template<> inline constexpr const auto& name<4, true>   = [](auto... args) -> decltype(auto) \
+				{ return fn128Aligned(args...); }; \
+			template<> inline constexpr const auto& name<8, true>   = [](auto... args) -> decltype(auto) \
+				{ return fn256Aligned(args...); }; \
+			template<> inline constexpr const auto& name<16, true>  = [](auto... args) -> decltype(auto) \
+				{ return fn512Aligned(args...); }; \
+			template<> inline constexpr const auto& name<4, false>  = [](auto... args) -> decltype(auto) \
+				{ return fn128Unaligned(args...); }; \
+			template<> inline constexpr const auto& name<8, false>  = [](auto... args) -> decltype(auto) \
+				{ return fn256Unaligned(args...); }; \
+			template<> inline constexpr const auto& name<16, false> = [](auto... args) -> decltype(auto) \
+				{ return fn512Unaligned(args...); };
 #	endif
 #elif defined(LMMS_HOST_ARM64)
-#	ifndef _MSC_VER
-#		define LMMS_DEFINE_SIMD_GENERIC(name, fn128)                            \
-			template<std::uint8_t lanes> inline constexpr const auto& name = 0; \
-			template<> inline constexpr const auto& name<4>  = fn128;
-#	else
-#		define LMMS_DEFINE_SIMD_GENERIC(name, fn128)               \
-			template<std::uint8_t lanes, class... Args>            \
-			LMMS_INLINE auto name(Args... args) -> decltype(auto)  \
-			{                                                      \
-			    if constexpr (lanes == 4) {                        \
-			        return (fn128)(args...);                       \
-			    } else { static_assert(lanes == 4); }              \
-			}
-#	endif
+#	define LMMS_DEFINE_SIMD_GENERIC(name, fn128) \
+		template<std::uint8_t lanes> inline constexpr const auto& name = 0; \
+		template<> inline constexpr const auto& name<4>  = [](auto... args) -> decltype(auto) \
+			{ return fn128(args...); };
+#	define LMMS_DEFINE_SIMD_GENERIC_ALIGN(name, fn128Aligned, fn128Unaligned) \
+		template<std::uint8_t lanes, bool aligned = false> inline constexpr const auto& name = 0; \
+		template<> inline constexpr const auto& name<4, true>   = [](auto... args) -> decltype(auto) \
+			{ return fn128Aligned(args...); }; \
+		template<> inline constexpr const auto& name<4, false>  = [](auto... args) -> decltype(auto) \
+			{ return fn128Unaligned(args...); };
 #endif
 
 namespace simd {
@@ -119,17 +133,13 @@ using Vec = detail::Vec<DataType, lanes>::type;
 /////////////////////////////////////////////////
 
 #if defined(LMMS_HOST_X86_64)
-	LMMS_DEFINE_SIMD_GENERIC(loadAligned,    _mm_load_ps,   _mm256_load_ps,   _mm512_load_ps)
-	LMMS_DEFINE_SIMD_GENERIC(loadUnaligned,  _mm_loadu_ps,  _mm256_loadu_ps,  _mm512_loadu_ps)
-	LMMS_DEFINE_SIMD_GENERIC(storeAligned,   _mm_store_ps,  _mm256_store_ps,  _mm512_store_ps)
-	LMMS_DEFINE_SIMD_GENERIC(storeUnaligned, _mm_storeu_ps, _mm256_storeu_ps, _mm512_storeu_ps)
-	LMMS_DEFINE_SIMD_GENERIC(add,            _mm_add_ps,    _mm256_add_ps,    _mm512_add_ps)
+	LMMS_DEFINE_SIMD_GENERIC_ALIGN(load,  _mm_load_ps,  _mm256_load_ps,  _mm512_load_ps,  _mm_loadu_ps,  _mm256_loadu_ps,  _mm512_loadu_ps)
+	LMMS_DEFINE_SIMD_GENERIC_ALIGN(store, _mm_store_ps, _mm256_store_ps, _mm512_store_ps, _mm_storeu_ps, _mm256_storeu_ps, _mm512_storeu_ps)
+	LMMS_DEFINE_SIMD_GENERIC(      add,   _mm_add_ps,   _mm256_add_ps,   _mm512_add_ps)
 #elif defined(LMMS_HOST_ARM64)
-	LMMS_DEFINE_SIMD_GENERIC(loadAligned,    vld1q_f32)
-	LMMS_DEFINE_SIMD_GENERIC(loadUnaligned,  vld1q_f32)
-	LMMS_DEFINE_SIMD_GENERIC(storeAligned,   vst1q_f32)
-	LMMS_DEFINE_SIMD_GENERIC(storeUnaligned, vst1q_f32)
-	LMMS_DEFINE_SIMD_GENERIC(add,            vaddq_f32)
+	LMMS_DEFINE_SIMD_GENERIC_ALIGN(load,  vld1q_f32,    vld1q_f32)
+	LMMS_DEFINE_SIMD_GENERIC_ALIGN(store, vst1q_f32,    vst1q_f32)
+	LMMS_DEFINE_SIMD_GENERIC(      add,   vaddq_f32)
 #endif
 
 // NOTE: Can define more generic intrinsics here as needed
@@ -161,20 +171,8 @@ struct SimdIntrinsics
 		}
 	}
 
-	// Loads
-
-	static constexpr const auto& loadAligned    = simd::loadAligned<lanes>;
-	static constexpr const auto& loadUnaligned  = simd::loadUnaligned<lanes>;
-	static constexpr const auto& load           = aligned ? loadAligned : loadUnaligned;
-
-	// Stores
-
-	static constexpr const auto& storeAligned   = simd::storeAligned<lanes>;
-	static constexpr const auto& storeUnaligned = simd::storeUnaligned<lanes>;
-	static constexpr const auto& store          = aligned ? storeAligned : storeUnaligned;
-
-	// Add
-
+	static constexpr const auto& load           = simd::load<lanes, aligned>;
+	static constexpr const auto& store          = simd::store<lanes, aligned>;
 	static constexpr const auto& add            = simd::add<lanes>;
 };
 
