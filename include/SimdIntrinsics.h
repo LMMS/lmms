@@ -159,8 +159,14 @@ using Vec = detail::Vec<DataType, lanes>::type;
 
 } // namespace simd
 
-#undef LMMS_DEFINE_SIMD_GENERIC
+#if defined(LMMS_DEFINE_SIMD_GENERIC)
+#	undef LMMS_DEFINE_SIMD_GENERIC
+#endif
+#if defined(LMMS_DEFINE_SIMD_GENERIC_ALIGN)
+#	undef LMMS_DEFINE_SIMD_GENERIC_ALIGN
+#endif
 
+//! SIMD intrinsics and helpers for the given @a DataType, @a lanes, and alignment
 template<typename DataType, std::uint8_t lanes, bool aligned = false>
 struct SimdIntrinsics
 {
@@ -184,9 +190,9 @@ struct SimdIntrinsics
 		}
 	}
 
-	static constexpr const auto& load           = simd::load<lanes, aligned>;
-	static constexpr const auto& store          = simd::store<lanes, aligned>;
-	static constexpr const auto& add            = simd::add<lanes>;
+	static constexpr const auto& load  = simd::load<lanes, aligned>;
+	static constexpr const auto& store = simd::store<lanes, aligned>;
+	static constexpr const auto& add   = simd::add<lanes>;
 };
 
 } // namespace lmms
