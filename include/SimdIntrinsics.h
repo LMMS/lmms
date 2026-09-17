@@ -137,9 +137,21 @@ using Vec = detail::Vec<DataType, lanes>::type;
 	LMMS_DEFINE_SIMD_GENERIC_ALIGN(store, _mm_store_ps, _mm256_store_ps, _mm512_store_ps, _mm_storeu_ps, _mm256_storeu_ps, _mm512_storeu_ps)
 	LMMS_DEFINE_SIMD_GENERIC(      add,   _mm_add_ps,   _mm256_add_ps,   _mm512_add_ps)
 #elif defined(LMMS_HOST_ARM64)
-	LMMS_DEFINE_SIMD_GENERIC_ALIGN(load,  vld1q_f32,    vld1q_f32)
-	LMMS_DEFINE_SIMD_GENERIC_ALIGN(store, vst1q_f32,    vst1q_f32)
-	LMMS_DEFINE_SIMD_GENERIC(      add,   vaddq_f32)
+#	if defined(__clang__)
+		// Clang uses macros for these load/store intrinsics...
+		template<std::uint8_t lanes, bool aligned = false> inline constexpr const auto& load = 0;
+		template<> inline constexpr const auto& load<4, aligned> = [](const float* p) -> Vec<float, 4> {
+			return vld1q_f32(p);
+		};
+		template<std::uint8_t lanes, bool aligned = false> inline constexpr const auto& store = 0;
+		template<> inline constexpr const auto& store<4, aligned> = [](float* p, Vec<float, 4> a) -> void {
+			vst1q_f32(p, a);
+		};
+#	else
+		LMMS_DEFINE_SIMD_GENERIC_ALIGN(load,  vld1q_f32, vld1q_f32)
+		LMMS_DEFINE_SIMD_GENERIC_ALIGN(store, vst1q_f32, vst1q_f32)
+		LMMS_DEFINE_SIMD_GENERIC(      add,   vaddq_f32)
+#	endif
 #endif
 
 // NOTE: Can define more generic intrinsics here as needed
