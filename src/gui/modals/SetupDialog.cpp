@@ -490,15 +490,28 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	labelWidget(audio_w,
 			tr("Audio"));
 
+	// General controls widget.
+	auto audioControls = new QWidget(audio_w);
+
+	// Path selectors layout.
+	auto audioControlsLayout = new QVBoxLayout;
+	audioControlsLayout->setSpacing(10);
+	audioControlsLayout->setContentsMargins(0, 0, 0, 0);
+
+
+	auto audioScroll = new QScrollArea(audio_w);
+	audioScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	audioScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
 	// Audio interface group
-	QGroupBox * audioInterfaceBox = new QGroupBox(tr("Audio interface"), audio_w);
+	QGroupBox * audioInterfaceBox = new QGroupBox(tr("Audio interface"), audioControls);
 	QVBoxLayout * audioInterfaceLayout = new QVBoxLayout(audioInterfaceBox);
 
 	m_audioInterfaces = new QComboBox(audioInterfaceBox);
 	audioInterfaceLayout->addWidget(m_audioInterfaces);
 
 	// Ifaces-settings-widget.
-	auto as_w = new QWidget(audio_w);
+	auto as_w = new QWidget(audioControls);
 
 	auto as_w_layout = new QHBoxLayout(as_w);
 	as_w_layout->setSpacing(0);
@@ -566,7 +579,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	connect(m_audioInterfaces, &QComboBox::textActivated, this, &SetupDialog::audioInterfaceChanged);
 
-	auto sampleRateBox = new QGroupBox{tr("Sample rate"), audio_w};
+	auto sampleRateBox = new QGroupBox{tr("Sample rate"), audioControls};
 
 	m_sampleRateSlider = new QSlider{Qt::Horizontal};
 	m_sampleRateSlider->setRange(0, SUPPORTED_SAMPLERATES.size() - 1);
@@ -605,7 +618,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		[setSampleRate] { setSampleRate(SUPPORTED_SAMPLERATES.front()); });
 
 	// Buffer size group
-	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audio_w);
+	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audioControls);
 	QVBoxLayout * bufferSizeLayout = new QVBoxLayout(bufferSizeBox);
 	QHBoxLayout * bufferSizeSubLayout = new QHBoxLayout();
 
@@ -641,7 +654,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	setBufferSize(m_bufferSizeSlider->value());
 
-	const auto otherBox = new QGroupBox(tr("Other"), audio_w);
+	const auto otherBox = new QGroupBox(tr("Other"), audioControls);
 	const auto otherBoxLayout = new QVBoxLayout{otherBox};
 
 	const auto enableMixSanitizationCheckbox = addCheckBox(tr("Enable mix sanitization"), otherBox, otherBoxLayout,
@@ -650,12 +663,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 												 "corrupted audio, but may negatively impact performance."));
 
 	// Audio layout ordering.
-	audio_layout->addWidget(audioInterfaceBox);
-	audio_layout->addWidget(as_w);
-	audio_layout->addWidget(sampleRateBox);
-	audio_layout->addWidget(bufferSizeBox);
-	audio_layout->addWidget(otherBox);
-	audio_layout->addStretch();
+	audioControlsLayout->addWidget(audioInterfaceBox);
+	audioControlsLayout->addWidget(as_w);
+	audioControlsLayout->addWidget(sampleRateBox);
+	audioControlsLayout->addWidget(bufferSizeBox);
+	audioControlsLayout->addWidget(otherBox);
+	audioControlsLayout->addStretch();
+	audioControls->setLayout(audioControlsLayout);
+
+	audioScroll->setWidget(audioControls);
+	audioScroll->setWidgetResizable(true);
+	audio_layout->addWidget(audioScroll, 1);
 
 
 
