@@ -140,11 +140,11 @@ using Vec = detail::Vec<DataType, lanes>::type;
 #	if defined(__clang__)
 		// Clang uses macros for these load/store intrinsics...
 		template<std::uint8_t lanes, bool aligned = false> inline constexpr const auto& load = 0;
-		template<> inline constexpr const auto& load<4, aligned> = [](const float* p) -> Vec<float, 4> {
+		template<bool aligned> inline constexpr const auto& load<4, aligned> = [](const float* p) -> Vec<float, 4> {
 			return vld1q_f32(p);
 		};
 		template<std::uint8_t lanes, bool aligned = false> inline constexpr const auto& store = 0;
-		template<> inline constexpr const auto& store<4, aligned> = [](float* p, Vec<float, 4> a) -> void {
+		template<bool aligned> inline constexpr const auto& store<4, aligned> = [](float* p, Vec<float, 4> a) -> void {
 			vst1q_f32(p, a);
 		};
 #	else
