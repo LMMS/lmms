@@ -212,7 +212,6 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 	{
 		parent.setAttribute("chance", m_chance);
 	}
-
 }
 
 
