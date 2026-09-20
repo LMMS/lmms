@@ -36,7 +36,7 @@ namespace lmms
 
 Note::Note( const TimePos & length, const TimePos & pos,
 		int key, volume_t volume, panning_t panning,
-						std::shared_ptr<DetuningHelper> detuning ) :
+						std::shared_ptr<DetuningHelper> detuning, noterand_t chance) :
 	m_selected( false ),
 	m_oldKey(std::clamp(key, 0, NumKeys)),
 	m_oldPos( pos ),
@@ -45,6 +45,7 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_key(std::clamp(key, 0, NumKeys)),
 	m_volume(std::clamp(volume, MinVolume, MaxVolume)),
 	m_panning(std::clamp(panning, PanningLeft, PanningRight)),
+	m_chance(std::clamp(chance, MinChance, MaxChance)),
 	m_length( length ),
 	m_pos(pos),
 	m_detuning(std::move(detuning))
@@ -64,6 +65,7 @@ Note::Note( const Note & note ) :
 	m_key( note.m_key),
 	m_volume( note.m_volume ),
 	m_panning( note.m_panning ),
+	m_chance( note.m_chance ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
 	m_detuning(note.m_detuning),
@@ -81,6 +83,7 @@ Note& Note::operator=(const Note& note)
 	m_key = note.m_key;
 	m_volume = note.m_volume;
 	m_panning = note.m_panning;
+	m_chance = note.m_chance;
 	m_length = note.m_length;
 	m_pos = note.m_pos;
 	m_type = note.m_type;
@@ -150,6 +153,12 @@ void Note::setPanning( panning_t panning )
 }
 
 
+void Note::setChance(noterand_t chance)
+{
+	m_chance = std::clamp(chance, MinChance, MaxChance);
+}
+
+
 
 
 TimePos Note::quantized( const TimePos & m, const int qGrid )
@@ -198,6 +207,12 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 	{
 		m_detuning->saveSettings( doc, parent );
 	}
+
+	if (m_chance < MaxChance)
+	{
+		parent.setAttribute("chance", m_chance);
+	}
+
 }
 
 
@@ -209,6 +224,7 @@ void Note::loadSettings( const QDomElement & _this )
 	m_key = std::max(oldKey, _this.attribute("key").toInt());
 	m_volume = _this.attribute( "vol" ).toInt();
 	m_panning = _this.attribute( "pan" ).toInt();
+	m_chance = std::clamp(_this.attribute("chance", "1").toFloat(), MinChance, MaxChance);
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
 	// Default m_type value is 0, which corresponds to RegularNote
