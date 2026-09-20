@@ -1,3 +1,27 @@
+/*
+ * PathUtil.cpp
+ *
+ * Copyright (c) 2019-2022 Spekular <Spekularr@gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
 #include "PathUtil.h"
 
 #include <QDir>
@@ -5,6 +29,8 @@
 
 #include "ConfigManager.h"
 #include "Engine.h"
+#include "lmmsconfig.h" // IWYU pragma: keep
+#include "IoHelper.h" // IWYU pragma: keep
 #include "Song.h"
 
 namespace lmms::PathUtil
@@ -226,4 +252,35 @@ namespace lmms::PathUtil
 		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
 	}
 
+	auto stringToPath(std::string_view path) -> std::filesystem::path
+	{
+#if defined(LMMS_BUILD_WIN32)
+		return toWString(path).get();
+#else
+		// Assume UTF-8 is the narrow encoding on non-Windows
+		return path;
+#endif
+	}
+
+	auto stringToPath(const QString& path) -> std::filesystem::path
+	{
+#if defined(LMMS_BUILD_WIN32)
+		// Cast QString's UTF-16 encoded unsigned short* to wchar_t*
+		return reinterpret_cast<const wchar_t*>(path.utf16());
+#else
+		// Convert to UTF-8, which we assume is the narrow encoding on non-Windows
+		return path.toStdString();
+#endif
+	}
+
+	auto pathToString(const std::filesystem::path& path) -> std::string
+	{
+#if defined(LMMS_BUILD_WIN32)
+		const auto utf8String = path.u8string();
+		return {reinterpret_cast<const char*>(utf8String.c_str()), utf8String.size()};
+#else
+		// Assume UTF-8 is the narrow encoding on non-Windows
+		return path.string();
+#endif
+	}
 } // namespace lmms::PathUtil

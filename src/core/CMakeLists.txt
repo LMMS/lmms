@@ -99,10 +99,8 @@ set(LMMS_SRCS
 	core/audio/AudioFileFlac.cpp
 	core/audio/AudioFileWave.cpp
 	core/audio/AudioJack.cpp
-	core/audio/AudioOss.cpp
 	core/audio/AudioSndio.cpp
 	core/audio/AudioPortAudio.cpp
-	core/audio/AudioSoundIo.cpp
 	core/audio/AudioPulseAudio.cpp
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
@@ -126,7 +124,6 @@ set(LMMS_SRCS
 	core/midi/MidiController.cpp
 	core/midi/MidiEventToByteSeq.cpp
 	core/midi/MidiJack.cpp
-	core/midi/MidiOss.cpp
 	core/midi/MidiSndio.cpp
 	core/midi/MidiApple.cpp
 	core/midi/MidiPort.cpp
