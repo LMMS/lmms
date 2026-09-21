@@ -152,6 +152,9 @@ file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION 
 set(ENV{EXTRA_PLATFORM_PLUGINS} "libqwayland-generic.so")
 set(ENV{EXTRA_QT_MODULES} "waylandcompositor")
 
+# Inform linuxdeploy-plugin-qt which qt version to use
+set(ENV{QMAKE} "${CPACK_QMAKE_EXECUTABLE}")
+
 # Call linuxdeploy
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
