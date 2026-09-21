@@ -63,6 +63,7 @@ SET(LMMS_PLUGIN_LIST
 	Sf2Player
 	Sfxr
 	Sid
+	SfzPlayer
 	SlewDistortion
 	SlicerT
 	SpectrumAnalyzer
