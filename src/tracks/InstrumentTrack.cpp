@@ -42,6 +42,8 @@
 #include "Pitch.h"
 #include "Song.h"
 
+#include "lmms_math.h"
+
 namespace lmms
 {
 
@@ -762,6 +764,13 @@ bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 			// Skip any notes note at the current time pos or not overlapping with the start.
 			if (!(currentNote->pos() == cur_start
 				|| (cur_start == -c->startTimeOffset() && (*nit)->pos() < cur_start && (*nit)->endPos() > cur_start)))
+			{
+				++nit;
+				continue;
+			}
+
+			if (const auto chance = currentNote->getChance();
+				chance < MaxChance && fastRand(1.f) >= chance)
 			{
 				++nit;
 				continue;
