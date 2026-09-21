@@ -17,7 +17,6 @@ jobs:
         -DWANT_DEBUG_CPACK=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      CMAKE_BUILD_PARALLEL_LEVEL: 4
     steps:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -26,6 +25,9 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Set up environment
+        run: |
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)" | tee -a "$GITHUB_ENV"
       - name: Clone fltk
         uses: actions/checkout@v7
         with:
@@ -107,7 +109,6 @@ jobs:
         -DWANT_DEBUG_CPACK=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      CMAKE_BUILD_PARALLEL_LEVEL: 4
       DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Configure git
@@ -117,6 +118,9 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Set up environment
+        run: |
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)" | tee -a "$GITHUB_ENV"
       - name: Clone fltk
         uses: actions/checkout@v7
         with:
@@ -186,12 +190,10 @@ jobs:
             os: macos-15-intel
             xcode: "16.4"
             macosx_deployment_target: 10.15
-            cores: 4
           - arch: arm64
             os: macos-15
             xcode: "16.4"
             macosx_deployment_target: 11.0
-            cores: 3
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
@@ -204,7 +206,6 @@ jobs:
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      CMAKE_BUILD_PARALLEL_LEVEL: ${{ matrix.cores }}
       DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - name: Check out
@@ -212,6 +213,9 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Set up environment
+        run: |
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=$(sysctl -n hw.logicalcpu)" | tee -a "$GITHUB_ENV"
       - name: Clean up Homebrew download cache
         run: rm -rf ~/Library/Caches/Homebrew/downloads
       - name: Restore Homebrew download cache
@@ -293,7 +297,6 @@ jobs:
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      CMAKE_BUILD_PARALLEL_LEVEL: 4
     steps:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -302,6 +305,9 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Set up environment
+        run: |
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)" | tee -a "$GITHUB_ENV"
       - name: Cache vcpkg dependencies
         id: cache-deps
         uses: actions/cache@v6
