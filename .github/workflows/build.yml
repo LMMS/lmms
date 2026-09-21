@@ -17,7 +17,7 @@ jobs:
         -DWANT_DEBUG_CPACK=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      MAKEFLAGS: -j2
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
     steps:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -107,7 +107,7 @@ jobs:
         -DWANT_DEBUG_CPACK=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      MAKEFLAGS: -j2
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
       DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Configure git
@@ -186,10 +186,12 @@ jobs:
             os: macos-15-intel
             xcode: "16.4"
             macosx_deployment_target: 10.15
+            cores: 4
           - arch: arm64
             os: macos-15
             xcode: "16.4"
             macosx_deployment_target: 11.0
+            cores: 3
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
@@ -202,7 +204,7 @@ jobs:
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      MAKEFLAGS: -j3
+      CMAKE_BUILD_PARALLEL_LEVEL: ${{ matrix.cores }}
       DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - name: Check out
@@ -291,7 +293,7 @@ jobs:
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      MAKEFLAGS: -j2
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
     steps:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -359,6 +361,7 @@ jobs:
     env:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
     steps:
       - name: Check out
         uses: actions/checkout@v7
@@ -454,7 +457,7 @@ jobs:
         -DCPACK_NSIS_EXECUTABLE=/clang64/bin/makensis.exe
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      MAKEFLAGS: -j2
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
     steps:
       - name: Check out
         uses: actions/checkout@v7
