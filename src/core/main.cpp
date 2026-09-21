@@ -61,6 +61,7 @@
 #include "NotePlayHandle.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FeatureDetection.h"
 #include "GuiApplication.h"
 #include "Hardware.h"
 #include "ImportFilter.h"
@@ -139,8 +140,10 @@ inline void loadTranslation( const QString & tname,
 
 void printVersion( char *executableName )
 {
+	const auto features = lmms::FeatureDetection::runtimeCpuFeatures();
 	printf("LMMS %s\n(%s %s, Qt %s, %s)\n\n"
 		"Build options:\n%s\n\n"
+		"Baseline CPU features:\n%s\n\nDetected CPU features:\n%s\n\n"
 		"Copyright (c) %s\n\n"
 		"This program is free software; you can redistribute it and/or\n"
 		"modify it under the terms of the GNU General Public\n"
@@ -148,6 +151,8 @@ void printVersion( char *executableName )
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
 		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION, LMMS_BUILD_OPTIONS,
+		lmms::FeatureDetection::formattedCpuFeatures().c_str(),
+		lmms::FeatureDetection::formattedCpuFeatures(features).c_str(),
 		LMMS_PROJECT_COPYRIGHT, executableName);
 }
 
@@ -292,6 +297,15 @@ int main( int argc, char * * argv )
 			// fullscreen mode (default, no -geometry given).
 			fullscreen = false;
 		}
+	}
+
+	if (!FeatureDetection::isCurrentCpuSupported())
+	{
+		const auto features = FeatureDetection::runtimeCpuFeatures();
+		qCritical() << QObject::tr("ERROR: This CPU is unsupported.\nRequired: %1\n  Actual: %2")
+			.arg(QString::fromStdString(FeatureDetection::formattedCpuFeatures()))
+			.arg(QString::fromStdString(FeatureDetection::formattedCpuFeatures(features)));
+		return EXIT_FAILURE;
 	}
 
 #ifdef LMMS_DEBUG_FPE
