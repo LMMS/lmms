@@ -28,6 +28,8 @@
 
 #include <vector>
 
+#include <algorithm>
+
 #include "AudioEngine.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
@@ -86,8 +88,7 @@ Controller::Controller( ControllerType _type, Model * _parent,
 
 Controller::~Controller()
 {
-	auto it = std::find(s_controllers.begin(), s_controllers.end(), this);
-	if (it != s_controllers.end())
+	if (auto it = std::ranges::find(s_controllers, this); it != s_controllers.end())
 	{
 		s_controllers.erase(it);
 	}
