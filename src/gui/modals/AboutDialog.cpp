@@ -28,6 +28,9 @@
 #include "embed.h"
 #include "versioninfo.h"
 
+#include <QClipboard>
+#include <QGuiApplication>
+
 
 namespace lmms::gui
 {
@@ -49,7 +52,11 @@ AboutDialog::AboutDialog(QWidget* parent) :
 					arg( LMMS_BUILDCONF_COMPILER_VERSION ) );
 	versionLabel->setTextInteractionFlags(
 					versionLabel->textInteractionFlags() |
-					Qt::TextSelectableByMouse );
+					Qt::TextSelectableByMouse |
+					Qt::TextSelectableByKeyboard );
+	connect(copyVersionButton, &QPushButton::clicked, this, [this] {
+		QGuiApplication::clipboard()->setText(versionLabel->text());
+	});
 
 	copyrightLabel->setText( copyrightLabel->text().
 					arg( LMMS_PROJECT_COPYRIGHT ) );
