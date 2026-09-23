@@ -26,20 +26,25 @@
 
 #include <cstdint>
 
-namespace lmms
-{
+#include "TracyProfiling.h"
 
-AudioEngineProfiler::AudioEngineProfiler() :
-	m_periodTimer(),
-	m_cpuLoad( 0 ),
-	m_outputFile()
+namespace lmms {
+namespace {
+
+[[maybe_unused]] constexpr const char* PeriodName = "AudioEngine period";
+
+} // namespace
+
+void AudioEngineProfiler::startPeriod()
 {
+	m_periodTimer.reset();
+	FrameMarkStart(PeriodName);
 }
-
-
 
 void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, f_cnt_t framesPerPeriod )
 {
+	FrameMarkEnd(PeriodName);
+
 	// Time taken to process all data and fill the audio buffer.
 	const unsigned int periodElapsed = m_periodTimer.elapsed();
 	// Maximum time the processing can take before causing buffer underflow. Convert to us.
@@ -65,13 +70,62 @@ void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, f_cnt_t frames
 	}
 }
 
-
-
 void AudioEngineProfiler::setOutputFile( const QString& outputFile )
 {
 	m_outputFile.close();
 	m_outputFile.setFileName( outputFile );
 	m_outputFile.open( QFile::WriteOnly | QFile::Truncate );
+}
+
+AudioEngineProfiler::Probe::Probe(AudioEngineProfiler& profiler, AudioEngineProfiler::DetailType type)
+	: m_profiler(profiler)
+	, m_type(type)
+{
+	profiler.startDetail(type);
+
+#ifdef LMMS_DEBUG_TRACY
+	TracyCZone(context, true);
+
+	switch (type)
+	{
+		case DetailType::NoteSetup:
+			TracyCZoneName(context, "Note Setup", sizeof("Note Setup"));
+			TracyCZoneColor(context, tracy::Color::SpringGreen); // #00ff7f
+			break;
+		case DetailType::Instruments:
+			TracyCZoneName(context, "Instruments", sizeof("Instruments"));
+			TracyCZoneColor(context, tracy::Color::Tomato); // #ff6347
+			break;
+		case DetailType::Effects:
+			TracyCZoneName(context, "Effects", sizeof("Effects"));
+			TracyCZoneColor(context, tracy::Color::DarkTurquoise); // #00ced1
+			break;
+		case DetailType::Mixing:
+			TracyCZoneName(context, "Mixing", sizeof("Mixing"));
+			TracyCZoneColor(context, tracy::Color::Maroon); // #b03060
+			break;
+		default: break;
+	}
+
+	// Store the Tracy context
+	m_context.id     = context.id;
+	m_context.active = context.active;
+#endif
+}
+
+AudioEngineProfiler::Probe::~Probe()
+{
+#ifdef LMMS_DEBUG_TRACY
+	// Restore the Tracy context
+	auto context = TracyCZoneCtx {
+		.id     = m_context.id,
+		.active = m_context.active
+	};
+
+	TracyCZoneEnd(context);
+#endif
+
+	m_profiler.finishDetail(m_type);
 }
 
 } // namespace lmms
