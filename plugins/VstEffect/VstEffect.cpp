@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new VstSubPluginFeatures( Plugin::Type::Effect )
+	new VstSubPluginFeatures(Plugin::Type::Effect)
 } ;
 
 }
@@ -69,9 +69,8 @@ VstEffect::VstEffect( Model * _parent,
 	if( !m_key.attributes["file"].isEmpty() )
 	{
 		loaded = openPlugin(m_key.attributes["file"]);
+		setDisplayName(m_key.displayName());
 	}
-	setDisplayName( m_key.attributes["file"].section( ".dll", 0, 0 ).isEmpty()
-		? m_key.name : m_key.attributes["file"].section( ".dll", 0, 0 ) );
 
 	setDontRun(!loaded);
 }
