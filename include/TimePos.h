@@ -35,9 +35,10 @@ namespace lmms
 {
 
 // note: a bar was erroneously called "tact" in older versions of LMMS
-const int DefaultTicksPerBar = 192;
-const int DefaultStepsPerBar = 16;
-const int DefaultBeatsPerBar = DefaultTicksPerBar / DefaultStepsPerBar;
+inline constexpr int DefaultTicksPerBar  = 192;
+inline constexpr int DefaultTicksPerBeat = DefaultTicksPerBar / 4;
+inline constexpr int DefaultStepsPerBar  = 16;
+inline constexpr int DefaultBeatsPerBar  = DefaultTicksPerBar / DefaultStepsPerBar;
 
 
 class MeterModel;
