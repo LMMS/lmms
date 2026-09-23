@@ -57,12 +57,12 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	createLcdFloatSpinBox(5, 2, "11green", tr("High/Mid Crossover"), this, 352, 76, &controls->m_split1Model, tr("High/Mid Crossover"));
 	createLcdFloatSpinBox(5, 2, "11green", tr("Mid/Low Crossover"), this, 352, 156, &controls->m_split2Model, tr("Mid/Low Crossover"));
 
-	createPixmapButton(tr("High/mid band split"), this, 369, 104, &controls->m_split1EnabledModel, "crossover_led_green", "crossover_led_off", tr("High/mid band split"));
-	createPixmapButton(tr("Mid/low band split"), this, 369, 126, &controls->m_split2EnabledModel, "crossover_led_green", "crossover_led_off", tr("Mid/low band split"));
+	createPixmapButton(this, 369, 104, &controls->m_split1EnabledModel, "crossover_led_green", "crossover_led_off", tr("High/mid band split"));
+	createPixmapButton(this, 369, 126, &controls->m_split2EnabledModel, "crossover_led_green", "crossover_led_off", tr("Mid/low band split"));
 
-	createPixmapButton(tr("Enable High Band"), this, 143, 66, &controls->m_band1EnabledModel, "high_band_active", "high_band_inactive", tr("Enable High Band"));
-	createPixmapButton(tr("Enable Mid Band"), this, 143, 146, &controls->m_band2EnabledModel, "mid_band_active", "mid_band_inactive", tr("Enable Mid Band"));
-	createPixmapButton(tr("Enable Low Band"), this, 143, 226, &controls->m_band3EnabledModel, "low_band_active", "low_band_inactive", tr("Enable Low Band"));
+	createPixmapButton(this, 143, 66, &controls->m_band1EnabledModel, "high_band_active", "high_band_inactive", tr("Enable High Band"));
+	createPixmapButton(this, 143, 146, &controls->m_band2EnabledModel, "mid_band_active", "mid_band_inactive", tr("Enable Mid Band"));
+	createPixmapButton(this, 143, 226, &controls->m_band3EnabledModel, "low_band_active", "low_band_inactive", tr("Enable Low Band"));
 
 	createKnob(KnobType::Bright26, this, 53, 43, &controls->m_inHighModel, tr("High Input Volume:"), " dB", tr("Input volume for high band"));
 	createKnob(KnobType::Bright26, this, 53, 123, &controls->m_inMidModel, tr("Mid Input Volume:"), " dB", tr("Input volume for mid band"));
@@ -97,24 +97,24 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	createKnob(KnobType::Small17, this, 24, 146, &controls->m_rangeModel, tr("Range:"), " dB", tr("Maximum gain increase for all bands"));
 	createKnob(KnobType::Small17, this, 13, 114, &controls->m_balanceModel, tr("Balance:"), " dB", tr("Bias input volume towards one channel"));
 
-	createPixmapButton(tr("Scale output volume with Depth"), this, 51, 0, &controls->m_depthScalingModel, "depthScaling_active", "depthScaling_inactive",
+	createPixmapButton(this, 51, 0, &controls->m_depthScalingModel, "depthScaling_active", "depthScaling_inactive",
 						tr("Scale output volume with Depth parameter"));
-	createPixmapButton(tr("Stereo Link"), this, 52, 237, &controls->m_stereoLinkModel, "stereoLink_active", "stereoLink_inactive",
+	createPixmapButton(this, 52, 237, &controls->m_stereoLinkModel, "stereoLink_active", "stereoLink_inactive",
 						tr("Apply same gain change to both channels"));
 
 	createKnob(KnobType::Small17, this, 24, 80, &controls->m_autoTimeModel, tr("Auto Time:"), "", tr("Speed up attack and release times when transients occur"));
 	createKnob(KnobType::Bright26, this, 363, 4, &controls->m_mixModel, tr("Mix:"), "", tr("Wet/Dry of all bands"));
 
-	m_feedbackButton = createPixmapButton(tr("Feedback"), this, 317, 238, &controls->m_feedbackModel, "feedback_active", "feedback_inactive",
+	m_feedbackButton = createPixmapButton(this, 317, 238, &controls->m_feedbackModel, "feedback_active", "feedback_inactive",
 										tr("Use output as sidechain signal instead of input"));
-	createPixmapButton(tr("Mid/Side"), this, 285, 238, &controls->m_midsideModel, "midside_active", "midside_inactive", tr("Compress mid/side channels instead of left/right"));
-	m_lowSideUpwardSuppressButton = createPixmapButton(tr("Suppress upward compression for side band"), this, 106, 180, &controls->m_lowSideUpwardSuppressModel,
+	createPixmapButton(this, 285, 238, &controls->m_midsideModel, "midside_active", "midside_inactive", tr("Compress mid/side channels instead of left/right"));
+	m_lowSideUpwardSuppressButton = createPixmapButton(this, 106, 180, &controls->m_lowSideUpwardSuppressModel,
 														"lowSideUpwardSuppress_active", "lowSideUpwardSuppress_inactive", tr("Suppress upward compression for side band"));
-	createPixmapButton(tr("Lookahead"), this, 147, 0, &controls->m_lookaheadEnableModel, "lookahead_active", "lookahead_inactive",
+	createPixmapButton(this, 147, 0, &controls->m_lookaheadEnableModel, "lookahead_active", "lookahead_inactive",
 						tr(("Enable lookahead with fixed " + std::to_string(int(LOMM_MAX_LOOKAHEAD)) + " ms latency").c_str()));
 	createLcdFloatSpinBox(2, 2, "11green", tr("Lookahead"), this, 214, 2, &controls->m_lookaheadModel, tr("Lookahead length"));
 
-	PixmapButton* initButton = createPixmapButton(tr("Clear all parameters"), this, 84, 237, nullptr, "init_active", "init_inactive", tr("Clear all parameters"));
+	PixmapButton* initButton = createPixmapButton(this, 84, 237, nullptr, "init_active", "init_inactive", tr("Clear all parameters"));
 	initButton->setCheckable(false);
 
 	connect(initButton, SIGNAL(clicked()), m_controls, SLOT(resetAllParameters()));

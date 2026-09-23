@@ -110,7 +110,7 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	mk(120, 324, "Delay Damping", &c->m_delayDamp, "Hz", "fs_damp", K24);
 	mk(245, 315, "Delay Glide", &c->m_delayGlide, "", "fs_dglide", K19);
 
-	PixmapButton* antireflectButton = new PixmapButton(this, "Antireflect");
+	PixmapButton* antireflectButton = new PixmapButton(this);
 	antireflectButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("antireflect_on"));
 	antireflectButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("antireflect_off"));
 	antireflectButton->setToolTip("Anti-reflect");
@@ -118,21 +118,21 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	antireflectButton->setCheckable(true);
 	antireflectButton->setModel(&c->m_antireflect);
 
-	PixmapButton* routeSend = new PixmapButton(this, tr("Send"));
+	PixmapButton* routeSend = new PixmapButton(this);
 	routeSend->setActiveGraphic(PLUGIN_NAME::getIconPixmap("send_on"));
 	routeSend->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("send_off"));
 	routeSend->setToolTip(tr("Route: Send"));
 	routeSend->setCheckable(true);
 	routeSend->move(188, 199);
 
-	PixmapButton* routePass = new PixmapButton(this, tr("Pass"));
+	PixmapButton* routePass = new PixmapButton(this);
 	routePass->setActiveGraphic(PLUGIN_NAME::getIconPixmap("pass_on"));
 	routePass->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("pass_off"));
 	routePass->setToolTip(tr("Route: Pass"));
 	routePass->setCheckable(true);
 	routePass->move(188, 217);
 
-	PixmapButton* routeMute = new PixmapButton(this, tr("Mute"));
+	PixmapButton* routeMute = new PixmapButton(this);
 	routeMute->setActiveGraphic(PLUGIN_NAME::getIconPixmap("mute_on"));
 	routeMute->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("mute_off"));
 	routeMute->setToolTip(tr("Route: Mute"));
@@ -145,7 +145,7 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	routeGroup->addButton(routeMute);
 	routeGroup->setModel(&c->m_routeMode);
 
-	PixmapButton* resetShifterBtn = new PixmapButton(this, tr("Reset Shifter"));
+	PixmapButton* resetShifterBtn = new PixmapButton(this);
 	resetShifterBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("reset_shifter_on"));
 	resetShifterBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("reset_shifter_off"));
 	resetShifterBtn->setToolTip(tr("Reset the shifter's oscillator phases to 0 (automatable)"));
@@ -153,7 +153,7 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	resetShifterBtn->move(77, 5);
 	resetShifterBtn->setModel(&c->m_resetShifter);
 
-	PixmapButton* resetLfoBtn = new PixmapButton(this, tr("Reset LFO"));
+	PixmapButton* resetLfoBtn = new PixmapButton(this);
 	resetLfoBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("reset_lfo_on"));
 	resetLfoBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("reset_lfo_off"));
 	resetLfoBtn->setToolTip(tr("Reset the LFO phase to 0 (automatable)"));
@@ -161,7 +161,7 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	resetLfoBtn->move(60, 179);
 	resetLfoBtn->setModel(&c->m_resetLfo);
 
-	PixmapButton* helpBtn = new PixmapButton(this, nullptr);
+	PixmapButton* helpBtn = new PixmapButton(this);
 	helpBtn->move(256, 278);
 	helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_on"));
 	helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_off"));
