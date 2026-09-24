@@ -15,6 +15,7 @@ jobs:
         -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
         -DWANT_DEBUG_CPACK=ON
+        -DWANT_IPO=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
     steps:
@@ -107,6 +108,7 @@ jobs:
         -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
         -DWANT_DEBUG_CPACK=ON
+        -DWANT_IPO=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       DEBIAN_FRONTEND: noninteractive
@@ -420,6 +422,7 @@ jobs:
             -DWANT_QT6=ON `
             -DUSE_COMPILE_CACHE=ON `
             -DUSE_WERROR=ON `
+            -DWANT_IPO=ON `
             -DVCPKG_TARGET_TRIPLET="x64-windows" `
             -DVCPKG_HOST_TRIPLET="x64-windows" `
             -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}"
@@ -461,6 +464,7 @@ jobs:
         -DWANT_QT6=ON
         -DUSE_COMPILE_CACHE=ON
         -DCPACK_NSIS_EXECUTABLE=/clang64/bin/makensis.exe
+        -DWANT_IPO=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       CMAKE_BUILD_PARALLEL_LEVEL: 4
