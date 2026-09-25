@@ -400,7 +400,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 
 	// Autosave tab.
-	QGroupBox * autoSaveBox = new QGroupBox(tr("Autosave"), performanceControls);
+	QGroupBox* autoSaveBox = new QGroupBox(tr("Autosave"), performanceControls);
 	QVBoxLayout * autoSaveLayout = new QVBoxLayout(autoSaveBox);
 	QHBoxLayout * autoSaveSubLayout = new QHBoxLayout();
 
@@ -449,7 +449,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 
 	// Plugins group
-	QGroupBox * pluginsBox = new QGroupBox(tr("Plugins"), performanceControls);
+	QGroupBox* pluginsBox = new QGroupBox(tr("Plugins"), performanceControls);
 	QVBoxLayout * pluginsLayout = new QVBoxLayout(pluginsBox);
 
 	m_vstEmbedLbl = new QLabel(pluginsBox);
@@ -710,7 +710,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	midiScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	// MIDI interface group
-	QGroupBox * midiInterfaceBox = new QGroupBox(tr("MIDI interface"), midiControls);
+	QGroupBox* midiInterfaceBox = new QGroupBox(tr("MIDI interface"), midiControls);
 	QVBoxLayout * midiInterfaceLayout = new QVBoxLayout(midiInterfaceBox);
 
 	m_midiInterfaces = new QComboBox(midiInterfaceBox);
@@ -781,7 +781,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	connect(m_midiInterfaces, &QComboBox::textActivated, this, &SetupDialog::midiInterfaceChanged);
 
 	// MIDI autoassign group
-	QGroupBox * midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midiControls);
+	QGroupBox* midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midiControls);
 	QVBoxLayout * midiAutoAssignLayout = new QVBoxLayout(midiAutoAssignBox);
 
 	m_assignableMidiDevices = new QComboBox(midiAutoAssignBox);
