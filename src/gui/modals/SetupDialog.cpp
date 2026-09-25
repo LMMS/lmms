@@ -504,7 +504,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	audioScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	// Audio interface group
-	QGroupBox * audioInterfaceBox = new QGroupBox(tr("Audio interface"), audioControls);
+	QGroupBox* audioInterfaceBox = new QGroupBox(tr("Audio interface"), audioControls);
 	QVBoxLayout * audioInterfaceLayout = new QVBoxLayout(audioInterfaceBox);
 
 	m_audioInterfaces = new QComboBox(audioInterfaceBox);
@@ -618,7 +618,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		[setSampleRate] { setSampleRate(SUPPORTED_SAMPLERATES.front()); });
 
 	// Buffer size group
-	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audioControls);
+	QGroupBox* bufferSizeBox = new QGroupBox(tr("Buffer size"), audioControls);
 	QVBoxLayout * bufferSizeLayout = new QVBoxLayout(bufferSizeBox);
 	QHBoxLayout * bufferSizeSubLayout = new QHBoxLayout();
 
