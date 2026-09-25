@@ -699,15 +699,25 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	midi_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(midi_w, tr("MIDI"));
 
+	auto midiControls = new QWidget(midi_w);
+
+	auto midiControlsLayout = new QVBoxLayout;
+	midiControlsLayout->setSpacing(10);
+	midiControlsLayout->setContentsMargins(0, 0, 0, 0);
+
+	auto midiScroll = new QScrollArea(midi_w);
+	midiScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	midiScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
 	// MIDI interface group
-	QGroupBox * midiInterfaceBox = new QGroupBox(tr("MIDI interface"), midi_w);
+	QGroupBox * midiInterfaceBox = new QGroupBox(tr("MIDI interface"), midiControls);
 	QVBoxLayout * midiInterfaceLayout = new QVBoxLayout(midiInterfaceBox);
 
 	m_midiInterfaces = new QComboBox(midiInterfaceBox);
 	midiInterfaceLayout->addWidget(m_midiInterfaces);
 
 	// Ifaces-settings-widget.
-	auto ms_w = new QWidget(midi_w);
+	auto ms_w = new QWidget(midiControls);
 
 	auto ms_w_layout = new QHBoxLayout(ms_w);
 	ms_w_layout->setSpacing(0);
@@ -771,7 +781,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	connect(m_midiInterfaces, &QComboBox::textActivated, this, &SetupDialog::midiInterfaceChanged);
 
 	// MIDI autoassign group
-	QGroupBox * midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midi_w);
+	QGroupBox * midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midiControls);
 	QVBoxLayout * midiAutoAssignLayout = new QVBoxLayout(midiAutoAssignBox);
 
 	m_assignableMidiDevices = new QComboBox(midiAutoAssignBox);
@@ -792,7 +802,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	}
 
 	// MIDI Recording tab
-	auto* midiRecordingTab = new QGroupBox(tr("Behavior when recording"), midi_w);
+	auto* midiRecordingTab = new QGroupBox(tr("Behavior when recording"), midiControls);
 	auto* midiRecordingLayout = new QVBoxLayout(midiRecordingTab);
 	{
 		auto *box = addCheckBox(tr("Auto-quantize notes in Piano Roll"),
@@ -803,12 +813,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	}
 
 	// MIDI layout ordering.
-	midi_layout->addWidget(midiInterfaceBox);
-	midi_layout->addWidget(ms_w);
-	midi_layout->addWidget(midiAutoAssignBox);
-	midi_layout->addWidget(midiRecordingTab);
-	midi_layout->addStretch();
+	midiControlsLayout->addWidget(midiInterfaceBox);
+	midiControlsLayout->addWidget(ms_w);
+	midiControlsLayout->addWidget(midiAutoAssignBox);
+	midiControlsLayout->addWidget(midiRecordingTab);
+	midiControlsLayout->addStretch();
+	midiControls->setLayout(midiControlsLayout);
 
+	midiScroll->setWidget(midiControls);
+	midiScroll->setWidgetResizable(true);
+
+	midi_layout->addWidget(midiScroll, 1);
 
 
 	// Paths widget.
