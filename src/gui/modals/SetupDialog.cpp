@@ -382,15 +382,25 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	// Performance widget.
 	auto performance_w = new QWidget(settings_w);
+
 	auto performance_layout = new QVBoxLayout(performance_w);
 	performance_layout->setSpacing(10);
 	performance_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(performance_w,
 			tr("Performance"));
 
+	auto performanceControls = new QWidget(performance_w);
+	auto performanceControlsLayout = new QVBoxLayout;
+	performanceControlsLayout->setSpacing(10);
+	performanceControlsLayout->setContentsMargins(0, 0, 0, 0);
+
+	auto performanceScroll = new QScrollArea(performance_w);
+	performanceScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	performanceScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
 
 	// Autosave tab.
-	QGroupBox * autoSaveBox = new QGroupBox(tr("Autosave"), performance_w);
+	QGroupBox * autoSaveBox = new QGroupBox(tr("Autosave"), performanceControls);
 	QVBoxLayout * autoSaveLayout = new QVBoxLayout(autoSaveBox);
 	QHBoxLayout * autoSaveSubLayout = new QHBoxLayout();
 
@@ -439,7 +449,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 
 	// Plugins group
-	QGroupBox * pluginsBox = new QGroupBox(tr("Plugins"), performance_w);
+	QGroupBox * pluginsBox = new QGroupBox(tr("Plugins"), performanceControls);
 	QVBoxLayout * pluginsLayout = new QVBoxLayout(pluginsBox);
 
 	m_vstEmbedLbl = new QLabel(pluginsBox);
@@ -475,10 +485,15 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 
 	// Performance layout ordering.
-	performance_layout->addWidget(autoSaveBox);
-	performance_layout->addWidget(uiFxBox);
-	performance_layout->addWidget(pluginsBox);
-	performance_layout->addStretch();
+	performanceControlsLayout->addWidget(autoSaveBox);
+	performanceControlsLayout->addWidget(uiFxBox);
+	performanceControlsLayout->addWidget(pluginsBox);
+	performanceControlsLayout->addStretch();
+	performanceControls->setLayout(performanceControlsLayout);
+
+	performanceScroll->setWidget(performanceControls);
+	performanceScroll->setWidgetResizable(true);
+	performance_layout->addWidget(performanceScroll, 1);
 
 
 
