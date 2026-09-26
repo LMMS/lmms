@@ -166,6 +166,21 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	Engine::projectJournal()->setJournalling(false);
 
 
+	auto makeControlsLayout = []() -> QVBoxLayout*
+	{
+		auto ret = new QVBoxLayout;
+		ret->setSpacing(10);
+		ret->setContentsMargins(0, 0, 0, 0);
+		return ret;
+	};
+	auto makeScroll = [](QWidget* parent) -> QScrollArea*
+	{
+		auto ret = new QScrollArea(parent);
+		ret->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+		ret->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		return ret;
+	};
+
 	// Main widget.
 	auto main_w = new QWidget(this);
 
@@ -197,17 +212,13 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	labelWidget(general_w, tr("General"));
 
 	// General scroll area.
-	auto generalScroll = new QScrollArea(general_w);
-	generalScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	generalScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	auto generalScroll = makeScroll(general_w);
 
 	// General controls widget.
 	auto generalControls = new QWidget(general_w);
 
 	// Path selectors layout.
-	auto generalControlsLayout = new QVBoxLayout;
-	generalControlsLayout->setSpacing(10);
-	generalControlsLayout->setContentsMargins(0, 0, 0, 0);
+	auto generalControlsLayout = makeControlsLayout();
 
 	auto addCheckBox = [&](const QString& ledText, QWidget* parent, QBoxLayout * layout,
 									  bool initialState, const char* toggledSlot, bool showRestartWarning) -> QCheckBox * {
@@ -390,13 +401,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			tr("Performance"));
 
 	auto performanceControls = new QWidget(performance_w);
-	auto performanceControlsLayout = new QVBoxLayout;
-	performanceControlsLayout->setSpacing(10);
-	performanceControlsLayout->setContentsMargins(0, 0, 0, 0);
+	auto performanceControlsLayout = makeControlsLayout();
 
-	auto performanceScroll = new QScrollArea(performance_w);
-	performanceScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	performanceScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	auto performanceScroll = makeScroll(performance_w);
 
 
 	// Autosave tab.
@@ -509,14 +516,10 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	auto audioControls = new QWidget(audio_w);
 
 	// Path selectors layout.
-	auto audioControlsLayout = new QVBoxLayout;
-	audioControlsLayout->setSpacing(10);
-	audioControlsLayout->setContentsMargins(0, 0, 0, 0);
+	auto audioControlsLayout = makeControlsLayout();
 
 
-	auto audioScroll = new QScrollArea(audio_w);
-	audioScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	audioScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	auto audioScroll = makeScroll(audio_w);
 
 	// Audio interface group
 	QGroupBox* audioInterfaceBox = new QGroupBox(tr("Audio interface"), audioControls);
@@ -701,13 +704,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	auto midiControls = new QWidget(midi_w);
 
-	auto midiControlsLayout = new QVBoxLayout;
-	midiControlsLayout->setSpacing(10);
-	midiControlsLayout->setContentsMargins(0, 0, 0, 0);
+	auto midiControlsLayout = makeControlsLayout();
 
-	auto midiScroll = new QScrollArea(midi_w);
-	midiScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	midiScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	auto midiScroll = makeScroll(midi_w);
 
 	// MIDI interface group
 	QGroupBox* midiInterfaceBox = new QGroupBox(tr("MIDI interface"), midiControls);
@@ -837,17 +836,13 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 
 	// Paths scroll area.
-	auto pathsScroll = new QScrollArea(paths_w);
-	pathsScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	pathsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	auto pathsScroll = makeScroll(paths_w);
 
 	// Path selectors widget.
 	auto pathSelectors = new QWidget(paths_w);
 
 	// Path selectors layout.
-	auto pathSelectorsLayout = new QVBoxLayout;
-	pathSelectorsLayout->setSpacing(10);
-	pathSelectorsLayout->setContentsMargins(0, 0, 0, 0);
+	auto pathSelectorsLayout = makeControlsLayout();
 
 	auto addPathEntry = [&](const QString& caption, const QString& content, const char* setSlot, const char* openSlot,
 							QLineEdit*& lineEdit, const char* pixmap = "project_open") {
