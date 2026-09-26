@@ -166,6 +166,21 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	Engine::projectJournal()->setJournalling(false);
 
 
+	auto makeControlsLayout = []() -> QVBoxLayout*
+	{
+		auto ret = new QVBoxLayout;
+		ret->setSpacing(10);
+		ret->setContentsMargins(0, 0, 0, 0);
+		return ret;
+	};
+	auto makeScroll = [](QWidget* parent) -> QScrollArea*
+	{
+		auto ret = new QScrollArea(parent);
+		ret->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+		ret->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		return ret;
+	};
+
 	// Main widget.
 	auto main_w = new QWidget(this);
 
@@ -197,17 +212,13 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	labelWidget(general_w, tr("General"));
 
 	// General scroll area.
-	auto generalScroll = new QScrollArea(general_w);
-	generalScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	generalScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	auto generalScroll = makeScroll(general_w);
 
 	// General controls widget.
 	auto generalControls = new QWidget(general_w);
 
 	// Path selectors layout.
-	auto generalControlsLayout = new QVBoxLayout;
-	generalControlsLayout->setSpacing(10);
-	generalControlsLayout->setContentsMargins(0, 0, 0, 0);
+	auto generalControlsLayout = makeControlsLayout();
 
 	auto addCheckBox = [&](const QString& ledText, QWidget* parent, QBoxLayout * layout,
 									  bool initialState, const char* toggledSlot, bool showRestartWarning) -> QCheckBox * {
@@ -382,15 +393,21 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	// Performance widget.
 	auto performance_w = new QWidget(settings_w);
+
 	auto performance_layout = new QVBoxLayout(performance_w);
 	performance_layout->setSpacing(10);
 	performance_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(performance_w,
 			tr("Performance"));
 
+	auto performanceControls = new QWidget(performance_w);
+	auto performanceControlsLayout = makeControlsLayout();
+
+	auto performanceScroll = makeScroll(performance_w);
+
 
 	// Autosave tab.
-	QGroupBox * autoSaveBox = new QGroupBox(tr("Autosave"), performance_w);
+	QGroupBox* autoSaveBox = new QGroupBox(tr("Autosave"), performanceControls);
 	QVBoxLayout * autoSaveLayout = new QVBoxLayout(autoSaveBox);
 	QHBoxLayout * autoSaveSubLayout = new QHBoxLayout();
 
@@ -439,7 +456,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 
 	// Plugins group
-	QGroupBox * pluginsBox = new QGroupBox(tr("Plugins"), performance_w);
+	QGroupBox* pluginsBox = new QGroupBox(tr("Plugins"), performanceControls);
 	QVBoxLayout * pluginsLayout = new QVBoxLayout(pluginsBox);
 
 	m_vstEmbedLbl = new QLabel(pluginsBox);
@@ -475,10 +492,15 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 
 	// Performance layout ordering.
-	performance_layout->addWidget(autoSaveBox);
-	performance_layout->addWidget(uiFxBox);
-	performance_layout->addWidget(pluginsBox);
-	performance_layout->addStretch();
+	performanceControlsLayout->addWidget(autoSaveBox);
+	performanceControlsLayout->addWidget(uiFxBox);
+	performanceControlsLayout->addWidget(pluginsBox);
+	performanceControlsLayout->addStretch();
+	performanceControls->setLayout(performanceControlsLayout);
+
+	performanceScroll->setWidget(performanceControls);
+	performanceScroll->setWidgetResizable(true);
+	performance_layout->addWidget(performanceScroll, 1);
 
 
 
@@ -490,15 +512,24 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	labelWidget(audio_w,
 			tr("Audio"));
 
+	// General controls widget.
+	auto audioControls = new QWidget(audio_w);
+
+	// Path selectors layout.
+	auto audioControlsLayout = makeControlsLayout();
+
+
+	auto audioScroll = makeScroll(audio_w);
+
 	// Audio interface group
-	QGroupBox * audioInterfaceBox = new QGroupBox(tr("Audio interface"), audio_w);
+	QGroupBox* audioInterfaceBox = new QGroupBox(tr("Audio interface"), audioControls);
 	QVBoxLayout * audioInterfaceLayout = new QVBoxLayout(audioInterfaceBox);
 
 	m_audioInterfaces = new QComboBox(audioInterfaceBox);
 	audioInterfaceLayout->addWidget(m_audioInterfaces);
 
 	// Ifaces-settings-widget.
-	auto as_w = new QWidget(audio_w);
+	auto as_w = new QWidget(audioControls);
 
 	auto as_w_layout = new QHBoxLayout(as_w);
 	as_w_layout->setSpacing(0);
@@ -566,7 +597,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	connect(m_audioInterfaces, &QComboBox::textActivated, this, &SetupDialog::audioInterfaceChanged);
 
-	auto sampleRateBox = new QGroupBox{tr("Sample rate"), audio_w};
+	auto sampleRateBox = new QGroupBox{tr("Sample rate"), audioControls};
 
 	m_sampleRateSlider = new QSlider{Qt::Horizontal};
 	m_sampleRateSlider->setRange(0, SUPPORTED_SAMPLERATES.size() - 1);
@@ -605,7 +636,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		[setSampleRate] { setSampleRate(SUPPORTED_SAMPLERATES.front()); });
 
 	// Buffer size group
-	QGroupBox * bufferSizeBox = new QGroupBox(tr("Buffer size"), audio_w);
+	QGroupBox* bufferSizeBox = new QGroupBox(tr("Buffer size"), audioControls);
 	QVBoxLayout * bufferSizeLayout = new QVBoxLayout(bufferSizeBox);
 	QHBoxLayout * bufferSizeSubLayout = new QHBoxLayout();
 
@@ -641,7 +672,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	setBufferSize(m_bufferSizeSlider->value());
 
-	const auto otherBox = new QGroupBox(tr("Other"), audio_w);
+	const auto otherBox = new QGroupBox(tr("Other"), audioControls);
 	const auto otherBoxLayout = new QVBoxLayout{otherBox};
 
 	const auto enableMixSanitizationCheckbox = addCheckBox(tr("Enable mix sanitization"), otherBox, otherBoxLayout,
@@ -650,12 +681,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 												 "corrupted audio, but may negatively impact performance."));
 
 	// Audio layout ordering.
-	audio_layout->addWidget(audioInterfaceBox);
-	audio_layout->addWidget(as_w);
-	audio_layout->addWidget(sampleRateBox);
-	audio_layout->addWidget(bufferSizeBox);
-	audio_layout->addWidget(otherBox);
-	audio_layout->addStretch();
+	audioControlsLayout->addWidget(audioInterfaceBox);
+	audioControlsLayout->addWidget(as_w);
+	audioControlsLayout->addWidget(sampleRateBox);
+	audioControlsLayout->addWidget(bufferSizeBox);
+	audioControlsLayout->addWidget(otherBox);
+	audioControlsLayout->addStretch();
+	audioControls->setLayout(audioControlsLayout);
+
+	audioScroll->setWidget(audioControls);
+	audioScroll->setWidgetResizable(true);
+	audio_layout->addWidget(audioScroll, 1);
 
 
 
@@ -666,15 +702,21 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	midi_layout->setContentsMargins(0, 0, 0, 0);
 	labelWidget(midi_w, tr("MIDI"));
 
+	auto midiControls = new QWidget(midi_w);
+
+	auto midiControlsLayout = makeControlsLayout();
+
+	auto midiScroll = makeScroll(midi_w);
+
 	// MIDI interface group
-	QGroupBox * midiInterfaceBox = new QGroupBox(tr("MIDI interface"), midi_w);
+	QGroupBox* midiInterfaceBox = new QGroupBox(tr("MIDI interface"), midiControls);
 	QVBoxLayout * midiInterfaceLayout = new QVBoxLayout(midiInterfaceBox);
 
 	m_midiInterfaces = new QComboBox(midiInterfaceBox);
 	midiInterfaceLayout->addWidget(m_midiInterfaces);
 
 	// Ifaces-settings-widget.
-	auto ms_w = new QWidget(midi_w);
+	auto ms_w = new QWidget(midiControls);
 
 	auto ms_w_layout = new QHBoxLayout(ms_w);
 	ms_w_layout->setSpacing(0);
@@ -738,7 +780,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	connect(m_midiInterfaces, &QComboBox::textActivated, this, &SetupDialog::midiInterfaceChanged);
 
 	// MIDI autoassign group
-	QGroupBox * midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midi_w);
+	QGroupBox* midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midiControls);
 	QVBoxLayout * midiAutoAssignLayout = new QVBoxLayout(midiAutoAssignBox);
 
 	m_assignableMidiDevices = new QComboBox(midiAutoAssignBox);
@@ -759,7 +801,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	}
 
 	// MIDI Recording tab
-	auto* midiRecordingTab = new QGroupBox(tr("Behavior when recording"), midi_w);
+	auto* midiRecordingTab = new QGroupBox(tr("Behavior when recording"), midiControls);
 	auto* midiRecordingLayout = new QVBoxLayout(midiRecordingTab);
 	{
 		auto *box = addCheckBox(tr("Auto-quantize notes in Piano Roll"),
@@ -770,12 +812,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	}
 
 	// MIDI layout ordering.
-	midi_layout->addWidget(midiInterfaceBox);
-	midi_layout->addWidget(ms_w);
-	midi_layout->addWidget(midiAutoAssignBox);
-	midi_layout->addWidget(midiRecordingTab);
-	midi_layout->addStretch();
+	midiControlsLayout->addWidget(midiInterfaceBox);
+	midiControlsLayout->addWidget(ms_w);
+	midiControlsLayout->addWidget(midiAutoAssignBox);
+	midiControlsLayout->addWidget(midiRecordingTab);
+	midiControlsLayout->addStretch();
+	midiControls->setLayout(midiControlsLayout);
 
+	midiScroll->setWidget(midiControls);
+	midiScroll->setWidgetResizable(true);
+
+	midi_layout->addWidget(midiScroll, 1);
 
 
 	// Paths widget.
@@ -789,17 +836,13 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 
 	// Paths scroll area.
-	auto pathsScroll = new QScrollArea(paths_w);
-	pathsScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	pathsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	auto pathsScroll = makeScroll(paths_w);
 
 	// Path selectors widget.
 	auto pathSelectors = new QWidget(paths_w);
 
 	// Path selectors layout.
-	auto pathSelectorsLayout = new QVBoxLayout;
-	pathSelectorsLayout->setSpacing(10);
-	pathSelectorsLayout->setContentsMargins(0, 0, 0, 0);
+	auto pathSelectorsLayout = makeControlsLayout();
 
 	auto addPathEntry = [&](const QString& caption, const QString& content, const char* setSlot, const char* openSlot,
 							QLineEdit*& lineEdit, const char* pixmap = "project_open") {
