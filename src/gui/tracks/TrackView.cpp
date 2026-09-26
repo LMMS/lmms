@@ -76,6 +76,9 @@ TrackView::TrackView(Track* track, TrackContainerView* tcv)
 	resizeEvent( nullptr );
 
 	setAcceptDrops( true );
+	setMouseTracking(true);
+	m_trackSettingsWidget.setMouseTracking(true);
+	m_trackSettingsWidget.setMouseTracking(true);
 	setAttribute( Qt::WA_DeleteOnClose, true );
 
 
@@ -94,6 +97,8 @@ TrackView::TrackView(Track* track, TrackContainerView* tcv)
 	connect( &m_track->m_soloModel, SIGNAL(dataChanged()),
 			m_track, SLOT(toggleSolo()), Qt::DirectConnection );
 	
+	connect(m_trackContainerView, &TrackContainerView::trackHeadWidthChanged, this, &TrackView::updateWidth);
+
 	auto trackGrip = m_trackOperationsWidget.getTrackGrip();
 	connect(trackGrip, &TrackGrip::grabbed, this, &TrackView::onTrackGripGrabbed);
 	connect(trackGrip, &TrackGrip::released, this, &TrackView::onTrackGripReleased);
@@ -112,19 +117,10 @@ TrackView::TrackView(Track* track, TrackContainerView* tcv)
 
 void TrackView::resizeEvent( QResizeEvent * re )
 {
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
-	{
-		m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH_COMPACT, height() - 1 );
-		m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT, height() - 1 );
-	}
-	else
-	{
-		m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH, height() - 1 );
-		m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH, height() - 1 );
-	}
+	m_trackOperationsWidget.setFixedSize(TRACK_OP_WIDTH, height() - 1);
+	m_trackSettingsWidget.setFixedSize(m_trackContainerView->getTrackHeadWidth() - m_trackOperationsWidget.width(), height() - 1);
 
-	m_trackContentWidget.setFixedHeight( height() );
+	m_trackContentWidget.setFixedHeight(height());
 }
 
 
@@ -218,19 +214,21 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 	}
 
 
-	int widgetTotal = ConfigManager::inst()->value( "ui",
-							"compacttrackbuttons" ).toInt()==1 ?
-		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
-		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+	int widgetTotal = m_trackContainerView->getTrackHeadWidth();
+
 	if (m_trackContainerView->allowRubberband() == true  && pos.x() > widgetTotal)
 	{
 		QWidget::mousePressEvent( me );
 	}
 	else if( me->button() == Qt::LeftButton )
 	{
-		if( me->modifiers() & Qt::ShiftModifier )
+		if (me->x() > widgetTotal - ResizeGripWidth && me->x() <= widgetTotal)
 		{
-			m_action = Action::Resize;
+			m_action = Action::ResizeHorizontal;
+		}
+		else if (me->modifiers() & Qt::ShiftModifier || (me->y() > height() - ResizeGripWidth && me->x() <= widgetTotal))
+		{
+			m_action = Action::ResizeVertical;
 			QCursor::setPos(mapToGlobal(QPoint(pos.x(), height())));
 			QApplication::setOverrideCursor(Qt::SizeVerCursor);
 		}
@@ -248,12 +246,10 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 
 void TrackView::mouseMoveEvent( QMouseEvent * me )
 {
+
 	const auto pos = position(me);
 
-	int widgetTotal = ConfigManager::inst()->value( "ui",
-							"compacttrackbuttons" ).toInt()==1 ?
-		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
-		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+	int widgetTotal = m_trackContainerView->getTrackHeadWidth();
 	if (m_trackContainerView->allowRubberband() == true && pos.x() > widgetTotal)
 	{
 		QWidget::mouseMoveEvent( me );
@@ -282,9 +278,27 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 			}
 		}
 	}
-	else if( m_action == Action::Resize )
+	else if (m_action == Action::ResizeVertical)
 	{
 		resizeToHeight(pos.y());
+		setCursor(Qt::SizeVerCursor);
+	}
+	else if (m_action == Action::ResizeHorizontal)
+	{
+		m_trackContainerView->setTrackHeadWidth(pos.x());
+		setCursor(Qt::SizeHorCursor);
+	}
+	else if (pos.x() > widgetTotal - ResizeGripWidth && pos.x() < widgetTotal)
+	{
+		setCursor(Qt::SizeHorCursor);
+	}
+	else if (pos.y() > height() - ResizeGripWidth && pos.x() < widgetTotal)
+	{
+		setCursor(Qt::SizeVerCursor);
+	}
+	else
+	{
+		setCursor(Qt::ArrowCursor);
 	}
 
 	if( height() < DEFAULT_TRACK_HEIGHT )
@@ -303,6 +317,7 @@ void TrackView::mouseReleaseEvent( QMouseEvent * me )
 		QApplication::restoreOverrideCursor();
 	}
 	m_trackOperationsWidget.update();
+	setCursor(Qt::ArrowCursor);
 
 	QWidget::mouseReleaseEvent( me );
 }
@@ -385,5 +400,9 @@ void TrackView::resizeToHeight(int h)
 	m_track->setHeight(height());
 }
 
+void TrackView::updateWidth(int width)
+{
+	m_trackSettingsWidget.setFixedWidth(width - m_trackOperationsWidget.width());
+}
 
 } // namespace lmms::gui

@@ -56,6 +56,8 @@ public:
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
 
+	static constexpr const int MinPatternWidthPixels = 384;
+
 public slots:
 	void addSteps();
 	void cloneSteps();
@@ -74,7 +76,6 @@ protected slots:
 private:
 	PatternStore* m_ps;
 	TimeLineWidget* m_timeLine;
-	int m_trackHeadWidth;
 	tick_t m_maxClipLength;
 	void makeSteps( bool clone );
 };
