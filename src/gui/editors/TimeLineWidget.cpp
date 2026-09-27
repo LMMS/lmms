@@ -76,6 +76,7 @@ TimeLineWidget::~TimeLineWidget()
 void TimeLineWidget::setXOffset(const int x)
 {
 	m_xOffset = x;
+	update();
 }
 
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
