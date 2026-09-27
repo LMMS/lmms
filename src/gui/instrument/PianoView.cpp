@@ -407,7 +407,7 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 			}
 			else
 			{
-				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
+				m_movedNoteModel->setValue(static_cast<float>(key_num));
 				if (m_movedNoteModel == m_piano->instrumentTrack()->baseNoteModel()) { emit baseNoteChanged(); }	// TODO: not actually used by anything?
 			}
 		}
@@ -495,7 +495,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 			else if (m_movedNoteModel != nullptr)
 			{
 				// upper section, move the base / first / last note marker
-				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
+				m_movedNoteModel->setValue(static_cast<float>(key_num));
 			}
 		}
 		// and let the user see that he pressed a key... :)
