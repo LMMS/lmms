@@ -407,7 +407,7 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 			}
 			else
 			{
-				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
+				m_movedNoteModel->setValue(static_cast<float>(key_num));
 				if (m_movedNoteModel == m_piano->instrumentTrack()->baseNoteModel()) { emit baseNoteChanged(); }	// TODO: not actually used by anything?
 			}
 		}
