@@ -46,24 +46,14 @@
 namespace lmms
 {
 
-/*! \brief Create a new (empty) track object
- *
- *  The track object is the whole track, linking its contents, its
- *  automation, name, type, and so forth.
- *
- * \param type The type of track (Song Editor or Pattern Editor)
- * \param tc The track Container object to encapsulate in this track.
- *
- * \todo check the definitions of all the properties - are they OK?
- */
-Track::Track( Type type, TrackContainer * tc ) :
-	Model( tc ),                   /*!< The track Model */
-	m_trackContainer( tc ),        /*!< The track container object */
-	m_type( type ),                /*!< The track type */
-	m_name(),                       /*!< The track's name */
-	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
-	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
-	m_clips()        /*!< The clips (segments) */
+Track::Track(Type type, TrackContainer* tc)
+	: Model(tc)
+	, m_trackContainer(tc)
+	, m_type(type)
+	, m_name()
+	, m_mutedModel(false, this, tr("Mute"))
+	, m_soloModel(false, this, tr("Solo"))
+	, m_clips()
 {	
 	m_trackContainer->addTrack( this );
 	m_height = -1;
@@ -72,10 +62,6 @@ Track::Track( Type type, TrackContainer * tc ) :
 
 
 
-/*! \brief Destroy this track
- *
- *  Delete the clips and remove this track from the track container.
- */
 Track::~Track()
 {
 	lock();
@@ -93,11 +79,6 @@ Track::~Track()
 
 
 
-/*! \brief Create a track based on the given track type and container.
- *
- *  \param tt The type of track to create
- *  \param tc The track container to attach to
- */
 Track * Track::create( Type tt, TrackContainer * tc )
 {
 	Engine::audioEngine()->requestChangeInModel();
@@ -132,11 +113,6 @@ Track * Track::create( Type tt, TrackContainer * tc )
 
 
 
-/*! \brief Create a track inside TrackContainer from track type in a QDomElement and restore state from XML
- *
- *  \param element The QDomElement containing the type of track to create
- *  \param tc The track container to attach to
- */
 Track * Track::create( const QDomElement & element, TrackContainer * tc )
 {
 	Engine::audioEngine()->requestChangeInModel();
@@ -157,9 +133,6 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 
 
 
-/*! \brief Clone a track from this track
- *
- */
 Track* Track::clone()
 {
 	// Save track to temporary XML and load it to create a new identical track
@@ -173,18 +146,6 @@ Track* Track::clone()
 }
 
 
-/*! \brief Save this track's settings to file
- *
- *  We save the track type and its muted state and solo state, then append the track-
- *  specific settings.  Then we iterate through the clips
- *  and save all their states in turn.
- *
- *  \param doc The QDomDocument to use to save
- *  \param element The The QDomElement to save into
- *  \param presetMode Describes whether to save the track as a preset or not.
- *  \todo Does this accurately describe the parameters?  I think not!?
- *  \todo Save the track height
- */
 void Track::saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode)
 {
 	if (!presetMode)
@@ -225,19 +186,7 @@ void Track::saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode)
 	}
 }
 
-/*! \brief Load the settings from a file
- *
- *  We load the track's type and muted state and solo state, then clear out our
- *  current Clip.
- *
- *  Then we step through the QDomElement's children and load the
- *  track-specific settings and clip states from it
- *  one at a time.
- *
- *  \param element the QDomElement to load track settings from
- *  \param presetMode Indicates if a preset or a full track is loaded
- *  \todo Load the track height.
- */
+
 void Track::loadTrack(const QDomElement& element, bool presetMode)
 {
 	if( static_cast<Type>(element.attribute( "type" ).toInt()) != type() )
@@ -334,10 +283,6 @@ void Track::loadSettings(const QDomElement& element)
 
 
 
-/*! \brief Add another Clip into this track
- *
- *  \param clip The Clip to attach to this track.
- */
 Clip * Track::addClip( Clip * clip )
 {
 	m_clips.push_back( clip );
@@ -350,10 +295,6 @@ Clip * Track::addClip( Clip * clip )
 
 
 
-/*! \brief Remove a given Clip from this track
- *
- *  \param clip The Clip to remove from this track.
- */
 void Track::removeClip( Clip * clip )
 {
 	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
@@ -369,7 +310,6 @@ void Track::removeClip( Clip * clip )
 }
 
 
-/*! \brief Remove all Clips from this track */
 void Track::deleteClips()
 {
 	while (!m_clips.empty())
@@ -379,30 +319,8 @@ void Track::deleteClips()
 }
 
 
-/*! \brief Return the number of clips we contain
- *
- *  \return the number of clips we currently contain.
- */
-int Track::numOfClips()
-{
-	return m_clips.size();
-}
 
 
-
-
-/*! \brief Get a Clip by number
- *
- *  If the Clip number is less than our Clip array size then fetch that
- *  numbered object from the array.  Otherwise we warn the user that
- *  we've somehow requested a Clip that is too large, and create a new
- *  Clip for them.
- *  \param clipNum The number of the Clip to fetch.
- *  \return the given Clip or a new one if out of range.
- *  \todo reject Clip numbers less than zero.
- *  \todo if we create a Clip here, should we somehow attach it to the
- *     track?
- */
 auto Track::getClip(std::size_t clipNum) -> Clip*
 {
 	if( clipNum < m_clips.size() )
@@ -418,11 +336,6 @@ auto Track::getClip(std::size_t clipNum) -> Clip*
 
 
 
-/*! \brief Determine the given Clip's number in our array.
- *
- *  \param clip The Clip to search for.
- *  \return its number in our array.
- */
 int Track::getClipNum( const Clip * clip )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfClips(); ++i )
@@ -442,17 +355,6 @@ int Track::getClipNum( const Clip * clip )
 
 
 
-/*! \brief Retrieve a list of clips that fall within a period.
- *
- *  Here we're interested in a range of clips that intersect
- *  the given time period.
- *
- *  We return the Clips we find in order by time, earliest Clips first.
- *
- *  \param clipV The list to contain the found clips.
- *  \param start The MIDI start time of the range.
- *  \param end   The MIDI endi time of the range.
- */
 void Track::getClipsInRange( clipVector & clipV, const TimePos & start,
 							const TimePos & end )
 {
@@ -473,14 +375,6 @@ void Track::getClipsInRange( clipVector & clipV, const TimePos & start,
 
 
 
-/*! \brief Swap the position of two clips.
- *
- *  First, we arrange to swap the positions of the two Clips in the
- *  clips list.  Then we swap their start times as well.
- *
- *  \param clipNum1 The first Clip to swap.
- *  \param clipNum2 The second Clip to swap.
- */
 void Track::swapPositionOfClips( int clipNum1, int clipNum2 )
 {
 	qSwap( m_clips[clipNum1], m_clips[clipNum2] );
@@ -507,13 +401,8 @@ void Track::createClipsForPattern(int pattern)
 
 
 
-/*! \brief Move all the clips after a certain time later by one bar.
- *
- *  \param pos The time at which we want to insert the bar.
- *  \todo if we stepped through this list last to first, and the list was
- *    in ascending order by Clip time, once we hit a Clip that was earlier
- *    than the insert time, we could fall out of the loop early.
- */
+//! @todo If we stepped through this list last to first, and the list was in ascending order by Clip time, once we hit
+//! a Clip that was earlier than the insert time, we could fall out of the loop early.
 void Track::insertBar( const TimePos & pos )
 {
 	// we'll increase the position of every Clip, positioned behind pos, by
@@ -530,10 +419,6 @@ void Track::insertBar( const TimePos & pos )
 
 
 
-/*! \brief Move all the clips after a certain time earlier by one bar.
- *
- *  \param pos The time at which we want to remove the bar.
- */
 void Track::removeBar( const TimePos & pos )
 {
 	// we'll decrease the position of every Clip, positioned behind pos, by
@@ -550,12 +435,6 @@ void Track::removeBar( const TimePos & pos )
 
 
 
-/*! \brief Return the length of the entire track in bars
- *
- *  We step through our list of Clips and determine their end position,
- *  keeping track of the latest time found in ticks.  Then we return
- *  that in bars by dividing by the number of ticks per bar.
- */
 bar_t Track::length() const
 {
 	// find last end-position
@@ -579,12 +458,6 @@ bar_t Track::length() const
 
 
 
-/*! \brief Invert the track's solo state.
- *
- *  We have to go through all the tracks determining if any other track
- *  is already soloed.  Then we have to save the mute state of all tracks,
- *  and set our mute state to on and all the others to off.
- */
 void Track::toggleSolo()
 {
 	const TrackContainer::TrackList & tl = m_trackContainer->tracks();

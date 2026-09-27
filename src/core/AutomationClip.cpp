@@ -87,6 +87,7 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 
 bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 {
+	assert(_obj != nullptr);
 	QMutexLocker m(&m_clipMutex);
 
 	if (_search_dup && std::find(m_objects.begin(), m_objects.end(), _obj) != m_objects.end())
@@ -213,15 +214,6 @@ void AutomationClip::updateLength()
 
 
 
-/**
- * @brief Puts an automation node on the timeMap with the given value.
- *        The inValue and outValue of the created node will be the same.
- * @param TimePos time to add the node to
- * @param Float inValue and outValue of the node
- * @param Boolean True to quantize the position (defaults to true)
- * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
- * @return TimePos of the recently added automation node
- */
 TimePos AutomationClip::putValue(
 	const TimePos & time,
 	const float value,
@@ -267,16 +259,6 @@ TimePos AutomationClip::putValue(
 
 
 
-/**
- * @brief Puts an automation node on the timeMap with the given inValue
- *        and outValue.
- * @param TimePos time to add the node to
- * @param Float inValue of the node
- * @param Float outValue of the node
- * @param Boolean True to quantize the position (defaults to true)
- * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
- * @return TimePos of the recently added automation node
- */
 TimePos AutomationClip::putValues(
 	const TimePos & time,
 	const float inValue,
@@ -345,11 +327,6 @@ void AutomationClip::removeNode(const TimePos & time)
 
 
 
-/**
- * @brief Removes all automation nodes between the given ticks
- * @param Int first tick of the range
- * @param Int second tick of the range
- */
 void AutomationClip::removeNodes(const int tick0, const int tick1)
 {
 	if (tick0 == tick1)
@@ -380,11 +357,6 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 
 
 
-/**
- * @brief Resets the outValues of all automation nodes between the given ticks
- * @param Int first tick of the range
- * @param Int second tick of the range
- */
 void AutomationClip::resetNodes(const int tick0, const int tick1)
 {
 	if (tick0 == tick1)
@@ -450,23 +422,12 @@ void AutomationClip::recordValue(TimePos time, float value)
 
 
 
-/**
- * @brief Set the position of the point that is being dragged.
- *        Calling this function will also automatically set m_dragging to true.
- *        When applyDragValue() is called, m_dragging is set back to false.
- * @param TimePos of the node being dragged
- * @param Float with the value to assign to the point being dragged
- * @param Boolean. True to snip x position
- * @param Boolean. True to ignore unquantized surrounding nodes
- * @return TimePos with current time of the dragged value
- */
 TimePos AutomationClip::setDragValue(
-	const TimePos & time,
+	const TimePos& time,
 	const float value,
 	const bool quantPos,
 	const bool controlKey
-)
-{
+) {
 	QMutexLocker m(&m_clipMutex);
 
 	if (m_dragging == false)
@@ -544,9 +505,6 @@ TimePos AutomationClip::setDragValue(
 
 
 
-/**
- * @brief After the point is dragged, this function is called to apply the change.
- */
 void AutomationClip::applyDragValue()
 {
 	QMutexLocker m(&m_clipMutex);
@@ -963,10 +921,8 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 }
 
 
-/**
- * @brief returns a list of all the automation clips that are connected to a specific model
- * @param _m the model we want to look for
- */
+
+
 std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableModel* _m)
 {
 	std::vector<AutomationClip *> clips;

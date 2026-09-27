@@ -71,7 +71,10 @@ public:
 	void loadSettings( const QDomElement& element ) override;
 
 	ComboBoxModel* snappingModel() const;
+
+	//! @brief Return grid size as number of bars
 	float getSnapSize() const;
+
 	QString getSnapSizeString() const;
 
 	TimeLineWidget* timeLine() const { return m_timeLine; }
@@ -120,7 +123,10 @@ private:
 	bool allowRubberband() const override;
 	bool knifeMode() const override;
 
+	//! @brief Convert zoom slider's value to bar width in pixels
 	int calculatePixelsPerBar() const;
+
+	//! @brief Convert bar width in pixels to zoom slider value
 	int calculateZoomSliderValue(int pixelsPerBar) const;
 
 	int trackIndexFromSelectionPoint(int yPos);
@@ -153,14 +159,14 @@ private:
 	bool m_smoothScroll;
 
 	EditMode m_mode;
-	EditMode m_ctrlMode; // mode they were in before they hit ctrl
+	EditMode m_ctrlMode; //!< Mode they were in before they hit ctrl
 
 	QPoint m_origin;
 	QPoint m_scrollPos;
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
 	TimePos m_rubberbandStartTimePos;
-	int m_rubberbandPixelsPerBar; //!< pixels per bar when selection starts
+	int m_rubberbandPixelsPerBar; //!< Pixels per bar when selection starts
 	int m_trackHeadWidth;
 	bool m_selectRegion;
 

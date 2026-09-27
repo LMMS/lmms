@@ -1,7 +1,7 @@
 /*
- * MidiOss.h - OSS raw MIDI client
+ * MidiPatch.h
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,60 +22,36 @@
  *
  */
 
-#ifndef LMMS_MIDI_OSS_H
-#define LMMS_MIDI_OSS_H
+#ifndef LMMS_MIDI_PATCH_H
+#define LMMS_MIDI_PATCH_H
 
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_OSS
-
-#include <QThread>
-#include <QFile>
-
-#include "MidiClient.h"
-
+#include <cstdint>
 
 namespace lmms
 {
 
-
-class MidiOss : public QThread, public MidiClientRaw
+struct MidiPatch
 {
-	Q_OBJECT
-public:
-	MidiOss();
-	~MidiOss() override;
+	//! 14-bit bank
+	std::uint16_t bank = 0;
 
-	static QString probeDevice();
+	//! 7-bit program
+	std::uint8_t program = 0;
 
+	constexpr auto bankMSB() const noexcept -> std::uint8_t { return (bank >> 7) & 0x7F; }
+	constexpr auto bankLSB() const noexcept -> std::uint8_t { return bank & 0x7F; }
 
-	inline static QString name()
+	constexpr void setBankMSB(std::uint8_t value) noexcept
 	{
-		return( QT_TRANSLATE_NOOP( "MidiSetupWidget",
-			"OSS Raw-MIDI (Open Sound System)" ) );
+		bank = ((static_cast<std::uint16_t>(value) & 0x7F) << 7) | (bank & 0x7F);
 	}
 
-	inline static QString configSection()
+	constexpr void setBankLSB(std::uint8_t value) noexcept
 	{
-		return "midioss";
+		bank = (bank & 0x3F80) | (value & 0x7F);
 	}
-
-protected:
-	void sendByte( const unsigned char c ) override;
-	void run() override;
-
-
-private:
-	QFile m_midiDev;
-
-	volatile bool m_quit;
-
-} ;
-
+};
 
 } // namespace lmms
 
-
-#endif // LMMS_HAVE_OSS
-
-#endif // LMMS_MIDI_OSS_H
+#endif // LMMS_MIDI_PATCH_H

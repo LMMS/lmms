@@ -54,9 +54,18 @@ public:
 	~GuiApplication() override;
 
 	static GuiApplication* instance();
+
+	//! @brief Called from main when SIGINT is fired
+	//!
+	//! Unix signal handlers can only call async-signal-safe functions:
+	//! `write(fd)` -> `QSocketNotifier` -> `SLOT sigintOccurred()`
+	//!
+	//! @see https://doc.qt.io/qt-6/unix-signals.html
 	static void sigintHandler(int);
+
 	static bool isWayland();
 #ifdef LMMS_BUILD_WIN32
+	//! @brief Returns the Windows System font.
 	static QFont getWin32SystemFont();
 #endif
 
