@@ -87,6 +87,7 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 
 bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 {
+	assert(_obj != nullptr);
 	QMutexLocker m(&m_clipMutex);
 
 	if (_search_dup && std::find(m_objects.begin(), m_objects.end(), _obj) != m_objects.end())

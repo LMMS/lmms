@@ -113,7 +113,7 @@ void AudioFileWave::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)
 	else
 	{
 		auto buf = new int_sample_t[_frames * channels()];
-		convertToS16(_ab, _frames, buf, !isLittleEndian());
+		convertToS16(_ab, _frames, buf, isBigEndian());
 
 		sf_writef_short( m_sf, buf, _frames );
 		delete[] buf;
