@@ -40,6 +40,8 @@ public:
 	PatternClip(Track* track);
 	~PatternClip() override = default;
 
+	bool isEmpty() const override { return false; };
+
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
