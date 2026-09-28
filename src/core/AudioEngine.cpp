@@ -55,8 +55,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-#include "BufferManager.h"
-
 namespace lmms
 {
 
@@ -99,8 +97,6 @@ AudioEngine::AudioEngine(bool renderOnly)
 		m_inputBufferChannels[i].push_back(m_inputBufferSource[i].data()); // L
 		m_inputBufferChannels[i].push_back(m_inputBufferSource[i].data() + initialSamplesPerChannel); // R
 	}
-
-	BufferManager::init( m_framesPerPeriod );
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{

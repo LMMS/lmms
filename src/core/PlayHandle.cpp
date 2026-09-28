@@ -24,7 +24,6 @@
  
 #include "PlayHandle.h"
 #include "AudioEngine.h"
-#include "BufferManager.h"
 #include "Engine.h"
 
 #include <QThread>
