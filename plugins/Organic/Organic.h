@@ -123,8 +123,7 @@ public:
 	OrganicInstrument( InstrumentTrack * _instrument_track );
 	~OrganicInstrument() override;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
+	void playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 

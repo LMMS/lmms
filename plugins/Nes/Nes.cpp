@@ -102,7 +102,7 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 }
 
 
-void NesObject::renderOutput( SampleFrame* buf, f_cnt_t frames )
+void NesObject::renderOutput(PlanarBufferSpan<float> out)
 {
 	////////////////////////////////
 	//	                          //
@@ -171,11 +171,11 @@ void NesObject::renderOutput( SampleFrame* buf, f_cnt_t frames )
 	{
 		ch2Sweep = -8 - ch2Sweep;
 	}
-	
-		
+
+
 	// start framebuffer loop
-		
-	for( f_cnt_t f = 0; f < frames; f++ )
+
+	for (f_cnt_t f = 0; f < out.frames(); ++f)
 	{
 		////////////////////////////////
 		//	                          //
@@ -424,8 +424,8 @@ void NesObject::renderOutput( SampleFrame* buf, f_cnt_t frames )
 		
 		const float mixdown = ( pin1 + pin2 ) * NES_MIXING_ALL * m_parent->m_masterVol.value();
 
-		buf[f][0] = mixdown;
-		buf[f][1] = mixdown;
+		out[0][f] = mixdown;
+		out[1][f] = mixdown;
 		
 	} // end framebuffer loop
 
@@ -544,11 +544,11 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 
 
 
-void NesInstrument::playNote( NotePlayHandle * n, SampleFrame* workingBuffer )
+void NesInstrument::playNote(NotePlayHandle* n, std::optional<PlanarBufferView<float>> out)
 {
 	const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
-	
+
 	if (!n->m_pluginData)
 	{
 		auto nes = new NesObject(this, Engine::audioEngine()->outputSampleRate(), n);
@@ -557,9 +557,9 @@ void NesInstrument::playNote( NotePlayHandle * n, SampleFrame* workingBuffer )
 
 	auto nes = static_cast<NesObject*>(n->m_pluginData);
 
-	nes->renderOutput( workingBuffer + offset, frames );
-	
-	applyRelease( workingBuffer, n );
+	nes->renderOutput(PlanarBufferSpan{out.value(), offset, frames});
+
+	applyRelease(*out, n);
 }
 
 

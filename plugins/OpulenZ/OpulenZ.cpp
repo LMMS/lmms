@@ -390,19 +390,26 @@ gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 }
 
 
-void OpulenzInstrument::play( SampleFrame* _working_buffer )
+void OpulenzInstrument::play(std::optional<PlanarBufferView<float>> out)
 {
 	emulatorMutex.lock();
-	theEmulator->update(renderbuffer, frameCount);
 
-	for( f_cnt_t frame = 0; frame < frameCount; ++frame )
-        {
-                sample_t s = float(renderbuffer[frame]) / 8192.0;
-                for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-                {
-                        _working_buffer[frame][ch] = s;
-                }
+	const f_cnt_t frames = out.value().frames();
+	theEmulator->update(renderbuffer, frames);
+
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
+	{
+		const auto s = static_cast<float>(renderbuffer[frame]) / 8192.f;
+		(*out)[0][frame] = s;
 	}
+
+	// Copy from 1st channel into other channels
+	// TODO: When mono/multi-channel plugin support is added, this should become a mono instrument
+	for (ch_cnt_t ch = 1; ch < out->channels(); ++ch)
+	{
+		std::ranges::copy(out->buffer(0), out->bufferPtr(ch));
+	}
+
 	emulatorMutex.unlock();
 }
 
@@ -585,7 +592,8 @@ void OpulenzInstrument::updatePatch() {
 }
 
 // Load an SBI file into the knob models
-void OpulenzInstrument::loadFile( const QString& file ) {
+void OpulenzInstrument::loadFile(const QString& file, bool)
+{
 	// http://cd.textfiles.com/soundsensations/SYNTH/SBINS/
 	// http://cd.textfiles.com/soundsensations/SYNTH/SBI1198/1198SBI.ZIP
 	if( !file.isEmpty() && QFileInfo( file ).exists() )
