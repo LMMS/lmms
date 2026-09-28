@@ -32,7 +32,6 @@
 
 #include "lmms_export.h"
 #include "SampleBuffer.h"
-#include "SampleFrame.h"
 
 class QPainter;
 
@@ -89,14 +88,7 @@ private:
 			{
 			}
 
-			Peak(const SampleFrame& frame)
-				: min(std::min(frame.left(), frame.right()))
-				, max(std::max(frame.left(), frame.right()))
-			{
-			}
-
 			Peak operator+(const Peak& other) const { return Peak(std::min(min, other.min), std::max(max, other.max)); }
-			Peak operator+(const SampleFrame& frame) const { return *this + Peak{frame}; }
 
 			float min = std::numeric_limits<float>::infinity();
 			float max = -std::numeric_limits<float>::infinity();

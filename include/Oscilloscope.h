@@ -30,13 +30,6 @@
 
 #include "AudioBufferSpan.h"
 
-namespace lmms
-{
-
-class SampleFrame;
-
-}
-
 namespace lmms::gui
 {
 

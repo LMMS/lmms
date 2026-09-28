@@ -43,7 +43,6 @@ namespace lmms
 
 class Track;
 class AudioBusHandle;
-class SampleFrame;
 
 class LMMS_EXPORT PlayHandle : public ThreadableJob
 {
