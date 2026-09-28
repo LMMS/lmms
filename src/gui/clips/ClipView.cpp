@@ -42,6 +42,7 @@
 #include "KeyboardShortcuts.h"
 #include "lmms_math.h"
 #include "MidiClipView.h"
+#include "PatternEditor.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
 #include "Song.h"
@@ -477,11 +478,13 @@ void ClipView::dropEvent( QDropEvent * de )
 	}
 
 	// Copy state into existing clip
-	DataFile dataFile( value.toUtf8() );
+	DataFile dataFile(value.toUtf8());
 	TimePos pos = m_clip->startPosition();
 	QDomElement clips = dataFile.content().firstChildElement("clips");
-	m_clip->restoreState( clips.firstChildElement().firstChildElement() );
-	m_clip->movePosition( pos );
+	TimePos pLength =  m_clip->length();
+	m_clip->restoreState(clips.firstChildElement().firstChildElement());
+	m_clip->changeLength(pLength);
+	m_clip->movePosition(pos);
 	AutomationClip::resolveAllIDs();
 	de->accept();
 }
@@ -1244,8 +1247,10 @@ void ClipView::paste()
 		Track* t = m_trackView->getTrack();
 		if (t->trackContainer() == Engine::patternStore())
 		{
+			size_t clipNum = t->numOfClips() - 1;
+			t->getClip(clipNum)->changeLength(m_clip->length());
 			// We swap index with the new clip so it is located in the rigth pattern
-			t->swapPositionOfClips(Engine::patternStore()->currentPattern(), t->numOfClips() - 1);
+			t->swapPositionOfClips(Engine::patternStore()->currentPattern(), clipNum);
 		}
 		// If we succeed on the paste we delete the Clip we pasted on
 		remove();
