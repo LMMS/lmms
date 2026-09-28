@@ -46,9 +46,9 @@
 namespace lmms::gui
 {
 
-AutomationClipView::AutomationClipView( AutomationClip * _clip,
-						TrackView * _parent ) :
-	ClipView( _clip, _parent ),
+AutomationClipView::AutomationClipView(AutomationClip * _clip,
+						TrackView * _parent, int offset) :
+	ClipView(_clip, _parent, offset),
 	m_clip( _clip ),
 	m_paintPixmap()
 {
@@ -259,8 +259,18 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		p.fillRect( rect(), c );
+		if (this->offset() == 0)
+		{
+			p.fillRect(rect(), c);
+		}
+		// Draw loop views with a slight color difference
+		else
+		{
+			p.fillRect(rect(), current ? c.lighter( 65 ) : c.darker( 150 ));
+		}
 	}
+	// Draw stripes on loop views
+	paintStripes(p, c);
 
 	// pixels per bar
 	const float ppb = fixedClips() ?
@@ -369,26 +379,45 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	}
 
 	// recording icon for when recording automation
-	if( m_clip->isRecording() )
+	if (m_clip->isRecording() && this->offset() == 0)
 	{
 		static auto s_clipRec = embed::getIconPixmap("clip_rec");
 		p.drawPixmap(1, rect().bottom() - s_clipRec.height(), s_clipRec);
 	}
 
 	// clip name
-	paintTextLabel(m_clip->name(), p);
+	if (this->offset() == 0)
+	{
+		paintTextLabel(m_clip->name(), p);
+	}
 
-	// inner border
-	p.setPen( c.lighter( current ? 160 : 130 ) );
-	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
-		rect().bottom() - BORDER_WIDTH );
+	if (this->offset() == 0)
+	{
+		// inner border
+		p.setPen(c.lighter(current ? 160 : 130));
+		p.drawRect(1, 1, rect().right() - BORDER_WIDTH,
+			rect().bottom() - BORDER_WIDTH);
 
-	// outer border
-	p.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+		// outer border
+		p.setPen(current ? c.lighter(130) : c.darker(300));
+		p.drawRect(0, 0, rect().right(), rect().bottom());
+	}
+	// In case of a loop view, we don't draw inner border and don't draw borders between loop views
+	else
+	{
+		p.setPen(current ? c.lighter(130) : c.darker(300));
+		p.drawLine(0, 0, rect().right(), 0);
+		p.drawLine(0, rect().bottom(), rect().right(), rect().bottom());
+
+		// Last loop view gets a right border
+		if (lastLoopView())
+		{
+			p.drawLine(rect().right(), 0, rect().right(), rect().bottom());
+		}
+	}
 
 	// draw the 'muted' pixmap only if the clip was manually muted
-	if( m_clip->isMuted() )
+	if(m_clip->isMuted() && this->offset() == 0)
 	{
 		const int spacing = BORDER_WIDTH;
 		const int size = 14;
@@ -396,7 +425,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 	
-	if (m_marker)
+	if (m_marker && this->offset() == 0)
 	{
 		p.setPen(markerColor());
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
@@ -453,6 +482,15 @@ void AutomationClipView::dropEvent( QDropEvent * _de )
 	{
 		ClipView::dropEvent( _de );
 	}
+}
+
+
+
+
+void AutomationClipView::createLoopView()
+{
+	AutomationClipView* view = new AutomationClipView(m_clip, m_trackView, offset() + 1);
+	connect(view, SIGNAL(closedWhileResizingLoop()), this, SLOT(resizeLoopAction()));
 }
 
 

@@ -200,6 +200,11 @@ public:
 		return supportsTangentEditing(m_progressionType);
 	}
 
+	bool loopable() const override
+	{
+		return true;
+	}
+
 	float valueAt( const TimePos & _time ) const;
 	float *valuesAfter( const TimePos & _time ) const;
 
