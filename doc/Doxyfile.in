@@ -16,6 +16,7 @@ CASE_SENSE_NAMES       = NO
 SORT_MEMBERS_CTORS_1ST = YES
 QUIET                  = YES
 INPUT                  = @CMAKE_SOURCE_DIR@/../README.md \
+                         @CMAKE_SOURCE_DIR@/pages \
                          @CMAKE_SOURCE_DIR@/../src \
                          @CMAKE_SOURCE_DIR@/../include \
                          @CMAKE_SOURCE_DIR@/../plugins
@@ -29,7 +30,8 @@ FILE_PATTERNS          = *.c \
                          *.h \
                          *.hh \
                          *.hxx \
-                         *.hpp
+                         *.hpp \
+                         *.md
 RECURSIVE              = YES
 EXCLUDE                = @CMAKE_SOURCE_DIR@/../src/3rdparty \
                          @CMAKE_SOURCE_DIR@/../plugins/CarlaBase/carla \
@@ -39,6 +41,7 @@ EXCLUDE                = @CMAKE_SOURCE_DIR@/../src/3rdparty \
                          @CMAKE_SOURCE_DIR@/../plugins/LadspaEffect/cmt/cmt \
                          @CMAKE_SOURCE_DIR@/../plugins/LadspaEffect/swh/ladspa \
                          @CMAKE_SOURCE_DIR@/../plugins/LadspaEffect/tap/tap-plugins \
+                         @CMAKE_SOURCE_DIR@/../plugins/MidiImport/portsmf \
                          @CMAKE_SOURCE_DIR@/../plugins/OpulenZ/adplug \
                          @CMAKE_SOURCE_DIR@/../plugins/Sid/resid/resid \
                          @CMAKE_SOURCE_DIR@/../plugins/Xpressive/exprtk \
