@@ -64,7 +64,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 
 	auto buildPixmapButton = [&](std::string_view activePixmap, std::string_view inactivePixmap)
 	{
-		auto button = new PixmapButton(this, nullptr);
+		auto button = new PixmapButton(this);
 		button->setActiveGraphic(embed::getIconPixmap(activePixmap));
 		button->setInactiveGraphic(embed::getIconPixmap(inactivePixmap));
 

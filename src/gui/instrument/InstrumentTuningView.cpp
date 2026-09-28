@@ -84,7 +84,7 @@ InstrumentTuningView::InstrumentTuningView(InstrumentTrack *it, QWidget *parent)
 	scaleEditLayout->addWidget(scaleLabel);
 
 	QPixmap editPixmap(embed::getIconPixmap("edit_draw_small"));
-	auto editPixButton = new PixmapButton(this, tr("Edit scales and keymaps"));
+	auto editPixButton = new PixmapButton(this);
 	editPixButton->setToolTip(tr("Edit scales and keymaps"));
 	editPixButton->setInactiveGraphic(editPixmap);
 	editPixButton->setActiveGraphic(editPixmap);

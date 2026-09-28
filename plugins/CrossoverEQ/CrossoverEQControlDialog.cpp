@@ -95,7 +95,7 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 		const QString& label,
 		int column
 	) {
-		auto b = new AutomatableButton(this, label);
+		auto b = new AutomatableButton(this);
 		b->setCheckable(true);
 		b->setModel(model);
 		b->setToolTip(label);

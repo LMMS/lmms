@@ -641,17 +641,17 @@ Lb302SynthView::Lb302SynthView(Instrument* instrument, QWidget* parent)
 	m_vcfDecKnob->move(210, 130);
 	m_vcfDecKnob->setHintText(tr("Decay:"), "");
 
-	m_slideToggle = new LedCheckBox("", this);
+	m_slideToggle = new LedCheckBox(this);
 	m_slideToggle->move(10, 180);
 
 	// accent removed pending real implementation - no need for non-functional buttons
-	/* m_accentToggle = new LedCheckBox("", this);
+	/* m_accentToggle = new LedCheckBox(this);
 	   m_accentToggle->move(10, 200); */
 
-	m_deadToggle = new LedCheckBox("", this);
+	m_deadToggle = new LedCheckBox(this);
 	m_deadToggle->move(10, 200);
 
-	m_db24Toggle = new LedCheckBox("", this);
+	m_db24Toggle = new LedCheckBox(this);
 	m_db24Toggle->move(10, 150);
 	m_db24Toggle->setToolTip(tr("303-es-que, 24dB/octave, 3 pole filter"));
 
@@ -668,84 +668,84 @@ Lb302SynthView::Lb302SynthView(Instrument* instrument, QWidget* parent)
 	const int waveBtnY = 96;
 	m_waveBtnGrp = new AutomatableButtonGroup(this);
 
-	auto sawWaveBtn = new PixmapButton(this, tr("Saw wave"));
+	auto sawWaveBtn = new PixmapButton(this);
 	sawWaveBtn->move(waveBtnX, waveBtnY);
 	sawWaveBtn->setActiveGraphic(embed::getIconPixmap("saw_wave_active"));
 	sawWaveBtn->setInactiveGraphic(embed::getIconPixmap("saw_wave_inactive"));
 	sawWaveBtn->setToolTip(tr("Click here for a sawtooth wave."));
 	m_waveBtnGrp->addButton(sawWaveBtn);
 
-	auto triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
+	auto triangleWaveBtn = new PixmapButton(this);
 	triangleWaveBtn->move(waveBtnX + (16 * 1), waveBtnY);
 	triangleWaveBtn->setActiveGraphic(embed::getIconPixmap("triangle_wave_active"));
 	triangleWaveBtn->setInactiveGraphic(embed::getIconPixmap("triangle_wave_inactive"));
 	triangleWaveBtn->setToolTip(tr("Click here for a triangle wave."));
 	m_waveBtnGrp->addButton(triangleWaveBtn);
 
-	auto sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
+	auto sqrWaveBtn = new PixmapButton(this);
 	sqrWaveBtn->move(waveBtnX + (16 * 2), waveBtnY);
 	sqrWaveBtn->setActiveGraphic(embed::getIconPixmap("square_wave_active"));
 	sqrWaveBtn->setInactiveGraphic(embed::getIconPixmap("square_wave_inactive"));
 	sqrWaveBtn->setToolTip(tr("Click here for a square wave."));
 	m_waveBtnGrp->addButton(sqrWaveBtn);
 
-	auto roundSqrWaveBtn = new PixmapButton(this, tr("Rounded square wave"));
+	auto roundSqrWaveBtn = new PixmapButton(this);
 	roundSqrWaveBtn->move(waveBtnX + (16 * 3), waveBtnY);
 	roundSqrWaveBtn->setActiveGraphic( embed::getIconPixmap("round_square_wave_active"));
 	roundSqrWaveBtn->setInactiveGraphic( embed::getIconPixmap("round_square_wave_inactive"));
 	roundSqrWaveBtn->setToolTip(tr("Click here for a square wave with a rounded end."));
 	m_waveBtnGrp->addButton(roundSqrWaveBtn);
 
-	auto moogWaveBtn = new PixmapButton(this, tr("Moog wave"));
+	auto moogWaveBtn = new PixmapButton(this);
 	moogWaveBtn->move(waveBtnX + (16 * 4), waveBtnY);
 	moogWaveBtn->setActiveGraphic(embed::getIconPixmap("moog_saw_wave_active"));
 	moogWaveBtn->setInactiveGraphic(embed::getIconPixmap("moog_saw_wave_inactive"));
 	moogWaveBtn->setToolTip(tr("Click here for a moog-like wave."));
 	m_waveBtnGrp->addButton(moogWaveBtn);
 
-	auto sinWaveBtn = new PixmapButton(this, tr("Sine wave"));
+	auto sinWaveBtn = new PixmapButton(this);
 	sinWaveBtn->move(waveBtnX + (16 * 5), waveBtnY);
 	sinWaveBtn->setActiveGraphic(embed::getIconPixmap("sin_wave_active"));
 	sinWaveBtn->setInactiveGraphic(embed::getIconPixmap("sin_wave_inactive"));
 	sinWaveBtn->setToolTip(tr("Click for a sine wave."));
 	m_waveBtnGrp->addButton(sinWaveBtn);
 
-	auto exponentialWaveBtn = new PixmapButton(this, tr("White noise wave"));
+	auto exponentialWaveBtn = new PixmapButton(this);
 	exponentialWaveBtn->move(waveBtnX + (16 * 6), waveBtnY);
 	exponentialWaveBtn->setActiveGraphic(embed::getIconPixmap("exp_wave_active"));
 	exponentialWaveBtn->setInactiveGraphic(embed::getIconPixmap("exp_wave_inactive"));
 	exponentialWaveBtn->setToolTip(tr("Click here for an exponential wave."));
 	m_waveBtnGrp->addButton(exponentialWaveBtn);
 
-	auto whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise wave"));
+	auto whiteNoiseWaveBtn = new PixmapButton(this);
 	whiteNoiseWaveBtn->move(waveBtnX + (16 * 7), waveBtnY);
 	whiteNoiseWaveBtn->setActiveGraphic(embed::getIconPixmap("white_noise_wave_active"));
 	whiteNoiseWaveBtn->setInactiveGraphic(embed::getIconPixmap("white_noise_wave_inactive"));
 	whiteNoiseWaveBtn->setToolTip(tr("Click here for white noise."));
 	m_waveBtnGrp->addButton(whiteNoiseWaveBtn);
 
-	auto blSawWaveBtn = new PixmapButton(this, tr("Bandlimited saw wave"));
+	auto blSawWaveBtn = new PixmapButton(this);
 	blSawWaveBtn->move(waveBtnX + (16 * 9) - 8, waveBtnY);
 	blSawWaveBtn->setActiveGraphic(embed::getIconPixmap("saw_wave_active"));
 	blSawWaveBtn->setInactiveGraphic(embed::getIconPixmap("saw_wave_inactive"));
 	blSawWaveBtn->setToolTip(tr("Click here for bandlimited sawtooth wave."));
 	m_waveBtnGrp->addButton(blSawWaveBtn);
 
-	auto blSquareWaveBtn = new PixmapButton(this, tr("Bandlimited square wave"));
+	auto blSquareWaveBtn = new PixmapButton(this);
 	blSquareWaveBtn->move(waveBtnX + (16 * 10) - 8, waveBtnY);
 	blSquareWaveBtn->setActiveGraphic(embed::getIconPixmap("square_wave_active"));
 	blSquareWaveBtn->setInactiveGraphic(embed::getIconPixmap("square_wave_inactive"));
 	blSquareWaveBtn->setToolTip(tr("Click here for bandlimited square wave."));
 	m_waveBtnGrp->addButton(blSquareWaveBtn);
 
-	auto blTriangleWaveBtn = new PixmapButton(this, tr("Bandlimited triangle wave"));
+	auto blTriangleWaveBtn = new PixmapButton(this);
 	blTriangleWaveBtn->move(waveBtnX + (16 * 11) - 8, waveBtnY);
 	blTriangleWaveBtn->setActiveGraphic(embed::getIconPixmap("triangle_wave_active"));
 	blTriangleWaveBtn->setInactiveGraphic(embed::getIconPixmap("triangle_wave_inactive"));
 	blTriangleWaveBtn->setToolTip(tr("Click here for bandlimited triangle wave."));
 	m_waveBtnGrp->addButton(blTriangleWaveBtn);
 
-	auto blMoogWaveBtn = new PixmapButton(this, tr("Bandlimited moog saw wave"));
+	auto blMoogWaveBtn = new PixmapButton(this);
 	blMoogWaveBtn->move(waveBtnX + (16 * 12) - 8, waveBtnY);
 	blMoogWaveBtn->setActiveGraphic(embed::getIconPixmap("moog_saw_wave_active"));
 	blMoogWaveBtn->setInactiveGraphic(embed::getIconPixmap("moog_saw_wave_inactive"));

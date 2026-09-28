@@ -53,7 +53,7 @@ OscilloscopeControlDialog::OscilloscopeControlDialog(OscilloscopeControls* contr
 	controlsLayout->setSpacing(10);
 
 
-	PixmapButton* pauseButton = new PixmapButton(this, tr("Pause"));
+	PixmapButton* pauseButton = new PixmapButton(this);
 	pauseButton->setToolTip(tr("Pause"));
 	pauseButton->setActiveGraphic(embed::getIconPixmap("play"));
 	pauseButton->setInactiveGraphic(embed::getIconPixmap("pause"));
@@ -61,7 +61,7 @@ OscilloscopeControlDialog::OscilloscopeControlDialog(OscilloscopeControls* contr
 	pauseButton->setModel(&controls->m_pauseModel);
 	controlsLayout->addWidget(pauseButton);
 
-	LedCheckBox* stereoCheck = new LedCheckBox("Stereo", this, tr("Stereo"), LedCheckBox::LedColor::Green);
+	LedCheckBox* stereoCheck = new LedCheckBox(tr("Stereo"), this, LedCheckBox::LedColor::Green);
 	stereoCheck->setModel(&controls->m_stereoModel);
 	controlsLayout->addWidget(stereoCheck);
 

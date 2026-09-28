@@ -39,8 +39,7 @@ class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView
 {
 	Q_OBJECT
 public:
-	AutomatableButton( QWidget * _parent, const QString & _name
-			= QString() );
+	AutomatableButton(QWidget* parent);
 	~AutomatableButton() override;
 
 	inline void setCheckable( bool _on )

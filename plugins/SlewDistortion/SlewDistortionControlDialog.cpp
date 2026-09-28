@@ -63,7 +63,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	
 	auto makeToggleButton = [this](int x, int y, const QString& tooltip, const std::string& activeIcon, const std::string& inactiveIcon, BoolModel* model)
 	{
-		PixmapButton* button = new PixmapButton(this, tooltip);
+		PixmapButton* button = new PixmapButton(this);
 		button->setActiveGraphic(PLUGIN_NAME::getIconPixmap(activeIcon));
 		button->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(inactiveIcon));
 		button->setToolTip(tooltip);
@@ -75,7 +75,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	
 	auto makeGroupButton = [this](int x, int y, const QString& tooltip, const std::string& activeIcon, const std::string& inactiveIcon)
 	{
-		PixmapButton* button = new PixmapButton(this, tooltip);
+		PixmapButton* button = new PixmapButton(this);
 		button->setActiveGraphic(PLUGIN_NAME::getIconPixmap(activeIcon));
 		button->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(inactiveIcon));
 		button->setToolTip(tooltip);
@@ -187,7 +187,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	oversampleGroup->addButton(oversample32xButton);
 	oversampleGroup->setModel(&controls->m_oversamplingModel);
 	
-	PixmapButton* m_helpBtn = new PixmapButton(this, nullptr);
+	PixmapButton* m_helpBtn = new PixmapButton(this);
 	m_helpBtn->move(614, 250);
 	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_on"));
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_off"));

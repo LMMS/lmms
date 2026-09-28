@@ -45,11 +45,9 @@ public:
 	} ;
 
 	LedCheckBox( const QString & _txt, QWidget * _parent,
-				const QString & _name = QString(),
 						LedColor _color = LedColor::Yellow,
 						bool legacyMode = true);
 	LedCheckBox( QWidget * _parent,
-				const QString & _name = QString(),
 						LedColor _color = LedColor::Yellow,
 						bool legacyMode = true);
 

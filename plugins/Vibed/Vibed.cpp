@@ -278,15 +278,15 @@ VibedView::VibedView(Instrument* instrument, QWidget* parent) :
 	m_lengthKnob(KnobType::Bright26, this),
 	m_graph(this),
 	m_impulse("", this),
-	m_power("", this, tr("Enable waveform")),
-	m_smoothBtn(this, tr("Smooth waveform")),
-	m_normalizeBtn(this, tr("Normalize waveform")),
-	m_sinWaveBtn(this, tr("Sine wave")),
-	m_triangleWaveBtn(this, tr("Triangle wave")),
-	m_sawWaveBtn(this, tr("Saw wave")),
-	m_sqrWaveBtn(this, tr("Square wave")),
-	m_whiteNoiseWaveBtn(this, tr("White noise")),
-	m_usrWaveBtn(this, tr("User-defined wave"))
+	m_power(this),
+	m_smoothBtn(this),
+	m_normalizeBtn(this),
+	m_sinWaveBtn(this),
+	m_triangleWaveBtn(this),
+	m_sawWaveBtn(this),
+	m_sqrWaveBtn(this),
+	m_whiteNoiseWaveBtn(this),
+	m_usrWaveBtn(this)
 {
 	setAutoFillBackground(true);
 	QPalette pal;

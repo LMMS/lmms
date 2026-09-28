@@ -35,13 +35,11 @@
 namespace lmms::gui
 {
 
-AutomatableButton::AutomatableButton( QWidget * _parent,
-						const QString & _name ) :
-	QPushButton( _parent ),
-	BoolModelView( new BoolModel( false, nullptr, _name, true ), this ),
-	m_group( nullptr )
+AutomatableButton::AutomatableButton(QWidget* parent)
+	: QPushButton(parent)
+	, BoolModelView(new BoolModel(false, nullptr, QString{}, true), this)
+	, m_group(nullptr)
 {
-	setWindowTitle( _name );
 	doConnections();
 	setFocusPolicy( Qt::NoFocus );
 }
