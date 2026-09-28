@@ -53,6 +53,8 @@ public:
 	static QString openAudioFile(const QString& previousFile = "");
 	static QString openWaveformFile(const QString& previousFile = "");
 	void clearSelection();
+	
+	void fileSelected(const QString &file);
 };
 
 

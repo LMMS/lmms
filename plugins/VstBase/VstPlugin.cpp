@@ -534,8 +534,16 @@ void VstPlugin::openPreset()
 {
 	gui::FileDialog ofd(nullptr, tr("Open Preset"), "", tr("VST Plugin Preset (*.fxp *.fxb)"));
 	ofd.setFileMode(gui::FileDialog::ExistingFiles);
+
+	if (p_name != "") // remember last directory
+	{
+		ofd.setDirectory(QFileInfo(p_name).absolutePath());
+	}
+
 	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
+		p_name = ofd.selectedFiles()[0];
+
 		lock();
 		sendMessage(message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(
 			QDir::toNativeSeparators(ofd.selectedFiles()[0]))));

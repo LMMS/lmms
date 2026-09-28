@@ -490,46 +490,32 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 void PatmanView::openFile()
 {
-	FileDialog ofd( nullptr, tr( "Open patch file" ) );
-	ofd.setFileMode( FileDialog::ExistingFiles );
+	FileDialog ofd(nullptr, tr("Open patch file"));
+	ofd.setFileMode(FileDialog::ExistingFiles);
 
 	QStringList types;
-	types << tr( "Patch-Files (*.pat)" );
-	ofd.setNameFilters( types );
+	types << tr("Patch-Files (*.pat)");
+	ofd.setNameFilters(types);
 
-	if( m_pi->m_patchFile == "" )
+	if (m_pi->m_patchFile != "")
 	{
-		if( QDir( "/usr/share/midi/freepats" ).exists() )
-		{
-			ofd.setDirectory( "/usr/share/midi/freepats" );
-		}
-		else
-		{
-			ofd.setDirectory(
-				ConfigManager::inst()->userSamplesDir() );
-		}
+		QString f = PathUtil::toAbsolute(m_pi->m_patchFile);
+		ofd.setDirectory(QFileInfo(f).absolutePath());
+		ofd.selectFile(QFileInfo(f).fileName());
 	}
-	else if( QFileInfo( m_pi->m_patchFile ).isRelative() )
+	else if (QDir("/usr/share/midi/freepats").exists())
 	{
-		QString f = ConfigManager::inst()->userSamplesDir()
-							+ m_pi->m_patchFile;
-		if( QFileInfo( f ).exists() == false )
-		{
-			f = ConfigManager::inst()->factorySamplesDir()
-							+ m_pi->m_patchFile;
-		}
-
-		ofd.selectFile( f );
+		ofd.setDirectory("/usr/share/midi/freepats");
 	}
 	else
 	{
-		ofd.selectFile( m_pi->m_patchFile );
+		ofd.setDirectory(ConfigManager::inst()->userSamplesDir());
 	}
 
-	if( ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
+	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
 		QString f = ofd.selectedFiles()[0];
-		if( f != "" )
+		if (f != "")
 		{
 			m_pi->setFile( f );
 			Engine::getSong()->setModified();

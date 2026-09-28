@@ -208,10 +208,11 @@ LfoControllerDialog::~LfoControllerDialog()
 
 void LfoControllerDialog::askUserDefWave()
 {
-	const auto fileName = FileDialog::openWaveformFile();
-	if (fileName.isEmpty()) { return; }
-
 	auto lfoModel = dynamic_cast<LfoController*>(model());
+
+	const auto fileName = FileDialog::openWaveformFile(lfoModel->m_userDefSampleBuffer->audioFile());
+	if (fileName.isEmpty()) { return; }
+	
 	auto& buffer = lfoModel->m_userDefSampleBuffer;
 	buffer = SampleBuffer::fromFile(fileName);
 
