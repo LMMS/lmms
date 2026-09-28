@@ -324,11 +324,9 @@ void Lv2Proc::copyModelsToCore()
 
 
 
-void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
-									unsigned firstChan, unsigned num,
-									f_cnt_t frames)
+void Lv2Proc::copyBuffersFromCore(PlanarBufferView<const float> buf, unsigned firstChan, unsigned num)
 {
-	inPorts().m_left->copyBuffersFromCore(buf, firstChan, frames);
+	inPorts().m_left->copyBuffersFromCore(buf.buffer(firstChan));
 	if (num > 1)
 	{
 		// if the caller requests to take input from two channels, but we only
@@ -337,11 +335,11 @@ void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
 		// (this happens if we have two outputs and only one input)
 		if (inPorts().m_right)
 		{
-			inPorts().m_right->copyBuffersFromCore(buf, firstChan + 1, frames);
+			inPorts().m_right->copyBuffersFromCore(buf.buffer(firstChan + 1));
 		}
 		else
 		{
-			inPorts().m_left->averageWithBuffersFromCore(buf, firstChan + 1, frames);
+			inPorts().m_left->averageWithBuffersFromCore(buf.buffer(firstChan + 1));
 		}
 	}
 }
@@ -349,11 +347,9 @@ void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
 
 
 
-void Lv2Proc::copyBuffersToCore(SampleFrame* buf,
-								unsigned firstChan, unsigned num,
-								f_cnt_t frames) const
+void Lv2Proc::copyBuffersToCore(PlanarBufferView<float> buf, unsigned firstChan, unsigned num) const
 {
-	outPorts().m_left->copyBuffersToCore(buf, firstChan + 0, frames);
+	outPorts().m_left->copyBuffersToCore(buf.buffer(firstChan));
 	if (num > 1)
 	{
 		// if the caller requests to copy into two channels, but we only have
@@ -361,7 +357,25 @@ void Lv2Proc::copyBuffersToCore(SampleFrame* buf,
 		// (this happens if we have two inputs and only one output)
 		Lv2Ports::Audio* ap = outPorts().m_right
 			? outPorts().m_right : outPorts().m_left;
-		ap->copyBuffersToCore(buf, firstChan + 1, frames);
+		ap->copyBuffersToCore(buf.buffer(firstChan + 1));
+	}
+}
+
+
+
+
+void Lv2Proc::copyBuffersToCore(PlanarBufferView<float> buf, unsigned firstChan, unsigned num,
+	float wet, float dry) const
+{
+	outPorts().m_left->copyBuffersToCore(buf.buffer(firstChan), wet, dry);
+	if (num > 1)
+	{
+		// if the caller requests to copy into two channels, but we only have
+		// one output channel, duplicate our output
+		// (this happens if we have two inputs and only one output)
+		Lv2Ports::Audio* ap = outPorts().m_right
+			? outPorts().m_right : outPorts().m_left;
+		ap->copyBuffersToCore(buf.buffer(firstChan + 1), wet, dry);
 	}
 }
 

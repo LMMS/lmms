@@ -185,21 +185,24 @@ struct Audio : public VisitablePort<Audio, PortBase>
 
 	//! @brief Copy buffer passed by LMMS into our ports
 	//! @param lmmsBuf The buffer to copy from
-	//! @param channel channel index into each sample frame
-	//! @param frames The length of the buffer @p lmmsBuf
-	void copyBuffersFromCore(const SampleFrame* lmmsBuf, unsigned channel, f_cnt_t frames);
+	void copyBuffersFromCore(std::span<const float> lmmsBuf);
 
 	//! @brief Add buffer passed by LMMS into our ports, and halve the result
 	//! @param lmmsBuf The buffer to average from
-	//! @param channel channel index into each sample frame
-	//! @param frames The length of the buffer @p lmmsBuf
-	void averageWithBuffersFromCore(const SampleFrame* lmmsBuf, unsigned channel, f_cnt_t frames);
+	void averageWithBuffersFromCore(std::span<const float> lmmsBuf);
 
 	//! @brief Copy our ports into buffers passed by LMMS
 	//! @param lmmsBuf The buffer to copy into
-	//! @param channel channel index into each sample frame
-	//! @param frames The length of the buffer @p lmmsBuf
-	void copyBuffersToCore(SampleFrame* lmmsBuf, unsigned channel, f_cnt_t frames) const;
+	//! @param wet the wet level
+	//! @param dry the dry level
+	void copyBuffersToCore(std::span<float> lmmsBuf) const;
+
+	//! @brief Copy our ports into buffers passed by LMMS, performing wet/dry mixing
+	//!        using @p lmmsBuf as the dry signal
+	//! @param lmmsBuf The buffer to copy into, and dry signal to read from
+	//! @param wet the wet level
+	//! @param dry the dry level
+	void copyBuffersToCore(std::span<float> lmmsBuf, float wet, float dry) const;
 
 	bool isSideChain() const { return m_sidechain; }
 	bool isOptional() const { return m_optional; }

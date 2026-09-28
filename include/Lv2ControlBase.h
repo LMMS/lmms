@@ -32,6 +32,7 @@
 #include <lilv/lilv.h>
 #include <memory>
 
+#include "AudioBufferSpan.h"
 #include "LinkedModelGroups.h"
 #include "lmms_export.h"
 #include "Plugin.h"
@@ -74,16 +75,16 @@ class SampleFrame;
 class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
 {
 public:
-	static Plugin::Type check(const LilvPlugin* m_plugin,
-		std::vector<PluginIssue> &issues);
+	static Plugin::Type check(const LilvPlugin* plugin,
+		std::vector<PluginIssue>& issues);
 
 	void shutdown();
 	void init(Model* meAsModel);
 
 	const LilvPlugin* getPlugin() const { return m_plugin; }
 
-	Lv2Proc *control(std::size_t idx) { return m_procs[idx].get(); }
-	const Lv2Proc *control(std::size_t idx) const { return m_procs[idx].get(); }
+	Lv2Proc* control(std::size_t idx) { return m_procs[idx].get(); }
+	const Lv2Proc* control(std::size_t idx) const { return m_procs[idx].get(); }
 
 	bool hasGui() const { return m_hasGUI; }
 	void setHasGui(bool val) { m_hasGUI = val; }
@@ -95,7 +96,7 @@ protected:
 	//! @param that the class inheriting this class and inheriting Model;
 	//!   this is the same pointer as this, but a different type
 	//! @param uri the Lv2 URI telling this class what plugin to construct
-	Lv2ControlBase(class Model *that, const QString& uri);
+	Lv2ControlBase(Model* that, const QString& uri);
 	Lv2ControlBase(const Lv2ControlBase&) = delete;
 	~Lv2ControlBase() override;
 	void reload();
@@ -118,18 +119,20 @@ protected:
 	void copyModelsToLmms() const;
 
 	//! Copy buffer passed by LMMS into our ports
-	void copyBuffersFromLmms(const SampleFrame* buf, f_cnt_t frames);
+	void copyBuffersFromLmms(PlanarBufferView<const float> buf);
 	//! Copy our ports into buffers passed by LMMS
-	void copyBuffersToLmms(SampleFrame* buf, f_cnt_t frames) const;
+	void copyBuffersToLmms(PlanarBufferView<float> buf) const;
+	//! Copy our ports into buffers passed by LMMS, performing wet/dry mixing using @p buf as the dry signal
+	void copyBuffersToLmms(PlanarBufferView<float> buf, float wet, float dry) const;
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(f_cnt_t frames);
 
 	/*
 		load/save, must be called from virtuals
 	*/
-	void saveSettings(QDomDocument &doc, QDomElement &that);
-	void loadSettings(const QDomElement &that);
-	void loadFile(const QString &file);
+	void saveSettings(QDomDocument& doc, QDomElement& that);
+	void loadSettings(const QDomElement& that);
+	void loadFile(const QString& file);
 
 	/*
 		more functions that must be called from virtuals
@@ -137,8 +140,8 @@ protected:
 	std::size_t controlCount() const;
 	QString nodeName() const { return "lv2controls"; }
 	bool hasNoteInput() const;
-	void handleMidiInputEvent(const class MidiEvent &event,
-		const class TimePos &time, f_cnt_t offset);
+	void handleMidiInputEvent(const class MidiEvent& event,
+		const class TimePos& time, f_cnt_t offset);
 
 private:
 	//! Independent processors

@@ -35,6 +35,7 @@
 
 #include <ringbuffer/ringbuffer.h>
 
+#include "AudioBufferSpan.h"
 #include "LinkedModelGroups.h"
 #include "LmmsSemaphore.h"
 #include "Lv2Basics.h"
@@ -129,9 +130,8 @@ public:
 	//! @param firstChan The offset for @p buf where we have to read our first channel.
 	//! This marks the first sample in each sample frame where we read from.
 	//! If we are the 2nd of 2 mono procs, this can be greater than 0.
-	//! @param num Number of channels we must read from @p buf (starting at @p offset)
-	//! @param frames The length of @p buf
-	void copyBuffersFromCore(const SampleFrame* buf, unsigned firstChan, unsigned num, f_cnt_t frames);
+	//! @param num Number of channels we must read from @p buf (starting at @p firstChan)
+	void copyBuffersFromCore(PlanarBufferView<const float> buf, unsigned firstChan, unsigned num);
 
 	//! @brief Copy our ports into buffers passed by the core
 	//! @param buf buffer of sample frames, each sample frame is something like a
@@ -139,8 +139,23 @@ public:
 	//! @param firstChan The offset for @p buf where we have to write our first channel.
 	//! This marks the first sample in each sample frame where we write to.
 	//! If we are the 2nd of 2 mono procs, this can be greater than 0.
-	//! @param num Number of channels we must write to @p buf (starting at @p offset)
-	void copyBuffersToCore(SampleFrame* buf, unsigned firstChan, unsigned num, f_cnt_t frames) const;
+	//! @param num Number of channels we must write to @p buf (starting at @p firstChan)
+	//! @param wet the wet level
+	//! @param dry the dry level
+	void copyBuffersToCore(PlanarBufferView<float> buf, unsigned firstChan, unsigned num) const;
+
+	//! @brief Copy our ports into buffers passed by the core, performing wet/dry mixing
+	//!        using @p buf as the dry signal
+	//! @param buf buffer of sample frames, each sample frame is something like a
+	//! `float[<number-of-procs> * <channels per proc>]` array.
+	//! @param firstChan The offset for @p buf where we have to write our first channel.
+	//! This marks the first sample in each sample frame where we write to.
+	//! If we are the 2nd of 2 mono procs, this can be greater than 0.
+	//! @param num Number of channels we must write to @p buf (starting at @p firstChan)
+	//! @param wet the wet level
+	//! @param dry the dry level
+	void copyBuffersToCore(PlanarBufferView<float> buf, unsigned firstChan, unsigned num,
+		float wet, float dry) const;
 
 	//! @brief Run the Lv2 plugin instance for @p frames frames
 	//! @param frames The number of frames to run
