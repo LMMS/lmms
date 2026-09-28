@@ -2172,6 +2172,7 @@ void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 
 	m_editor->setCurrentClip(clip);
 
+
 	// Set our window's title
 	if (clip == nullptr)
 	{
@@ -2311,6 +2312,11 @@ void AutomationEditorWindow::updateEditTanButton()
 	auto progType = currentClip()->progressionType();
 	m_editTanAction->setEnabled(AutomationClip::supportsTangentEditing(progType));
 	if (!m_editTanAction->isEnabled() && m_editTanAction->isChecked()) { m_drawAction->trigger(); }
+}
+
+bool AutomationEditorWindow::hasValidClip()
+{
+	return m_editor->validClip();
 }
 
 } // namespace lmms::gui
