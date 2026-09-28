@@ -29,7 +29,7 @@
 #include "PatternTrack.h"
 #include "SampleBuffer.h"
 #include "SampleClip.h"
-
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -65,6 +65,9 @@ SampleRecordHandle::~SampleRecordHandle()
 
 void SampleRecordHandle::play( SampleFrame* /*_working_buffer*/ )
 {
+	ZoneScopedC(0xff7f50); // #ff7f50 (tracy::Color::Coral)
+	ZoneNameF("SampleRecordHandle::play [%s]", m_track ? m_track->displayNameUtf8().c_str() : "no track");
+
 	const SampleFrame* recbuf = Engine::audioEngine()->inputBuffer();
 	const f_cnt_t frames = Engine::audioEngine()->inputBufferFrames();
 	writeBuffer( recbuf, frames );

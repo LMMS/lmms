@@ -33,6 +33,7 @@
 #include "EffectControls.h"
 #include "EffectView.h"
 #include "SampleFrame.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -94,8 +95,12 @@ void Effect::loadSettings( const QDomElement & _this )
 
 bool Effect::processAudioBuffer(AudioBuffer& inOut)
 {
+	ZoneScopedC(0xafeeee); // #afeeee (tracy::Color::PaleTurquoise)
+	ZoneNameF("Effect::processAudioBuffer [%s]", displayNameUtf8().c_str());
+
 	if (!isAwake())
 	{
+		ZoneScopedN("Sleeping");
 		if (!inOut.hasSignal(0b11))
 		{
 			// Sleeping plugins need to zero any track channels their output is routed to in order to
@@ -113,11 +118,16 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 	if (!isProcessingAudio())
 	{
 		// Plugin is awake but not processing audio
+		ZoneScopedN("Bypassed");
 		processBypassedImpl();
 		return false;
 	}
 
-	const auto status = processImpl(inOut.interleavedBuffer().asSampleFrames().data(), inOut.frames());
+	ProcessStatus status;
+	{
+		ZoneScopedN("Process");
+		status = processImpl(inOut.interleavedBuffer().asSampleFrames().data(), inOut.frames());
+	}
 
 	// Copy interleaved plugin output to planar
 	toPlanar(inOut.interleavedBuffer(), inOut.groupBuffers(0));
