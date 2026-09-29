@@ -25,21 +25,35 @@
 
 #include <QLabel>
 #include <QList>
+#include <qlist.h>
 
 #include "lmms_export.h"
-namespace lmms 
-{
+namespace lmms {
+
+
+class EffectCategoryData {
+public:
+	QString m_category;
+	bool m_is_favorite;
+};
 
 class LMMS_EXPORT EffectCategory
 {
 public:
 	static EffectCategory* instance();
 	QString getCategoryName(QString effectName);
+	bool getIsFavorite(QString effectName);
 	QStringList getCategories();
+	void setCategory(QString effectName, QString categoryName);
+	void toggleFavorite(QString effectName, bool isFavorite);
+	void save();
+
 private:
 	static std::unique_ptr<EffectCategory> s_instance;
-	QStringList m_categories;
-	QStringList getCategoriesFromMap(std::map<QString, QString> map);
+	QStringList m_categories_list;
+	std::map<QString, EffectCategoryData> m_categories_map;
+	QStringList getCategoriesFromMap(std::map<QString, EffectCategoryData> map);
+	void load();
 };
 
 // Short-hand function
