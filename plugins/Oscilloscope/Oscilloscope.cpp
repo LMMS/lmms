@@ -25,6 +25,7 @@
 #include "Oscilloscope.h"
 
 #include "embed.h"
+#include "MixHelpers.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -60,12 +61,26 @@ Oscilloscope::Oscilloscope(Model* parent, const Descriptor::SubPluginFeatures::K
 }
 
 
-Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const f_cnt_t frames)
+Effect::ProcessStatus Oscilloscope::processImpl(PlanarBufferView<float> inOut)
 {
 	if (!m_controls.m_pauseModel.value())
 	{
+		// Planar-to-interleaved ringbuffer copier
+		class Copier
+		{
+		public:
+			explicit Copier(PlanarBufferView<const float> src) : m_src(src) {}
+
+			void operator()(std::size_t srcOffset, std::size_t amount, SampleFrame* dest) const
+			{
+				MixHelpers::copy(InterleavedBufferSpan{dest, amount}, m_src.subspan(srcOffset, amount));
+			}
+		private:
+			PlanarBufferSpan<const float> m_src;
+		} copier{inOut};
+
 		// Send the samples from the audio thread over to the gui via a ring buffer; the gui will do all of the processing.
-		m_inputBuffer.write(buffer, frames);
+		m_inputBuffer.write(copier, inOut.frames());
 	}
 	return ProcessStatus::Continue;
 }

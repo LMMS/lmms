@@ -25,10 +25,9 @@
 #ifndef LMMS_GUI_OSCILLOSCOPE_H
 #define LMMS_GUI_OSCILLOSCOPE_H
 
+#include <memory>
 #include <QWidget>
 #include <QPixmap>
-
-#include "AudioBufferSpan.h"
 
 namespace lmms::gui
 {

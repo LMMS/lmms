@@ -92,6 +92,15 @@ LMMS_EXPORT void copy(PlanarBufferView<float> dst, PlanarBufferView<const float>
 //! @pre dst.frames() >= src.frames()
 LMMS_EXPORT void copy(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src);
 
+//! @brief Copies data from @a src to @a dst, performing planar to interleaved conversion
+//! @note If @a dst  has more channels or frames than @a src,
+//!       the additional channels or frames are left unmodified.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @pre dst.channels() >= src.channels()
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copy(InterleavedBufferSpan<float> dst, PlanarBufferSpan<const float> src);
+
 //! @brief Copies data from @a src to @a dst
 //! @note If @a dst has more channels than @a src, the additional channels are zeroed,
 //!       but only the first `src.frames()` frames.

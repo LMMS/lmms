@@ -122,6 +122,25 @@ void copy(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src)
 	}
 }
 
+void copy(InterleavedBufferSpan<float> dst, PlanarBufferSpan<const float> src)
+{
+	assert(dst.channels() >= src.channels());
+	assert(dst.frames() >= src.frames());
+
+	const auto channels = src.channels();
+	const auto frames = src.frames();
+	const float* const* const srcData = src.data();
+
+	float* dstPtr = dst.data();
+	for (f_cnt_t frame = 0; frame < frames; ++frame, dstPtr += channels)
+	{
+		for (ch_cnt_t ch = 0; ch < channels; ++ch)
+		{
+			dstPtr[ch] = srcData[ch][frame];
+		}
+	}
+}
+
 void copyAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src)
 {
 	copy(dst, src);
