@@ -30,16 +30,14 @@
 
 #include "lmms_export.h"
 
-namespace lmms
-{
+namespace lmms {
 
 class ValueBuffer;
-class SampleFrame;
 
-namespace MixHelpers
-{
+namespace MixHelpers {
 
-LMMS_EXPORT bool isSilent(const SampleFrame* src, int frames);
+//! @returns true if all samples within @p buffer fall below a silence threshold
+//! @note NaN is considered non-silent
 LMMS_EXPORT bool isSilent(std::span<const float> buffer);
 
 //! @returns true if all samples within @p buffer fall below a silence threshold
@@ -116,10 +114,7 @@ LMMS_EXPORT void copyMix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const flo
 //! @pre dst.frames() >= src.frames()
 LMMS_EXPORT void copyMixAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
-/*! \brief Add samples from src to dst */
-LMMS_EXPORT void add( SampleFrame* dst, const SampleFrame* src, int frames );
-
-/*! \brief Add samples from src to dst */
+//! @brief Add samples from src to dst
 LMMS_EXPORT void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src);
 
 //! @brief Multiply samples from `dst` by `coeff` starting at `offset`
@@ -128,17 +123,11 @@ LMMS_EXPORT void multiply(PlanarBufferView<float> dst, float coeff, f_cnt_t offs
 //! @brief Multiply samples from `dst` by `coeff`
 LMMS_EXPORT void multiply(PlanarBufferView<float> dst, float coeff);
 
-/*! \brief Multiply samples from `dst` by `coeff` */
-LMMS_EXPORT void multiply(SampleFrame* dst, float coeff, int frames);
-
 //! @brief Add samples from src multiplied by coeffSrc to dst
-LMMS_EXPORT void addMultiplied(PlanarBufferView<float> dst, PlanarBufferView<const float> src, float coeffSrc);
+LMMS_EXPORT void addMultiplied(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float coeffSrc);
 
-/*! \brief Add samples from src multiplied by coeffSrc to dst */
-LMMS_EXPORT void addMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
-
-/*! \brief Add samples from src multiplied by coeffSrc to dst, swap inputs */
-LMMS_EXPORT void addSwappedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
+//! @brief Add samples from src multiplied by coeffSrc to dst, swap inputs
+LMMS_EXPORT void addSwappedMultiplied(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float coeffSrc);
 
 //! @brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst
 LMMS_EXPORT void addMultipliedByBuffer(PlanarBufferView<float> dst, PlanarBufferView<const float> src,
@@ -148,18 +137,7 @@ LMMS_EXPORT void addMultipliedByBuffer(PlanarBufferView<float> dst, PlanarBuffer
 LMMS_EXPORT void addMultipliedByBuffers(PlanarBufferView<float> dst, PlanarBufferView<const float> src,
 	const ValueBuffer* coeffSrcBuf1, const ValueBuffer* coeffSrcBuf2);
 
-/*! \brief Add samples from src multiplied by coeffSrcLeft/coeffSrcRight to dst */
-LMMS_EXPORT void addMultipliedStereo( SampleFrame* dst, const SampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames );
-
-/*! \brief Multiply dst by coeffDst and add samples from src multiplied by coeffSrc */
-LMMS_EXPORT void multiplyAndAddMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffDst, float coeffSrc, int frames );
-
-/*! \brief Multiply dst by coeffDst and add samples from srcLeft/srcRight multiplied by coeffSrc */
-LMMS_EXPORT void multiplyAndAddMultipliedJoined( SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames );
-
 } // namespace MixHelpers
-
-
 } // namespace lmms
 
 #endif // LMMS_MIX_HELPERS_H

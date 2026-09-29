@@ -52,24 +52,18 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 }
 
 
-MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &multitapecho_plugin_descriptor, parent, key ),
-	m_stages( 1 ),
-	m_controls( this ),
-	m_buffer( 16100.0f ),
-	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
-	m_sampleRatio( 1.0f / m_sampleRate )
+MultitapEchoEffect::MultitapEchoEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
+	: Effect(&multitapecho_plugin_descriptor, parent, key)
+	, m_stages(1)
+	, m_controls(this)
+	, m_buffer(16100.0f)
+	, m_sampleRate(Engine::audioEngine()->outputSampleRate())
+	, m_sampleRatio(1.0f / m_sampleRate)
+	, m_work(Engine::audioEngine()->framesPerPeriod())
 {
-	m_work = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
 	m_buffer.reset();
 	m_stages = static_cast<int>( m_controls.m_stages.value() );
 	updateFilters( 0, 19 );
-}
-
-
-MultitapEchoEffect::~MultitapEchoEffect()
-{
-	delete[] m_work;
 }
 
 
@@ -85,17 +79,18 @@ void MultitapEchoEffect::updateFilters( int begin, int end )
 }
 
 
-void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const f_cnt_t frames )
+void MultitapEchoEffect::runFilter(PlanarBufferView<float> dst, PlanarBufferView<const float> src, StereoOnePole& filter)
 {
-	for (auto f = std::size_t{0}; f < frames; ++f)
+	assert(dst.frames() >= src.frames());
+	for (f_cnt_t f = 0; f < src.frames(); ++f)
 	{
-		dst[f][0] = filter.update( src[f][0], 0 );
-		dst[f][1] = filter.update( src[f][1], 1 );
+		dst[0][f] = filter.update(src[0][f], 0);
+		dst[1][f] = filter.update(src[1][f], 1);
 	}
 }
 
 
-Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus MultitapEchoEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -103,54 +98,67 @@ Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const f_
 	// get processing vars
 	const int steps = m_controls.m_steps.value();
 	const float stepLength = m_controls.m_stepLength.value();
-	const float dryGain = dbfsToAmp( m_controls.m_dryGain.value() );
+	const float dryGain = dbfsToAmp(m_controls.m_dryGain.value());
 	const bool swapInputs = m_controls.m_swapInputs.value();
-	
+
 	// check if number of stages has changed
-	if( m_controls.m_stages.isValueChanged() )
+	if (m_controls.m_stages.isValueChanged())
 	{
-		m_stages = static_cast<int>( m_controls.m_stages.value() );
-		updateFilters( 0, steps - 1 );
+		m_stages = static_cast<int>(m_controls.m_stages.value());
+		updateFilters(0, steps - 1);
 	}
-	
+
 	// add dry buffer - never swap inputs for dry
-	m_buffer.writeAddingMultiplied(buf, f_cnt_t{0}, frames, dryGain);
+	m_buffer.write(inOut, [dryGain](PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src) {
+		MixHelpers::addMultiplied(dst, src, dryGain);
+	});
+
+	auto workBuffers = m_work.allBuffers();
 
 	// swapped inputs?
-	if( swapInputs )
+	if (swapInputs)
 	{
-		float offset = stepLength;
-		for( int i = 0; i < steps; ++i ) // add all steps swapped
+		float offset = stepLength; // milliseconds
+		for (int i = 0; i < steps; ++i) // add all steps swapped
 		{
-			for( int s = 0; s < m_stages; ++s )
+			for (int s = 0; s < m_stages; ++s)
 			{
-				runFilter( m_work, buf, m_filter[i][s], frames );
+				runFilter(workBuffers, inOut, m_filter[i][s]);
 			}
-			m_buffer.writeSwappedAddingMultiplied( m_work, offset, frames, m_amp[i] );
+			m_buffer.write(workBuffers, offset,
+				[amp = m_amp[i]](PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src) {
+					MixHelpers::addSwappedMultiplied(dst, src, amp);
+				}
+			);
 			offset += stepLength;
 		}
 	}
 	else
 	{
-		float offset = stepLength;
-		for( int i = 0; i < steps; ++i ) // add all steps
+		float offset = stepLength; // milliseconds
+		for (int i = 0; i < steps; ++i) // add all steps
 		{
-			for( int s = 0; s < m_stages; ++s )
+			for (int s = 0; s < m_stages; ++s)
 			{
-				runFilter( m_work, buf, m_filter[i][s], frames );
+				runFilter(workBuffers, inOut, m_filter[i][s]);
 			}
-			m_buffer.writeAddingMultiplied( m_work, offset, frames, m_amp[i] );
+			m_buffer.write(workBuffers, offset,
+				[amp = m_amp[i]](PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src) {
+					MixHelpers::addMultiplied(dst, src, amp);
+				}
+			);
 			offset += stepLength;
 		}
 	}
-	
-	// pop the buffer and mix it into output
-	m_buffer.pop( m_work );
 
-	for (auto f = std::size_t{0}; f < frames; ++f)
+	// pop the buffer and mix it into output
+	m_buffer.pop(workBuffers);
+
+	// TODO: Add a RingBuffer::pop which accepts a lambda function, then perform the following work there
+	for (f_cnt_t f = 0; f < inOut.frames(); ++f)
 	{
-		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
-		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
+		inOut[0][f] = d * inOut[0][f] + w * workBuffers[0][f];
+		inOut[1][f] = d * inOut[1][f] + w * workBuffers[1][f];
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

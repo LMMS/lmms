@@ -29,42 +29,11 @@
 #include <cmath>
 
 #include "ValueBuffer.h"
-#include "SampleFrame.h"
 
-namespace lmms::MixHelpers
-{
-
+namespace lmms::MixHelpers {
 namespace {
-
 constexpr auto SilenceThreshold = 0.000001f; // -120 dBFS
-
-/*! \brief Function for applying MIXOP on all sample frames */
-template<typename MIXOP>
-inline void run(SampleFrame* dst, const SampleFrame* src, int frames, const MIXOP& OP)
-{
-	for( int i = 0; i < frames; ++i )
-	{
-		OP( dst[i], src[i] );
-	}
-}
-
-/*! \brief Function for applying MIXOP on all sample frames - split source */
-template<typename MIXOP>
-inline void run(SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, int frames, const MIXOP& OP)
-{
-	for( int i = 0; i < frames; ++i )
-	{
-		const SampleFrame src = { srcLeft[i], srcRight[i] };
-		OP( dst[i], src );
-	}
-}
-
 } // namespace
-
-bool isSilent(const SampleFrame* src, int frames)
-{
-	return isSilent({&src[0][0], static_cast<std::size_t>(frames * 2)});
-}
 
 bool isSilent(std::span<const float> buffer)
 {
@@ -196,20 +165,6 @@ void copyMixAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> s
 	}
 }
 
-struct AddOp
-{
-	void operator()( SampleFrame& dst, const SampleFrame& src ) const
-	{
-		dst += src;
-	}
-} ;
-
-void add( SampleFrame* dst, const SampleFrame* src, int frames )
-{
-	run<>( dst, src, frames, AddOp() );
-}
-
-
 void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 {
 	assert(dst.channels() == src.channels());
@@ -228,27 +183,13 @@ void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 	}
 }
 
-
-struct AddMultipliedOp
+void addMultiplied(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float coeffSrc)
 {
-	AddMultipliedOp( float coeff ) : m_coeff( coeff ) { }
+	assert(dst.channels() >= src.channels());
+	assert(dst.frames() >= src.frames());
 
-	void operator()( SampleFrame& dst, const SampleFrame& src ) const
-	{
-		dst += src * m_coeff;
-	}
-
-	const float m_coeff;
-} ;
-
-
-void addMultiplied(PlanarBufferView<float> dst, PlanarBufferView<const float> src, float coeffSrc)
-{
-	assert(dst.channels() == src.channels());
-	assert(dst.frames() == src.frames());
-
-	const ch_cnt_t channels = dst.channels();
-	const f_cnt_t frames = dst.frames();
+	const auto channels = src.channels();
+	const auto frames = src.frames();
 	for (ch_cnt_t ch = 0; ch < channels; ++ch)
 	{
 		float* dstPtr = dst.bufferPtr(ch);
@@ -259,25 +200,6 @@ void addMultiplied(PlanarBufferView<float> dst, PlanarBufferView<const float> sr
 		}
 	}
 }
-
-void addMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames )
-{
-	run<>( dst, src, frames, AddMultipliedOp(coeffSrc) );
-}
-
-
-struct AddSwappedMultipliedOp
-{
-	AddSwappedMultipliedOp( float coeff ) : m_coeff( coeff ) { }
-
-	void operator()( SampleFrame& dst, const SampleFrame& src ) const
-	{
-		dst[0] += src[1] * m_coeff;
-		dst[1] += src[0] * m_coeff;
-	}
-
-	const float m_coeff;
-};
 
 void multiply(PlanarBufferView<float> dst, float coeff, f_cnt_t offset)
 {
@@ -309,17 +231,22 @@ void multiply(PlanarBufferView<float> dst, float coeff)
 	}
 }
 
-void multiply(SampleFrame* dst, float coeff, int frames)
+void addSwappedMultiplied(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float coeffSrc)
 {
-	for (int i = 0; i < frames; ++i)
-	{
-		dst[i] *= coeff;
-	}
-}
+	assert(dst.channels() == 2);
+	assert(src.channels() == 2);
+	assert(dst.frames() >= src.frames());
 
-void addSwappedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames )
-{
-	run<>( dst, src, frames, AddSwappedMultipliedOp(coeffSrc) );
+	const auto frames = src.frames();
+	float* dstPtrL = dst.bufferPtr(0);
+	float* dstPtrR = dst.bufferPtr(1);
+	const float* srcPtrL = src.bufferPtr(0);
+	const float* srcPtrR = src.bufferPtr(1);
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
+	{
+		dstPtrL[frame] += srcPtrR[frame] * coeffSrc;
+		dstPtrR[frame] += srcPtrL[frame] * coeffSrc;
+	}
 }
 
 void addMultipliedByBuffer(PlanarBufferView<float> dst, PlanarBufferView<const float> src,
@@ -360,67 +287,4 @@ void addMultipliedByBuffers(PlanarBufferView<float> dst, PlanarBufferView<const 
 	}
 }
 
-
-struct AddMultipliedStereoOp
-{
-	AddMultipliedStereoOp( float coeffLeft, float coeffRight )
-	{
-		m_coeffs[0] = coeffLeft;
-		m_coeffs[1] = coeffRight;
-	}
-
-	void operator()( SampleFrame& dst, const SampleFrame& src ) const
-	{
-		dst[0] += src[0] * m_coeffs[0];
-		dst[1] += src[1] * m_coeffs[1];
-	}
-
-	std::array<float, 2> m_coeffs;
-} ;
-
-
-void addMultipliedStereo( SampleFrame* dst, const SampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames )
-{
-
-	run<>( dst, src, frames, AddMultipliedStereoOp(coeffSrcLeft, coeffSrcRight) );
-}
-
-
-
-
-
-struct MultiplyAndAddMultipliedOp
-{
-	MultiplyAndAddMultipliedOp( float coeffDst, float coeffSrc )
-	{
-		m_coeffs[0] = coeffDst;
-		m_coeffs[1] = coeffSrc;
-	}
-
-	void operator()( SampleFrame& dst, const SampleFrame& src ) const
-	{
-		dst[0] = dst[0]*m_coeffs[0] + src[0]*m_coeffs[1];
-		dst[1] = dst[1]*m_coeffs[0] + src[1]*m_coeffs[1];
-	}
-
-	std::array<float, 2> m_coeffs;
-} ;
-
-
-void multiplyAndAddMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffDst, float coeffSrc, int frames )
-{
-	run<>( dst, src, frames, MultiplyAndAddMultipliedOp(coeffDst, coeffSrc) );
-}
-
-
-
-void multiplyAndAddMultipliedJoined( SampleFrame* dst,
-										const sample_t* srcLeft,
-										const sample_t* srcRight,
-										float coeffDst, float coeffSrc, int frames )
-{
-	run<>( dst, srcLeft, srcRight, frames, MultiplyAndAddMultipliedOp(coeffDst, coeffSrc) );
-}
-
 } // namespace lmms::MixHelpers
-
