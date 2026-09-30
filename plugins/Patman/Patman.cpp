@@ -117,9 +117,9 @@ void PatmanInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void PatmanInstrument::loadFile( const QString & _file )
+void PatmanInstrument::loadFile(const QString& file, bool)
 {
-	setFile( _file );
+	setFile(file);
 }
 
 
@@ -133,8 +133,7 @@ QString PatmanInstrument::nodeName() const
 
 
 
-void PatmanInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void PatmanInstrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out)
 {
 	if( m_patchFile == "" )
 	{
@@ -153,14 +152,14 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
 
-	if (hdata->sample->play(_working_buffer + offset, hdata->state, frames,
-			m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off, DefaultBaseFreq / play_freq))
+	if (hdata->sample->play(PlanarBufferSpan{out.value(), offset, frames}, hdata->state,
+		m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off, DefaultBaseFreq / play_freq))
 	{
-		applyRelease( _working_buffer, _n );
+		applyRelease(*out, _n);
 	}
 	else
 	{
-		zeroSampleFrames(_working_buffer, frames + offset);
+		MixHelpers::zero(PlanarBufferSpan{*out, frames + offset});
 	}
 }
 
@@ -342,18 +341,8 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			}
 		}
 
-		auto data = new SampleFrame[frames];
-
-		for( f_cnt_t frame = 0; frame < frames; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
-									++chnl )
-			{
-				data[frame][chnl] = wave_samples[frame];
-			}
-		}
-
-		auto psample = std::make_shared<Sample>(data, frames, sample_rate);
+		const float* waveSamplesPtr = wave_samples.get();
+		auto psample = std::make_shared<Sample>(PlanarBufferSpan{&waveSamplesPtr, 1, frames}, sample_rate);
 		psample->setFrequency(root_freq / 1000.0f);
 
 		if( modes & MODES_LOOPING )
@@ -363,8 +352,6 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 		}
 
 		m_patchSamples.push_back(psample);
-
-		delete[] data;
 	}
 	fclose( fd );
 	return( LoadError::OK );
@@ -407,7 +394,7 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 	auto hdata = new handle_data;
 	hdata->tuned = m_tunedModel.value();
 	hdata->sample = sample ? sample : std::make_shared<Sample>();
-	hdata->state = new Sample::PlaybackState(AudioResampler::Mode::Linear);
+	hdata->state = new Sample::PlaybackState(sample->sampleChannels(), AudioResampler::Mode::Linear);
 
 	_n->m_pluginData = hdata;
 }

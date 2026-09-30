@@ -115,7 +115,7 @@ auto AudioResampler::process(InterleavedBufferSpan<const float> input, Interleav
 
 auto AudioResampler::process(PlanarBufferSpan<const float> input, PlanarBufferSpan<float> output) -> Result
 {
-	if (input.channels() != m_channels || output.channels() != m_channels)
+	if (input.channels() != m_channels || output.channels() < m_channels)
 	{
 		throw std::invalid_argument{"Invalid channel count"};
 	}
@@ -160,6 +160,13 @@ auto AudioResampler::process(PlanarBufferSpan<const float> input, PlanarBufferSp
 		}
 		inputFramesUsed = data.input_frames_used;
 		outputFramesGen = data.output_frames_gen;
+	}
+
+	// Can have extra output channels, which are filled with the 1st channel's contents.
+	// This allows mono-to-stereo conversion.
+	for (ch_cnt_t ch = m_channels; ch < output.channels(); ++ch)
+	{
+		std::ranges::copy(output.buffer(0), output.bufferPtr(ch));
 	}
 
 	return {static_cast<f_cnt_t>(inputFramesUsed), static_cast<f_cnt_t>(outputFramesGen)};
