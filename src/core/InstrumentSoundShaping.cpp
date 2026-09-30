@@ -105,10 +105,9 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 
 
 
-void InstrumentSoundShaping::processAudioBuffer(PlanarBufferView<float> inOut,
-	const f_cnt_t offset, NotePlayHandle* nph)
+void InstrumentSoundShaping::processAudioBuffer(PlanarBufferSpan<float> inOut, NotePlayHandle* nph)
 {
-	const auto frames = inOut.frames() - offset;
+	const auto frames = inOut.frames();
 	const f_cnt_t envTotalFrames = nph->totalFramesPlayed();
 	f_cnt_t envReleaseBegin = envTotalFrames - nph->releaseFramesDone() + nph->framesBeforeRelease();
 
@@ -176,7 +175,7 @@ void InstrumentSoundShaping::processAudioBuffer(PlanarBufferView<float> inOut,
 
 				for (ch_cnt_t ch = 0; ch < filterChannels; ++ch)
 				{
-					inOut[ch][frame + offset] = nph->m_filter->update(inOut[ch][frame + offset], ch);
+					inOut[ch][frame] = nph->m_filter->update(inOut[ch][frame], ch);
 				}
 			}
 		}
@@ -195,7 +194,7 @@ void InstrumentSoundShaping::processAudioBuffer(PlanarBufferView<float> inOut,
 
 				for (ch_cnt_t ch = 0; ch < filterChannels; ++ch)
 				{
-					inOut[ch][frame + offset] = nph->m_filter->update(inOut[ch][frame + offset], ch);
+					inOut[ch][frame] = nph->m_filter->update(inOut[ch][frame], ch);
 				}
 			}
 		}
@@ -213,7 +212,7 @@ void InstrumentSoundShaping::processAudioBuffer(PlanarBufferView<float> inOut,
 
 				for (ch_cnt_t ch = 0; ch < filterChannels; ++ch)
 				{
-					inOut[ch][frame + offset] = nph->m_filter->update(inOut[ch][frame + offset], ch);
+					inOut[ch][frame] = nph->m_filter->update(inOut[ch][frame], ch);
 				}
 			}
 		}
@@ -225,7 +224,7 @@ void InstrumentSoundShaping::processAudioBuffer(PlanarBufferView<float> inOut,
 			{
 				for (ch_cnt_t ch = 0; ch < filterChannels; ++ch)
 				{
-					inOut[ch][frame + offset] = nph->m_filter->update(inOut[ch][frame + offset], ch);
+					inOut[ch][frame] = nph->m_filter->update(inOut[ch][frame], ch);
 				}
 			}
 		}
@@ -242,8 +241,8 @@ void InstrumentSoundShaping::processAudioBuffer(PlanarBufferView<float> inOut,
 		{
 			float vol_level = volBuffer[frame];
 			vol_level = vol_level * vol_level;
-			inOut[0][frame + offset] = vol_level * inOut[0][frame + offset];
-			inOut[1][frame + offset] = vol_level * inOut[1][frame + offset];
+			inOut[0][frame] *= vol_level;
+			inOut[1][frame] *= vol_level;
 		}
 	}
 
@@ -256,7 +255,7 @@ void InstrumentSoundShaping::processAudioBuffer(PlanarBufferView<float> inOut,
 			vol_level = vol_level*vol_level;
 			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
-				inOut[chnl][frame + offset] = vol_level * inOut[chnl][frame + offset];
+				inOut[chnl][frame] *= vol_level;
 			}
 		}
 	}*/

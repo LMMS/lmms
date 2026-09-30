@@ -251,7 +251,7 @@ void InstrumentTrack::processAudioBuffer(PlanarBufferView<float> buffer, NotePla
 	if (!m_instrument->isSingleStreamed() && n != nullptr)
 	{
 		const f_cnt_t offset = n->noteOffset();
-		m_soundShaping.processAudioBuffer(buffer, offset, n);
+		m_soundShaping.processAudioBuffer(PlanarBufferSpan{buffer, offset}, n);
 		const float vol = ( (float) n->getVolume() * DefaultVolumeRatio );
 
 		if (buffer.channels() == 2)

@@ -50,7 +50,7 @@ public:
 	InstrumentSoundShaping( InstrumentTrack * _instrument_track );
 	~InstrumentSoundShaping() override = default;
 
-	void processAudioBuffer(PlanarBufferView<float> inOut, const f_cnt_t offset, NotePlayHandle* nph);
+	void processAudioBuffer(PlanarBufferSpan<float> inOut, NotePlayHandle* nph);
 
 	const EnvelopeAndLfoParameters& getVolumeParameters() const { return m_volumeParameters; }
 	EnvelopeAndLfoParameters& getVolumeParameters() { return m_volumeParameters; }
