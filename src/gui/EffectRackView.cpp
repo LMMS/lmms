@@ -102,8 +102,8 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	rowLayout->addWidget(addButton, 85);
 	rowLayout->addWidget(clearButton, 5);
-	rowLayout->addWidget(loadPresetButton, 5);
 	rowLayout->addWidget(savePresetButton, 5);
+	rowLayout->addWidget(loadPresetButton, 5);
 
 	effectsLayout->addLayout(rowLayout);
 
