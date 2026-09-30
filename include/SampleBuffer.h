@@ -44,6 +44,8 @@ public:
 	// TODO: Give `mod` parameters default values then simplify call sites
 	SampleBuffer(AudioBuffer data, SampleImportModification mod,
 		int sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
+	SampleBuffer(PlanarBufferSpan<const float> data, SampleImportModification mod,
+		int sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
 	SampleBuffer(std::span<const SampleFrame> data, SampleImportModification mod,
 		int sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
 

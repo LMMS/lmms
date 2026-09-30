@@ -29,6 +29,15 @@
 
 namespace lmms {
 
+Sample::Sample(PlanarBufferSpan<const float> data, int sampleRate)
+	: m_buffer(std::make_shared<SampleBuffer>(data, SampleImportModification::Unmodified, sampleRate))
+	, m_startFrame(0)
+	, m_endFrame(m_buffer->frames())
+	, m_loopStartFrame(0)
+	, m_loopEndFrame(m_buffer->frames())
+{
+}
+
 Sample::Sample(const SampleFrame* data, f_cnt_t numFrames, int sampleRate)
 	: m_buffer(std::make_shared<SampleBuffer>(
 		std::span{data, numFrames}, SampleImportModification::Unmodified, sampleRate))
@@ -105,7 +114,7 @@ auto Sample::play(PlanarBufferSpan<float> dst, PlaybackState* state,
 {
 	if (!m_buffer || m_buffer->empty()) { return false; }
 
-	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
+	state->m_frameIndex = std::clamp<f_cnt_t>(state->m_frameIndex, m_startFrame, m_endFrame);
 
 	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
 	const auto freqRatio = frequency() / DefaultBaseFreq;
@@ -161,9 +170,10 @@ f_cnt_t Sample::render(PlaybackState* state, Loop loop) const
 		const float* const* src, f_cnt_t srcBegin, f_cnt_t srcEnd, f_cnt_t& srcReadPos,
 		ch_cnt_t channels, float amp) -> f_cnt_t
 	{
+		if (srcBegin == srcEnd) { return 0; }
+
 		assert(srcBegin <= srcReadPos);
-		assert(srcReadPos < srcEnd);
-		(void)srcBegin;
+		assert(srcReadPos <= srcEnd);
 
 		const auto maxWriteAmount = dstEnd - dstBegin;
 		const auto maxReadAmount = srcEnd - srcReadPos;
@@ -189,9 +199,10 @@ f_cnt_t Sample::render(PlaybackState* state, Loop loop) const
 		const float* const* src, f_cnt_t srcBegin, f_cnt_t srcEnd, f_cnt_t& srcReadPos,
 		ch_cnt_t channels, float amp) -> f_cnt_t
 	{
+		if (srcBegin == srcEnd) { return 0; }
+
 		assert(srcBegin <= srcReadPos);
-		assert(srcReadPos < srcEnd);
-		(void)srcEnd;
+		assert(srcReadPos <= srcEnd);
 
 		const auto maxWriteAmount = dstEnd - dstBegin;
 		const auto maxReadAmount = srcReadPos - srcBegin + 1;
@@ -219,40 +230,117 @@ f_cnt_t Sample::render(PlaybackState* state, Loop loop) const
 		? std::array{copyBackwardRead, copyForwardRead/* <-- might need further restrictions */}
 		: std::array{copyForwardRead, copyBackwardRead};
 
+	// std::minmax but without dangling references
+	constexpr auto minmax = [](f_cnt_t a, f_cnt_t b) -> std::pair<f_cnt_t, f_cnt_t> {
+		return (b < a) ? std::pair{b, a} : std::pair{a, b};
+	};
+
+	const auto dstFrames = dst.frames();
+	const auto [startFrame, endFrame] = minmax(m_startFrame.load(), m_endFrame.load());
+	const auto [loopStartFrame, loopEndFrame] = minmax(m_loopStartFrame.load(), m_loopEndFrame.load());
+
 	switch (loop)
 	{
 		case Loop::Off:
 		{
-			// Snap to a valid position
-			state->m_frameIndex = std::clamp(state->m_frameIndex, static_cast<f_cnt_t>(0), src.frames() - 1);
+			const auto backwards = state->m_backwards;
 
-			return copy[state->m_backwards](
-				dst.data(), 0, dst.frames(),
-				src.data(), 0, src.frames(), state->m_frameIndex,
+			f_cnt_t srcStartFrame;
+			f_cnt_t srcEndFrame;
+
+			// Check if the sample reached the point where it would normally loop
+			if (backwards)
+			{
+				if (state->m_frameIndex >= endFrame)
+				{
+					// Jump backwards to end (starting position when playing backward)
+					state->m_frameIndex = endFrame - 1;
+				}
+
+				if (state->m_frameIndex < loopStartFrame || state->m_frameIndex == static_cast<f_cnt_t>(-1))
+				{
+					// The sample reached the end - stop playback
+					return 0;
+				}
+
+				srcStartFrame = loopStartFrame;
+				srcEndFrame = endFrame;
+			}
+			else
+			{
+				if (state->m_frameIndex < startFrame)
+				{
+					// Jump forwards to start
+					state->m_frameIndex = startFrame;
+				}
+
+				if (state->m_frameIndex >= loopEndFrame)
+				{
+					// The sample reached the end - stop playback
+					return 0;
+				}
+
+				srcStartFrame = startFrame;
+				srcEndFrame = loopEndFrame;
+			}
+
+			return copy[backwards](
+				dst.data(), 0, dstFrames,
+				src.data(), srcStartFrame, srcEndFrame, state->m_frameIndex,
 				dst.channels(), m_amplification
 			);
 		}
 		case Loop::On:
 		{
-			const auto dstFrames = dst.frames();
-			const auto loopStartFrame = m_loopStartFrame.load();
-			const auto loopEndFrame = m_loopEndFrame.load();
 			const auto backwards = state->m_backwards;
 
 			f_cnt_t framesWritten = 0;
 			f_cnt_t framesLeft = dstFrames;
 			while (framesLeft > 0)
 			{
-				// Loop wraparound
-				if (state->m_frameIndex < loopStartFrame || state->m_frameIndex >= loopEndFrame)
+				f_cnt_t srcStartFrame;
+				f_cnt_t srcEndFrame;
+
+				// Check if the sample reached the point where it would loop
+				if (backwards)
 				{
-					state->m_frameIndex = backwards ? loopEndFrame - 1 : loopStartFrame;
+					if (state->m_frameIndex >= endFrame)
+					{
+						// Jump backwards to end (starting position when playing backward)
+						state->m_frameIndex = endFrame - 1;
+					}
+
+					if (state->m_frameIndex < loopStartFrame || state->m_frameIndex == static_cast<f_cnt_t>(-1))
+					{
+						// The sample reached the end - loop back to start (end position when playing backward)
+						state->m_frameIndex = loopEndFrame - 1; // may underflow
+					}
+
+					srcStartFrame = loopStartFrame;
+					srcEndFrame = endFrame;
+				}
+				else
+				{
+					if (state->m_frameIndex < startFrame)
+					{
+						// Jump forwards to start
+						state->m_frameIndex = startFrame;
+					}
+
+					if (state->m_frameIndex >= loopEndFrame)
+					{
+						// The sample reached the end - loop back to start
+						state->m_frameIndex = loopStartFrame;
+					}
+
+					srcStartFrame = startFrame;
+					srcEndFrame = loopEndFrame;
 				}
 
 				// Copy contiguous section
 				const auto written = copy[backwards](
 					dst.data(), framesWritten, dstFrames,
-					src.data(), loopStartFrame, loopEndFrame, state->m_frameIndex,
+					src.data(), srcStartFrame, srcEndFrame, state->m_frameIndex,
 					dst.channels(), m_amplification
 				);
 
@@ -263,44 +351,55 @@ f_cnt_t Sample::render(PlaybackState* state, Loop loop) const
 		}
 		case Loop::PingPong:
 		{
-			const auto dstFrames = dst.frames();
-			const auto loopStartFrame = m_loopStartFrame.load();
-			const auto loopEndFrame = m_loopEndFrame.load();
-
 			f_cnt_t framesWritten = 0;
 			f_cnt_t framesLeft = dstFrames;
 			while (framesLeft > 0)
 			{
+				f_cnt_t srcStartFrame;
+				f_cnt_t srcEndFrame;
+
 				// Loop ping-pong
 				if (state->m_backwards)
 				{
+					if (state->m_frameIndex >= endFrame)
+					{
+						// Jump backwards to end (starting position when playing backward)
+						state->m_frameIndex = endFrame - 1;
+					}
+
 					if (state->m_frameIndex < loopStartFrame || state->m_frameIndex == static_cast<f_cnt_t>(-1))
 					{
+						// The sample reached the end - reverse loop direction
 						state->m_frameIndex = loopStartFrame;
 						state->m_backwards = false;
 					}
-					else if (state->m_frameIndex >= loopEndFrame)
-					{
-						state->m_frameIndex = loopEndFrame - 1;
-					}
+
+					srcStartFrame = loopStartFrame;
+					srcEndFrame = endFrame;
 				}
 				else
 				{
-					if (state->m_frameIndex < loopStartFrame || state->m_frameIndex == static_cast<f_cnt_t>(-1))
+					if (state->m_frameIndex < startFrame)
 					{
-						state->m_frameIndex = loopStartFrame;
+						// Jump forwards to start
+						state->m_frameIndex = startFrame;
 					}
-					else if (state->m_frameIndex >= loopEndFrame)
+
+					if (state->m_frameIndex >= loopEndFrame)
 					{
-						state->m_frameIndex = loopEndFrame - 1;
+						// The sample reached the end - reverse loop direction
+						state->m_frameIndex = loopEndFrame - 1; // may underflow
 						state->m_backwards = true;
 					}
+
+					srcStartFrame = startFrame;
+					srcEndFrame = loopEndFrame;
 				}
 
 				// Copy contiguous section
 				const auto written = copy[state->m_backwards](
 					dst.data(), framesWritten, dstFrames,
-					src.data(), loopStartFrame, loopEndFrame, state->m_frameIndex,
+					src.data(), srcStartFrame, srcEndFrame, state->m_frameIndex,
 					dst.channels(), m_amplification
 				);
 
@@ -326,6 +425,11 @@ auto Sample::sampleDuration() const -> std::chrono::milliseconds
 
 void Sample::setAllPointFrames(f_cnt_t startFrame, f_cnt_t endFrame, f_cnt_t loopStartFrame, f_cnt_t loopEndFrame)
 {
+	assert(startFrame <= endFrame);
+	assert(loopStartFrame <= loopEndFrame);
+	assert(startFrame <= loopStartFrame);
+	assert(loopEndFrame <= endFrame);
+
 	setStartFrame(startFrame);
 	setEndFrame(endFrame);
 	setLoopStartFrame(loopStartFrame);

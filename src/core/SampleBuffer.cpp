@@ -43,6 +43,16 @@ SampleBuffer::SampleBuffer(AudioBuffer data, SampleImportModification mod,
 {
 }
 
+SampleBuffer::SampleBuffer(PlanarBufferSpan<const float> data, SampleImportModification mod,
+	int sampleRate, const QString& audioFile)
+	: m_data(data.frames(), data.channels())
+	, m_audioFile(audioFile)
+	, m_sampleRate(sampleRate)
+	, m_modification{mod}
+{
+	MixHelpers::copy(PlanarBufferSpan{m_data.allBuffers()}, data);
+}
+
 SampleBuffer::SampleBuffer(std::span<const SampleFrame> data, SampleImportModification mod,
 	int sampleRate, const QString& audioFile)
 	: m_data(data.size(), 2)

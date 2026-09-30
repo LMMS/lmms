@@ -91,6 +91,7 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 				this, SLOT( loopPointChanged() ), Qt::DirectConnection );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
 				this, SLOT( stutterModelChanged() ), Qt::DirectConnection );
+	connect(&m_loopModel, &IntModel::dataChanged, this, &AudioFileProcessor::loopModeChanged, Qt::DirectConnection);
 
 //interpolation modes
 	m_interpolationModel.addItem( tr( "None" ) );
@@ -442,6 +443,14 @@ void AudioFileProcessor::pointChanged()
 	emit dataChanged();
 }
 
+void AudioFileProcessor::loopModeChanged()
+{
+	if (static_cast<Sample::Loop>(m_loopModel.value()) != Sample::Loop::PingPong)
+	{
+		// Ensure non-ping-pong modes play forwards
+		m_nextPlayBackwards = false;
+	}
+}
 
 extern "C"
 {

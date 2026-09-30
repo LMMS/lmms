@@ -86,7 +86,7 @@ private slots:
 	void endPointChanged();
 	void pointChanged();
 	void stutterModelChanged();
-
+	void loopModeChanged();
 
 signals:
 	void isPlaying( lmms::f_cnt_t _current_frame );

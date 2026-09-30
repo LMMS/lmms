@@ -74,6 +74,7 @@ public:
 
 	Sample() = default;
 
+	explicit Sample(PlanarBufferSpan<const float> data, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const SampleFrame* data, f_cnt_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other) noexcept;
