@@ -38,10 +38,9 @@ namespace lmms
 {
 
 
-Effect::Effect( const Plugin::Descriptor * desc,
-			Model * parent,
-			const Descriptor::SubPluginFeatures::Key * key ) :
-	Plugin( desc, parent, key ),
+Effect::Effect(const Plugin::Descriptor* desc, Model* parent,
+	const Descriptor::SubPluginFeatures::Key* key)
+	: Plugin(desc, parent, key),
 	m_parent( nullptr ),
 	m_okay( true ),
 	m_noRun( false ),
@@ -71,9 +70,9 @@ void Effect::saveSettings(QDomDocument& doc, QDomElement& thisElement)
 
 void Effect::loadSettings(const QDomElement& thisElement)
 {
-	m_enabledModel.loadSettings( thisElement, "on" );
-	m_wetDryModel.loadSettings( thisElement, "wet" );
-	m_autoQuitModel.loadSettings( thisElement, "autoquit" );
+	m_enabledModel.loadSettings(thisElement, "on");
+	m_wetDryModel.loadSettings(thisElement, "wet");
+	m_autoQuitModel.loadSettings(thisElement, "autoquit");
 
 	QDomNode node = thisElement.firstChild();
 	while( !node.isNull() )
@@ -157,7 +156,7 @@ Effect* Effect::instantiate(const QString& pluginName,
 	{
 		// everything ok, so return pointer
 		auto effect = dynamic_cast<Effect*>(p);
-		effect->m_parent = dynamic_cast<EffectChain *>(parent);
+		effect->m_parent = dynamic_cast<EffectChain*>(parent);
 		return effect;
 	}
 
