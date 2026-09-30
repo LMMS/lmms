@@ -220,7 +220,7 @@ bool DataFile::validate( QString extension )
 		}
 		break;
 	case Type::EffectSettings:
-		if (extension == "lfxp" || extension == "fxc")
+		if (extension == "lfxp")
 		{
 			return true;
 		}
@@ -293,6 +293,12 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 			if (extension != "xpf")
 			{
 				return _fn + ".xpf";
+			}
+			break;
+		case Type::EffectSettings:
+			if (extension != "lfxp")
+			{
+				return _fn + ".lfxp";
 			}
 			break;
 		default: ;

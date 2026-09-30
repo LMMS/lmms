@@ -88,14 +88,14 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	savePresetButton->setFocusPolicy(Qt::NoFocus);
 	savePresetButton->setIconSize(smallIconSize);
 	savePresetButton->setFixedSize(18, 18);
-	savePresetButton->setToolTip(tr("Save the effect chain to a preset file"));
+	savePresetButton->setToolTip(tr("Save the effects as a preset file"));
 
 	auto loadPresetButton = new QPushButton;
 	loadPresetButton->setIcon(embed::getIconPixmap("project_export"));
 	loadPresetButton->setFocusPolicy(Qt::NoFocus);
 	loadPresetButton->setIconSize(smallIconSize);
 	loadPresetButton->setFixedSize(18, 18);
-	loadPresetButton->setToolTip(tr("Load the effect chain from a preset file, overriding the current one"));
+	loadPresetButton->setToolTip(tr("Append effects from a preset file"));
 
 	rowLayout->addWidget(addButton, 45);
 	rowLayout->addWidget(clearButton, 45);
@@ -129,7 +129,8 @@ EffectRackView::~EffectRackView()
 void EffectRackView::dragEnterEvent(QDragEnterEvent* event)
 {
 	const QString type = StringPairDrag::decodeKey(event);
-	if (type == "effectpresetfile" || type == "chainpresetfile")
+
+	if (type == "effectpresetfile")
 	{
 		event->acceptProposedAction();
 	}
@@ -139,21 +140,14 @@ void EffectRackView::dragEnterEvent(QDragEnterEvent* event)
 	}
 }
 
-
 void EffectRackView::dropEvent(QDropEvent* event)
 {
 	const QString type = StringPairDrag::decodeKey(event);
-	const QString filePath = StringPairDrag::decodeValue(event);
 
 	if (type == "effectpresetfile")
 	{
-		addEffectFromPreset(filePath);
-		event->accept();
-	}
-	else if (type == "chainpresetfile")
-	{
-		fxChain()->loadPreset(filePath);
-		event->accept();
+		addEffectFromPreset(StringPairDrag::decodeValue(event));
+		event->acceptProposedAction();
 	}
 	else
 	{
@@ -165,17 +159,101 @@ void EffectRackView::dropEvent(QDropEvent* event)
 
 void EffectRackView::addEffectFromPreset(const QString& filePath)
 {
-	Effect* fx = Effect::createFromPreset(filePath, fxChain());
-	if (!fx)
+	DataFile dataFile(filePath);
+	const QDomElement content = dataFile.content();
+
+	if (content.isNull())
 	{
 		TextFloat::displayMessage(
-			"Preset loading error",
-			tr("Couldn't load preset file."),
-			embed::getIconPixmap("error")
-		);
+			tr("Preset loading error"),
+			tr("Could not read the preset file."),
+			embed::getIconPixmap("error"));
 		return;
 	}
-	fxChain()->appendEffect(fx);
+
+	QVector<Effect*> effects;
+
+	auto appendEffectFromElement = [&](const QDomElement& effectElement) -> bool
+	{
+		const QString pluginName = effectElement.attribute("pluginname");
+		const QDomElement keyElement = effectElement.firstChildElement("key");
+
+		if (pluginName.isEmpty() || keyElement.isNull())
+		{
+			return false;
+		}
+
+		EffectKey key(keyElement);
+		Effect* effect = Effect::instantiate(
+			pluginName,
+			fxChain(),
+			&key);
+
+		if (effect == nullptr || !effect->isOkay())
+		{
+			delete effect;
+			return false;
+		}
+
+		effect->loadSettings(effectElement);
+		effects.push_back(effect);
+		return true;
+	};
+
+	// Backward-compatible single-effect LFXP:
+	//
+	// <effectsettings pluginname="..." displayname="...">
+	//     ...
+	// </effectsettings>
+	if (!content.attribute("pluginname").isEmpty())
+	{
+		if (!appendEffectFromElement(content))
+		{
+			TextFloat::displayMessage(
+				tr("Preset loading error"),
+				tr("Could not instantiate the effect in the preset."),
+				embed::getIconPixmap("error"));
+			return;
+		}
+	}
+	else
+	{
+		// Multi-effect LFXP:
+		//
+		// <effectsettings numofeffects="N">
+		//     <effect>...</effect>
+		//     <effect>...</effect>
+		// </effectsettings>
+		const int expectedCount = content.attribute("numofeffects").toInt();
+		const QDomNodeList effectNodes = content.elementsByTagName("effect");
+
+		const int effectCount = expectedCount > 0
+			? qMin(expectedCount, effectNodes.count())
+			: effectNodes.count();
+
+		for (int i = 0; i < effectCount; ++i)
+		{
+			if (!appendEffectFromElement(effectNodes.at(i).toElement()))
+			{
+				for (Effect* effect : effects)
+				{
+					delete effect;
+				}
+
+				TextFloat::displayMessage(
+					tr("Preset loading error"),
+					tr("Could not instantiate every effect in the preset."),
+					embed::getIconPixmap("error"));
+				return;
+			}
+		}
+	}
+
+	for (Effect* effect : effects)
+	{
+		fxChain()->appendEffect(effect);
+	}
+
 	update();
 }
 
@@ -186,45 +264,67 @@ void EffectRackView::clearEffects()
 
 void EffectRackView::savePreset()
 {
-	FileDialog sfd(this, tr("Save preset"), "", tr("FX Chain (*.fxc)"));
-	QString workingDir = ConfigManager::inst()->userPresetsDir();
+	FileDialog sfd(this, tr("Save preset"), "",
+		tr("LMMS FX Preset (*.lfxp)"));
+
+	const QString workingDir = ConfigManager::inst()->userPresetsDir();
 
 	sfd.setAcceptMode(FileDialog::AcceptSave);
 	sfd.setDirectory(workingDir);
 	sfd.setFileMode(FileDialog::AnyFile);
-	sfd.setDefaultSuffix("fxc");
+	sfd.setDefaultSuffix("lfxp");
 
-	if (sfd.exec() == QDialog::Accepted
-		&& !sfd.selectedFiles().isEmpty()
-		&& !sfd.selectedFiles().first().isEmpty())
+	if (sfd.exec() != QDialog::Accepted
+		|| sfd.selectedFiles().isEmpty()
+		|| sfd.selectedFiles().first().isEmpty())
 	{
-		DataFile dataFile(DataFile::Type::EffectSettings);
-		QDomElement& content(dataFile.content());
-
-		fxChain()->saveSettings(dataFile, content);
-
-		QString f = sfd.selectedFiles()[0];
-
-		dataFile.writeFile(f);
+		return;
 	}
+
+	DataFile dataFile(DataFile::Type::EffectSettings);
+	QDomElement& content = dataFile.content();
+
+	content.setAttribute("numofeffects",
+		static_cast<int>(fxChain()->m_effects.size()));
+
+	for (Effect* effect : fxChain()->m_effects)
+	{
+		auto effectElement = dataFile.createElement("effect");
+
+		effectElement.setAttribute(
+			"pluginname",
+			QString::fromUtf8(effect->descriptor()->name));
+
+		effectElement.setAttribute(
+			"displayname",
+			effect->displayName());
+
+		effect->saveSettings(dataFile, effectElement);
+		effectElement.appendChild(effect->key().saveXML(dataFile));
+
+		content.appendChild(effectElement);
+	}
+
+	dataFile.writeFile(sfd.selectedFiles().first());
 }
 
 void EffectRackView::loadPreset()
 {
-	FileDialog sfd(this, tr("Load preset"), "", tr("FX Chain (*.fxc)"));
-	QString workingDir = ConfigManager::inst()->userPresetsDir();
+	FileDialog sfd(this, tr("Load preset"), "",
+		tr("LMMS FX Preset (*.lfxp)"));
+
+	const QString workingDir = ConfigManager::inst()->userPresetsDir();
 
 	sfd.setAcceptMode(FileDialog::AcceptOpen);
 	sfd.setDirectory(workingDir);
 	sfd.setFileMode(FileDialog::ExistingFile);
-	sfd.setDefaultSuffix("fxc");
+	sfd.setDefaultSuffix("lfxp");
 
 	if (sfd.exec() == QDialog::Accepted
 		&& !sfd.selectedFiles().isEmpty()
 		&& !sfd.selectedFiles().first().isEmpty())
 	{
-		QString f = sfd.selectedFiles()[0];
-		fxChain()->loadPreset(f);
+		addEffectFromPreset(sfd.selectedFiles().first());
 	}
 }
 

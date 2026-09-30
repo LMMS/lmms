@@ -33,7 +33,6 @@
 #include "EffectControls.h"
 #include "EffectView.h"
 #include "SampleFrame.h"
-#include "DataFile.h"
 
 namespace lmms
 {
@@ -167,33 +166,6 @@ Effect* Effect::instantiate(const QString& pluginName,
 
 	return nullptr;
 }
-
-
-
-Effect* Effect::createFromPreset(const QString& filePath, Model* parent)
-{
-	DataFile dataFile(filePath);
-
-	const QDomElement content = dataFile.content();
-	if (content.isNull()) { return nullptr; }
-
-	const QString displayName = content.attribute("displayname");
-	const QString pluginName = content.attribute("pluginname");
-	if (displayName.isEmpty() || pluginName.isEmpty()) { return nullptr; }
-
-	QDomElement keyElement = content.firstChildElement("key");
-	if (keyElement.isNull()) { return nullptr; }
-
-	EffectKey key(keyElement);
-
-	Effect* fx = Effect::instantiate(pluginName, parent, &key);
-	if (!fx) { return nullptr; }
-
-	fx->loadSettings(content);
-
-	return fx;
-}
-
 
 
 

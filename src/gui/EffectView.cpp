@@ -234,6 +234,17 @@ void EffectView::loadPreset()
 			return;
 		}
 
+		const bool isSingleEffectPreset =
+			!content.attribute("pluginname").isEmpty();
+		if (!isSingleEffectPreset)
+		{
+			TextFloat::displayMessage(
+				tr("Preset loading error"),
+				tr("This preset contains multiple effects. Load it into the effect rack instead."),
+				embed::getIconPixmap("error"));
+			return;
+		}
+
 		if (presetName.isEmpty()
 			|| presetName != effect()->displayName())
 		{

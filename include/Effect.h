@@ -141,7 +141,6 @@ public:
 		Model* parent,
 		Descriptor::SubPluginFeatures::Key* key);
 
-	static Effect* createFromPreset(const QString& filePath, Model* parent);
 
 
 protected:
