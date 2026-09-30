@@ -55,6 +55,7 @@ public slots:
 	void moveDown(EffectView* view);
 	void deletePlugin(EffectView* view);
 
+	void clearEffects();
 	void savePreset();
 	void loadPreset();
 

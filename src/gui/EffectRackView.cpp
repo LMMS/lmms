@@ -79,6 +79,10 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	addButton->setText( tr( "Add effect" ) );
 	addButton->setFocusPolicy(Qt::NoFocus);
 
+	auto clearButton = new QPushButton;
+	clearButton->setText(tr("Clear effects"));
+	clearButton->setFocusPolicy(Qt::NoFocus);
+
 	auto savePresetButton = new QPushButton;
 	savePresetButton->setIcon(embed::getIconPixmap("project_import"));
 	savePresetButton->setFocusPolicy(Qt::NoFocus);
@@ -93,13 +97,15 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	loadPresetButton->setFixedSize(18, 18);
 	loadPresetButton->setToolTip(tr("Load the effect chain from a preset file, overriding the current one"));
 
-	rowLayout->addWidget(addButton, 90);
+	rowLayout->addWidget(addButton, 45);
+	rowLayout->addWidget(clearButton, 45);
 	rowLayout->addWidget(loadPresetButton, 5);
 	rowLayout->addWidget(savePresetButton, 5);
 
 	effectsLayout->addLayout(rowLayout);
 
 	connect(addButton, &QPushButton::clicked, this, &EffectRackView::addEffect);
+	connect(clearButton, &QPushButton::clicked, this, &EffectRackView::clearEffects);
 	connect(savePresetButton, &QPushButton::clicked, this, &EffectRackView::savePreset);
 	connect(loadPresetButton, &QPushButton::clicked, this, &EffectRackView::loadPreset);
 
@@ -173,7 +179,10 @@ void EffectRackView::addEffectFromPreset(const QString& filePath)
 	update();
 }
 
-
+void EffectRackView::clearEffects()
+{
+	this->fxChain()->clear();
+}
 
 void EffectRackView::savePreset()
 {
