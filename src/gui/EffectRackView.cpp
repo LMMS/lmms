@@ -80,8 +80,11 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	addButton->setFocusPolicy(Qt::NoFocus);
 
 	auto clearButton = new QPushButton;
-	clearButton->setText(tr("Clear effects"));
+	clearButton->setIcon(embed::getIconPixmap("discard"));
 	clearButton->setFocusPolicy(Qt::NoFocus);
+	clearButton->setIconSize(smallIconSize);
+	clearButton->setFixedSize(18, 18);
+	clearButton->setToolTip(tr("Clear the effects from the effect chain"));
 
 	auto savePresetButton = new QPushButton;
 	savePresetButton->setIcon(embed::getIconPixmap("project_import"));
@@ -97,8 +100,8 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	loadPresetButton->setFixedSize(18, 18);
 	loadPresetButton->setToolTip(tr("Append effects from a preset file"));
 
-	rowLayout->addWidget(addButton, 45);
-	rowLayout->addWidget(clearButton, 45);
+	rowLayout->addWidget(addButton, 85);
+	rowLayout->addWidget(clearButton, 5);
 	rowLayout->addWidget(loadPresetButton, 5);
 	rowLayout->addWidget(savePresetButton, 5);
 
