@@ -87,7 +87,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	clearButton->setToolTip(tr("Clear the effects from the effect chain"));
 
 	auto savePresetButton = new QPushButton;
-	savePresetButton->setIcon(embed::getIconPixmap("project_import"));
+	savePresetButton->setIcon(embed::getIconPixmap("project_save"));
 	savePresetButton->setFocusPolicy(Qt::NoFocus);
 	savePresetButton->setIconSize(smallIconSize);
 	savePresetButton->setFixedSize(18, 18);
