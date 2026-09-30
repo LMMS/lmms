@@ -783,10 +783,10 @@ private:
 	}
 
 public:
-	using SuperBase::data;
 	using SuperBase::channels;
 	using SuperBase::frames;
 	using Base::empty;
+	// NOTE: Deliberately missing data()
 
 	//! @return the sample at the given channel and frame indicies
 	constexpr auto sample(ch_cnt_t channel, f_cnt_t frame) const noexcept -> T&

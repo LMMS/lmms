@@ -69,21 +69,21 @@ Oscilloscope::~Oscilloscope()
 
 
 
-void Oscilloscope::updateAudioBuffer(const float* const* in, unsigned short channels, unsigned long frames)
+void Oscilloscope::updateAudioBuffer(const float* const* buffer, unsigned short channels, unsigned long frames)
 {
 	if (Engine::getSong()->isExporting()) { return; }
 
-	const auto buffer = PlanarBufferView{in, channels, frames};
-	assert(buffer.channels() > 0);
-	if (buffer.channels() == 1)
+	const auto buf = PlanarBufferView{buffer, channels, frames};
+	assert(buf.channels() > 0);
+	if (buf.channels() == 1)
 	{
-		std::ranges::copy(buffer.buffer(0), m_buffer.get()); // L
-		std::fill_n(m_buffer.get() + buffer.frames(), buffer.frames(), 0.f); // R
+		std::ranges::copy(buf.buffer(0), m_buffer.get()); // L
+		std::fill_n(m_buffer.get() + buf.frames(), buf.frames(), 0.f); // R
 	}
 	else
 	{
-		std::ranges::copy(buffer.buffer(0), m_buffer.get()); // L
-		std::ranges::copy(buffer.buffer(1), m_buffer.get() + buffer.frames()); // R
+		std::ranges::copy(buf.buffer(0), m_buffer.get()); // L
+		std::ranges::copy(buf.buffer(1), m_buffer.get() + buf.frames()); // R
 	}
 }
 

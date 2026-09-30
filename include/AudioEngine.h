@@ -346,7 +346,7 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer(const float* const* in, ch_cnt_t channels, f_cnt_t frames);
+	void nextAudioBuffer(const float* const* buffer, unsigned short channels, unsigned long frames);
 
 
 private:

@@ -66,7 +66,7 @@ protected:
 
 
 protected slots:
-	void updateAudioBuffer(const float* const* in, unsigned short channels, unsigned long frames);
+	void updateAudioBuffer(const float* const* buffer, unsigned short channels, unsigned long frames);
 
 private:
 	bool clips(float level) const;
