@@ -74,6 +74,22 @@ void monoUpmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src)
 	}
 }
 
+void monoUpmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src,
+	float wet, float dry)
+{
+	assert(dst.channels() == 2);
+	assert(src.channels() == 1);
+	assert(dst.frames() >= src.frames());
+
+	const auto frames = src.frames();
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
+	{
+		float sample = src[0][frame] * wet;
+		dst[0][frame] = sample + dst[0][frame] * dry;
+		dst[1][frame] = sample + dst[1][frame] * dry;
+	}
+}
+
 void stereoDownmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src)
 {
 	assert(dst.frames() >= src.frames());
@@ -85,12 +101,24 @@ void stereoDownmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> sr
 	}
 }
 
-void copy(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src)
+void stereoDownmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src,
+	float wet, float dry)
 {
-	assert(dst.channels() >= src.channels());
 	assert(dst.frames() >= src.frames());
 
-	const auto channels = src.channels();
+	const auto frames = src.frames();
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
+	{
+		float sample = ((src[0][frame] + src[1][frame]) / 2) * wet;
+		dst[0][frame] = sample + dst[0][frame] * dry;
+	}
+}
+
+void copy(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src)
+{
+	assert(dst.frames() >= src.frames());
+
+	const auto channels = std::min(src.channels(), dst.channels());
 	const auto frames = src.frames();
 	for (ch_cnt_t ch = 0; ch < channels; ++ch)
 	{
@@ -103,19 +131,36 @@ void copy(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src)
 	}
 }
 
-void copy(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src)
+void copy(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float wet, float dry)
 {
-	assert(dst.channels() >= src.channels());
 	assert(dst.frames() >= src.frames());
 
-	const auto channels = src.channels();
+	const auto channels = std::min(src.channels(), dst.channels());
+	const auto frames = src.frames();
+	for (ch_cnt_t ch = 0; ch < channels; ++ch)
+	{
+		float* dstPtr = dst.bufferPtr(ch);
+		const float* srcPtr = src.bufferPtr(ch);
+		for (f_cnt_t frame = 0; frame < frames; ++frame)
+		{
+			dstPtr[frame] = srcPtr[frame] * wet + dstPtr[frame] * dry;
+		}
+	}
+}
+
+void copy(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src)
+{
+	assert(dst.frames() >= src.frames());
+
+	const auto channels = std::min(src.channels(), dst.channels());
+	const auto srcChannels = src.channels();
 	const auto frames = src.frames();
 	const float* const srcData = src.data();
 	for (ch_cnt_t ch = 0; ch < channels; ++ch)
 	{
 		float* const dstPtr = dst.bufferPtr(ch);
 		const float* srcPtr = srcData + ch;
-		for (f_cnt_t frame = 0; frame < frames; ++frame, srcPtr += channels)
+		for (f_cnt_t frame = 0; frame < frames; ++frame, srcPtr += srcChannels)
 		{
 			dstPtr[frame] = *srcPtr;
 		}
@@ -124,14 +169,14 @@ void copy(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src)
 
 void copy(InterleavedBufferSpan<float> dst, PlanarBufferSpan<const float> src)
 {
-	assert(dst.channels() >= src.channels());
 	assert(dst.frames() >= src.frames());
 
-	const auto channels = src.channels();
+	const auto channels = std::min(src.channels(), dst.channels());
+	const auto dstChannels = dst.channels();
 	const auto frames = src.frames();
 
 	float* dstPtr = dst.data();
-	for (f_cnt_t frame = 0; frame < frames; ++frame, dstPtr += channels)
+	for (f_cnt_t frame = 0; frame < frames; ++frame, dstPtr += dstChannels)
 	{
 		for (ch_cnt_t ch = 0; ch < channels; ++ch)
 		{
@@ -143,6 +188,17 @@ void copy(InterleavedBufferSpan<float> dst, PlanarBufferSpan<const float> src)
 void copyAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src)
 {
 	copy(dst, src);
+
+	// Zero any additional channels in the output buffer
+	for (ch_cnt_t ch = src.channels(); ch < dst.channels(); ++ch)
+	{
+		std::ranges::fill(dst.buffer(ch).subspan(0, src.frames()), 0.f);
+	}
+}
+
+void copyAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float wet, float dry)
+{
+	copy(dst, src, wet, dry);
 
 	// Zero any additional channels in the output buffer
 	for (ch_cnt_t ch = src.channels(); ch < dst.channels(); ++ch)

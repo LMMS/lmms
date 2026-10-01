@@ -57,6 +57,20 @@ LMMS_EXPORT void zero(PlanarBufferSpan<float> dst);
 //! @pre dst.frames() >= src.frames()
 LMMS_EXPORT void monoUpmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
+//! @brief Copies data from @a src to @a dst, upmixing from mono to stereo and performing
+//!        wet/dry mixing
+//! @note If @a dst has more frames than @a src, the additional
+//!       frames are left unmodified.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @param wet the wet level, applied to @p src
+//! @param dry the dry level, applied to @p dst
+//! @pre dst.channels() == 2
+//! @pre src.channels() == 1
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void monoUpmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src,
+	float wet, float dry);
+
 //! @brief Copies data from @a src to @a dst, downmixing from stereo to mono
 //! @note If @a dst has more frames than @a src, the additional
 //!       frames are left unmodified.
@@ -67,37 +81,53 @@ LMMS_EXPORT void monoUpmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const f
 //! @pre dst.frames() >= src.frames()
 LMMS_EXPORT void stereoDownmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
-//! @brief Copies data from @a src to @a dst
-//! @note If @a dst has more channels or frames than @a src, the additional channels or frames are left unmodified.
+//! @brief Copies data from @a src to @a dst, downmixing from stereo to mono and performing
+//!        wet/dry mixing
+//! @note If @a dst has more frames than @a src, the additional
+//!       frames are left unmodified.
 //! @param dst the output buffer
 //! @param src the input buffer
-//! @pre dst.channels() >= src.channels()
+//! @param wet the wet level, applied to @p src
+//! @param dry the dry level, applied to @p dst
+//! @pre dst.channels() == 1
+//! @pre src.channels() == 2
 //! @pre dst.frames() >= src.frames()
-LMMS_EXPORT void copy(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
+LMMS_EXPORT void stereoDownmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src,
+	float wet, float dry);
 
 //! @brief Copies data from @a src to @a dst
 //! @note If @a dst has more channels or frames than @a src, the additional channels or frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
 //! @param dst the output buffer
 //! @param src the input buffer
-//! @pre dst.channels() >= src.channels()
 //! @pre dst.frames() >= src.frames()
-LMMS_EXPORT void copy(PlanarBufferView<float> dst, PlanarBufferView<const float> src);
+LMMS_EXPORT void copy(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
+
+//! @brief Copies data from @a src to @a dst, performing wet/dry mixing
+//! @note If @a dst has more channels or frames than @a src, the additional channels or frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @param wet the wet level, applied to @p src
+//! @param dry the dry level, applied to @p dst
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copy(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float wet, float dry);
 
 //! @brief Copies data from @a src to @a dst, performing interleaved to planar conversion
 //! @note If @a dst  has more channels or frames than @a src,
 //!       the additional channels or frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
 //! @param dst the output buffer
 //! @param src the input buffer
-//! @pre dst.channels() >= src.channels()
 //! @pre dst.frames() >= src.frames()
 LMMS_EXPORT void copy(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src);
 
 //! @brief Copies data from @a src to @a dst, performing planar to interleaved conversion
 //! @note If @a dst  has more channels or frames than @a src,
 //!       the additional channels or frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
 //! @param dst the output buffer
 //! @param src the input buffer
-//! @pre dst.channels() >= src.channels()
 //! @pre dst.frames() >= src.frames()
 LMMS_EXPORT void copy(InterleavedBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
@@ -105,21 +135,31 @@ LMMS_EXPORT void copy(InterleavedBufferSpan<float> dst, PlanarBufferSpan<const f
 //! @note If @a dst has more channels than @a src, the additional channels are zeroed,
 //!       but only the first `src.frames()` frames.
 //! @note If @a dst has more frames than @a src, the additional frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
 //! @param dst the output buffer
 //! @param src the input buffer
-//! @pre dst.channels() >= src.channels()
 //! @pre dst.frames() >= src.frames()
 LMMS_EXPORT void copyAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
+//! @brief Copies data from @a src to @a dst, performing wet/dry mixing
+//! @note If @a dst has more channels than @a src, the additional channels are zeroed,
+//!       but only the first `src.frames()` frames.
+//! @note If @a dst has more frames than @a src, the additional frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @param wet the wet level, applied to @p src
+//! @param dry the dry level, applied to @p dst
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copyAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float wet, float dry);
+
 //! Same as @ref copy(PlanarBufferSpan<float>, PlanarBufferSpan<const float>) but
 //! applies @ref monoUpmix or @ref stereoDownmix if possible.
-//! @pre dst.channels() >= src.channels() || (dst.channels() == 1 && src.channels() == 2)
 //! @pre dst.frames() >= src.frames()
 LMMS_EXPORT void copyMix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
 //! Same as @ref copyAndZero(PlanarBufferSpan<float>, PlanarBufferSpan<const float>) but
 //! applies @ref monoUpmix or @ref stereoDownmix if possible.
-//! @pre dst.channels() >= src.channels() || (dst.channels() == 1 && src.channels() == 2)
 //! @pre dst.frames() >= src.frames()
 LMMS_EXPORT void copyMixAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
