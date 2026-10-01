@@ -73,6 +73,7 @@ AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels, bool interleaved)
 		}
 
 		// `channels` States with 1 channel each
+		m_states.reserve(channels);
 		for (ch_cnt_t ch = 0; ch < channels; ++ch)
 		{
 			auto state = State{src_new(converterType(mode), 1, &m_error)};

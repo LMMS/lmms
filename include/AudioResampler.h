@@ -26,8 +26,8 @@
 #define LMMS_AUDIO_RESAMPLER_H
 
 #include <memory>
+#include <vector>
 
-#include "ArrayVector.h"
 #include "AudioBufferSpan.h"
 #include "lmms_export.h"
 
@@ -71,7 +71,7 @@ public:
 	 * @param channels Number of audio channels. Defaults to `2` (stereo).
 	 * @param interleaved Whether this resampler will process interleaved or planar audio.
 	 */
-	AudioResampler(Mode mode, ch_cnt_t channels = 2, bool interleaved = false);
+	explicit AudioResampler(Mode mode, ch_cnt_t channels = 2, bool interleaved = false);
 
 	/**
 	 * @brief Process a block of interleaved audio input from `input` and resample it into `output`.
@@ -145,7 +145,7 @@ private:
 
 	//! If interleaved, there is a single State with `m_channels` channels
 	//! If planar, there are `m_channels` States with 1 channel each
-	ArrayVector<State, MaxChannelsPerAudioBuffer> m_states;
+	std::vector<State> m_states;
 
 	Mode m_mode;
 	ch_cnt_t m_channels = 0;

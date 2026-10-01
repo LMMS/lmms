@@ -303,10 +303,9 @@ QString TripleOscillator::nodeName() const
 
 
 
-void TripleOscillator::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> dst)
+void TripleOscillator::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out)
 {
-	assert(dst.has_value());
-	assert(dst->channels() == 2);
+	assert(out.has_value());
 	if (!_n->m_pluginData)
 	{
 		auto oscs_l = std::array<Oscillator*, NUM_OF_OSCILLATORS>{};
@@ -375,11 +374,11 @@ void TripleOscillator::playNote(NotePlayHandle* _n, std::optional<PlanarBufferVi
 	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	osc_l->update(dst->buffer(0).subspan(offset, frames));
-	osc_r->update(dst->buffer(1).subspan(offset, frames));
+	osc_l->update(out->buffer(0).subspan(offset, frames));
+	osc_r->update(out->buffer(1).subspan(offset, frames));
 
-	applyFadeIn(*dst, _n);
-	applyRelease(*dst, _n);
+	applyFadeIn(*out, _n);
+	applyRelease(*out, _n);
 }
 
 

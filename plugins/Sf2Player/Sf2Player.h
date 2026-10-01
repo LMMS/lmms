@@ -67,17 +67,16 @@ public:
 	Sf2Instrument( InstrumentTrack * _instrument_track );
 	~Sf2Instrument() override;
 
-	void play( SampleFrame* _working_buffer ) override;
+	void play(std::optional<PlanarBufferView<float>> out) override;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
+	void playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	void loadFile( const QString & _file ) override;
+	void loadFile(const QString& file, bool previewMode = false) override;
 
 	auto midiPatch() const -> std::optional<MidiPatch> override;
 	AutomatableModel* childModel(std::string_view modelName) override;
@@ -108,8 +107,9 @@ public slots:
 
 private:
 	AudioResampler m_resampler;
-	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_buffer;
-	std::span<SampleFrame> m_bufferView;
+	std::array<float, DEFAULT_BUFFER_SIZE * 2> m_buffer;
+	std::array<float*, 2> m_bufferAccess;
+	PlanarBufferSpan<float> m_bufferView;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
@@ -156,7 +156,7 @@ private:
 	void freeFont();
 	void noteOn( Sf2PluginData * n );
 	void noteOff( Sf2PluginData * n );
-	void renderFrames( f_cnt_t frames, SampleFrame* buf );
+	void renderFrames(PlanarBufferSpan<float> out);
 
 	friend class gui::Sf2InstrumentView;
 

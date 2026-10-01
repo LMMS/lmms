@@ -132,7 +132,8 @@ struct Sf2PluginData
 
 Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument(_instrument_track, &sf2player_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
-	m_resampler(AudioResampler::Mode::Linear),
+	m_resampler(AudioResampler::Mode::Linear, 2),
+	m_bufferAccess{m_buffer.data(), m_buffer.data() + (m_buffer.size() / 2)},
 	m_synth(nullptr),
 	m_font( nullptr ),
 	m_fontId( 0 ),
@@ -296,7 +297,7 @@ void Sf2Instrument::loadSettings( const QDomElement & _this )
 
 
 
-void Sf2Instrument::loadFile( const QString & _file )
+void Sf2Instrument::loadFile(const QString& _file, bool)
 {
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{
@@ -631,7 +632,7 @@ void Sf2Instrument::reloadSynth()
 
 
 
-void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
+void Sf2Instrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>>)
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -764,9 +765,9 @@ void Sf2Instrument::noteOff( Sf2PluginData * n )
 }
 
 
-void Sf2Instrument::play( SampleFrame* _working_buffer )
+void Sf2Instrument::play(std::optional<PlanarBufferView<float>> out)
 {
-	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
+	assert(out.has_value());
 
 	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();
@@ -789,7 +790,7 @@ void Sf2Instrument::play( SampleFrame* _working_buffer )
 	// if we have no new noteons/noteoffs, just render a period and call it a day
 	if( m_playingNotes.isEmpty() )
 	{
-		renderFrames( frames, _working_buffer );
+		renderFrames(*out);
 		return;
 	}
 
@@ -816,7 +817,7 @@ void Sf2Instrument::play( SampleFrame* _working_buffer )
 		auto currentData = static_cast<Sf2PluginData*>(currentNote->m_pluginData);
 		if( currentData->offset > currentFrame )
 		{
-			renderFrames( currentData->offset - currentFrame, _working_buffer + currentFrame );
+			renderFrames(PlanarBufferSpan{*out, currentFrame, currentData->offset - currentFrame});
 			currentFrame = currentData->offset;
 		}
 		if( currentData->isNew )
@@ -843,45 +844,50 @@ void Sf2Instrument::play( SampleFrame* _working_buffer )
 		}
 	}
 
-	if( currentFrame < frames )
+	if (currentFrame < out->frames())
 	{
-		renderFrames( frames - currentFrame, _working_buffer + currentFrame );
+		renderFrames(PlanarBufferSpan{*out, currentFrame});
 	}
 }
 
 
-void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
+void Sf2Instrument::renderFrames(PlanarBufferSpan<float> out)
 {
 	const auto guard = std::lock_guard{m_synthMutex};
 
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
-	if (m_internalSampleRate == Engine::audioEngine()->outputSampleRate()) {
-		fluid_synth_write_float(m_synth, frames, buf, 0, 2, buf, 1, 2);
+	if (m_internalSampleRate == Engine::audioEngine()->outputSampleRate())
+	{
+		fluid_synth_write_float(m_synth, out.frames(), out.bufferPtr(0), 0, 1, out.bufferPtr(1), 0, 1);
 		return;
 	}
 
 	// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work with
 	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
+	auto frames = out.frames();
 	while (frames > 0)
 	{
 		if (m_bufferView.empty())
 		{
-			fluid_synth_write_float(m_synth, m_buffer.size(), m_buffer.data(), 0, 2, m_buffer.data(), 1, 2);
-			m_bufferView = m_buffer;
+			const auto bufferFrames = static_cast<int>(m_buffer.size() / 2);
+			fluid_synth_write_float(m_synth, bufferFrames,
+				m_bufferAccess[0], 0, 1,
+				m_bufferAccess[1], 0, 1
+			);
+			m_bufferView = PlanarBufferSpan{m_bufferAccess.data(), 2, bufferFrames};
 		}
 
-		const auto [inputFramesUsed, outputFramesGenerated]
-			= m_resampler.process({&m_bufferView.data()[0][0], 2, m_bufferView.size()}, {&buf[0][0], 2, frames});
+		const auto [inputFramesUsed, outputFramesGenerated] = m_resampler.process(m_bufferView, out);
 
 		if (inputFramesUsed == 0 && outputFramesGenerated == 0)
 		{
-			std::fill_n(buf, frames, SampleFrame{});
+			MixHelpers::zero(out);
 			break;
 		}
 
 		m_bufferView = m_bufferView.subspan(inputFramesUsed);
-		buf += outputFramesGenerated;
+		out = out.subspan(outputFramesGenerated);
 		frames -= outputFramesGenerated;
 	}
 }

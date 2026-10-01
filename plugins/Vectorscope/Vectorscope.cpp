@@ -58,14 +58,28 @@ Vectorscope::Vectorscope(Model *parent, const Plugin::Descriptor::SubPluginFeatu
 
 
 // Take audio data and store them for processing and display in the GUI thread.
-Effect::ProcessStatus Vectorscope::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus Vectorscope::processImpl(PlanarBufferView<float> inOut)
 {
 	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 	if (m_controls.isViewVisible())
 	{
+		// Planar-to-interleaved ringbuffer copier
+		class Copier
+		{
+		public:
+			explicit Copier(PlanarBufferView<const float> src) : m_src(src) {}
+
+			void operator()(std::size_t srcOffset, std::size_t amount, SampleFrame* dest) const
+			{
+				MixHelpers::copy(InterleavedBufferSpan{dest, amount}, m_src.subspan(srcOffset, amount));
+			}
+		private:
+			PlanarBufferSpan<const float> m_src;
+		} copier{inOut};
+
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		m_inputBuffer.write(buf, frames);
+		m_inputBuffer.writeFunc(copier, inOut.frames());
 	}
 
 	return ProcessStatus::Continue;
