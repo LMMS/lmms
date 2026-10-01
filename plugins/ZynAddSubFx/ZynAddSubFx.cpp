@@ -295,7 +295,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void ZynAddSubFxInstrument::loadFile( const QString & _file )
+void ZynAddSubFxInstrument::loadFile(const QString& _file, bool)
 {
 	const std::string fn = QSTR_TO_STDSTR( _file );
 	if( m_remotePlugin )
@@ -330,16 +330,16 @@ QString ZynAddSubFxInstrument::nodeName() const
 
 
 
-void ZynAddSubFxInstrument::play( SampleFrame* _buf )
+void ZynAddSubFxInstrument::play(std::optional<PlanarBufferView<float>> out)
 {
-	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
-	if( m_remotePlugin )
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return; }
+	if (m_remotePlugin)
 	{
-		m_remotePlugin->process( nullptr, _buf );
+		m_remotePlugin->process({}, out.value());
 	}
 	else
 	{
-		m_plugin->processAudio( _buf );
+		m_plugin->processAudio(out.value());
 	}
 	m_pluginMutex.unlock();
 }

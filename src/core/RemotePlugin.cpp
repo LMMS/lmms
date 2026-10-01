@@ -36,6 +36,7 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "MidiEvent.h"
+#include "MixHelpers.h"
 #include "Song.h"
 
 #include <QCoreApplication>
@@ -130,19 +131,15 @@ void ProcessWatcher::run()
 
 
 
-RemotePlugin::RemotePlugin() :
-	QObject(),
+RemotePlugin::RemotePlugin()
+	: QObject()
 #ifdef SYNC_WITH_SHM_FIFO
-	RemotePluginBase( new shmFifo(), new shmFifo() ),
+	, RemotePluginBase(new shmFifo(), new shmFifo())
 #else
-	RemotePluginBase(),
+	, RemotePluginBase()
 #endif
-	m_failed( true ),
-	m_watcher( this ),
-	m_splitChannels( false ),
-	m_audioBufferSize( 0 ),
-	m_inputCount( DEFAULT_CHANNELS ),
-	m_outputCount( DEFAULT_CHANNELS )
+	, m_failed(true)
+	, m_watcher(this)
 {
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
@@ -327,77 +324,42 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
+bool RemotePlugin::process(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out)
 {
-	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
-
 	if( m_failed || !isRunning() )
 	{
-		if( _out_buf != nullptr )
-		{
-			zeroSampleFrames(_out_buf, frames);
-		}
+		MixHelpers::zero(out);
 		return false;
 	}
 
 	if (!m_audioBuffer)
 	{
+		// TODO: Is the following logic still correct?
 		// m_audioBuffer being zero means we didn't initialize everything so
 		// far so process one message each time (and hope we get
 		// information like SHM-key etc.) until we process messages
 		// in a later stage of this procedure
-		if( m_audioBufferSize == 0 )
+		if (m_audioBuffer.size() == 0)
 		{
 			lock();
 			fetchAndProcessAllMessages();
 			unlock();
 		}
-		if( _out_buf != nullptr )
-		{
-			zeroSampleFrames(_out_buf, frames);
-		}
+		MixHelpers::zero(out);
 		return false;
 	}
 
-	memset( m_audioBuffer.get(), 0, m_audioBufferSize );
-
-	ch_cnt_t inputs = std::min<ch_cnt_t>(m_inputCount, DEFAULT_CHANNELS);
-
-	if( _in_buf != nullptr && inputs > 0 )
+	// Write to remote plugin inputs
+	if (inputCount() > 0)
 	{
-		if( m_splitChannels )
-		{
-			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
-			{
-				for( f_cnt_t frame = 0; frame < frames; ++frame )
-				{
-					m_audioBuffer[ch * frames + frame] =
-							_in_buf[frame][ch];
-				}
-			}
-		}
-		else if( inputs == DEFAULT_CHANNELS )
-		{
-			auto target = m_audioBuffer.get();
-			copyFromSampleFrames(target, _in_buf, frames);
-		}
-		else
-		{
-			auto o = (SampleFrame*)m_audioBuffer.get();
-			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
-			{
-				for( f_cnt_t frame = 0; frame < frames; ++frame )
-				{
-					o[frame][ch] = _in_buf[frame][ch];
-				}
-			}
-		}
+		auto remoteInputsView = PlanarBufferSpan{m_audioBufferAccessIn.data(), inputCount(), m_frames};
+		MixHelpers::copyMixAndZero(remoteInputsView, in);
 	}
 
 	lock();
 	sendMessage( IdStartProcessing );
 
-	if( m_failed || _out_buf == nullptr || m_outputCount == 0 )
+	if (m_failed || out.empty())
 	{
 		unlock();
 		return false;
@@ -406,38 +368,11 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 	waitForMessage( IdProcessingDone );
 	unlock();
 
-	const ch_cnt_t outputs = std::min<ch_cnt_t>(m_outputCount,
-							DEFAULT_CHANNELS);
-	if( m_splitChannels )
+	// Read from remote plugin outputs
+	if (!out.empty())
 	{
-		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
-		{
-			for( f_cnt_t frame = 0; frame < frames; ++frame )
-			{
-				_out_buf[frame][ch] = m_audioBuffer[( m_inputCount+ch )*
-								frames + frame];
-			}
-		}
-	}
-	else if( outputs == DEFAULT_CHANNELS )
-	{
-		auto source = m_audioBuffer.get() + m_inputCount * frames;
-		copyToSampleFrames(_out_buf, source, frames);
-	}
-	else
-	{
-		auto o = (SampleFrame*)(m_audioBuffer.get() + m_inputCount * frames);
-		// clear buffer, if plugin didn't fill up both channels
-		zeroSampleFrames(_out_buf, frames);
-
-		for (ch_cnt_t ch = 0; ch <
-				std::min<int>(DEFAULT_CHANNELS, outputs); ++ch)
-		{
-			for( f_cnt_t frame = 0; frame < frames; ++frame )
-			{
-				_out_buf[frame][ch] = o[frame][ch];
-			}
-		}
+		auto remoteOutputsView = PlanarBufferSpan{m_audioBufferAccessOut.data(), outputCount(), m_frames};
+		MixHelpers::copyMixAndZero(out, remoteOutputsView);
 	}
 
 	return true;
@@ -479,10 +414,12 @@ void RemotePlugin::hideUI()
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
-	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
+	const auto frames = Engine::audioEngine()->framesPerPeriod();
+	const auto audioBufferSize = (inputCount() + outputCount()) * frames;
+
 	try
 	{
-		m_audioBuffer.create(s);
+		m_audioBuffer.create(audioBufferSize);
 	}
 	catch (const std::runtime_error& error)
 	{
@@ -490,7 +427,21 @@ void RemotePlugin::resizeSharedProcessingMemory()
 		m_audioBuffer.detach();
 		return;
 	}
-	m_audioBufferSize = s * sizeof(float);
+
+	float* ptr = m_audioBuffer.get();
+	for (ch_cnt_t ch = 0; ch < inputCount(); ++ch, ptr += frames)
+	{
+		m_audioBufferAccessIn[ch] = ptr;
+	}
+
+	ptr = m_audioBuffer.get() + (inputCount() * frames);
+	for (ch_cnt_t ch = 0; ch < outputCount(); ++ch, ptr += frames)
+	{
+		m_audioBufferAccessOut[ch] = ptr;
+	}
+
+	m_frames = frames;
+
 	sendMessage(message(IdChangeSharedMemoryKey).addString(m_audioBuffer.key()));
 }
 
@@ -546,19 +497,9 @@ bool RemotePlugin::processMessage( const message & _m )
 			reply_message.addInt( Engine::audioEngine()->framesPerPeriod() );
 			break;
 
-		case IdChangeInputCount:
-			m_inputCount = _m.getInt( 0 );
-			resizeSharedProcessingMemory();
-			break;
-
-		case IdChangeOutputCount:
-			m_outputCount = _m.getInt( 0 );
-			resizeSharedProcessingMemory();
-			break;
-
 		case IdChangeInputOutputCount:
-			m_inputCount = _m.getInt( 0 );
-			m_outputCount = _m.getInt( 1 );
+			m_audioBufferAccessIn.resize(static_cast<ch_cnt_t>(_m.getInt(0)));
+			m_audioBufferAccessOut.resize(static_cast<ch_cnt_t>(_m.getInt(1)));
 			resizeSharedProcessingMemory();
 			break;
 

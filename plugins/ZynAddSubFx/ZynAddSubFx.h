@@ -74,14 +74,14 @@ public:
 	ZynAddSubFxInstrument( InstrumentTrack * _instrument_track );
 	~ZynAddSubFxInstrument() override;
 
-	void play( SampleFrame* _working_buffer ) override;
+	void play(std::optional<PlanarBufferView<float>> out) override;
 
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	void loadFile( const QString & _file ) override;
+	void loadFile(const QString& _file, bool previewMode = false) override;
 
 
 	QString nodeName() const override;
