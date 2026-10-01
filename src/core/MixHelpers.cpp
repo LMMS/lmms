@@ -115,7 +115,7 @@ void copy(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src)
 	{
 		float* const dstPtr = dst.bufferPtr(ch);
 		const float* srcPtr = srcData + ch;
-		for (f_cnt_t frame = 0; frame < frames; ++frame, ++srcPtr)
+		for (f_cnt_t frame = 0; frame < frames; ++frame, srcPtr += channels)
 		{
 			dstPtr[frame] = *srcPtr;
 		}
@@ -213,7 +213,7 @@ void add(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src)
 	{
 		float* const dstPtr = dst.bufferPtr(ch);
 		const float* srcPtr = srcData + ch;
-		for (f_cnt_t frame = 0; frame < frames; ++frame, ++srcPtr)
+		for (f_cnt_t frame = 0; frame < frames; ++frame, srcPtr += channels)
 		{
 			dstPtr[frame] += *srcPtr;
 		}

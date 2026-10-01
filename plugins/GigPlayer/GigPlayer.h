@@ -151,11 +151,11 @@ class GigSample
 public:
 	GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation,
 		AudioResampler::Mode interpolation, float desiredFreq);
-	~GigSample() = default;
 
-	// Needed when initially creating in QList
-	GigSample( const GigSample& g );
-	GigSample& operator=( const GigSample& g );
+	GigSample(const GigSample&) = delete;
+	GigSample& operator=(const GigSample& g) = delete;
+	GigSample(GigSample&& g) noexcept = default;
+	GigSample& operator=(GigSample&& g) noexcept = default;
 
 	gig::Sample * sample;
 	gig::DimensionRegion * region;
@@ -168,14 +168,14 @@ public:
 	// Whether to change the pitch of the samples, e.g. if there's only one
 	// sample per octave and you want that sample pitch shifted for the rest of
 	// the notes in the octave, this will be true
-	bool pitchtrack;
+	//bool pitchtrack;
 
 	// Used to convert sample rates
 	AudioResampler m_resampler;
 	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_sourceBuffer;
 	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_mixBuffer;
-	InterleavedBufferSpan<float, 2> m_sourceBufferView;
-	InterleavedBufferSpan<float, 2> m_mixBufferView;
+	std::span<const SampleFrame> m_sourceBufferView;
+	std::span<SampleFrame> m_mixBufferView;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;
@@ -291,7 +291,7 @@ private:
 	QMutex m_notesMutex;
 
 	// List of all the currently playing notes
-	QList<GigNote> m_notes;
+	std::vector<GigNote> m_notes;
 
 	// Used when determining which samples to use
 	uint32_t m_RandomSeed;
