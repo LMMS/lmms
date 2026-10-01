@@ -61,14 +61,14 @@ public:
 	VestigeInstrument( InstrumentTrack * _instrument_track );
 	virtual ~VestigeInstrument();
 
-	virtual void play( SampleFrame* _working_buffer );
+	virtual void play(std::optional<PlanarBufferView<float>> out);
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName() const;
 
-	virtual void loadFile( const QString & _file );
+	void loadFile(const QString& file, bool previewMode = false) override;
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 

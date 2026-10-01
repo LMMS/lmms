@@ -99,6 +99,7 @@ public:
 	bool processMessage( const message & _m ) override;
 
 	bool process(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out);
+	bool process(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out, float wet, float dry);
 
 	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
 
@@ -160,6 +161,7 @@ protected:
 	bool m_failed;
 
 private:
+	bool processImpl(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out);
 	void resizeSharedProcessingMemory();
 
 	QProcess m_process;

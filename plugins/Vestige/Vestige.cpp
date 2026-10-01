@@ -331,7 +331,7 @@ QString VestigeInstrument::nodeName( void ) const
 
 
 
-void VestigeInstrument::loadFile( const QString & _file )
+void VestigeInstrument::loadFile(const QString& file, bool)
 {
 	m_pluginMutex.lock();
 	const bool set_ch_name = ( m_plugin != nullptr &&
@@ -343,14 +343,14 @@ void VestigeInstrument::loadFile( const QString & _file )
 
 	// if the same is loaded don't load again (for preview)
 	if (instrumentTrack() != nullptr && instrumentTrack()->isPreviewMode() &&
-			m_pluginDLL == PathUtil::toShortestRelative( _file ))
+			m_pluginDLL == PathUtil::toShortestRelative(file))
 		return;
 
 	if ( m_plugin != nullptr )
 	{
 		closePlugin();
 	}
-	m_pluginDLL = PathUtil::toShortestRelative( _file );
+	m_pluginDLL = PathUtil::toShortestRelative(file);
 	gui::TextFloat * tf = nullptr;
 	if( gui::getGUI() != nullptr )
 	{
@@ -393,9 +393,9 @@ void VestigeInstrument::loadFile( const QString & _file )
 
 
 
-void VestigeInstrument::play( SampleFrame* _buf )
+void VestigeInstrument::play(std::optional<PlanarBufferView<float>> out)
 {
-	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return; }
 
 	if( m_plugin == nullptr )
 	{
@@ -403,7 +403,7 @@ void VestigeInstrument::play( SampleFrame* _buf )
 		return;
 	}
 
-	m_plugin->process( nullptr, _buf );
+	m_plugin->process({}, out.value());
 
 	m_pluginMutex.unlock();
 }

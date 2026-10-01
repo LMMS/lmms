@@ -185,7 +185,7 @@ public:
 	void hideEditor();
 	void destroyEditor();
 
-	virtual void process( const SampleFrame* _in, SampleFrame* _out );
+	void process(PlanarBufferView<const float> in, PlanarBufferView<float> out) override;
 
 
 	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t offset );
@@ -287,7 +287,7 @@ public:
 	void savePreset( const std::string & _file );
 
 	// number of inputs
-	virtual int inputCount() const
+	ch_cnt_t inputCount() const override
 	{
 		if( m_plugin )
 		{
@@ -297,7 +297,7 @@ public:
 	}
 
 	// number of outputs
-	virtual int outputCount() const
+	ch_cnt_t outputCount() const override
 	{
 		if( m_plugin )
 		{
@@ -468,10 +468,6 @@ private:
 	std::queue<message> m_messageList;
 	bool m_shouldGiveIdle;
 
-
-	float * * m_inputs;
-	float * * m_outputs;
-
 	std::mutex m_shmLock;
 	bool m_shmValid;
 
@@ -513,8 +509,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_processing( false ),
 	m_messageList(),
 	m_shouldGiveIdle( false ),
-	m_inputs( nullptr ),
-	m_outputs( nullptr ),
 	m_shmValid( false ),
 	m_midiEvents(),
 	m_bpm( 0 ),
@@ -553,9 +547,6 @@ RemoteVstPlugin::~RemoteVstPlugin()
 #endif
 		m_libInst = nullptr;
 	}
-
-	delete[] m_inputs;
-	delete[] m_outputs;
 }
 
 
@@ -1042,7 +1033,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 
 
 
-void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
+void RemoteVstPlugin::process(PlanarBufferView<const float> in, PlanarBufferView<float> out)
 {
 	// first we gonna post all MIDI-events we enqueued so far
 	if( m_midiEvents.size() )
@@ -1092,30 +1083,25 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 		return;
 	}
 
-	for( int i = 0; i < inputCount(); ++i )
+	for (ch_cnt_t ch = 0; ch < out.channels(); ++ch)
 	{
-		m_inputs[i] = &((float *) _in)[i * bufferSize()];
+		std::ranges::fill(out.buffer(ch), 0.f);
 	}
 
-	for( int i = 0; i < outputCount(); ++i )
-	{
-		m_outputs[i] = &((float *) _out)[i * bufferSize()];
-		memset( m_outputs[i], 0, bufferSize() * sizeof( float ) );
-	}
+	const auto inPtr = const_cast<float**>(in.data());
+	const auto outPtr = const_cast<float**>(out.data());
 
 #ifdef OLD_VST_SDK
 	if( m_plugin->flags & effFlagsCanReplacing )
 	{
-		m_plugin->processReplacing( m_plugin, m_inputs, m_outputs,
-								bufferSize() );
+		m_plugin->processReplacing(m_plugin, inPtr, outPtr, bufferSize());
 	}
 	else
 	{
-		m_plugin->process( m_plugin, m_inputs, m_outputs,
-								bufferSize() );
+		m_plugin->process(m_plugin, inPtr, outPtr, bufferSize());
 	}
 #else
-	m_plugin->processReplacing(m_plugin, m_inputs, m_outputs, bufferSize());
+	m_plugin->processReplacing(m_plugin, inPtr, outPtr, bufferSize());
 #endif
 
 	unlockShm();
@@ -1774,20 +1760,11 @@ int RemoteVstPlugin::updateInOutCount()
 
 	unlockShm();
 
-	delete[] m_inputs;
-	delete[] m_outputs;
-
-	m_inputs = nullptr;
-	m_outputs = nullptr;
-
 	setInputOutputCount( inputCount(), outputCount() );
 
 	char buf[64] = {};
 	std::snprintf(buf, sizeof(buf), "inputs: %d; outputs: %d\n", inputCount(), outputCount());
 	debugMessage(buf);
-
-	if (inputCount() > 0) { m_inputs = new float*[inputCount()]; }
-	if (outputCount() > 0) { m_outputs = new float*[outputCount()]; }
 
 	return 1;
 }

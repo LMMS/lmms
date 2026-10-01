@@ -326,7 +326,35 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 bool RemotePlugin::process(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out)
 {
-	if( m_failed || !isRunning() )
+	if (!processImpl(in, out)) { return false; }
+
+	// Read from remote plugin outputs
+	if (!out.empty())
+	{
+		auto remoteOutputsView = PlanarBufferSpan{m_audioBufferAccessOut.data(), outputCount(), m_frames};
+		MixHelpers::copyAndZero(out, remoteOutputsView);
+	}
+
+	return true;
+}
+
+bool RemotePlugin::process(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out, float wet, float dry)
+{
+	if (!processImpl(in, out)) { return false; }
+
+	// Read from remote plugin outputs
+	if (!out.empty())
+	{
+		auto remoteOutputsView = PlanarBufferSpan{m_audioBufferAccessOut.data(), outputCount(), m_frames};
+		MixHelpers::copyAndZero(out, remoteOutputsView, wet, dry);
+	}
+
+	return true;
+}
+
+bool RemotePlugin::processImpl(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out)
+{
+	if (m_failed || !isRunning())
 	{
 		MixHelpers::zero(out);
 		return false;
@@ -357,7 +385,7 @@ bool RemotePlugin::process(PlanarBufferSpan<const float> in, PlanarBufferSpan<fl
 	}
 
 	lock();
-	sendMessage( IdStartProcessing );
+	sendMessage(IdStartProcessing);
 
 	if (m_failed || out.empty())
 	{
@@ -365,21 +393,11 @@ bool RemotePlugin::process(PlanarBufferSpan<const float> in, PlanarBufferSpan<fl
 		return false;
 	}
 
-	waitForMessage( IdProcessingDone );
+	waitForMessage(IdProcessingDone);
 	unlock();
-
-	// Read from remote plugin outputs
-	if (!out.empty())
-	{
-		auto remoteOutputsView = PlanarBufferSpan{m_audioBufferAccessOut.data(), outputCount(), m_frames};
-		MixHelpers::copyMixAndZero(out, remoteOutputsView);
-	}
 
 	return true;
 }
-
-
-
 
 void RemotePlugin::processMidiEvent( const MidiEvent & _e,
 							const f_cnt_t _offset )
