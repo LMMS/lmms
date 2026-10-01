@@ -124,7 +124,10 @@ LMMS_EXPORT void copyMix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const flo
 LMMS_EXPORT void copyMixAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
 //! @brief Add samples from src to dst
-LMMS_EXPORT void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src);
+LMMS_EXPORT void add(PlanarBufferView<float> dst, PlanarBufferView<const float> src);
+
+//! @brief Add samples from src to dst
+LMMS_EXPORT void add(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src);
 
 //! @brief Multiply samples from `dst` by `coeff` starting at `offset`
 LMMS_EXPORT void multiply(PlanarBufferView<float> dst, float coeff, f_cnt_t offset);

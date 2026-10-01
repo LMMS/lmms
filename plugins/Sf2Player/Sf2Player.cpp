@@ -870,8 +870,8 @@ void Sf2Instrument::renderFrames(PlanarBufferSpan<float> out)
 	{
 		if (m_bufferView.empty())
 		{
-			const auto bufferFrames = static_cast<int>(m_buffer.size() / 2);
-			fluid_synth_write_float(m_synth, bufferFrames,
+			const auto bufferFrames = static_cast<f_cnt_t>(m_buffer.size() / 2);
+			fluid_synth_write_float(m_synth, static_cast<int>(bufferFrames),
 				m_bufferAccess[0], 0, 1,
 				m_bufferAccess[1], 0, 1
 			);

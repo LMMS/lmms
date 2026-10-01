@@ -183,20 +183,39 @@ void copyMixAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> s
 	}
 }
 
-void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
+void add(PlanarBufferView<float> dst, PlanarBufferView<const float> src)
 {
 	assert(dst.channels() == src.channels());
 	assert(dst.frames() == src.frames());
 
-	const auto channels = dst.channels();
-	const auto frames = dst.frames();
-	for (ch_cnt_t channel = 0; channel < channels; ++channel)
+	const auto channels = src.channels();
+	const auto frames = src.frames();
+	for (ch_cnt_t ch = 0; ch < channels; ++ch)
 	{
-		auto* dstPtr = dst.bufferPtr(channel);
-		const auto* srcPtr = src.bufferPtr(channel);
+		float* const dstPtr = dst.bufferPtr(ch);
+		const float* srcPtr = src.bufferPtr(ch);
 		for (f_cnt_t frame = 0; frame < frames; ++frame)
 		{
 			dstPtr[frame] += srcPtr[frame];
+		}
+	}
+}
+
+void add(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src)
+{
+	assert(dst.channels() >= src.channels());
+	assert(dst.frames() >= src.frames());
+
+	const auto channels = src.channels();
+	const auto frames = src.frames();
+	const float* const srcData = src.data();
+	for (ch_cnt_t ch = 0; ch < channels; ++ch)
+	{
+		float* const dstPtr = dst.bufferPtr(ch);
+		const float* srcPtr = srcData + ch;
+		for (f_cnt_t frame = 0; frame < frames; ++frame, ++srcPtr)
+		{
+			dstPtr[frame] += *srcPtr;
 		}
 	}
 }

@@ -136,7 +136,7 @@ public:
 	//! @returns the interpolation mode used by this resampler.
 	auto mode() const -> Mode { return m_mode; }
 
-	//! @returns whether this resampler is configured to process
+	//! @returns whether this resampler is configured to process interleaved buffers
 	auto interleaved() const -> bool { return m_interleaved; }
 
 private:
