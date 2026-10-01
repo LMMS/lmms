@@ -24,7 +24,15 @@
 
 #include <QList>
 #include <QObject>
+#include <QDomDocument>
+#include <QFile>
+#include <qdebug.h>
+#include <qdir.h>
+#include <qdom.h>
+#include <qfileinfo.h>
 #include <qobject.h>
+#include <qregion.h>
+#include <qstandardpaths.h>
 
 namespace lmms {
 
@@ -274,6 +282,8 @@ const std::map<QString, EffectCategoryData> defaultLadspaEffects =
 	{"z-1", {QObject::tr("Delay")}},
 };
 const QString defaultCategory = "Other";
+const QString effectCategoriesFolder = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QDir::separator() + "lmms";
+const QString effectCategoriesFileName = effectCategoriesFolder +  QDir::separator() + "lmms_effect_categories.xml";
 
 std::unique_ptr<EffectCategory> EffectCategory::s_instance;
 
@@ -296,29 +306,30 @@ EffectCategory* getEffectCategory()
 
 QString EffectCategory::getCategoryName(QString effectName)
 {
-	if (defaultLmmsEffects.find(effectName) != defaultLmmsEffects.end()) { return defaultLmmsEffects.at(effectName).m_category; }
-	if (defaultLadspaEffects.find(effectName) != defaultLadspaEffects.end()) { return defaultLadspaEffects.at(effectName).m_category; }
+	if(m_categories_map.empty()) {loadData();}
+	if(m_categories_map.find(effectName) != m_categories_map.end())
+	{
+		return m_categories_map.at(effectName).m_category;
+	}
 	return defaultCategory;
 }
 
 bool EffectCategory::getIsFavorite(QString effectName)
 {
-	return false; // TODO
+	if(m_categories_map.empty()) {loadData();}
+	if(m_categories_map.find(effectName) != m_categories_map.end())
+	{
+		return m_categories_map.at(effectName).m_is_favorite;
+	}
+	return false;
 }
 
 QStringList EffectCategory::getCategories() 
 {
 	if (m_categories_list.isEmpty()) 
 	{
-		m_categories_list = getCategoriesFromMap(defaultLmmsEffects);
-		QStringList ladspaCategories = getCategoriesFromMap(defaultLadspaEffects);
-		for (const QString& category : ladspaCategories) 
-		{
-			if (!m_categories_list.contains(category)) 
-			{
-				m_categories_list.append(category);
-			}
-		}
+		if(m_categories_map.empty()) {loadData();}
+		m_categories_list = getCategoriesFromMap(m_categories_map);
 	}
 	m_categories_list.sort();
 	return m_categories_list;
@@ -326,17 +337,46 @@ QStringList EffectCategory::getCategories()
 
 void EffectCategory::setCategory(QString effectName, QString categoryName)
 {
-	//TODO
+	if(m_categories_map.empty()) {loadData();}
+	if(m_categories_map.find(effectName) != m_categories_map.end()) {
+		m_categories_map.at(effectName).m_category = categoryName;
+	}
+	else {
+		m_categories_map[effectName] = {categoryName};
+	}
+	m_categories_list = getCategoriesFromMap(m_categories_map);
 }
 
 void EffectCategory::toggleFavorite(QString effectName, bool isFavorite)
 {
-	// TODO
+	if(m_categories_map.empty()) {loadData();}
+	if(m_categories_map.find(effectName) != m_categories_map.end()) {
+		m_categories_map.at(effectName).m_is_favorite = isFavorite;
+		return;
+	}
+	m_categories_map[effectName] = {defaultCategory, isFavorite};
 }
 
 void EffectCategory::save()
 {
-	// TODO 
+	qDebug() << "Trying to save data to " + effectCategoriesFileName;
+	QDomDocument doc("effect-categories");
+	QDir dir;
+	if(!dir.exists(effectCategoriesFolder)){
+		dir.mkpath(effectCategoriesFolder);
+	}
+	for (auto& effect: m_categories_map) 
+	{
+		QDomElement effectData = doc.createElement(effect.first);
+		effectData.setAttribute("category", effect.second.m_category);
+		effectData.setAttribute("isFavorite", effect.second.m_is_favorite);
+		doc.appendChild(effectData);
+	}
+	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString(2);
+	QFile outfile(effectCategoriesFileName);
+	outfile.open(QIODevice::ReadWrite);
+	outfile.write(xml.toUtf8());
+	outfile.close();
 }
 
 QStringList EffectCategory::getCategoriesFromMap(std::map<QString, EffectCategoryData> map)
@@ -352,9 +392,27 @@ QStringList EffectCategory::getCategoriesFromMap(std::map<QString, EffectCategor
 	return *categories;
 }
 
-void load()
+void EffectCategory::loadData()
 {
-	// TODO
+	qDebug() << "Trying to load data from " + effectCategoriesFileName;
+	QFile effectCategoriesFile(effectCategoriesFileName);
+	m_categories_map = {};
+	if(effectCategoriesFile.exists()) 
+	{
+		QDomDocument doc;
+		effectCategoriesFile.open(QIODevice::ReadOnly);
+		doc.setContent(&effectCategoriesFile);
+		QDomElement root = doc.documentElement();
+		for(QDomNode node = root.firstChild(); !node.isNull(); node = node.nextSibling())
+		{
+			QDomElement element = node.toElement();
+			m_categories_map[element.tagName()] = {QString(element.attribute("category")), element.attribute("isFavorite", "0") != "0"};
+		}
+		return;
+	}
+	m_categories_map = defaultLmmsEffects;
+	m_categories_map.insert(defaultLadspaEffects.begin(),defaultLadspaEffects.end());
+	save();
 }
 
 } // namespace lmms

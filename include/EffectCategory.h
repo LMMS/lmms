@@ -53,7 +53,7 @@ private:
 	QStringList m_categories_list;
 	std::map<QString, EffectCategoryData> m_categories_map;
 	QStringList getCategoriesFromMap(std::map<QString, EffectCategoryData> map);
-	void load();
+	void loadData();
 };
 
 // Short-hand function
