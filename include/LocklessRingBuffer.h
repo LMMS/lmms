@@ -59,7 +59,7 @@ public:
 		return written;
 	}
 	template<class Copier>
-	std::size_t write(Copier& copier, std::size_t cnt, bool notify = false)
+	std::size_t writeFunc(Copier& copier, std::size_t cnt, bool notify = false)
 	{
 		std::size_t written = LocklessRingBuffer<T>::m_buffer.write_func(copier, cnt);
 		// Let all waiting readers know new data are available.

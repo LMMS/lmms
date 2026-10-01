@@ -80,7 +80,7 @@ Effect::ProcessStatus Oscilloscope::processImpl(PlanarBufferView<float> inOut)
 		} copier{inOut};
 
 		// Send the samples from the audio thread over to the gui via a ring buffer; the gui will do all of the processing.
-		m_inputBuffer.write(copier, inOut.frames());
+		m_inputBuffer.writeFunc(copier, inOut.frames());
 	}
 	return ProcessStatus::Continue;
 }
