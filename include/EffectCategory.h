@@ -25,7 +25,8 @@
 
 #include <QLabel>
 #include <QList>
-#include <qlist.h>
+#include <QDomElement>
+#include <QDomDocument>
 
 #include "lmms_export.h"
 namespace lmms {
@@ -54,6 +55,7 @@ private:
 	std::map<QString, EffectCategoryData> m_categories_map;
 	QStringList getCategoriesFromMap(std::map<QString, EffectCategoryData> map);
 	void loadData();
+	QDomElement createXMLTag(QDomDocument doc, QString tagName, QString value);
 };
 
 // Short-hand function
