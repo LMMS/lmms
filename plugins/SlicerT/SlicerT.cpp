@@ -183,12 +183,6 @@ void SlicerT::findSlices()
 		}
 	}
 
-	for (f_cnt_t i = 0; i < m_originalSample.frames(); i++)
-	{
-		singleChannel[i] = (m_originalSample.data()[i][0] + m_originalSample.data()[i][1]) / 2;
-		maxMag = std::max(maxMag, singleChannel[i]);
-	}
-
 	// normalize and find 0 crossings
 	std::vector<int> zeroCrossings;
 	float lastValue = 1;
