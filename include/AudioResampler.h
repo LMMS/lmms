@@ -73,6 +73,11 @@ public:
 	 */
 	explicit AudioResampler(Mode mode, ch_cnt_t channels = 2, bool interleaved = false);
 
+	AudioResampler(const AudioResampler&) = delete;
+	auto operator=(const AudioResampler&) -> AudioResampler& = delete;
+	AudioResampler(AudioResampler&&) noexcept = default;
+	auto operator=(AudioResampler&&) noexcept -> AudioResampler& = default;
+
 	/**
 	 * @brief Process a block of interleaved audio input from `input` and resample it into `output`.
 	 *
@@ -151,7 +156,6 @@ private:
 	ch_cnt_t m_channels = 0;
 	bool m_interleaved = false;
 	double m_ratio = 1.0;
-	int m_error = 0;
 };
 
 } // namespace lmms

@@ -61,8 +61,9 @@ AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels, bool interleaved)
 	if (interleaved)
 	{
 		// one single State with `channels` channels
-		auto state = State{src_new(converterType(mode), channels, &m_error)};
-		if (!state) { throw std::runtime_error{src_strerror(m_error)}; }
+		int error = 0;
+		auto state = State{src_new(converterType(mode), channels, &error)};
+		if (!state) { throw std::runtime_error{src_strerror(error)}; }
 		m_states.push_back(std::move(state));
 	}
 	else
@@ -76,8 +77,9 @@ AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels, bool interleaved)
 		m_states.reserve(channels);
 		for (ch_cnt_t ch = 0; ch < channels; ++ch)
 		{
-			auto state = State{src_new(converterType(mode), 1, &m_error)};
-			if (!state) { throw std::runtime_error{src_strerror(m_error)}; }
+			int error = 0;
+			auto state = State{src_new(converterType(mode), 1, &error)};
+			if (!state) { throw std::runtime_error{src_strerror(error)}; }
 			m_states.push_back(std::move(state));
 		}
 	}
@@ -106,9 +108,9 @@ auto AudioResampler::process(InterleavedBufferSpan<const float> input, Interleav
 	data.src_ratio = m_ratio;
 	data.end_of_input = 0;
 
-	if ((m_error = src_process(static_cast<SRC_STATE*>(m_states[0].get()), &data)))
+	if (auto error = src_process(static_cast<SRC_STATE*>(m_states[0].get()), &data))
 	{
-		throw std::runtime_error{src_strerror(m_error)};
+		throw std::runtime_error{src_strerror(error)};
 	}
 
 	return {static_cast<f_cnt_t>(data.input_frames_used), static_cast<f_cnt_t>(data.output_frames_gen)};
@@ -141,9 +143,9 @@ auto AudioResampler::process(PlanarBufferSpan<const float> input, PlanarBufferSp
 		data.src_ratio = m_ratio;
 		data.end_of_input = 0;
 
-		if ((m_error = src_process(static_cast<SRC_STATE*>(m_states[ch].get()), &data)))
+		if (auto error = src_process(static_cast<SRC_STATE*>(m_states[ch].get()), &data))
 		{
-			throw std::runtime_error{src_strerror(m_error)};
+			throw std::runtime_error{src_strerror(error)};
 		}
 
 		if (ch > 0)
@@ -177,9 +179,9 @@ void AudioResampler::reset()
 {
 	for (const State& state : m_states)
 	{
-		if ((m_error = src_reset(static_cast<SRC_STATE*>(state.get()))))
+		if (auto error = src_reset(static_cast<SRC_STATE*>(state.get())))
 		{
-			throw std::runtime_error{src_strerror(m_error)};
+			throw std::runtime_error{src_strerror(error)};
 		}
 	}
 }
