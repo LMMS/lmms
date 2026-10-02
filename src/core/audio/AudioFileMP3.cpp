@@ -28,6 +28,7 @@
 #ifdef LMMS_HAVE_MP3LAME
 
 #include <cassert>
+#include <memory>
 
 namespace lmms
 {

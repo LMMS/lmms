@@ -24,9 +24,11 @@
  */
 
 #include "AudioFileWave.h"
-#include "endian_handling.h"
-#include "AudioEngine.h"
 
+#include <memory>
+
+#include "AudioEngine.h"
+#include "endian_handling.h"
 
 namespace lmms
 {
