@@ -31,6 +31,7 @@
 
 #include <lilv/lilv.h>
 #include <memory>
+#include <span>
 #include <vector>
 
 #include "Flags.h"
@@ -40,8 +41,6 @@
 
 namespace lmms
 {
-
-class SampleFrame;
 
 struct ConnectPortVisitor;
 using LV2_Evbuf = struct LV2_Evbuf_Impl;
