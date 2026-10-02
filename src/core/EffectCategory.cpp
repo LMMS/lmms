@@ -270,6 +270,7 @@ const QString defaultCategory = "Other";
 const QString effectCategoriesFolder
 	= QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QDir::separator() + "lmms";
 const QString effectCategoriesFileName = effectCategoriesFolder + QDir::separator() + "lmms_effect_categories.xml";
+const QString effectsRootTag = "effects";
 const QString effectTag = "effect";
 const QString effectNameTag = "name";
 const QString effectCategoryTag = "category";
@@ -351,14 +352,16 @@ void EffectCategory::save()
 	QDomDocument doc("effect-categories");
 	QDir dir;
 	if (!dir.exists(effectCategoriesFolder)) { dir.mkpath(effectCategoriesFolder); }
+	QDomElement effectsRoot = doc.createElement(effectsRootTag);
 	for (auto& effect : m_categories_map)
 	{
 		QDomElement effectData = doc.createElement(effectTag);
 		effectData.appendChild(createXMLTag(doc, effectNameTag, effect.first));
 		effectData.appendChild(createXMLTag(doc, effectCategoryTag, effect.second.m_category));
 		effectData.appendChild(createXMLTag(doc, effectFavoriteTag, effect.second.m_is_favorite ? "1" : "0"));
-		doc.appendChild(effectData);
+		effectsRoot.appendChild(effectData);
 	}
+	doc.appendChild(effectsRoot);
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString(2);
 	QFile outfile(effectCategoriesFileName);
 	outfile.open(QIODevice::ReadWrite);
@@ -388,12 +391,12 @@ void EffectCategory::loadData()
 		doc.setContent(&effectCategoriesFile);
 		QDomElement root = doc.documentElement();
 		QDomNodeList effects = root.elementsByTagName(effectTag);
-		for(int effect_idx = 0; effect_idx < effects.size(); ++effect_idx) 
+		for (int effect_idx = 0; effect_idx < effects.size(); ++effect_idx)
 		{
 			QDomElement effectElement = effects.at(effect_idx).toElement();
-			QString name = effectElement.elementsByTagName(effectNameTag).at(0).nodeValue();
-			QString category = effectElement.elementsByTagName(effectCategoryTag).at(0).nodeValue();
-			bool isFavorite = effectElement.elementsByTagName(effectFavoriteTag).at(0).nodeValue() == "1";
+			QString name = effectElement.elementsByTagName(effectNameTag).at(0).toElement().text();
+			QString category = effectElement.elementsByTagName(effectCategoryTag).at(0).toElement().text();
+			bool isFavorite = effectElement.elementsByTagName(effectFavoriteTag).at(0).toElement().text() == "1";
 			m_categories_map[name] = {category, isFavorite};
 		}
 		return;
