@@ -359,7 +359,7 @@ public:
 
 	constexpr auto dataView() noexcept -> std::span<T>
 	{
-		return std::span<T>{this->m_data, this->m_frames * Base::channels()};
+		return {this->m_data, static_cast<std::size_t>(this->m_frames * Base::channels())};
 	}
 
 	//! @return the sample at the given channel and frame indicies
@@ -489,13 +489,13 @@ public:
 	auto asSampleFrames() noexcept -> std::span<SampleFrame>
 		requires (std::is_same_v<T, float> && channelCount == 2)
 	{
-		return {reinterpret_cast<SampleFrame*>(this->m_data), this->m_frames};
+		return {reinterpret_cast<SampleFrame*>(this->m_data), static_cast<std::size_t>(this->m_frames)};
 	}
 
 	auto asSampleFrames() const noexcept -> std::span<const SampleFrame>
 		requires (std::is_same_v<T, const float> && channelCount == 2)
 	{
-		return {reinterpret_cast<const SampleFrame*>(this->m_data), this->m_frames};
+		return {reinterpret_cast<const SampleFrame*>(this->m_data), static_cast<std::size_t>(this->m_frames)};
 	}
 
 	/**
@@ -577,14 +577,14 @@ public:
 	//! @return the buffer of the given channel
 	constexpr auto buffer(ch_cnt_t channel) const noexcept -> std::span<T>
 	{
-		return {bufferPtr(channel), this->m_frames};
+		return {bufferPtr(channel), static_cast<std::size_t>(this->m_frames)};
 	}
 
 	//! @return the buffer of the given channel
 	template<ch_cnt_t channel> requires (channelCount != DynamicChannelCount)
 	constexpr auto buffer() const noexcept -> std::span<T>
 	{
-		return {bufferPtr<channel>(), this->m_frames};
+		return {bufferPtr<channel>(), static_cast<std::size_t>(this->m_frames)};
 	}
 
 	/**
@@ -797,14 +797,14 @@ public:
 	//! @return the buffer of the given channel
 	constexpr auto buffer(ch_cnt_t channel) const noexcept -> std::span<T>
 	{
-		return {bufferPtr(channel), this->m_frames};
+		return {bufferPtr(channel), static_cast<std::size_t>(this->m_frames)};
 	}
 
 	//! @return the buffer of the given channel
 	template<ch_cnt_t channel> requires (channelCount != DynamicChannelCount)
 	constexpr auto buffer() const noexcept -> std::span<T>
 	{
-		return {bufferPtr<channel>(), this->m_frames};
+		return {bufferPtr<channel>(), static_cast<std::size_t>(this->m_frames)};
 	}
 
 	/**
