@@ -161,11 +161,10 @@ void AudioEngine::preparePushInputFrames(f_cnt_t framesNeeded)
 	auto& sourceBuffer = m_inputBufferSource[m_inputBufferWrite];
 	auto& channelBuffer = m_inputBufferChannels[m_inputBufferWrite];
 	const auto channels = static_cast<ch_cnt_t>(channelBuffer.size());
-	const auto totalSamplesNeeded = framesNeeded * channels;
+	const auto totalSamplesNeeded = static_cast<std::size_t>(framesNeeded * channels);
 
-	if (totalSamplesNeeded > sourceBuffer.size())
+	if (const auto oldSize = sourceBuffer.size(); totalSamplesNeeded > oldSize)
 	{
-		const auto oldSize = sourceBuffer.size();
 		const auto newSize = std::max(oldSize * 2, totalSamplesNeeded);
 		sourceBuffer.resize(newSize);
 
