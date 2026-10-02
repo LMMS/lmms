@@ -378,6 +378,7 @@ private:
 	f_cnt_t m_framesPerPeriod;
 	sample_rate_t m_baseSampleRate;
 
+	// TODO: Use AudioBuffer m_inputBuffer[2];
 	std::vector<float> m_inputBufferSource[2];
 	std::vector<float*> m_inputBufferChannels[2]; //!< points into m_inputBufferSource
 	f_cnt_t m_inputBufferFrames[2];

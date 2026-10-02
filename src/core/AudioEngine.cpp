@@ -156,30 +156,36 @@ bool AudioEngine::criticalXRuns() const
 
 void AudioEngine::preparePushInputFrames(f_cnt_t framesNeeded)
 {
-	const f_cnt_t frames = m_inputBufferFrames[m_inputBufferWrite];
-
 	auto& sourceBuffer = m_inputBufferSource[m_inputBufferWrite];
 	auto& channelBuffer = m_inputBufferChannels[m_inputBufferWrite];
 	const auto channels = static_cast<ch_cnt_t>(channelBuffer.size());
 	const auto totalSamplesNeeded = static_cast<std::size_t>(framesNeeded * channels);
 
+	// Check if we need to grow the source buffer
 	if (const auto oldSize = sourceBuffer.size(); totalSamplesNeeded > oldSize)
 	{
 		const auto newSize = std::max(oldSize * 2, totalSamplesNeeded);
-		sourceBuffer.resize(newSize);
+		const auto newFramesCapacity = static_cast<f_cnt_t>(newSize / channels);
+		const auto oldFramesCapacity = static_cast<f_cnt_t>(oldSize / channels);
+		const auto oldFramesWritten = m_inputBufferFrames[m_inputBufferWrite];
+		assert(oldFramesWritten <= oldFramesCapacity);
 
-		// Data for each channel in the source buffer (besides the first) needs
-		// to be moved to its new starting position
-		assert(channels > 0);
-		for (ch_cnt_t ch = channels - 1; ch > 0; --ch)
+		auto newSourceBuffer = std::vector<float>{};
+		newSourceBuffer.reserve(newSize);
+		for (ch_cnt_t ch = 0; ch < channels; ++ch)
 		{
-			// Move old data to new starting position for this channel
-			float* newStart = sourceBuffer.data() + ch * framesNeeded;
-			std::move_backward(channelBuffer.at(ch), channelBuffer[ch] + frames, newStart);
+			const float* src = sourceBuffer.data() + (ch * oldFramesCapacity);
 
-			// Update channel buffer
-			channelBuffer[ch] = newStart;
+			// Copy this channel's data from the old buffer
+			const auto it = newSourceBuffer.insert(newSourceBuffer.end(), src, src + oldFramesWritten);
+
+			// Zero the new frames
+			newSourceBuffer.insert(newSourceBuffer.end(), newFramesCapacity - oldFramesWritten, 0.f);
+
+			channelBuffer[ch] = &*it;
 		}
+
+		sourceBuffer = std::move(newSourceBuffer);
 	}
 }
 
