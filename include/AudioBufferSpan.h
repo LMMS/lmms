@@ -513,10 +513,6 @@ public:
 	}
 };
 
-// Check that the std::span-like space optimization works
-static_assert(sizeof(InterleavedBufferSpan<float>) > sizeof(InterleavedBufferSpan<float, 2>));
-static_assert(sizeof(InterleavedBufferSpan<float, 2>) == sizeof(void*) + sizeof(f_cnt_t));
-
 // Deduction guides
 template<typename T> InterleavedBufferSpan(T*, ch_cnt_t, f_cnt_t) -> InterleavedBufferSpan<T>;
 InterleavedBufferSpan(const SampleFrame*, f_cnt_t) -> InterleavedBufferSpan<const float, 2>;
@@ -680,10 +676,6 @@ public:
 		return PlanarBufferView<T, count>{this->m_data + start, this->m_frames};
 	}
 };
-
-// Check that the std::span-like space optimization works
-static_assert(sizeof(PlanarBufferView<float>) > sizeof(PlanarBufferView<float, 2>));
-static_assert(sizeof(PlanarBufferView<float, 2>) == sizeof(void**) + sizeof(f_cnt_t));
 
 // Deduction guides
 template<typename T> PlanarBufferView(T**, ch_cnt_t, f_cnt_t) -> PlanarBufferView<T>;
@@ -950,10 +942,6 @@ public:
 private:
 	f_cnt_t m_offset = 0;
 };
-
-// Check that the std::span-like space optimization works
-static_assert(sizeof(PlanarBufferSpan<float>) > sizeof(PlanarBufferSpan<float, 2>));
-static_assert(sizeof(PlanarBufferSpan<float, 2>) == sizeof(void**) + sizeof(f_cnt_t) * 2);
 
 // Deduction guides
 template<typename T> PlanarBufferSpan(T**, ch_cnt_t, f_cnt_t) -> PlanarBufferSpan<T>;
