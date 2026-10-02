@@ -61,9 +61,6 @@
 namespace lmms
 {
 
-// this doesn't seem to be defined anywhere
-static const double ticksPerBeat = 48.0;
-
 /*
  * Current TODO items:
  *  - get plugin instance name (to use in external window title)
@@ -514,10 +511,10 @@ void CarlaInstrument::play(SampleFrame* workingBuffer)
     fTimeInfo.bbt.bar  = s->getBars() + 1;
     fTimeInfo.bbt.beat = s->getBeat() + 1;
     fTimeInfo.bbt.tick = s->getBeatTicks();
-    fTimeInfo.bbt.barStartTick   = ticksPerBeat*s->getTimeSigModel().getNumerator()*s->getBars();
+    fTimeInfo.bbt.barStartTick   = DefaultTicksPerBeat * s->getTimeSigModel().getNumerator() * s->getBars();
     fTimeInfo.bbt.beatsPerBar    = s->getTimeSigModel().getNumerator();
     fTimeInfo.bbt.beatType       = s->getTimeSigModel().getDenominator();
-    fTimeInfo.bbt.ticksPerBeat   = ticksPerBeat;
+    fTimeInfo.bbt.ticksPerBeat   = DefaultTicksPerBeat;
     fTimeInfo.bbt.beatsPerMinute = s->getTempo();
 
 #ifndef _MSC_VER

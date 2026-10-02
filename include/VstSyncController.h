@@ -28,11 +28,14 @@
 
 #include <QObject>
 
+#include "LmmsTypes.h"
 #include "SharedMemory.h"
 #include "VstSyncData.h"  // IWYU pragma: keep
 
 namespace lmms
 {
+
+class Timeline;
 
 class VstSyncController : public QObject
 {
@@ -40,11 +43,11 @@ class VstSyncController : public QObject
 public:
 	VstSyncController();
 
-	void setAbsolutePosition(double ticks);
+	void setAbsolutePosition(const Timeline& timeline);
 	void setPlaybackState(bool enabled);
 	void setTempo(int newTempo);
 	void setTimeSignature(int num, int denom);
-	void startCycle(int startTick, int endTick);
+	void startCycle(tick_t startTick, tick_t endTick);
 	void stopCycle();
 	void setPlaybackJumped(bool jumped);
 	void update();
