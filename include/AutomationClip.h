@@ -200,7 +200,7 @@ public:
 		return supportsTangentEditing(m_progressionType);
 	}
 
-	float valueAt( const TimePos & _time ) const;
+	float valueAt(const TimePos& _time, bool wantInValue = false) const;
 	float *valuesAfter( const TimePos & _time ) const;
 
 	QString name() const;
@@ -251,7 +251,7 @@ private:
 	void cleanObjects();
 	void generateTangents();
 	void generateTangents(timeMap::iterator it, int numToGenerate);
-	float valueAt( timeMap::const_iterator v, int offset ) const;
+	float valueAt(timeMap::const_iterator v, int offset) const;
 
 	/**
 	 * @brief
