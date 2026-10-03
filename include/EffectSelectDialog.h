@@ -60,16 +60,24 @@ public:
 		invalidateFilter();
 	}
 
+	void setFavoriteOnlyFilter(const bool filter)
+	{
+		m_effectFavoriteOnlyFilter = filter;
+		invalidateFilter();
+	}
+
 protected:
 	bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
 	{
 		QModelIndex nameIndex = sourceModel()->index(source_row, 0, source_parent);
 		QModelIndex categoryIndex = sourceModel()->index(source_row, 1, source_parent);
 		QModelIndex typeIndex = sourceModel()->index(source_row, 2, source_parent);
+		QModelIndex favoriteIndex = sourceModel()->index(source_row, 3, source_parent);
 
 		QString name = sourceModel()->data(nameIndex, Qt::DisplayRole).toString();
 		QString category = sourceModel()->data(categoryIndex, Qt::DisplayRole).toString();
 		QString type = sourceModel()->data(typeIndex, Qt::DisplayRole).toString();
+		bool isFavorite = !sourceModel()->data(favoriteIndex, Qt::DecorationRole).isNull();
 
 		QRegularExpression nameRegularExpression(filterRegularExpression());
 		nameRegularExpression.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
@@ -77,13 +85,15 @@ protected:
 		bool nameFilterPassed = nameRegularExpression.match(name).capturedStart() != -1;
 		bool typeFilterPassed = type.contains(m_effectTypeFilter, Qt::CaseInsensitive);
 		bool categoryFilterPassed = category.contains(m_effectCategoryFilter, Qt::CaseInsensitive);
+		bool favoriteOnlyFilterPassed = isFavorite == m_effectFavoriteOnlyFilter;
 
-		return nameFilterPassed && typeFilterPassed && categoryFilterPassed;
+		return nameFilterPassed && typeFilterPassed && categoryFilterPassed && favoriteOnlyFilterPassed;
 	}
 
 private:
 	QString m_effectTypeFilter;
 	QString m_effectCategoryFilter;
+	bool m_effectFavoriteOnlyFilter;
 };
 
 
@@ -115,6 +125,7 @@ private:
 	QHBoxLayout* buildFiltersLayout();
 	QHBoxLayout* buildTypeFilterLayout();
 	QHBoxLayout* buildCategoryFilterLayout();
+	QHBoxLayout* buildFavoriteOnlyFilterLayout();
 };
 
 } // namespace lmms::gui

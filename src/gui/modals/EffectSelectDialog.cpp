@@ -26,6 +26,7 @@
 #include "EffectSelectDialog.h"
 
 #include <QApplication>
+#include <QComboBox>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -33,14 +34,19 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollArea>
 #include <QTableView>
 #include <QVBoxLayout>
-#include <QComboBox>
-#include <QLabel>
-#include <QList>
+#include <QCheckBox>
+#include <qboxlayout.h>
+#include <qcheckbox.h>
+#include <qicon.h>
+#include <qlabel.h>
+#include <qnamespace.h>
+#include <qstandarditemmodel.h>
 
 #include "DummyEffect.h"
 #include "EffectCategory.h"
@@ -48,8 +54,7 @@
 #include "PluginFactory.h"
 #include "embed.h"
 
-namespace lmms::gui 
-{
+namespace lmms::gui {
 
 EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	: QDialog(parent)
@@ -68,6 +73,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 
 	// Query effects
 	EffectKeyList subPluginEffectKeys;
+	QIcon favoriteIcon = QIcon(embed::getIconPixmap("star"));
 	for (const auto desc : getPluginFactory()->descriptors(Plugin::Type::Effect))
 	{
 		if (desc->subPluginFeatures) { desc->subPluginFeatures->listSubPluginKeys(desc, subPluginEffectKeys); }
@@ -82,11 +88,14 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	m_sourceModel.setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
 	m_sourceModel.setHorizontalHeaderItem(1, new QStandardItem(tr("Category")));
 	m_sourceModel.setHorizontalHeaderItem(2, new QStandardItem(tr("Type")));
+	QStandardItem* favoriteItemHeader = new QStandardItem();
+	favoriteItemHeader->setIcon(favoriteIcon);
+	m_sourceModel.setHorizontalHeaderItem(3, favoriteItemHeader);
 	int row = 0;
 	for (EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it)
 	{
-		QString name;
 		QString type;
+		QString name;
 		if (it->desc->subPluginFeatures)
 		{
 			name = it->displayName();
@@ -100,6 +109,9 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 		m_sourceModel.setItem(row, 0, new QStandardItem(name));
 		m_sourceModel.setItem(row, 1, new QStandardItem(getEffectCategory()->getCategoryName(name)));
 		m_sourceModel.setItem(row, 2, new QStandardItem(type));
+		QStandardItem* favoriteItem = new QStandardItem();
+		if(getEffectCategory()->getIsFavorite(name)) { favoriteItem->setIcon(favoriteIcon); }
+		m_sourceModel.setItem(row, 3, favoriteItem);
 		++row;
 	}
 
@@ -130,6 +142,8 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	m_pluginList->verticalHeader()->hide();
 	m_pluginList->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 	m_pluginList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+	m_pluginList->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+	m_pluginList->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 	m_pluginList->setFocusPolicy(Qt::NoFocus);
 
 	// Scroll Area
@@ -311,6 +325,7 @@ QHBoxLayout* EffectSelectDialog::buildFiltersLayout()
 	auto* layout = new QHBoxLayout();
 	layout->addLayout(buildTypeFilterLayout());
 	layout->addLayout(buildCategoryFilterLayout());
+	layout->addLayout(buildFavoriteOnlyFilterLayout());
 	return layout;
 }
 
@@ -347,6 +362,20 @@ QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
 	auto* layout = new QHBoxLayout();
 	layout->addWidget(label);
 	layout->addWidget(buttonFilter);
+	return layout;
+}
+
+QHBoxLayout* EffectSelectDialog::buildFavoriteOnlyFilterLayout()
+{
+	auto* checkBoxFilter = new QCheckBox(tr("Favorites only"));
+	connect(checkBoxFilter, &QCheckBox::toggled, this, [this](bool checked) 
+	{
+		m_model.setFavoriteOnlyFilter(checked);
+		updateSelection();
+	});
+	checkBoxFilter->toggled(false);
+	auto* layout = new QHBoxLayout();
+	layout->addWidget(checkBoxFilter);
 	return layout;
 }
 
