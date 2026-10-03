@@ -118,7 +118,6 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 
 
-
 void EffectChain::appendEffect( Effect * _effect )
 {
 	Engine::audioEngine()->requestChangeInModel();
@@ -154,7 +153,6 @@ void EffectChain::removeEffect( Effect * _effect )
 
 	emit dataChanged();
 }
-
 
 
 
