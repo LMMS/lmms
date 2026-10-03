@@ -280,10 +280,10 @@ void EffectView::contextMenuEvent(QContextMenuEvent*)
 						tr("Move &down"),
 						this, SLOT(moveDown()));
 	contextMenu->addSeparator();
-	contextMenu->addAction(embed::getIconPixmap("project_export"),
+	contextMenu->addAction(embed::getIconPixmap("project_save"),
 						tr("&Save as preset"),
 						this, &EffectView::savePreset);
-	contextMenu->addAction(embed::getIconPixmap("project_import"),
+	contextMenu->addAction(embed::getIconPixmap("project_export"),
 						tr("&Load from preset"),
 						this, &EffectView::loadPreset);
 	contextMenu->addSeparator();
