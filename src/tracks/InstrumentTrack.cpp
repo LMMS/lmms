@@ -72,6 +72,7 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_piano(this),
 	m_microtuner()
 {
+	setHookAttributeNames({"tab", "visible", "maximized", "x", "y", "width", "height"});
 	m_pitchModel.setCenterValue( 0 );
 	m_pitchModel.setStrictStepSize(true);
 	m_panningModel.setCenterValue( DefaultPanning );

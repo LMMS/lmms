@@ -39,6 +39,7 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
+#include "EffectChain.h"
 #include "FadeButton.h"
 #include "GuiApplication.h"
 #include "Instrument.h"
@@ -165,6 +166,11 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	setModel( _it );
 
 	onInstrumentChanged();
+	if (_it->deferredHookAttribute("visible").toInt()
+		|| _it->audioBusHandle()->effects()->hasVisibleEffectViewState())
+	{
+		getInstrumentTrackWindow();
+	}
 }
 
 

@@ -29,6 +29,7 @@
 #include "AutomatableModel.h"
 #include "PluginView.h"
 #include "Effect.h"
+#include "SerializingObject.h"
 
 class QGraphicsOpacityEffect;
 class QGroupBox;
@@ -45,7 +46,7 @@ class LedCheckBox;
 class TempoSyncKnob;
 
 
-class EffectView : public PluginView
+class EffectView : public PluginView, public SerializingObjectHook
 {
 	Q_OBJECT
 public:
@@ -81,6 +82,8 @@ signals:
 	void deletedPlugin(EffectView* view);
 
 protected:
+	void saveSettings(QDomDocument& doc, QDomElement& element) override;
+	void loadSettings(const QDomElement& element) override;
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;
 	void modelChanged() override;
