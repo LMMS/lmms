@@ -27,6 +27,8 @@
 
 #include <QMouseEvent>
 
+#include <algorithm>
+
 #include "CaptionMenu.h"
 #include "StringPairDrag.h"
 #include "KeyboardShortcuts.h"
@@ -229,7 +231,7 @@ void AutomatableButtonGroup::addButton( AutomatableButton * _btn )
 
 void AutomatableButtonGroup::removeButton( AutomatableButton * _btn )
 {
-	m_buttons.erase( std::find( m_buttons.begin(), m_buttons.end(), _btn ) );
+	m_buttons.erase(std::ranges::find(m_buttons, _btn));
 	_btn->m_group = nullptr;
 }
 
