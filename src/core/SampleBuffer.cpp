@@ -34,25 +34,11 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_data(data, data + numFrames)
-	, m_sampleRate(sampleRate)
-{
-}
-
 SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate, const QString& audioFile)
 	: m_data(std::move(data))
 	, m_audioFile(audioFile)
 	, m_sampleRate(sampleRate)
 {
-}
-
-void swap(SampleBuffer& first, SampleBuffer& second) noexcept
-{
-	using std::swap;
-	swap(first.m_data, second.m_data);
-	swap(first.m_audioFile, second.m_audioFile);
-	swap(first.m_sampleRate, second.m_sampleRate);
 }
 
 QString SampleBuffer::toBase64() const

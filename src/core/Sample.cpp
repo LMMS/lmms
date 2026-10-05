@@ -26,15 +26,6 @@
 
 namespace lmms {
 
-Sample::Sample(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(data, numFrames, sampleRate))
-	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
-	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
-{
-}
-
 Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
 	: m_buffer(buffer)
 	, m_startFrame(0)
