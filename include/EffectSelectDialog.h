@@ -85,7 +85,7 @@ protected:
 		bool nameFilterPassed = nameRegularExpression.match(name).capturedStart() != -1;
 		bool typeFilterPassed = type.contains(m_effectTypeFilter, Qt::CaseInsensitive);
 		bool categoryFilterPassed = category.contains(m_effectCategoryFilter, Qt::CaseInsensitive);
-		bool favoriteOnlyFilterPassed = isFavorite == m_effectFavoriteOnlyFilter;
+		bool favoriteOnlyFilterPassed = !m_effectFavoriteOnlyFilter || (isFavorite == m_effectFavoriteOnlyFilter);
 
 		return nameFilterPassed && typeFilterPassed && categoryFilterPassed && favoriteOnlyFilterPassed;
 	}
@@ -101,9 +101,11 @@ class EffectSelectDialog : public QDialog
 {
 	Q_OBJECT
 public:
+	Effect* instantiateSelectedPlugin(EffectChain* parent);
 	EffectSelectDialog(QWidget* parent);
 
-	Effect* instantiateSelectedPlugin(EffectChain* parent);
+signals:
+	void refreshData(QString effectName);
 
 protected slots:
 	void acceptSelection();
@@ -126,6 +128,7 @@ private:
 	QHBoxLayout* buildTypeFilterLayout();
 	QHBoxLayout* buildCategoryFilterLayout();
 	QHBoxLayout* buildFavoriteOnlyFilterLayout();
+	void showContextMenu(const QPoint &);
 };
 
 } // namespace lmms::gui

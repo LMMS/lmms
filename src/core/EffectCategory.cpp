@@ -333,17 +333,22 @@ void EffectCategory::setCategory(QString effectName, QString categoryName)
 		m_categories_map[effectName] = {categoryName};
 	}
 	m_categories_list = getCategoriesFromMap(m_categories_map);
+	save();
 }
 
 void EffectCategory::toggleFavorite(QString effectName, bool isFavorite)
 {
+
 	if (m_categories_map.empty()) { loadData(); }
 	if (m_categories_map.find(effectName) != m_categories_map.end())
 	{
 		m_categories_map.at(effectName).m_is_favorite = isFavorite;
-		return;
 	}
-	m_categories_map[effectName] = {defaultCategory, isFavorite};
+	else 
+	{
+		m_categories_map[effectName] = {defaultCategory, isFavorite};
+	}
+	save();
 }
 
 void EffectCategory::save()

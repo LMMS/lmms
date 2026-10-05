@@ -26,6 +26,7 @@
 #include "EffectSelectDialog.h"
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
@@ -35,20 +36,24 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QList>
+#include <QMenu>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollArea>
 #include <QTableView>
 #include <QVBoxLayout>
-#include <QCheckBox>
 #include <qboxlayout.h>
 #include <qcheckbox.h>
+#include <qdebug.h>
+#include <qglobal.h>
 #include <qicon.h>
 #include <qlabel.h>
 #include <qnamespace.h>
+#include <qobjectdefs.h>
 #include <qstandarditemmodel.h>
 
 #include "DummyEffect.h"
+#include "Effect.h"
 #include "EffectCategory.h"
 #include "EffectChain.h"
 #include "PluginFactory.h"
@@ -88,9 +93,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	m_sourceModel.setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
 	m_sourceModel.setHorizontalHeaderItem(1, new QStandardItem(tr("Category")));
 	m_sourceModel.setHorizontalHeaderItem(2, new QStandardItem(tr("Type")));
-	QStandardItem* favoriteItemHeader = new QStandardItem();
-	favoriteItemHeader->setIcon(favoriteIcon);
-	m_sourceModel.setHorizontalHeaderItem(3, favoriteItemHeader);
+	m_sourceModel.setHorizontalHeaderItem(3, new QStandardItem(tr("Favorites")));
 	int row = 0;
 	for (EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it)
 	{
@@ -109,8 +112,18 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 		m_sourceModel.setItem(row, 0, new QStandardItem(name));
 		m_sourceModel.setItem(row, 1, new QStandardItem(getEffectCategory()->getCategoryName(name)));
 		m_sourceModel.setItem(row, 2, new QStandardItem(type));
-		QStandardItem* favoriteItem = new QStandardItem();
-		if(getEffectCategory()->getIsFavorite(name)) { favoriteItem->setIcon(favoriteIcon); }
+		auto* favoriteItem = new QStandardItem();
+		connect(this, &EffectSelectDialog::refreshData, this, [this, name, favoriteIcon, favoriteItem](QString nameToRefresh){
+			if(QString::compare(name, nameToRefresh) == 0)
+			{
+				qDebug() << "refreshing favorite for " + name;
+				favoriteItem->setData(getEffectCategory()->getIsFavorite(name) ? favoriteIcon : QIcon());
+				QModelIndex topLeft = m_sourceModel.index(0, 0);
+				QModelIndex bottomRight = m_sourceModel.index(m_sourceModel.rowCount() - 1, 3);
+				emit m_sourceModel.dataChanged(topLeft, bottomRight, {Qt::DecorationRole});
+			}
+		});
+		if (getEffectCategory()->getIsFavorite(name)) { favoriteItem->setIcon(favoriteIcon); }
 		m_sourceModel.setItem(row, 3, favoriteItem);
 		++row;
 	}
@@ -119,7 +132,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	m_model.setSourceModel(&m_sourceModel);
 	m_model.setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-	QHBoxLayout* mainLayout = new QHBoxLayout(this);
+	auto* mainLayout = new QHBoxLayout(this);
 
 	m_filterEdit = new QLineEdit(this);
 	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
@@ -145,23 +158,25 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	m_pluginList->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
 	m_pluginList->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 	m_pluginList->setFocusPolicy(Qt::NoFocus);
+	m_pluginList->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(m_pluginList, &QTableView::customContextMenuRequested, this, &EffectSelectDialog::showContextMenu);
 
 	// Scroll Area
 	m_scrollArea->setWidgetResizable(true);
-	QWidget* scrollAreaWidgetContents = new QWidget(m_scrollArea);
+	auto* scrollAreaWidgetContents = new QWidget(m_scrollArea);
 	scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
 	m_scrollArea->setWidget(scrollAreaWidgetContents);
 	m_scrollArea->setMaximumHeight(180);
 	m_scrollArea->setFocusPolicy(Qt::NoFocus);
 
 	// Button Box
-	QDialogButtonBox* buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
+	auto* buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
 	buttonBox->setStandardButtons(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
 	buttonBox->setFocusPolicy(Qt::NoFocus);
 	connect(buttonBox, &QDialogButtonBox::accepted, this, &EffectSelectDialog::acceptSelection);
 	connect(buttonBox, &QDialogButtonBox::rejected, this, &EffectSelectDialog::reject);
 
-	QVBoxLayout* rightSectionLayout = new QVBoxLayout();
+	auto* rightSectionLayout = new QVBoxLayout();
 	rightSectionLayout->addWidget(m_filterEdit);
 	rightSectionLayout->addLayout(buildFiltersLayout());
 	rightSectionLayout->addWidget(m_pluginList);
@@ -301,7 +316,7 @@ bool EffectSelectDialog::eventFilter(QObject* obj, QEvent* event)
 {
 	if (obj == this && event->type() == QEvent::KeyPress)
 	{
-		QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+		auto* keyEvent = static_cast<QKeyEvent*>(event);
 		if (keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down)
 		{
 			QItemSelectionModel* selectionModel = m_pluginList->selectionModel();
@@ -377,6 +392,22 @@ QHBoxLayout* EffectSelectDialog::buildFavoriteOnlyFilterLayout()
 	auto* layout = new QHBoxLayout();
 	layout->addWidget(checkBoxFilter);
 	return layout;
+}
+
+void EffectSelectDialog::showContextMenu(const QPoint& pos)
+{
+	QMenu menu(this);
+	QModelIndex selectedItem = m_pluginList->indexAt(pos);
+	QString selectedName = selectedItem.siblingAtColumn(0).data(Qt::DisplayRole).toString();
+	QString selectedCategory = selectedItem.siblingAtColumn(1).data(Qt::DisplayRole).toString();
+	bool selectedIsFavorite = !selectedItem.siblingAtColumn(3).data(Qt::DecorationRole).isNull();
+	auto* setFavoriteAction = new QAction(tr("Toggle favorite"), this);
+	connect(setFavoriteAction, &QAction::triggered, this, [this, selectedName, selectedIsFavorite, selectedItem]() {
+		getEffectCategory()->toggleFavorite(selectedName, !selectedIsFavorite);
+	});
+	menu.addAction(setFavoriteAction);
+	menu.exec(mapToGlobal(pos));
+	emit this->refreshData(selectedName);
 }
 
 } // namespace lmms::gui
