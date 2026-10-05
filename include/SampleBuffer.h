@@ -39,7 +39,7 @@ class LMMS_EXPORT SampleBuffer
 {
 public:
 	SampleBuffer() = default;
-	SampleBuffer(std::vector<SampleFrame> data, int sampleRate, const QString& audioFile = "");
+	SampleBuffer(std::vector<SampleFrame> data, sample_rate_t sampleRate, const QString& audioFile = "");
 
 	auto toBase64() const -> QString;
 
@@ -54,7 +54,7 @@ public:
 
 	static std::shared_ptr<const SampleBuffer> fromFile(const QString& path);
 	static std::shared_ptr<const SampleBuffer> fromBase64(
-		const QString& str, int sampleRate = Engine::audioEngine()->outputSampleRate());
+		const QString& str, sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate());
 
 private:
 	std::vector<SampleFrame> m_data;

@@ -34,7 +34,7 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate, const QString& audioFile)
+SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, sample_rate_t sampleRate, const QString& audioFile)
 	: m_data(std::move(data))
 	, m_audioFile(audioFile)
 	, m_sampleRate(sampleRate)
@@ -88,7 +88,7 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePa
 	return std::make_shared<SampleBuffer>(std::move(data), sampleRate, storedPath);
 }
 
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str, int sampleRate)
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str, sample_rate_t sampleRate)
 {
 	if (str.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
