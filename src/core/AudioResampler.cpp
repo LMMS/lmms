@@ -67,6 +67,9 @@ auto AudioResampler::process(InterleavedBufferView<const float> input, Interleav
 		throw std::invalid_argument{"Invalid channel count"};
 	}
 
+	// libsamplerate throws on empty buffers; bail before touching it.
+	if (input.frames() == 0 || output.frames() == 0) { return {0, 0}; }
+
 	auto data = SRC_DATA{};
 
 	data.data_in = input.data();
