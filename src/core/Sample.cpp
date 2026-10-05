@@ -23,6 +23,8 @@
  */
 
 #include "Sample.h"
+#include "Engine.h"
+#include "AudioEngine.h"
 
 namespace lmms {
 

@@ -27,6 +27,7 @@
 
 #include <memory>
 
+#include "AudioEngine.h"
 #include "AudioResampler.h"
 #include "Note.h"
 #include "SampleBuffer.h"
@@ -69,7 +70,7 @@ public:
 
 	Sample() = default;
 
-	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	Sample(const SampleFrame* data, size_t numFrames, int sampleRate);
 	Sample(const Sample& other);
 	Sample(Sample&& other) noexcept;
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
