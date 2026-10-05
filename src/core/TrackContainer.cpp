@@ -266,7 +266,7 @@ AutomatedValueMap TrackContainer::automatedValuesAt(TimePos time, int clipNum) c
 
 AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, TimePos time, int clipNum)
 {
-	Track::clipVector clips;
+	Track::clipVector clipsBeforeTime, clipsAfterTime;
 
 	for (Track* track: tracks)
 	{
@@ -280,10 +280,11 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 		case Track::Type::HiddenAutomation:
 		case Track::Type::Pattern:
 			if (clipNum < 0) {
-				track->getClipsInRange(clips, 0, time);
+				track->getClipsInRange(clipsBeforeTime, 0, time);
+				track->getClipsInRange(clipsAfterTime, time, TimePos::stepPosition(track->length()) * TimePos::ticksPerBar());
 			} else {
 				Q_ASSERT(track->numOfClips() > clipNum);
-				clips.push_back(track->getClip(clipNum));
+				clipsBeforeTime.push_back(track->getClip(clipNum));
 			}
 		default:
 			break;
@@ -292,9 +293,36 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 
 	AutomatedValueMap valueMap;
 
-	Q_ASSERT(std::is_sorted(clips.begin(), clips.end(), Clip::comparePosition));
+	Q_ASSERT(std::is_sorted(clipsBeforeTime.begin(), clipsBeforeTime.end(), Clip::comparePosition));
 
-	for(Clip* clip : clips)
+	if (clipsAfterTime.size() > 0)
+	{
+		// Set the value of every automatable model to the value of the first node of the closest relevent automation
+		// clip after the current time if there is any.
+		for (int i = clipsAfterTime.size() - 1; i >= 0; i--)
+		{
+			Clip* clip = clipsAfterTime[i];
+			
+			if (clip->isMuted() || clip->startPosition() < time) {
+				continue;
+			}
+
+			if (auto* p = dynamic_cast<AutomationClip *>(clip))
+			{
+				if (! p->hasAutomation()) {
+					continue;
+				}
+				float value = p->valueAt(0);
+
+				for (AutomatableModel* model : p->objects())
+				{
+					valueMap[model] = value;
+				}
+			}
+		}
+	}
+
+	for(Clip* clip : clipsBeforeTime)
 	{
 		if (clip->isMuted() || clip->startPosition() > time) {
 			continue;
