@@ -16,6 +16,7 @@ set(LMMS_SRCS
 	core/Clipboard.cpp
 	core/ComboBoxModel.cpp
 	core/ConfigManager.cpp
+	core/ControlSurface.cpp
 	core/Controller.cpp
 	core/ControllerConnection.cpp
 	core/DataFile.cpp
@@ -118,6 +119,7 @@ set(LMMS_SRCS
 	core/lv2/Lv2UridMap.cpp
 	core/lv2/Lv2Worker.cpp
 
+	core/midi/ControlSurfaceMCU.cpp
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp
 	core/midi/MidiClient.cpp

@@ -258,6 +258,9 @@ public:
 	//! Returns a non-owning pointer to the model for the knob at the given index in the track's MIDI CC rack
 	FloatModel* midiCCModel(int index) const { return m_midiCCModel[index].get(); }
 
+        /// Gets the auto assigned track (more or less the selected track).
+        static InstrumentTrack* getAutoAssignedTrack() { return InstrumentTrack::s_autoAssignedTrack; }
+
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const lmms::Note& );
