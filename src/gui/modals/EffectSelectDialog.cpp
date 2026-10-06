@@ -44,6 +44,7 @@
 #include <QVBoxLayout>
 #include <qboxlayout.h>
 #include <qcheckbox.h>
+#include <qcursor.h>
 #include <qdebug.h>
 #include <qglobal.h>
 #include <qicon.h>
@@ -93,7 +94,10 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	m_sourceModel.setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
 	m_sourceModel.setHorizontalHeaderItem(1, new QStandardItem(tr("Category")));
 	m_sourceModel.setHorizontalHeaderItem(2, new QStandardItem(tr("Type")));
-	m_sourceModel.setHorizontalHeaderItem(3, new QStandardItem(tr("Favorites")));
+	auto* favoritesHeader = new QStandardItem();
+	favoritesHeader->setIcon(favoriteIcon);
+	favoritesHeader->setToolTip(tr("Favorites"));
+	m_sourceModel.setHorizontalHeaderItem(3, favoritesHeader);
 	int row = 0;
 	for (EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it)
 	{
@@ -113,14 +117,12 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 		m_sourceModel.setItem(row, 1, new QStandardItem(getEffectCategory()->getCategoryName(name)));
 		m_sourceModel.setItem(row, 2, new QStandardItem(type));
 		auto* favoriteItem = new QStandardItem();
-		connect(this, &EffectSelectDialog::refreshData, this, [this, name, favoriteIcon, favoriteItem](QString nameToRefresh){
+		connect(this, &EffectSelectDialog::refreshData, this, [this, name, favoriteIcon, favoriteItem, row](QString nameToRefresh){
 			if(QString::compare(name, nameToRefresh) == 0)
 			{
 				qDebug() << "refreshing favorite for " + name;
-				favoriteItem->setData(getEffectCategory()->getIsFavorite(name) ? favoriteIcon : QIcon());
-				QModelIndex topLeft = m_sourceModel.index(0, 0);
-				QModelIndex bottomRight = m_sourceModel.index(m_sourceModel.rowCount() - 1, 3);
-				emit m_sourceModel.dataChanged(topLeft, bottomRight, {Qt::DecorationRole});
+				favoriteItem->setData(getEffectCategory()->getIsFavorite(name) ? favoriteIcon : QIcon(), Qt::DecorationRole);
+				emit m_sourceModel.dataChanged(m_sourceModel.index(row, 3), m_sourceModel.index(row, 3), {Qt::DecorationRole});
 			}
 		});
 		if (getEffectCategory()->getIsFavorite(name)) { favoriteItem->setIcon(favoriteIcon); }
@@ -406,7 +408,7 @@ void EffectSelectDialog::showContextMenu(const QPoint& pos)
 		getEffectCategory()->toggleFavorite(selectedName, !selectedIsFavorite);
 	});
 	menu.addAction(setFavoriteAction);
-	menu.exec(mapToGlobal(pos));
+	menu.exec(QCursor::pos());
 	emit this->refreshData(selectedName);
 }
 
