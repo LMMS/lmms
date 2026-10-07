@@ -33,12 +33,12 @@ template <typename T, typename E>
 class Expected
 {
 public:
-	constexpr explicit Expected(T expected)
+	constexpr Expected(T expected)
 		: m_value{std::move(expected)}
 	{
 	}
 
-	constexpr explicit Expected(E unexpected)
+	constexpr Expected(E unexpected)
 		: m_value{std::move(unexpected)}
 	{
 	}
