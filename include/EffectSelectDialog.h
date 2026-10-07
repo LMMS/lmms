@@ -32,6 +32,8 @@
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QHBoxLayout>
+#include <qlist.h>
+#include <qobject.h>
 
 class QScrollArea;
 class QTableView;
@@ -126,9 +128,11 @@ private:
 	QLineEdit* m_filterEdit;
 	QHBoxLayout* buildFiltersLayout();
 	QHBoxLayout* buildTypeFilterLayout();
+	QStringList getEffectCategoryLabels();
 	QHBoxLayout* buildCategoryFilterLayout();
 	QHBoxLayout* buildFavoriteOnlyFilterLayout();
 	void showContextMenu(const QPoint &);
+	void showEffectCategoryEditDialog(QString effectName, QString currentCategory);
 };
 
 } // namespace lmms::gui

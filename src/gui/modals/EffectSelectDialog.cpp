@@ -42,14 +42,19 @@
 #include <QScrollArea>
 #include <QTableView>
 #include <QVBoxLayout>
+#include <QCompleter>
+#include <qaction.h>
 #include <qboxlayout.h>
 #include <qcheckbox.h>
 #include <qcursor.h>
 #include <qdebug.h>
+#include <qdialog.h>
+#include <qdialogbuttonbox.h>
 #include <qglobal.h>
 #include <qicon.h>
 #include <qlabel.h>
 #include <qnamespace.h>
+#include <qobject.h>
 #include <qobjectdefs.h>
 #include <qstandarditemmodel.h>
 
@@ -114,7 +119,17 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 			type = "LMMS";
 		}
 		m_sourceModel.setItem(row, 0, new QStandardItem(name));
-		m_sourceModel.setItem(row, 1, new QStandardItem(getEffectCategory()->getCategoryName(name)));
+		auto* categoryItem = new QStandardItem(getEffectCategory()->getCategoryName(name));
+		connect(this, &EffectSelectDialog::refreshData, this, [this, name, categoryItem, row](QString nameToRefresh){
+			if(QString::compare(name, nameToRefresh) == 0)
+			{
+				qDebug() << "refreshing category for " + name;
+				categoryItem->setData(getEffectCategory()->getCategoryName(name), Qt::DisplayRole);
+				emit m_sourceModel.dataChanged(m_sourceModel.index(row, 1), m_sourceModel.index(row, 1), {Qt::DisplayRole});
+
+			}
+		});
+		m_sourceModel.setItem(row, 1, categoryItem);
 		m_sourceModel.setItem(row, 2, new QStandardItem(type));
 		auto* favoriteItem = new QStandardItem();
 		connect(this, &EffectSelectDialog::refreshData, this, [this, name, favoriteIcon, favoriteItem, row](QString nameToRefresh){
@@ -363,18 +378,26 @@ QHBoxLayout* EffectSelectDialog::buildTypeFilterLayout()
 	return layout;
 }
 
+QStringList EffectSelectDialog::getEffectCategoryLabels(){
+	QStringList categories = getEffectCategory()->getCategories();
+	QStringList labels = categories;
+	labels.push_front(tr("All"));
+	return labels;
+}
+
 QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
 {
 	auto* label = new QLabel(tr("Category"));
 	auto* buttonFilter = new QComboBox();
-	QStringList categories = getEffectCategory()->getCategories();
-	QStringList labels = categories;
-	labels.push_front(tr("All"));
-	buttonFilter->addItems(labels);
+	buttonFilter->addItems(getEffectCategoryLabels());
 	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) 
 	{
 		m_model.setEffectCategoryFilter(value == tr("All") ? "" : value);
 		updateSelection();
+	});
+	connect(this, &EffectSelectDialog::refreshData, this, [this, buttonFilter](QString value){
+		buttonFilter->clear();
+		buttonFilter->addItems(getEffectCategoryLabels());
 	});
 	auto* layout = new QHBoxLayout();
 	layout->addWidget(label);
@@ -404,12 +427,46 @@ void EffectSelectDialog::showContextMenu(const QPoint& pos)
 	QString selectedCategory = selectedItem.siblingAtColumn(1).data(Qt::DisplayRole).toString();
 	bool selectedIsFavorite = !selectedItem.siblingAtColumn(3).data(Qt::DecorationRole).isNull();
 	auto* setFavoriteAction = new QAction(tr("Toggle favorite"), this);
-	connect(setFavoriteAction, &QAction::triggered, this, [this, selectedName, selectedIsFavorite, selectedItem]() {
+	connect(setFavoriteAction, &QAction::triggered, this, [selectedName, selectedIsFavorite]() {
 		getEffectCategory()->toggleFavorite(selectedName, !selectedIsFavorite);
 	});
 	menu.addAction(setFavoriteAction);
+	auto* setCategoryAction = new QAction(tr("Set category"), this);
+	connect(setCategoryAction, &QAction::triggered, this, [this, selectedName, selectedCategory](){
+		showEffectCategoryEditDialog(selectedName, selectedCategory);
+	});
+	menu.addAction(setCategoryAction);
 	menu.exec(QCursor::pos());
 	emit this->refreshData(selectedName);
+}
+
+void EffectSelectDialog::showEffectCategoryEditDialog(QString effectName, QString currentCategory)
+{
+	qDebug() << "Showing dialog for " + effectName;
+	auto* effectSelectDialog = new QDialog(this);
+	effectSelectDialog->setWindowTitle(tr("Set the effect category for ") + effectName);
+	effectSelectDialog->resize(200, 50);
+	auto* layout = new QVBoxLayout();
+	auto* buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
+	auto* label = new QLabel();
+	label->setText(tr("Set the effect category for ") + effectName);
+	layout->addWidget(label);
+	auto* lineEdit = new QLineEdit(this);
+	auto* completer = new QCompleter(getEffectCategory()->getCategories(), this);
+	completer->setCaseSensitivity(Qt::CaseInsensitive);
+	lineEdit->setCompleter(completer);
+	lineEdit->setText(currentCategory);
+	layout->addWidget(lineEdit);
+	buttonBox->setStandardButtons(QDialogButtonBox::Ok);
+	buttonBox->setFocusPolicy(Qt::NoFocus);
+	layout->addWidget(buttonBox);
+	effectSelectDialog->setLayout(layout);
+	connect(buttonBox, &QDialogButtonBox::accepted, this, [this, lineEdit, effectName, effectSelectDialog](){
+		getEffectCategory()->setCategory(effectName,lineEdit->text());
+		refreshData(effectName);
+		effectSelectDialog->close();
+	});
+	effectSelectDialog->exec();
 }
 
 } // namespace lmms::gui
