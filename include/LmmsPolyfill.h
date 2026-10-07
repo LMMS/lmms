@@ -44,8 +44,12 @@ public:
 	}
 
 	operator bool() const { return std::holds_alternative<T>(m_value); }
-    auto value() const -> const T& { return std::get<T>(m_value); }
-	auto error() const -> const E& { return std::get<E>(m_value); }
+
+	constexpr auto value() -> T& { return std::get<T>(m_value); }
+	constexpr auto value() const -> const T& { return std::get<T>(m_value); }
+
+	constexpr auto error() -> E& { return std::get<E>(m_value); }
+	constexpr auto error() const -> const E& { return std::get<E>(m_value); }
 
 private:
 	std::variant<T, E> m_value;
