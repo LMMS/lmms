@@ -45,10 +45,10 @@ class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:
-	VstPlugin( const QString & _plugin );
+	VstPlugin(const QString & _plugin, bool skipInit = false);
 	~VstPlugin() override;
 
-	void tryLoad( const QString &remoteVstPluginExecutable );
+	void tryLoad(const QString &remoteVstPluginExecutable, bool skipInit = false);
 
 	bool processMessage( const message & _m ) override;
 
@@ -100,6 +100,16 @@ public:
 	const std::vector<QString>& allParameterDisplays() const
 	{
 		return m_allParameterDisplays;
+	}
+
+	inline const QString& uniqueID() const
+	{
+		return m_uniqueID;
+	}
+
+	inline bool isSynth() const
+	{
+		return m_isSynth;
 	}
 
 	int currentProgram();
@@ -165,6 +175,8 @@ private:
 	QString m_allProgramNames;
 	std::vector<QString> m_allParameterLabels;
 	std::vector<QString> m_allParameterDisplays;
+	QString m_uniqueID;
+	bool m_isSynth;
 
 	QString p_name;
 
