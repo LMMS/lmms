@@ -160,9 +160,37 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 			this, SLOT(updateSampleVars()), Qt::DirectConnection );
 	connect( &m_x100Model, SIGNAL(dataChanged()),
 			this, SLOT(updateSampleVars()), Qt::DirectConnection );
-
+	connect( &m_controlEnvAmountModel, SIGNAL(dataChanged()), 
+			this, SLOT(updateSampleVars()), Qt::DirectConnection );
+	
 	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()),
 				this, SLOT(updateSampleVars()));
+
+	connect( &m_predelayModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerEnvelope()), Qt::DirectConnection );
+	connect( &m_attackModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerEnvelope()), Qt::DirectConnection );
+	connect( &m_holdModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerEnvelope()), Qt::DirectConnection );
+	connect(&m_decayModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerEnvelope()), Qt::DirectConnection );
+	connect( &m_releaseModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerEnvelope()), Qt::DirectConnection );
+	connect( &m_sustainModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerEnvelope()), Qt::DirectConnection );
+
+	connect( &m_lfoPredelayModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerLfo()), Qt::DirectConnection );
+	connect( &m_lfoAttackModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerLfo()), Qt::DirectConnection );
+	connect( &m_lfoSpeedModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerLfo()), Qt::DirectConnection );
+	connect( &m_lfoWaveModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerLfo()), Qt::DirectConnection );
+	connect( &m_x100Model, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerLfo()), Qt::DirectConnection );
+	connect( &m_controlEnvAmountModel, SIGNAL(dataChanged()), 
+					this, SLOT(dataChangeTriggerLfo()), Qt::DirectConnection );
 
 
 	m_lfoShapeData =
@@ -396,8 +424,21 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	updateSampleVars();
 }
 
+void EnvelopeAndLfoParameters::dataChangeTriggerEnvelope()
+{
+	if (m_amountModel.value() == 0) 
+	{ 
+		m_amountModel.setValue(1); 
+	}
+}
 
-
+void EnvelopeAndLfoParameters::dataChangeTriggerLfo()
+{
+	if (m_lfoAmountModel.value() == 0) 
+	{ 
+		m_lfoAmountModel.setValue(1); 
+	}
+}
 
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
@@ -534,7 +575,6 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	m_bad_lfoShapeData = true;
 
 	emit dataChanged();
-
 }
 
 
