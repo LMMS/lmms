@@ -31,21 +31,21 @@ namespace lmms {
 
 enum class Error
 {
-    None,
-    SampleNotFound,
-    SampleDecodeFailure
+	None,
+	SampleNotFound,
+	SampleDecodeFailure
 };
 
 constexpr auto errorMessage(Error error) -> std::string_view
 {
-    switch (error)
-    {
+	switch (error)
+	{
 	case Error::None:
-        return "Success";
+		return "Success";
 	case Error::SampleNotFound:
-        return "Sample not found";
+		return "Sample not found";
 	case Error::SampleDecodeFailure:
-        return "Failed to decode sample";
+		return "Failed to decode sample";
 	}
 }
 
