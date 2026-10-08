@@ -40,14 +40,25 @@ public:
 	static constexpr auto DefaultSampleRate = sample_rate_t{44100};
 
 	SampleBuffer() = default;
-	SampleBuffer(std::vector<SampleFrame> data, sample_rate_t sampleRate, const QString& audioFile = "");
+	SampleBuffer(f_cnt_t frames, sample_rate_t sampleRate, const QString& audioFile = "");
+
+	auto operator[](f_cnt_t index) -> SampleFrame& { return m_data[index]; }
+	auto operator[](f_cnt_t index) const -> const SampleFrame& { return m_data[index]; }
+
+	auto begin() { return m_data.begin(); }
+	auto begin() const { return m_data.begin(); }
+
+	auto end() { return m_data.end(); }
+	auto end() const { return m_data.end(); }
 
 	auto toBase64() const -> QString;
 
 	auto audioFile() const -> const QString& { return m_audioFile; }
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
+	auto data() -> SampleFrame* { return m_data.data(); }
 	auto data() const -> const SampleFrame* { return m_data.data(); }
+
 	auto size() const -> f_cnt_t { return m_data.size(); }
 	auto empty() const -> bool { return m_data.empty(); }
 

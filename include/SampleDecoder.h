@@ -30,25 +30,19 @@
 #include <string>
 #include <vector>
 
-#include "SampleFrame.h"
-
 namespace lmms {
+class SampleBuffer;
+
 class SampleDecoder
 {
 public:
-	struct Result
-	{
-		std::vector<SampleFrame> data;
-		int sampleRate;
-	};
-
 	struct AudioType
 	{
 		std::string name;
 		std::string extension;
 	};
 
-	static auto decode(const QString& audioFile) -> std::optional<Result>;
+	static auto decode(const QString& audioFile) -> std::optional<SampleBuffer>;
 	static auto supportedAudioTypes() -> const std::vector<AudioType>&;
 };
 } // namespace lmms

@@ -33,8 +33,8 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, sample_rate_t sampleRate, const QString& audioFile)
-	: m_data(std::move(data))
+SampleBuffer::SampleBuffer(f_cnt_t frames, sample_rate_t sampleRate, const QString& audioFile)
+	: m_data(frames)
 	, m_audioFile(audioFile)
 	, m_sampleRate(sampleRate)
 {
@@ -63,8 +63,7 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePa
 	auto result = SampleDecoder::decode(absolutePath);
 	if (!result) { return nullptr; }
 
-	auto& [data, sampleRate] = *result;
-	return std::make_shared<SampleBuffer>(std::move(data), sampleRate, storedPath);
+	return std::make_shared<const SampleBuffer>(std::move(*result));
 }
 
 std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str, sample_rate_t sampleRate)
@@ -72,9 +71,9 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str,
 	const auto result = QByteArray::fromBase64Encoding(str.toUtf8(), QByteArray::AbortOnBase64DecodingErrors);
 	if (!result || result.decoded.size() % sizeof(SampleFrame) != 0) { return nullptr; }
 
-	auto data = std::vector<SampleFrame>(result.decoded.size() / sizeof(SampleFrame));
-	std::memcpy(data.data(), result.decoded.data(), result.decoded.size());
-	return std::make_shared<SampleBuffer>(std::move(data), sampleRate);
+	auto buffer = SampleBuffer{result.decoded.size() / sizeof(SampleFrame), sampleRate};
+	std::memcpy(buffer.data(), result.decoded.data(), result.decoded.size());
+	return std::make_shared<const SampleBuffer>(std::move(buffer));
 }
 
 } // namespace lmms
