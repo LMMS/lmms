@@ -31,9 +31,9 @@ namespace lmms {
 Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
 	: m_buffer(buffer)
 	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
+	, m_endFrame(m_buffer->frames())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
+	, m_loopEndFrame(m_buffer->frames())
 {
 }
 
@@ -159,7 +159,7 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 		}
 
 		const auto value
-			= m_buffer->data()[m_reversed ? m_buffer->size() - state->m_frameIndex - 1 : state->m_frameIndex]
+			= m_buffer->data()[m_reversed ? m_buffer->frames() - state->m_frameIndex - 1 : state->m_frameIndex]
 			* m_amplification;
 		dst[frame] = value;
 		state->m_backwards ? --state->m_frameIndex : ++state->m_frameIndex;

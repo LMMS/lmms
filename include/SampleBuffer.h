@@ -59,7 +59,7 @@ public:
 	auto data() -> SampleFrame* { return m_data.data(); }
 	auto data() const -> const SampleFrame* { return m_data.data(); }
 
-	auto size() const -> f_cnt_t { return m_data.size(); }
+	auto frames() const -> f_cnt_t { return m_data.size(); }
 	auto empty() const -> bool { return m_data.empty(); }
 
 	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;

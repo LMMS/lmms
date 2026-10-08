@@ -76,7 +76,7 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleBuffer>
 	file.close();
 
 	auto result = SampleBuffer{static_cast<f_cnt_t>(sfInfo.frames), static_cast<sample_rate_t>(sfInfo.samplerate)};
-	for (int i = 0; i < static_cast<int>(result.size()); ++i)
+	for (int i = 0; i < static_cast<int>(result.frames()); ++i)
 	{
 		if (sfInfo.channels == 1)
 		{
@@ -174,7 +174,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuff
 	}
 
 	auto result = SampleBuffer{static_cast<f_cnt_t>(totalSamplesRead / numChannels), sampleRate};
-	for (auto i = std::size_t{0}; i < result.size(); ++i)
+	for (auto i = std::size_t{0}; i < result.frames(); ++i)
 	{
 		if (numChannels == 1) { result[i] = {buffer[i], buffer[i]}; }
 		else if (numChannels > 1) { result[i] = {buffer[i * numChannels], buffer[i * numChannels + 1]}; }
