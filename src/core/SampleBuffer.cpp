@@ -28,7 +28,6 @@
 #include <QMessageBox>
 #include <cstring>
 
-#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleDecoder.h"
 
@@ -58,31 +57,11 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 
 std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePath)
 {
-	if (filePath.isEmpty()) { return SampleBuffer::emptyBuffer(); }
-
 	const auto absolutePath = PathUtil::toAbsolute(filePath);
 	const auto storedPath = PathUtil::toShortestRelative(filePath);
 
 	auto result = SampleDecoder::decode(absolutePath);
-
-	if (!result)
-	{
-		// TODO: Improve error handling. We dont always want to show a message box on failure when there is a GUI (e.g.
-		// when loading the project), and this function also shouldn't be concerned with handling the error.
-		if (gui::getGUI())
-		{
-			QMessageBox::warning(nullptr, QObject::tr("Failed to load sample"),
-				QObject::tr("The sample may be corrupted or unsupported."));
-		}
-		else
-		{
-			qWarning() << QObject::tr(
-				"Failed to load sample at path %1, the file may not exist, be corrupted, or is unsupported.")
-							  .arg(absolutePath);
-		}
-
-		return SampleBuffer::emptyBuffer();
-	}
+	if (!result) { return nullptr; }
 
 	auto& [data, sampleRate] = *result;
 	return std::make_shared<SampleBuffer>(std::move(data), sampleRate, storedPath);
@@ -90,29 +69,11 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePa
 
 std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str, sample_rate_t sampleRate)
 {
-	if (str.isEmpty()) { return SampleBuffer::emptyBuffer(); }
+	const auto result = QByteArray::fromBase64Encoding(str.toUtf8(), QByteArray::AbortOnBase64DecodingErrors);
+	if (!result || result.decoded.size() % sizeof(SampleFrame) != 0) { return nullptr; }
 
-	const auto bytes = QByteArray::fromBase64(str.toUtf8());
-
-	if (bytes.size() % sizeof(SampleFrame) != 0)
-	{
-		// TODO: Improve error handling. We dont always want to show a message box on failure when there is a GUI (e.g.
-		// when loading the project), and this function also shouldn't be concerned with handling the error.
-		if (gui::getGUI())
-		{
-			QMessageBox::warning(
-				nullptr, QObject::tr("Failed to load sample"), QObject::tr("The sample size is invalid."));
-		}
-		else
-		{
-			qWarning() << QObject::tr("Failed to load Base64 sample, invalid size");
-		}
-
-		return SampleBuffer::emptyBuffer();
-	}
-
-	auto data = std::vector<SampleFrame>(bytes.size() / sizeof(SampleFrame));
-	std::memcpy(reinterpret_cast<char*>(data.data()), bytes, bytes.size());
+	auto data = std::vector<SampleFrame>(result.decoded.size() / sizeof(SampleFrame));
+	std::memcpy(data.data(), result.decoded.data(), result.decoded.size());
 	return std::make_shared<SampleBuffer>(std::move(data), sampleRate);
 }
 

@@ -57,7 +57,10 @@ void TapTempo::tap(bool play)
 	if (play)
 	{
 		const auto metronomeFile = m_beat == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg";
-		Engine::audioEngine()->addPlayHandle(new SamplePlayHandle(metronomeFile));
+		if (auto handle = SamplePlayHandle::fromFile(metronomeFile))
+		{
+			Engine::audioEngine()->addPlayHandle(handle);
+		}
 	}
 
 	m_beat = (m_beat + 1) % Engine::getSong()->getTimeSigModel().getNumerator();

@@ -25,6 +25,7 @@
 
 #include "EnvelopeAndLfoView.h"
 
+#include <QMessageBox>
 #include <string_view>
 
 #include <QSizePolicy>
@@ -241,11 +242,20 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		m_params->m_userWave = SampleBuffer::fromFile(value);
-		m_userLfoBtn->model()->setValue( true );
-		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
+		if (auto buffer = SampleBuffer::fromFile(value))
+		{
+			m_params->m_userWave = std::move(buffer);
+			m_userLfoBtn->model()->setValue(true);
+			m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
+			update();
+		}
+		else
+		{
+			QMessageBox::warning(
+				nullptr, tr("Error"), QString{"%1: %2"}.arg(tr("Failed to load sample"), value));
+		}
+
 		_de->accept();
-		update();
 	}
 	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
 	{
@@ -253,11 +263,21 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
-		m_params->m_userWave = SampleBuffer::fromFile(file);
-		m_userLfoBtn->model()->setValue( true );
-		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
+
+		if (auto buffer = SampleBuffer::fromFile(file))
+		{
+			m_params->m_userWave = std::move(buffer);
+			m_userLfoBtn->model()->setValue(true);
+			m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
+			update();
+		}
+		else
+		{
+			QMessageBox::warning(
+				nullptr, tr("Error"), QString{"%1: %2"}.arg(tr("Failed to load sample"), file));
+		}
+
 		_de->accept();
-		update();
 	}
 }
 

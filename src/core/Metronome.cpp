@@ -33,9 +33,13 @@ void Metronome::processTick(int currentTick, int ticksPerBar, int beatsPerBar, s
 	const auto ticksPerBeat = ticksPerBar / beatsPerBar;
 	if (currentTick % ticksPerBeat != 0 || !m_active) { return; }
 
-	const auto handle = currentTick % ticksPerBar == 0 ? new SamplePlayHandle("misc/metronome02.ogg")
-													   : new SamplePlayHandle("misc/metronome01.ogg");
-	handle->setOffset(bufferOffset);
-	Engine::audioEngine()->addPlayHandle(handle);
+	const auto handle = currentTick % ticksPerBar == 0 ? SamplePlayHandle::fromFile("misc/metronome02.ogg")
+													   : SamplePlayHandle::fromFile("misc/metronome01.ogg");
+
+	if (handle)
+	{
+		handle->setOffset(bufferOffset);
+		Engine::audioEngine()->addPlayHandle(handle);
+	}
 }
 } // namespace lmms

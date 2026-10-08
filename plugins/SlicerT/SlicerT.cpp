@@ -306,12 +306,14 @@ std::vector<Note> SlicerT::getMidi()
 
 void SlicerT::updateFile(QString file)
 {
-	if (auto buffer = SampleBuffer::fromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
-
-	findBPM();
-	findSlices();
-
-	emit dataChanged();
+	// TODO: Return error back to caller
+	if (auto buffer = SampleBuffer::fromFile(file))
+	{
+		m_originalSample = Sample{std::move(buffer)};
+		findBPM();
+		findSlices();
+		emit dataChanged();
+	}
 }
 
 void SlicerT::loadFile(const QString& file)
@@ -351,8 +353,15 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			auto buffer = SampleBuffer::fromFile(srcFile);
-			m_originalSample = Sample(std::move(buffer));
+			if (auto buffer = SampleBuffer::fromFile(srcFile))
+			{
+				m_originalSample = Sample{std::move(buffer)};
+			}
+			else
+			{
+				const auto message = tr("Failed to load sample: %1").arg(srcFile);
+				Engine::getSong()->collectError(message);
+			}
 		}
 		else
 		{
@@ -362,8 +371,15 @@ void SlicerT::loadSettings(const QDomElement& element)
 	}
 	else if (auto sampleData = element.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		auto buffer = SampleBuffer::fromBase64(sampleData);
-		m_originalSample = Sample(std::move(buffer));
+		if (auto buffer = SampleBuffer::fromBase64(sampleData))
+		{
+			m_originalSample = Sample{std::move(buffer)};
+		}
+		else
+		{
+			const auto message = tr("Failed to load sample: <Base64 data>");
+			Engine::getSong()->collectError(message);
+		}
 	}
 
 	if (!element.attribute("totalSlices").isEmpty())

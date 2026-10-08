@@ -307,6 +307,13 @@ gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 
 void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
+	auto buffer = SampleBuffer::fromFile(_audio_file);
+
+	// TODO: Return error back to caller
+	if (!buffer) { return; }
+
+	m_sample = Sample{buffer};
+
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
 		( instrumentTrack()->name() ==
@@ -318,7 +325,6 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(SampleBuffer::fromFile(_audio_file));
 	loopPointChanged();
 	ampModelChanged();
 	reverseModelChanged();

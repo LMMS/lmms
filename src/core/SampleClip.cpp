@@ -155,19 +155,23 @@ void SampleClip::setSampleFile(const QString& sf)
 {
 	// Remove any prior offset in the clip
 	setStartTimeOffset(0);
-	if (!sf.isEmpty())
-	{
-		m_sample = Sample(SampleBuffer::fromFile(sf));
-		updateLength();
-	}
-	else
-	{
+
+	if (sf.isEmpty())
+	{ 
 		// If there is no sample, make the clip a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
 		changeLength(DefaultTicksPerBar * (nom / den));
+		return;
 	}
 
+	auto buffer = SampleBuffer::fromFile(sf);
+	
+	// TODO: Return error back to be handled by caller
+	if (!buffer) { return; }
+
+	m_sample = Sample{std::move(buffer)};
+	updateLength();
 	emit sampleChanged();
 	emit playbackPositionChanged();
 }

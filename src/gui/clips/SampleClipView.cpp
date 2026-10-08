@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
+#include <QMessageBox>
 
 #include "FileDialog.h"
 #include "GuiApplication.h"
@@ -189,18 +190,18 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	if (m_trackView->trackContainerView()->knifeMode()) { return; }
 
 	const QString selectedAudioFile = FileDialog::openAudioFile();
+	if (selectedAudioFile.isEmpty() || m_clip->hasSampleFileLoaded(selectedAudioFile)) { return; }
 
-	if (selectedAudioFile.isEmpty()) { return; }
-	
-	if (!m_clip->hasSampleFileLoaded(selectedAudioFile))
+	if (auto buffer = SampleBuffer::fromFile(selectedAudioFile))
 	{
-		auto sampleBuffer = SampleBuffer::fromFile(selectedAudioFile);
-		if (sampleBuffer != SampleBuffer::emptyBuffer())
-		{
-			m_clip->setSampleBuffer(sampleBuffer);
-		}
+		m_clip->setSampleBuffer(std::move(buffer));
+		m_clip->updateLength();
 	}
-	m_clip->updateLength();
+	else
+	{
+		QMessageBox::warning(
+			nullptr, tr("Error"), QString{"%1: %2"}.arg(tr("Failed to load sample"), selectedAudioFile));
+	}
 }
 
 

@@ -23,8 +23,11 @@
  */
 
 #include "SamplePlayHandle.h"
-#include "AudioEngine.h"
+
+#include <QDebug>
+
 #include "AudioBusHandle.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "PatternTrack.h"
 #include "SampleClip.h"
@@ -43,17 +46,6 @@ SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle)
 		setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
 	}
 }
-
-
-
-
-SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle(new Sample(SampleBuffer::fromFile(sampleFile)), true)
-{
-}
-
-
-
 
 SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
 	SamplePlayHandle(&clip->sample(), false)
@@ -138,6 +130,22 @@ f_cnt_t SamplePlayHandle::totalFrames() const
 {
 	return (m_sample->endFrame() - m_sample->startFrame()) *
 			(static_cast<float>(Engine::audioEngine()->outputSampleRate()) / m_sample->sampleRate());
+}
+
+SamplePlayHandle* SamplePlayHandle::fromFile(const QString& path)
+{
+	if (auto buffer = SampleBuffer::fromFile(path))
+	{
+		const auto sample = new Sample{std::move(buffer)};
+		return new SamplePlayHandle{sample};
+	}
+	else
+	{
+#ifdef LMMS_DEBUG
+		qDebug() << "Failed to load SamplePlayHandle from file: " << path << '\n';
+#endif
+		return nullptr;
+	}
 }
 
 
