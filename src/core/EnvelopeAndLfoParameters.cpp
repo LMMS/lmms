@@ -426,7 +426,6 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 void EnvelopeAndLfoParameters::dataChangeTriggerEnvelope()
 {
-
 	if (m_amountModel.value() == 0) 
 	{ 
 		m_amountModel.setValue(1); 
@@ -435,7 +434,6 @@ void EnvelopeAndLfoParameters::dataChangeTriggerEnvelope()
 
 void EnvelopeAndLfoParameters::dataChangeTriggerLfo()
 {
-
 	if (m_lfoAmountModel.value() == 0) 
 	{ 
 		m_lfoAmountModel.setValue(1); 
@@ -577,7 +575,6 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	m_bad_lfoShapeData = true;
 
 	emit dataChanged();
-
 }
 
 
