@@ -353,7 +353,6 @@ void EffectCategory::toggleFavorite(QString effectName, bool isFavorite)
 
 void EffectCategory::save()
 {
-	qDebug() << "Trying to save data to " + effectCategoriesFileName;
 	QDomDocument doc("effect-categories");
 	QDir dir;
 	if (!dir.exists(effectCategoriesFolder)) { dir.mkpath(effectCategoriesFolder); }
@@ -386,7 +385,6 @@ QStringList EffectCategory::getCategoriesFromMap(std::map<QString, EffectCategor
 
 void EffectCategory::loadData()
 {
-	qDebug() << "Trying to load data from " + effectCategoriesFileName;
 	QFile effectCategoriesFile(effectCategoriesFileName);
 	m_categories_map = {};
 	if (effectCategoriesFile.exists())
