@@ -115,7 +115,7 @@ set_target_properties(zynaddsubfx_synth PROPERTIES SYSTEM TRUE)
 # Relative include paths don't work automatically for the GUI, because the
 # generated C++ files aren't in the source directory. Thus, add the expected
 # source directory as an additional include directory.
-target_include_directories(zynaddsubfx_gui PUBLIC zynaddsubfx/src/UI /usr/include/cairo)
+target_include_directories(zynaddsubfx_gui PUBLIC zynaddsubfx/src/UI)
 
 add_library(ZynAddSubFxCore STATIC
 	LocalZynAddSubFx.cpp
