@@ -171,8 +171,7 @@ public:
 		const auto frames = buffer->frames();
 		const auto frame = absFraction(sample) * frames;
 		const auto f1 = static_cast<f_cnt_t>(frame);
-
-		return std::lerp(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
+		return std::lerp(buffer->frame(f1)[0], buffer->frame((f1 + 1) % frames)[0], fraction(frame));
 	}
 
 	struct wtSampleControl {

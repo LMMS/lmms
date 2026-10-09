@@ -69,30 +69,13 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleBuffer>
 	sndFile = sf_open_fd(file.handle(), SFM_READ, &sfInfo, false);
 	if (sf_error(sndFile) != 0) { return std::nullopt; }
 
-	auto buf = std::vector<sample_t>(sfInfo.channels * sfInfo.frames);
-	sf_read_float(sndFile, buf.data(), buf.size());
+	auto buffer = SampleBuffer{static_cast<ch_cnt_t>(sfInfo.channels), static_cast<f_cnt_t>(sfInfo.frames),
+		static_cast<sample_rate_t>(sfInfo.samplerate)};
 
+	sf_readf_float(sndFile, buffer.data(), buffer.frames());
 	sf_close(sndFile);
 	file.close();
-
-	auto result = SampleBuffer{static_cast<f_cnt_t>(sfInfo.frames), static_cast<sample_rate_t>(sfInfo.samplerate)};
-	for (int i = 0; i < static_cast<int>(result.frames()); ++i)
-	{
-		if (sfInfo.channels == 1)
-		{
-			// Upmix from mono to stereo
-			result[i] = {buf[i], buf[i]};
-		}
-		else if (sfInfo.channels > 1)
-		{
-			// TODO: Add support for higher number of channels (i.e., 5.1 channel systems)
-			// The current behavior assumes stereo in all cases excluding mono.
-			// This may not be the expected behavior, given some audio files with a higher number of channels.
-			result[i] = {buf[i * sfInfo.channels], buf[i * sfInfo.channels + 1]};
-		}
-	}
-
-	return result;
+	return buffer;
 }
 
 auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleBuffer>
@@ -107,7 +90,7 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleBuffer>
 
 	if (frames <= 0 || !data) { return std::nullopt; }
 
-	auto result = SampleBuffer{static_cast<f_cnt_t>(frames), engineRate};
+	auto result = SampleBuffer{2, static_cast<f_cnt_t>(frames), engineRate};
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
 	return result;
@@ -116,72 +99,48 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleBuffer>
 #ifdef LMMS_HAVE_OGGVORBIS
 auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuffer>
 {
-	static auto s_read = [](void* buffer, size_t size, size_t count, void* stream) -> size_t {
-		auto file = static_cast<QFile*>(stream);
-		return file->read(static_cast<char*>(buffer), size * count);
-	};
-
-	static auto s_seek = [](void* stream, ogg_int64_t offset, int whence) -> int {
-		auto file = static_cast<QFile*>(stream);
-		if (whence == SEEK_SET) { file->seek(offset); }
-		else if (whence == SEEK_CUR) { file->seek(file->pos() + offset); }
-		else if (whence == SEEK_END) { file->seek(file->size() + offset); }
-		else { return -1; }
-		return 0;
-	};
-
-	static auto s_close = [](void* stream) -> int {
-		auto file = static_cast<QFile*>(stream);
-		file->close();
-		return 0;
-	};
-
-	static auto s_tell = [](void* stream) -> long {
-		auto file = static_cast<QFile*>(stream);
-		return file->pos();
-	};
-
-	static ov_callbacks s_callbacks = {s_read, s_seek, s_close, s_tell};
-
 	// TODO: Remove use of QFile
 	auto file = QFile{audioFile};
 	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
 
 	auto vorbisFile = OggVorbis_File{};
-	if (ov_open_callbacks(&file, &vorbisFile, nullptr, 0, s_callbacks) < 0) { return std::nullopt; }
+	if (ov_open_callbacks(&file, &vorbisFile, nullptr, 0, OV_CALLBACKS_DEFAULT) < 0) { return std::nullopt; }
 
 	const auto vorbisInfo = ov_info(&vorbisFile, -1);
 	if (vorbisInfo == nullptr) { return std::nullopt; }
 
-	const auto numChannels = vorbisInfo->channels;
+	const auto numChannels = static_cast<ch_cnt_t>(vorbisInfo->channels);
 	const auto sampleRate = static_cast<sample_rate_t>(vorbisInfo->rate);
 	const auto numSamples = ov_pcm_total(&vorbisFile, -1);
 	if (numSamples < 0) { return std::nullopt; }
 
-	auto buffer = std::vector<float>(numSamples);
+	auto buffer = SampleBuffer{numChannels, static_cast<f_cnt_t>(numSamples / numChannels), sampleRate};
 	auto output = static_cast<float**>(nullptr);
+	auto currentSection = 0;
+	auto samplesToRead = numSamples;
+	auto samplesRead = 0;
 
-	auto totalSamplesRead = 0;
-	while (true)
+	while ((samplesRead = ov_read_float(&vorbisFile, &output, samplesToRead, &currentSection)) > 0)
 	{
-		auto samplesRead = ov_read_float(&vorbisFile, &output, numSamples, 0);
+		const auto info = ov_info(&vorbisFile, currentSection);
 
-		if (samplesRead < 0) { return std::nullopt; }
-		else if (samplesRead == 0) { break; }
+		// Vorbis files can contain multiple bitstreams of different channels and sample rates
+		// We ignore any bitstreams that differ in channel count and sample rate
+		if (info->channels != numChannels || info->rate != sampleRate) { break; }
 
-		std::copy_n(*output, samplesRead, buffer.begin() + totalSamplesRead);
-		totalSamplesRead += samplesRead;
-	}
+		for (auto channel = 0; channel < numChannels; ++channel)
+		{
+			for (auto frame = numSamples - samplesToRead; frame < samplesRead; ++samplesRead)
+			{
+				buffer[frame][channel] = output[channel][frame];
+			}
+		}
 
-	auto result = SampleBuffer{static_cast<f_cnt_t>(totalSamplesRead / numChannels), sampleRate};
-	for (auto i = std::size_t{0}; i < result.frames(); ++i)
-	{
-		if (numChannels == 1) { result[i] = {buffer[i], buffer[i]}; }
-		else if (numChannels > 1) { result[i] = {buffer[i * numChannels], buffer[i * numChannels + 1]}; }
+		samplesToRead -= samplesRead;
 	}
 
 	ov_clear(&vorbisFile);
-	return result;
+	return buffer;
 }
 #endif // LMMS_HAVE_OGGVORBIS
 } // namespace

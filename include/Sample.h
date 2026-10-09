@@ -88,7 +88,6 @@ public:
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 
-	auto data() const -> const SampleFrame* { return m_buffer->data(); }
 	auto buffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
 	auto startFrame() const -> int { return m_startFrame.load(std::memory_order_relaxed); }
 	auto endFrame() const -> int { return m_endFrame.load(std::memory_order_relaxed); }

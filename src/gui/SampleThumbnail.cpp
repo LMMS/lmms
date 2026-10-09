@@ -94,7 +94,7 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 		s_sampleThumbnailCacheMap[std::move(entry)] = m_thumbnailCache;
 	}
 
-	const auto flatBuffer = m_buffer->data()->data();
+	const auto flatBuffer = m_buffer->data();
 	const auto flatBufferSize = m_buffer->frames() * DEFAULT_CHANNELS;
 	m_thumbnailCache->emplace_back(flatBuffer, flatBufferSize, flatBufferSize / AggregationPerZoomStep);
 
@@ -141,7 +141,7 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	{
 		if (useOriginalBuffer && drawOriginalBuffer)
 		{
-			const auto value = m_buffer->data()->data()[i];
+			const auto value = m_buffer->data()[i];
 			painter.drawPoint(x, renderRect.center().y() - value * yScale);
 			continue;
 		}
@@ -155,7 +155,7 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 
 			if (useOriginalBuffer)
 			{
-				const auto flatBuffer = m_buffer->data()->data();
+				const auto flatBuffer = m_buffer->data();
 				const auto [min, max] = std::minmax_element(flatBuffer + beginIndex, flatBuffer + endIndex);
 				minPeak = *min;
 				maxPeak = *max;

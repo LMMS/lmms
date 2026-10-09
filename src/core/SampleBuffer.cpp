@@ -33,11 +33,13 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(f_cnt_t frames, sample_rate_t sampleRate, const QString& audioFile)
+SampleBuffer::SampleBuffer(ch_cnt_t channels, f_cnt_t frames, sample_rate_t sampleRate, const QString& audioFile)
 	: m_data(frames)
+	, m_channels{channels}
+	, m_sampleRate{sampleRate}
 	, m_audioFile(audioFile)
-	, m_sampleRate(sampleRate)
 {
+	assert(channels > 0 && "channel count must be greater than 0");
 }
 
 QString SampleBuffer::toBase64() const
@@ -71,7 +73,7 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str,
 	const auto result = QByteArray::fromBase64Encoding(str.toUtf8(), QByteArray::AbortOnBase64DecodingErrors);
 	if (!result || result.decoded.size() % sizeof(SampleFrame) != 0) { return nullptr; }
 
-	auto buffer = SampleBuffer{result.decoded.size() / sizeof(SampleFrame), sampleRate};
+	auto buffer = SampleBuffer{2, result.decoded.size() / sizeof(SampleFrame), sampleRate};
 	std::memcpy(buffer.data(), result.decoded.data(), result.decoded.size());
 	return std::make_shared<const SampleBuffer>(std::move(buffer));
 }

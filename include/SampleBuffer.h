@@ -29,8 +29,8 @@
 #include <memory>
 #include <vector>
 
+#include "AudioBufferView.h"
 #include "LmmsTypes.h"
-#include "SampleFrame.h"
 #include "lmms_export.h"
 
 namespace lmms {
@@ -40,37 +40,49 @@ public:
 	static constexpr auto DefaultSampleRate = sample_rate_t{44100};
 
 	SampleBuffer() = default;
-	SampleBuffer(f_cnt_t frames, sample_rate_t sampleRate, const QString& audioFile = "");
+	SampleBuffer(
+		ch_cnt_t channels, f_cnt_t frames, sample_rate_t sampleRate = DefaultSampleRate, const QString& audioFile = "");
 
-	auto operator[](f_cnt_t index) -> SampleFrame& { return m_data[index]; }
-	auto operator[](f_cnt_t index) const -> const SampleFrame& { return m_data[index]; }
+	auto operator[](f_cnt_t frameIndex) -> float* { return &m_data[frameIndex * m_channels]; }
+	auto operator[](f_cnt_t frameIndex) const -> const float* { return &m_data[frameIndex * m_channels]; }
 
-	auto begin() { return m_data.begin(); }
-	auto begin() const { return m_data.begin(); }
+	auto frame(f_cnt_t frameIndex) -> std::span<float> { return {&m_data[frameIndex * m_channels], m_channels}; }
 
-	auto end() { return m_data.end(); }
-	auto end() const { return m_data.end(); }
+	auto frame(f_cnt_t frameIndex) const -> std::span<const float>
+	{ return {&m_data[frameIndex * m_channels], m_channels}; }
+
+	auto begin() { return view().framesView().begin(); }
+	auto begin() const { return view().framesView().begin(); }
+
+	auto end() { return view().framesView().end(); }
+	auto end() const { return view().framesView().end(); }
+
+	auto view() -> InterleavedBufferView<float> { return {m_data.data(), m_channels, frames()}; }
+	auto view() const -> InterleavedBufferView<const float> { return {m_data.data(), m_channels, frames()}; }
+
+	auto data() -> float* { return m_data.data(); }
+	auto data() const -> const float* { return m_data.data(); }
+
+	auto frames() const -> f_cnt_t { return m_data.size() / m_channels; }
+	auto empty() const -> bool { return m_data.empty(); }
+
+	auto channels() const -> ch_cnt_t { return m_channels; }
+	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
+	auto audioFile() const -> const QString& { return m_audioFile; }
 
 	auto toBase64() const -> QString;
-
-	auto audioFile() const -> const QString& { return m_audioFile; }
-	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
-
-	auto data() -> SampleFrame* { return m_data.data(); }
-	auto data() const -> const SampleFrame* { return m_data.data(); }
-
-	auto frames() const -> f_cnt_t { return m_data.size(); }
-	auto empty() const -> bool { return m_data.empty(); }
 
 	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
 
 	static std::shared_ptr<const SampleBuffer> fromFile(const QString& path);
-	static std::shared_ptr<const SampleBuffer> fromBase64(const QString& str, sample_rate_t sampleRate = DefaultSampleRate);
+	static std::shared_ptr<const SampleBuffer> fromBase64(
+		const QString& str, sample_rate_t sampleRate = DefaultSampleRate);
 
 private:
-	std::vector<SampleFrame> m_data;
-	QString m_audioFile;
+	std::vector<float> m_data;
+	ch_cnt_t m_channels{};
 	sample_rate_t m_sampleRate{};
+	QString m_audioFile;
 };
 
 } // namespace lmms
