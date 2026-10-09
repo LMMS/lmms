@@ -88,7 +88,7 @@ public:
 	}
 
 public slots:
-	void setSampleFile(const QString& sf, SampleImportOption option);
+	void setSampleFile(const QString& sf);
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackClips();

@@ -217,7 +217,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 						).quantize(snapSize, true);
 
 		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
-		if (sClip) { sClip->setSampleFile(value, SampleImportOption::Inquire); }
+		if (sClip) { sClip->setSampleFile(value); }
 	}
 }
 

@@ -81,7 +81,7 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	void loadFile(const QString& _file, bool previewMode = false) override;
+	void loadFile(const QString& _file) override;
 
 
 	QString nodeName() const override;

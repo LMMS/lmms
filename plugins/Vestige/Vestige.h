@@ -68,7 +68,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	void loadFile(const QString& file, bool previewMode = false) override;
+	void loadFile(const QString& file) override;
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 

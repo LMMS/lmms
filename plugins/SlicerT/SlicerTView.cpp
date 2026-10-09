@@ -160,7 +160,7 @@ void SlicerTView::openFiles()
 {
 	const auto audioFile = FileDialog::openAudioFile();
 	if (audioFile.isEmpty()) { return; }
-	m_slicerTParent->updateFile(audioFile, SampleImportOption::Inquire);
+	m_slicerTParent->updateFile(audioFile);
 }
 
 // all the drag stuff is copied from AudioFileProcessor
@@ -189,7 +189,7 @@ void SlicerTView::dropEvent(QDropEvent* de)
 	if (type == "samplefile")
 	{
 		// set m_wf wave file
-		m_slicerTParent->updateFile(value, SampleImportOption::Inquire);
+		m_slicerTParent->updateFile(value);
 		return;
 	}
 	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
@@ -198,10 +198,7 @@ void SlicerTView::dropEvent(QDropEvent* de)
 		const auto elem = dataFile.content().firstChild().toElement();
 		const auto file = elem.attribute("src");
 
-		SampleImportOption option;
-		deserialize(elem, option);
-
-		m_slicerTParent->updateFile(file, option);
+		m_slicerTParent->updateFile(file);
 		de->accept();
 		return;
 	}

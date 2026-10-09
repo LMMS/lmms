@@ -74,8 +74,10 @@ public:
 
 	Sample() = default;
 
-	explicit Sample(PlanarBufferSpan<const float> data, int sampleRate = Engine::audioEngine()->outputSampleRate());
-	Sample(const SampleFrame* data, f_cnt_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	explicit Sample(PlanarBufferSpan<const float> data,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate());
+	Sample(const SampleFrame* data, f_cnt_t numFrames,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other) noexcept;
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
@@ -89,11 +91,10 @@ public:
 	// TODO: Remove the "sample" prefix from some of these method names
 	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
-	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
+	auto sampleRate() const -> sample_rate_t { return m_buffer->sampleRate(); }
 	auto sampleChannels() const -> ch_cnt_t { return m_buffer->channels(); }
 	auto frames() const -> f_cnt_t { return m_buffer->frames(); }
 	auto sampleEmpty() const -> bool { return m_buffer->empty(); }
-	auto sampleImportModification() const -> SampleImportModification { return m_buffer->importModification(); }
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 

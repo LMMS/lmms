@@ -34,31 +34,25 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(AudioBuffer data, SampleImportModification mod,
-	int sampleRate, const QString& audioFile)
+SampleBuffer::SampleBuffer(AudioBuffer data, sample_rate_t sampleRate, const QString& audioFile)
 	: m_data(std::move(data))
 	, m_audioFile(audioFile)
 	, m_sampleRate(sampleRate)
-	, m_modification{mod}
 {
 }
 
-SampleBuffer::SampleBuffer(PlanarBufferSpan<const float> data, SampleImportModification mod,
-	int sampleRate, const QString& audioFile)
+SampleBuffer::SampleBuffer(PlanarBufferSpan<const float> data, sample_rate_t sampleRate, const QString& audioFile)
 	: m_data(data.frames(), data.channels())
 	, m_audioFile(audioFile)
 	, m_sampleRate(sampleRate)
-	, m_modification{mod}
 {
 	MixHelpers::copy(PlanarBufferSpan{m_data.allBuffers()}, data);
 }
 
-SampleBuffer::SampleBuffer(std::span<const SampleFrame> data, SampleImportModification mod,
-	int sampleRate, const QString& audioFile)
+SampleBuffer::SampleBuffer(std::span<const SampleFrame> data, sample_rate_t sampleRate, const QString& audioFile)
 	: m_data(data.size(), 2)
 	, m_audioFile(audioFile)
 	, m_sampleRate(sampleRate)
-	, m_modification{mod}
 {
 	toPlanar(InterleavedBufferSpan{data}, m_data.allBuffers());
 }
@@ -69,7 +63,6 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 	swap(first.m_data, second.m_data);
 	swap(first.m_audioFile, second.m_audioFile);
 	swap(first.m_sampleRate, second.m_sampleRate);
-	swap(first.m_modification, second.m_modification);
 }
 
 QString SampleBuffer::toBase64() const
@@ -83,11 +76,7 @@ QString SampleBuffer::toBase64() const
 	auto byteArray = QByteArray{};
 
 	const auto frames = static_cast<B64FrameCount>(m_data.frames());
-
-	// When the source data was mono upmixed, we only need to store the first channel's data
-	const auto channels = m_modification == SampleImportModification::UpmixMonoToStereo
-		? static_cast<B64ChannelCount>(1)
-		: static_cast<B64ChannelCount>(m_data.totalChannels());
+	const auto channels = static_cast<B64ChannelCount>(m_data.totalChannels());
 
 	byteArray.append(reinterpret_cast<const char*>(frames), sizeof(B64FrameCount));
 	byteArray.append(reinterpret_cast<const char*>(channels), sizeof(B64ChannelCount));
@@ -106,24 +95,14 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 	return s_buffer;
 }
 
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromFileInteractive(const QString& path)
-{
-	return fromFile(path, SampleImportOption::Inquire);
-}
-
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& path, SampleImportOption option)
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& path)
 {
 	if (path.isEmpty()) { return SampleBuffer::emptyBuffer(); }
-
-	if (option == SampleImportOption::Inquire && !gui::getGUI())
-	{
-		throw std::logic_error{"SampleImportOption::Inquire cannot be used in headless mode"};
-	}
 
 	const auto absolutePath = PathUtil::toAbsolute(path);
 	const auto storedPath = PathUtil::toShortestRelative(path);
 
-	auto result = SampleDecoder::decode(absolutePath, option);
+	auto result = SampleDecoder::decode(absolutePath);
 
 	if (!result)
 	{
@@ -144,23 +123,22 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& path, 
 		return SampleBuffer::emptyBuffer();
 	}
 
-	auto& [data, sampleRate, modification] = *result;
-	return std::make_shared<SampleBuffer>(std::move(data), modification, sampleRate, storedPath);
+	auto& [data, sampleRate] = *result;
+	return std::make_shared<SampleBuffer>(std::move(data), sampleRate, storedPath);
 }
 
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str,
-	SampleImportOption option, int sampleRate)
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str, sample_rate_t sampleRate)
 {
-	return fromBase64(false, str, option, sampleRate);
+	return fromBase64(false, str, sampleRate);
 }
 
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromLegacyBase64(const QString& str, int sampleRate)
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromLegacyBase64(const QString& str, sample_rate_t sampleRate)
 {
-	return fromBase64(true, str, SampleImportOption::ForceStereo, sampleRate);
+	return fromBase64(true, str, sampleRate);
 }
 
 std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(bool legacyInterleaved,
-	const QString& str, SampleImportOption option, int sampleRate)
+	const QString& str, sample_rate_t sampleRate)
 {
 	if (str.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
@@ -207,14 +185,8 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(bool legacyInterlea
 		: *reinterpret_cast<const B64FrameCount*>(bytes.data());
 
 	const auto channels = legacyInterleaved
-		? 2
+		? static_cast<B64ChannelCount>(2)
 		: *reinterpret_cast<const B64ChannelCount*>(bytes.data() + sizeof(B64FrameCount));
-
-	// As an optimization, mono samples that are upmixed to stereo are stored in base64 as mono samples
-	const auto mod = getSampleImportModification(option, channels);
-	const auto outputChannels = mod == SampleImportModification::UpmixMonoToStereo
-		? static_cast<ch_cnt_t>(2)
-		: static_cast<ch_cnt_t>(channels);
 
 	const char* dataStart = legacyInterleaved
 		? bytes.data()
@@ -237,7 +209,7 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(bool legacyInterlea
 		return SampleBuffer::emptyBuffer();
 	}
 
-	auto data = AudioBuffer{frames, outputChannels};
+	auto data = AudioBuffer{frames, static_cast<ch_cnt_t>(channels)};
 	if (legacyInterleaved)
 	{
 		const auto decoded = InterleavedBufferSpan{reinterpret_cast<const SampleFrame*>(dataStart), frames};
@@ -245,21 +217,19 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(bool legacyInterlea
 	}
 	else
 	{
-		auto dataBuffers = data.allBuffers();
+		const auto dataBuffers = data.allBuffers();
 		for (ch_cnt_t ch = 0; ch < channels; ++ch)
 		{
 			const auto channelBufferOffset = ch * frames * sizeof(float);
-			const auto channelBuffer = std::span{reinterpret_cast<const float*>(dataStart + channelBufferOffset), frames};
+			const auto channelBuffer = std::span {
+				reinterpret_cast<const float*>(dataStart + channelBufferOffset),
+				frames
+			};
 			std::ranges::copy(channelBuffer, dataBuffers.bufferPtr(ch));
-		}
-		if (mod == SampleImportModification::UpmixMonoToStereo)
-		{
-			// Perform mono-to-stereo upmix
-			std::ranges::copy(dataBuffers.buffer(0), dataBuffers.bufferPtr(1));
 		}
 	}
 
-	return std::make_shared<SampleBuffer>(std::move(data), mod, sampleRate);
+	return std::make_shared<SampleBuffer>(std::move(data), sampleRate);
 }
 
 } // namespace lmms

@@ -331,7 +331,7 @@ QString VestigeInstrument::nodeName( void ) const
 
 
 
-void VestigeInstrument::loadFile(const QString& file, bool)
+void VestigeInstrument::loadFile(const QString& file)
 {
 	m_pluginMutex.lock();
 	const bool set_ch_name = ( m_plugin != nullptr &&

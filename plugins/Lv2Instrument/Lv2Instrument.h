@@ -68,7 +68,7 @@ public:
 	*/
 	void saveSettings(QDomDocument& doc, QDomElement& that) override;
 	void loadSettings(const QDomElement& that) override;
-	void loadFile(const QString& file, bool previewMode = false) override;
+	void loadFile(const QString& file) override;
 
 	/*
 		realtime funcs

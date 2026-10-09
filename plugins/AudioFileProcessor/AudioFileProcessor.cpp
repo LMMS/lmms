@@ -204,7 +204,6 @@ void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 	{
 		elem.setAttribute("src", m_sample.sampleFile());
 	}
-	serialize(elem, m_sample.sampleImportModification());
 	m_reverseModel.saveSettings(doc, elem, "reversed");
 	m_loopModel.saveSettings(doc, elem, "looped");
 	m_ampModel.saveSettings(doc, elem, "amp");
@@ -220,20 +219,18 @@ void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 void AudioFileProcessor::loadSettings(const QDomElement& elem)
 {
-	SampleImportOption option;
-	deserialize(elem, option);
 	if (auto srcFile = elem.attribute("src"); !srcFile.isEmpty())
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			setAudioFile(srcFile, option, false);
+			setAudioFile(srcFile, false);
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
 	}
 	else if (auto sampleData = elem.attribute("b64sample"); !sampleData.isEmpty())
 	{
 		// planar data
-		m_sample = Sample(SampleBuffer::fromBase64(sampleData, option));
+		m_sample = Sample(SampleBuffer::fromBase64(sampleData));
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
@@ -275,9 +272,9 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 
 
 
-void AudioFileProcessor::loadFile(const QString& file, bool previewMode)
+void AudioFileProcessor::loadFile(const QString& file)
 {
-	setAudioFile(file, previewMode ? SampleImportOption::ForceStereo : SampleImportOption::Inquire);
+	setAudioFile(file);
 }
 
 
@@ -319,7 +316,7 @@ gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 	return new gui::AudioFileProcessorView( this, _parent );
 }
 
-void AudioFileProcessor::setAudioFile(const QString& _audio_file, SampleImportOption option, bool _rename)
+void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
@@ -332,7 +329,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, SampleImportOp
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(SampleBuffer::fromFile(_audio_file, option));
+	m_sample = Sample(SampleBuffer::fromFile(_audio_file));
 
 	loopPointChanged();
 	ampModelChanged();

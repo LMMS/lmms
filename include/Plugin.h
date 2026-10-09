@@ -276,7 +276,7 @@ public:
 
 	//! Can be called if a file matching supportedFileTypes should be
 	//! loaded/processed with the help of this plugin
-	virtual void loadFile(const QString& file, bool previewMode = false);
+	virtual void loadFile(const QString& file);
 
 	//! Overload if the argument passed to the plugin is a subPluginKey
 	//! If you can not pass the key and are aware that it's stored in Engine::pickDndPluginKey(), use this function, too

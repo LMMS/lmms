@@ -117,7 +117,7 @@ void PatmanInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void PatmanInstrument::loadFile(const QString& file, bool)
+void PatmanInstrument::loadFile(const QString& file)
 {
 	setFile(file);
 }

@@ -34,7 +34,6 @@
 #include "Engine.h"
 #include "LmmsTypes.h"
 #include "lmms_export.h"
-#include "SampleImportOption.h"
 
 namespace lmms {
 class LMMS_EXPORT SampleBuffer
@@ -42,12 +41,12 @@ class LMMS_EXPORT SampleBuffer
 public:
 	SampleBuffer() = default;
 	// TODO: Give `mod` parameters default values then simplify call sites
-	SampleBuffer(AudioBuffer data, SampleImportModification mod,
-		int sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
-	SampleBuffer(PlanarBufferSpan<const float> data, SampleImportModification mod,
-		int sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
-	SampleBuffer(std::span<const SampleFrame> data, SampleImportModification mod,
-		int sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
+	SampleBuffer(AudioBuffer data,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
+	SampleBuffer(PlanarBufferSpan<const float> data,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
+	SampleBuffer(std::span<const SampleFrame> data,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 	auto toBase64() const -> QString;
@@ -58,33 +57,26 @@ public:
 	auto audioFile() const -> const QString& { return m_audioFile; }
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
-	//! @returns whether the SampleBuffer data was modified from the original when imported
-	auto importModification() const -> SampleImportModification { return m_modification; }
-
 	auto channels() const -> ch_cnt_t { return m_data.totalChannels(); }
 	auto frames() const -> f_cnt_t { return m_data.frames(); }
 	auto empty() const -> bool { return m_data.empty(); }
 
 	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
 
-	//! Loads sample from path, deducing the import options based on the Settings or user interaction
-	//! @note This method cannot be used in headless mode
-	static std::shared_ptr<const SampleBuffer> fromFileInteractive(const QString& path);
-
-	//! Loads sample from path, following the import options
-	static std::shared_ptr<const SampleBuffer> fromFile(const QString& path, SampleImportOption option);
+	//! Loads sample from file path
+	static std::shared_ptr<const SampleBuffer> fromFile(const QString& path);
 
 	//! Loads sample from planar base64 data
 	static std::shared_ptr<const SampleBuffer> fromBase64(const QString& str,
-		SampleImportOption option, int sampleRate = Engine::audioEngine()->outputSampleRate());
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate());
 
 	//! Loads sample from old `SampleFrame` base64 data
 	static std::shared_ptr<const SampleBuffer> fromLegacyBase64(const QString& str,
-		int sampleRate = Engine::audioEngine()->outputSampleRate());
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate());
 
 private:
 	static std::shared_ptr<const SampleBuffer> fromBase64(bool legacyInterleaved,
-		const QString& str, SampleImportOption option, int sampleRate);
+		const QString& str, sample_rate_t sampleRate);
 
 	using B64FrameCount = std::uint64_t;
 	using B64ChannelCount = std::uint16_t;
@@ -92,10 +84,6 @@ private:
 	AudioBuffer m_data;
 	QString m_audioFile;
 	sample_rate_t m_sampleRate = Engine::audioEngine()->outputSampleRate();
-
-	// Whether the original sample (on disk or base64) was mono/multi-channel
-	// but was upmixed/downmixed to stereo when loaded
-	SampleImportModification m_modification = SampleImportModification::Unmodified;
 };
 
 } // namespace lmms

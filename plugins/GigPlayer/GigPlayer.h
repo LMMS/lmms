@@ -252,7 +252,7 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	void loadFile(const QString& file, bool previewMode) override;
+	void loadFile(const QString& file) override;
 
 	auto midiPatch() const -> std::optional<MidiPatch> override;
 	AutomatableModel* childModel(std::string_view modelName) override;

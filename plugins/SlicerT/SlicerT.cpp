@@ -157,7 +157,7 @@ void SlicerT::findSlices()
 	const int windowSize = 512;
 	const float minBeatLength = 0.05f; // in seconds, ~ 1/4 length at 220 bpm
 
-	int sampleRate = m_originalSample.sampleRate();
+	int sampleRate = static_cast<int>(m_originalSample.sampleRate());
 	int minDist = sampleRate * minBeatLength;
 
 	float maxMag = -1;
@@ -324,9 +324,9 @@ std::vector<Note> SlicerT::getMidi()
 	return outputNotes;
 }
 
-void SlicerT::updateFile(const QString& file, SampleImportOption option)
+void SlicerT::updateFile(const QString& file)
 {
-	if (auto buffer = SampleBuffer::fromFile(file, option))
+	if (auto buffer = SampleBuffer::fromFile(file))
 	{
 		m_originalSample = Sample(std::move(buffer));
 	}
@@ -337,9 +337,9 @@ void SlicerT::updateFile(const QString& file, SampleImportOption option)
 	emit dataChanged();
 }
 
-void SlicerT::loadFile(const QString& file, bool previewMode)
+void SlicerT::loadFile(const QString& file)
 {
-	updateFile(file, previewMode ? SampleImportOption::ForceStereo : SampleImportOption::Inquire);
+	updateFile(file);
 }
 
 void SlicerT::updateSlices()
@@ -359,7 +359,6 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 		element.setAttribute("src", m_originalSample.sampleFile());
 	}
 
-	serialize(element, m_originalSample.sampleImportModification());
 	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
 	for (auto i = std::size_t{0}; i < m_slicePoints.size(); i++)
 	{
@@ -374,13 +373,11 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 
 void SlicerT::loadSettings(const QDomElement& element)
 {
-	SampleImportOption option;
-	deserialize(element, option);
 	if (auto srcFile = element.attribute("src"); !srcFile.isEmpty())
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			auto buffer = SampleBuffer::fromFile(srcFile, option);
+			auto buffer = SampleBuffer::fromFile(srcFile);
 			m_originalSample = Sample(std::move(buffer));
 		}
 		else
@@ -392,7 +389,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	else if (auto sampleData = element.attribute("b64sample"); !sampleData.isEmpty())
 	{
 		// planar data
-		auto buffer = SampleBuffer::fromBase64(sampleData, option);
+		auto buffer = SampleBuffer::fromBase64(sampleData);
 		m_originalSample = Sample(std::move(buffer));
 	}
 	else if (auto sampleData = element.attribute("sampledata"); !sampleData.isEmpty())

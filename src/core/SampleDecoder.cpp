@@ -43,14 +43,14 @@ namespace lmms {
 
 namespace {
 
-using Decoder = std::optional<SampleDecoder::Result> (*)(const QString&, SampleImportOption);
+using Decoder = std::optional<SampleDecoder::Result> (*)(const QString&);
 
-auto decodeSampleSF(const QString& audioFile, SampleImportOption option)
+auto decodeSampleSF(const QString& audioFile)
 	-> std::optional<SampleDecoder::Result>;
-auto decodeSampleDS(const QString& audioFile, SampleImportOption option)
+auto decodeSampleDS(const QString& audioFile)
 	-> std::optional<SampleDecoder::Result>;
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile, SampleImportOption option)
+auto decodeSampleOggVorbis(const QString& audioFile)
 	-> std::optional<SampleDecoder::Result>;
 #endif
 
@@ -60,68 +60,7 @@ static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
 #endif
 	&decodeSampleDS};
 
-void postProcess(AudioBuffer& dst, SampleImportModification mod,
-	const float* src, ch_cnt_t srcChannels)
-{
-	const auto frames = dst.frames();
-	if (mod == SampleImportModification::UpmixMonoToStereo)
-	{
-		// Upmix mono sample to stereo
-		assert(srcChannels == 1);
-		const float* channelBuffer[1] = { src };
-		const auto srcAsPlanar = PlanarBufferView{channelBuffer, 1, frames};
-
-		MixHelpers::monoUpmix(dst.allBuffers(), srcAsPlanar);
-	}
-	else
-	{
-		const auto srcAsInterleaved = InterleavedBufferSpan{src, srcChannels, frames};
-		auto dstBuffers = dst.allBuffers();
-
-		if (mod == SampleImportModification::ForcedMono)
-		{
-			f_cnt_t idx = 0;
-			if (srcChannels == 2)
-			{
-				// Downmix stereo to mono
-				for (const float* frame : srcAsInterleaved.framesView())
-				{
-					dstBuffers[0][idx] = (frame[0] + frame[1]) / 2;
-					++idx;
-				}
-			}
-			else
-			{
-				// Multichannel - discard channels >1
-				assert(srcChannels > 2);
-				for (const float* frame : srcAsInterleaved.framesView())
-				{
-					dstBuffers[0][idx] = frame[0];
-					++idx;
-				}
-			}
-		}
-		else if (mod == SampleImportModification::DownmixMultiChannelToStereo)
-		{
-			assert(srcChannels > 2);
-			f_cnt_t idx = 0;
-			for (const float* frame : srcAsInterleaved.framesView())
-			{
-				dstBuffers[0][idx] = frame[0];
-				dstBuffers[1][idx] = frame[1];
-				++idx;
-			}
-		}
-		else
-		{
-			assert(mod == SampleImportModification::Unmodified);
-			toPlanar(srcAsInterleaved, dstBuffers);
-		}
-	}
-}
-
-auto decodeSampleSF(const QString& audioFile, SampleImportOption option)
-	-> std::optional<SampleDecoder::Result>
+auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>
 {
 	SNDFILE* sndFile = nullptr;
 	auto sfInfo = SF_INFO{};
@@ -139,36 +78,18 @@ auto decodeSampleSF(const QString& audioFile, SampleImportOption option)
 	sf_close(sndFile);
 	file.close();
 
-	// Determine what modifications to make to the sample we're importing (if any)
-	const auto mod = getSampleImportModification(option, static_cast<ch_cnt_t>(sfInfo.channels), audioFile);
-	ch_cnt_t desiredChannels;
-	switch (mod)
-	{
-		case SampleImportModification::Unmodified:
-			desiredChannels = static_cast<ch_cnt_t>(sfInfo.channels);
-			break;
-		case SampleImportModification::ForcedMono:
-			desiredChannels = 1;
-			break;
-		default:
-			assert(false);
-			[[fallthrough]];
-		case SampleImportModification::UpmixMonoToStereo: [[fallthrough]];
-		case SampleImportModification::DownmixMultiChannelToStereo:
-			desiredChannels = 2;
-			break;
-	}
-
 	const auto frames = static_cast<f_cnt_t>(sfInfo.frames);
-	auto result = AudioBuffer{frames, desiredChannels};
+	auto result = AudioBuffer{frames, static_cast<ch_cnt_t>(sfInfo.channels)};
 
-	postProcess(result, mod, buffer.data(), static_cast<ch_cnt_t>(sfInfo.channels));
+	toPlanar(
+		InterleavedBufferSpan{buffer.data(), static_cast<ch_cnt_t>(sfInfo.channels), frames},
+		result.allBuffers()
+	);
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sfInfo.samplerate), mod};
+	return SampleDecoder::Result{std::move(result), static_cast<sample_rate_t>(sfInfo.samplerate)};
 }
 
-auto decodeSampleDS(const QString& audioFile, SampleImportOption option)
-	-> std::optional<SampleDecoder::Result>
+auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>
 {
 	// Populated by DrumSynth::GetDSFileSamples
 	int_sample_t* dataPtr = nullptr;
@@ -180,39 +101,15 @@ auto decodeSampleDS(const QString& audioFile, SampleImportOption option)
 
 	if (frames <= 0 || !data) { return std::nullopt; }
 
-	// Determine what modifications to make to the sample we're importing (if any)
-	const auto mod = getSampleImportModification(option, 1, audioFile);
-	ch_cnt_t desiredChannels;
-	switch (mod)
-	{
-		case SampleImportModification::Unmodified: [[fallthrough]];
-		case SampleImportModification::ForcedMono:
-			desiredChannels = 1;
-			break;
-		default:
-			[[fallthrough]];
-		case SampleImportModification::DownmixMultiChannelToStereo:
-			assert(false);
-			[[fallthrough]];
-		case SampleImportModification::UpmixMonoToStereo:
-			desiredChannels = 2;
-			break;
-	}
-
-	auto result = AudioBuffer{static_cast<f_cnt_t>(frames), desiredChannels};
+	auto result = AudioBuffer{static_cast<f_cnt_t>(frames), 1};
 
 	src_short_to_float_array(data.get(), result.buffer(0).data(), frames);
-	if (mod == SampleImportModification::UpmixMonoToStereo)
-	{
-		std::ranges::copy(result.buffer(0), result.buffer(1).data());
-	}
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(engineRate), mod};
+	return SampleDecoder::Result{std::move(result), static_cast<sample_rate_t>(engineRate)};
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile, SampleImportOption option)
-	-> std::optional<SampleDecoder::Result>
+auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>
 {
 	static auto s_read = [](void* buffer, size_t size, size_t count, void* stream) -> size_t {
 		auto file = static_cast<QFile*>(stream);
@@ -271,34 +168,17 @@ auto decodeSampleOggVorbis(const QString& audioFile, SampleImportOption option)
 		totalSamplesRead += samplesRead;
 	}
 
-	// Determine what modifications to make to the sample we're importing (if any)
-	const auto mod = getSampleImportModification(option, numChannels, audioFile);
-	ch_cnt_t desiredChannels;
-	switch (mod)
-	{
-		case SampleImportModification::Unmodified:
-			desiredChannels = static_cast<ch_cnt_t>(numChannels);
-			break;
-		case SampleImportModification::ForcedMono:
-			desiredChannels = 1;
-			break;
-		default:
-			assert(false);
-			[[fallthrough]];
-		case SampleImportModification::UpmixMonoToStereo: [[fallthrough]];
-		case SampleImportModification::DownmixMultiChannelToStereo:
-			desiredChannels = 2;
-			break;
-	}
-
 	const auto frames = static_cast<f_cnt_t>(totalSamplesRead / numChannels);
-	auto result = AudioBuffer{frames, desiredChannels};
+	auto result = AudioBuffer{frames, static_cast<ch_cnt_t>(numChannels)};
 
-	postProcess(result, mod, buffer.data(), static_cast<ch_cnt_t>(numChannels));
+	toPlanar(
+		InterleavedBufferSpan{buffer.data(), static_cast<ch_cnt_t>(numChannels), frames},
+		result.allBuffers()
+	);
 
 	ov_clear(&vorbisFile);
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sampleRate), mod};
+	return SampleDecoder::Result{std::move(result), static_cast<sample_rate_t>(sampleRate)};
 }
 #endif // LMMS_HAVE_OGGVORBIS
 } // namespace
@@ -332,18 +212,18 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 			types.push_back(AudioType{std::move(name), sfFormatInfo.extension});
 		}
 
-		std::sort(types.begin(), types.end(), [&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
+		std::sort(types.begin(), types.end(), [](const AudioType& a, const AudioType& b) { return a.name < b.name; });
 		return types;
 	}();
 	return s_audioTypes;
 }
 
-auto SampleDecoder::decode(const QString& audioFile, SampleImportOption option) -> std::optional<Result>
+auto SampleDecoder::decode(const QString& audioFile) -> std::optional<Result>
 {
 	auto result = std::optional<Result>{};
 	for (const auto& decoder : decoders)
 	{
-		result = decoder(audioFile, option);
+		result = decoder(audioFile);
 		if (result) { break; }
 	}
 

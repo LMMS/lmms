@@ -70,7 +70,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	void loadPatch(const unsigned char inst[14]);
 	void tuneEqual(int center, float Hz);
-	void loadFile(const QString& file, bool previewMode) override;
+	void loadFile(const QString& file) override;
 
 	IntModel m_patchModel;
 

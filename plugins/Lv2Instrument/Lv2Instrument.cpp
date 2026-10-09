@@ -153,7 +153,7 @@ void Lv2Instrument::loadSettings(const QDomElement& that)
 
 
 
-void Lv2Instrument::loadFile(const QString& file, bool)
+void Lv2Instrument::loadFile(const QString& file)
 {
 	Lv2ControlBase::loadFile(file);
 }

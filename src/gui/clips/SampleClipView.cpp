@@ -124,14 +124,14 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
 	{
 		const auto file = StringPairDrag::decodeValue(_de);
-		m_clip->setSampleFile(file, SampleImportOption::Inquire);
+		m_clip->setSampleFile(file);
 		_de->accept();
 	}
 	else if (StringPairDrag::decodeKey(_de) == "b64sample")
 	{
 		// planar data
 		const auto base64 = StringPairDrag::decodeValue(_de);
-		m_clip->setSampleBuffer(SampleBuffer::fromBase64(base64, SampleImportOption::Inquire));
+		m_clip->setSampleBuffer(SampleBuffer::fromBase64(base64));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -204,7 +204,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	
 	if (!m_clip->hasSampleFileLoaded(selectedAudioFile))
 	{
-		auto sampleBuffer = SampleBuffer::fromFile(selectedAudioFile, SampleImportOption::Inquire);
+		auto sampleBuffer = SampleBuffer::fromFile(selectedAudioFile);
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);

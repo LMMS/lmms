@@ -50,7 +50,7 @@ public:
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
 	void loadSettings(const QDomElement& elem) override;
 
-	void loadFile(const QString& file, bool previewMode) override;
+	void loadFile(const QString& file) override;
 
 	QString nodeName() const override;
 
@@ -76,7 +76,7 @@ public:
 
 
 public slots:
-	void setAudioFile(const QString& audioFile, SampleImportOption option, bool rename = true);
+	void setAudioFile(const QString& audioFile, bool rename = true);
 
 private slots:
 	void reverseModelChanged();

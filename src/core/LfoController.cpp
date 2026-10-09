@@ -246,8 +246,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userDefSampleBuffer = SampleBuffer::fromFile(
-				_this.attribute("userwavefile"), SampleImportOption::ForceMono);
+			m_userDefSampleBuffer = SampleBuffer::fromFile(_this.attribute("userwavefile"));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 	}

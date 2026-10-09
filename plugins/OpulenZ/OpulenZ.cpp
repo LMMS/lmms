@@ -592,7 +592,7 @@ void OpulenzInstrument::updatePatch() {
 }
 
 // Load an SBI file into the knob models
-void OpulenzInstrument::loadFile(const QString& file, bool)
+void OpulenzInstrument::loadFile(const QString& file)
 {
 	// http://cd.textfiles.com/soundsensations/SYNTH/SBINS/
 	// http://cd.textfiles.com/soundsensations/SYNTH/SBI1198/1198SBI.ZIP

@@ -295,7 +295,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void ZynAddSubFxInstrument::loadFile(const QString& _file, bool)
+void ZynAddSubFxInstrument::loadFile(const QString& _file)
 {
 	const std::string fn = QSTR_TO_STDSTR( _file );
 	if( m_remotePlugin )

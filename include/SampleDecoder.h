@@ -31,7 +31,6 @@
 #include <vector>
 
 #include "AudioBuffer.h"
-#include "SampleImportOption.h"
 
 namespace lmms {
 class SampleDecoder
@@ -40,8 +39,7 @@ public:
 	struct Result
 	{
 		AudioBuffer data;
-		int sampleRate;
-		SampleImportModification modification;
+		sample_rate_t sampleRate;
 	};
 
 	struct AudioType
@@ -50,7 +48,7 @@ public:
 		std::string extension;
 	};
 
-	static auto decode(const QString& audioFile, SampleImportOption option) -> std::optional<Result>;
+	static auto decode(const QString& audioFile) -> std::optional<Result>;
 	static auto supportedAudioTypes() -> const std::vector<AudioType>&;
 };
 } // namespace lmms

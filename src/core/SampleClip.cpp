@@ -43,7 +43,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying):
 	m_startFrameOffset(0)
 {
 	saveJournallingState( false );
-	setSampleFile("", SampleImportOption::Unmodified);
+	setSampleFile("");
 	restoreJournallingState();
 
 	// we need to receive bpm-change-events, because then we have to
@@ -80,7 +80,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	m_startFrameOffset(orig.m_startFrameOffset)
 {
 	saveJournallingState( false );
-	setSampleFile("", SampleImportOption::Unmodified);
+	setSampleFile("");
 	restoreJournallingState();
 
 	// we need to receive bpm-change-events, because then we have to
@@ -151,13 +151,13 @@ void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 	Engine::getSong()->setModified();
 }
 
-void SampleClip::setSampleFile(const QString& sf, SampleImportOption option)
+void SampleClip::setSampleFile(const QString& sf)
 {
 	// Remove any prior offset in the clip
 	setStartTimeOffset(0);
 	if (!sf.isEmpty())
 	{
-		m_sample = Sample(SampleBuffer::fromFile(sf, option));
+		m_sample = Sample(SampleBuffer::fromFile(sf));
 		updateLength();
 	}
 	else
@@ -301,7 +301,6 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute("src", sampleFile());
 	}
 
-	serialize(_this, m_sample.sampleImportModification());
 	_this.setAttribute( "sample_rate", m_sample.sampleRate());
 	if (const auto& c = color())
 	{
@@ -324,13 +323,11 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
 
-	SampleImportOption option;
-	deserialize(_this, option);
 	if (const auto srcFile = _this.attribute("src"); !srcFile.isEmpty())
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			setSampleFile(srcFile, option);
+			setSampleFile(srcFile);
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
 	}
@@ -338,13 +335,13 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	if (sampleFile().isEmpty())
 	{
 		const auto sampleRate = _this.hasAttribute("sample_rate")
-			? _this.attribute("sample_rate").toInt()
+			? _this.attribute("sample_rate").toUInt()
 			: Engine::audioEngine()->outputSampleRate();
 
 		if (_this.hasAttribute("b64data"))
 		{
 			// planar data
-			auto buffer = SampleBuffer::fromBase64(_this.attribute("b64data"), option, sampleRate);
+			auto buffer = SampleBuffer::fromBase64(_this.attribute("b64data"), sampleRate);
 			m_sample = Sample(std::move(buffer));
 		}
 		else if (_this.hasAttribute("data"))

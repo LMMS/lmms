@@ -29,8 +29,8 @@
 
 namespace lmms {
 
-Sample::Sample(PlanarBufferSpan<const float> data, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(data, SampleImportModification::Unmodified, sampleRate))
+Sample::Sample(PlanarBufferSpan<const float> data, sample_rate_t sampleRate)
+	: m_buffer(std::make_shared<SampleBuffer>(data, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->frames())
 	, m_loopStartFrame(0)
@@ -38,9 +38,8 @@ Sample::Sample(PlanarBufferSpan<const float> data, int sampleRate)
 {
 }
 
-Sample::Sample(const SampleFrame* data, f_cnt_t numFrames, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(
-		std::span{data, numFrames}, SampleImportModification::Unmodified, sampleRate))
+Sample::Sample(const SampleFrame* data, f_cnt_t numFrames, sample_rate_t sampleRate)
+	: m_buffer(std::make_shared<SampleBuffer>(std::span{data, numFrames}, sampleRate))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->frames())
 	, m_loopStartFrame(0)

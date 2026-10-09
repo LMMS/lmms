@@ -39,7 +39,7 @@ class SlicerT : public Instrument
 	Q_OBJECT
 
 public slots:
-	void updateFile(const QString& file, SampleImportOption option);
+	void updateFile(const QString& file);
 	void updateSlices();
 
 signals:
@@ -54,7 +54,7 @@ public:
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
 
-	void loadFile(const QString& file, bool previewMode) override;
+	void loadFile(const QString& file) override;
 	void findSlices();
 	void findBPM();
 

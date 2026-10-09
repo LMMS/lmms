@@ -297,7 +297,7 @@ void Sf2Instrument::loadSettings( const QDomElement & _this )
 
 
 
-void Sf2Instrument::loadFile(const QString& _file, bool)
+void Sf2Instrument::loadFile(const QString& _file)
 {
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{

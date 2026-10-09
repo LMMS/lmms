@@ -139,7 +139,7 @@ void GigInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void GigInstrument::loadFile(const QString& _file, bool)
+void GigInstrument::loadFile(const QString& _file)
 {
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{

@@ -145,7 +145,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 		}
 		if( i != nullptr )
 		{
-			i->loadFile(_preset_file, true);
+			i->loadFile(_preset_file);
 		}
 	}
 	else

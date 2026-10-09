@@ -242,7 +242,7 @@ void copyMixAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> s
 void add(PlanarBufferView<float> dst, PlanarBufferView<const float> src)
 {
 	assert(dst.channels() == src.channels());
-	assert(dst.frames() == src.frames());
+	assert(dst.frames() >= src.frames());
 
 	const auto channels = src.channels();
 	const auto frames = src.frames();
