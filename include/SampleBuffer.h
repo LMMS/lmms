@@ -38,6 +38,7 @@ class LMMS_EXPORT SampleBuffer
 {
 public:
 	static constexpr auto DefaultSampleRate = sample_rate_t{44100};
+	static constexpr auto DefaultChannels = ch_cnt_t{2};
 
 	SampleBuffer() = default;
 	SampleBuffer(
@@ -80,8 +81,8 @@ public:
 
 private:
 	std::vector<float> m_data;
-	ch_cnt_t m_channels{};
-	sample_rate_t m_sampleRate{};
+	ch_cnt_t m_channels = DefaultChannels;
+	sample_rate_t m_sampleRate = DefaultSampleRate;
 	QString m_audioFile;
 };
 
