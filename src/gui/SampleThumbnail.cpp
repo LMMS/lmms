@@ -72,7 +72,7 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 }
 
 SampleThumbnail::SampleThumbnail(const Sample& sample)
-	: m_buffer(sample.buffer())
+	: m_buffer(sample.shareBuffer())
 {
 	auto entry = SampleThumbnailEntry{sample.sampleFile(), QFileInfo{sample.sampleFile()}.lastModified()};
 	if (!entry.filePath.isEmpty())

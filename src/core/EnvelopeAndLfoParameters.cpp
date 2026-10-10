@@ -390,7 +390,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 		{
 			if (auto buffer = SampleBuffer::fromFile(userWaveFile))
 			{
-				m_userWave = std::move(buffer);
+				m_userWave = std::make_shared<SampleBuffer>(std::move(*buffer));
 			}
 			else
 			{

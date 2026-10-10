@@ -224,7 +224,10 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(SampleBuffer::fromBase64(sampleData));
+		if (const auto buffer = SampleBuffer::fromBase64(sampleData))
+		{
+			m_sample = Sample{std::move(*buffer)};
+		}
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -312,7 +315,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	// TODO: Return error back to caller
 	if (!buffer) { return; }
 
-	m_sample = Sample{buffer};
+	m_sample = Sample{std::move(*buffer)};
 
 	// is current channel-name equal to previous-filename??
 	if( _rename &&

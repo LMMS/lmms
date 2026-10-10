@@ -215,8 +215,8 @@ void LfoControllerDialog::askUserDefWave()
 	if (auto buffer = SampleBuffer::fromFile(fileName))
 	{
 		const auto lfoModel = dynamic_cast<LfoController*>(model());
-		lfoModel->m_userDefSampleBuffer = std::move(buffer);
-		m_userWaveBtn->setToolTip(lfoModel->m_userDefSampleBuffer->audioFile());
+		lfoModel->m_userDefSampleBuffer = std::make_shared<SampleBuffer>(std::move(*buffer));
+		m_userWaveBtn->setToolTip(fileName);
 	}
 	else
 	{

@@ -126,16 +126,16 @@ public:
 	//! @brief Converts the buffer's audio into a Base64 string
 	auto toBase64() const -> QString;
 
-	//! @returns An empty buffer that can be shared
+	//! @returns An immutable empty buffer that can be shared
 	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
 
 	/**
 	 * @brief Creates a buffer from the given @a path.
 	 *
 	 * @param path
-	 * @returns The buffer on success, and nullptr on failure.
+	 * @returns The buffer on success, and nullptr on failure
 	 */
-	static std::shared_ptr<const SampleBuffer> fromFile(const QString& path);
+	static auto fromFile(const QString& path) -> std::optional<SampleBuffer>;
 
 	/**
 	 * @brief Creates a buffer from a Base64 string containing encoded floating-point audio date.
@@ -143,10 +143,10 @@ public:
 	 * @param str The Base64 string to decode
 	 * @param channels The number of channels for this buffer
 	 * @param sampleRate The sample rate for this buffer
-	 * @returns The buffer on success, and nullptr on failure.
+	 * @returns The buffer on success, and nullptr on failure
 	 */
-	static std::shared_ptr<const SampleBuffer> fromBase64(
-		const QString& str, ch_cnt_t channels = DefaultChannels, sample_rate_t sampleRate = DefaultSampleRate);
+	static auto fromBase64(const QString& str, ch_cnt_t channels = DefaultChannels,
+		sample_rate_t sampleRate = DefaultSampleRate) -> std::optional<SampleBuffer>;
 
 private:
 	std::vector<float> m_data;

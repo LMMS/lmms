@@ -105,7 +105,7 @@ f_cnt_t SampleRecordHandle::framesRecorded() const
 
 
 
-std::shared_ptr<const SampleBuffer> SampleRecordHandle::createSampleBuffer()
+SampleBuffer SampleRecordHandle::createSampleBuffer()
 {
 	const f_cnt_t frames = framesRecorded();
 
@@ -121,7 +121,7 @@ std::shared_ptr<const SampleBuffer> SampleRecordHandle::createSampleBuffer()
 	}
 
 	// create according sample-buffer out of big buffer
-	return std::make_shared<SampleBuffer>(std::move(bigBuffer));
+	return bigBuffer;
 }
 
 

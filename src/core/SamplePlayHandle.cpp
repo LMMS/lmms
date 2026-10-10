@@ -136,7 +136,7 @@ SamplePlayHandle* SamplePlayHandle::fromFile(const QString& path)
 {
 	if (auto buffer = SampleBuffer::fromFile(path))
 	{
-		const auto sample = new Sample{std::move(buffer)};
+		const auto sample = new Sample{std::move(*buffer)};
 		return new SamplePlayHandle{sample};
 	}
 	else

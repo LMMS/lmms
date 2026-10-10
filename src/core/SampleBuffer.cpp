@@ -57,25 +57,21 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 	return s_buffer;
 }
 
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePath)
+auto SampleBuffer::fromFile(const QString& filePath) -> std::optional<SampleBuffer>
 {
 	const auto absolutePath = PathUtil::toAbsolute(filePath);
 	const auto storedPath = PathUtil::toShortestRelative(filePath);
-
-	auto result = SampleDecoder::decode(absolutePath);
-	if (!result) { return nullptr; }
-
-	return std::make_shared<const SampleBuffer>(std::move(*result));
+	return SampleDecoder::decode(absolutePath);
 }
 
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str, sample_rate_t sampleRate)
+auto SampleBuffer::fromBase64(const QString& str, ch_cnt_t channels, sample_rate_t sampleRate) -> std::optional<SampleBuffer>
 {
 	const auto result = QByteArray::fromBase64Encoding(str.toUtf8(), QByteArray::AbortOnBase64DecodingErrors);
-	if (!result || result.decoded.size() % sizeof(SampleFrame) != 0) { return nullptr; }
+	if (!result || result.decoded.size() % sizeof(SampleFrame) != 0) { return std::nullopt; }
 
-	auto buffer = SampleBuffer{2, result.decoded.size() / sizeof(SampleFrame), sampleRate};
+	auto buffer = SampleBuffer{channels, result.decoded.size() / sizeof(SampleFrame), sampleRate};
 	std::memcpy(buffer.data(), result.decoded.data(), result.decoded.size());
-	return std::make_shared<const SampleBuffer>(std::move(buffer));
+	return buffer;
 }
 
 } // namespace lmms

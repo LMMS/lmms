@@ -159,7 +159,7 @@ void SlicerT::findSlices()
 	std::vector<float> singleChannel(m_originalSample.sampleSize(), 0);
 	for (auto i = std::size_t{0}; i < m_originalSample.sampleSize(); i++)
 	{
-		singleChannel[i] = (m_originalSample.data()[i][0] + m_originalSample.data()[i][1]) / 2;
+		singleChannel[i] = (m_originalSample.buffer()[i][0] + m_originalSample.buffer()[i][1]) / 2;
 		maxMag = std::max(maxMag, singleChannel[i]);
 	}
 
@@ -309,7 +309,7 @@ void SlicerT::updateFile(QString file)
 	// TODO: Return error back to caller
 	if (auto buffer = SampleBuffer::fromFile(file))
 	{
-		m_originalSample = Sample{std::move(buffer)};
+		m_originalSample = Sample{std::move(*buffer)};
 		findBPM();
 		findSlices();
 		emit dataChanged();
@@ -355,7 +355,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 		{
 			if (auto buffer = SampleBuffer::fromFile(srcFile))
 			{
-				m_originalSample = Sample{std::move(buffer)};
+				m_originalSample = Sample{std::move(*buffer)};
 			}
 			else
 			{
@@ -373,7 +373,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (auto buffer = SampleBuffer::fromBase64(sampleData))
 		{
-			m_originalSample = Sample{std::move(buffer)};
+			m_originalSample = Sample{std::move(*buffer)};
 		}
 		else
 		{

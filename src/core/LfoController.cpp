@@ -245,7 +245,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 		{
 			if (auto buffer = SampleBuffer::fromFile(userWaveFile))
 			{
-				m_userDefSampleBuffer = std::move(buffer);
+				m_userDefSampleBuffer = std::make_shared<SampleBuffer>(std::move(*buffer));
 			}
 			else
 			{
