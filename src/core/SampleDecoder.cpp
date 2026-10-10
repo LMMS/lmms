@@ -129,10 +129,12 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuff
 	while ((framesRead = ov_read_float(&vorbisFile, &output, numFrames - totalFramesRead, &currentSection)) > 0)
 	{
 		const auto info = ov_info(&vorbisFile, currentSection);
+		const auto channels = static_cast<ch_cnt_t>(info->channels);
+		const auto rate = static_cast<sample_rate_t>(info->rate);
 
 		// Vorbis files can contain multiple bitstreams of different channels and sample rates
 		// We ignore any bitstreams that differ in channel count and sample rate from the first one seen
-		if (info->channels != numChannels || info->rate != sampleRate) { break; }
+		if (channels != numChannels || rate != sampleRate) { break; }
 
 		for (auto channel = 0; channel < numChannels; ++channel)
 		{
