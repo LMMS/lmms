@@ -34,7 +34,7 @@
 namespace lmms {
 
 SampleBuffer::SampleBuffer(ch_cnt_t channels, f_cnt_t frames, sample_rate_t sampleRate, const QString& audioFile)
-	: m_data(frames)
+	: m_data(frames * channels)
 	, m_channels{channels}
 	, m_sampleRate{sampleRate}
 	, m_audioFile(audioFile)
