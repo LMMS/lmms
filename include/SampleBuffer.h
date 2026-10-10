@@ -111,6 +111,9 @@ public:
 	//! @returns The number of frames this buffer holds
 	auto frames() const -> f_cnt_t { return m_data.size() / m_channels; }
 
+	//! @returns The number of floating-point samples this buffer holds
+	auto samples() const -> std::size_t { return m_data.size(); }
+
 	//! @returns True if the buffer contains no frames, false otherwise
 	auto empty() const -> bool { return m_data.empty(); }
 
