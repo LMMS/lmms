@@ -224,7 +224,10 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(SampleBuffer::fromBase64(sampleData));
+		if (const auto buffer = SampleBuffer::fromBase64(sampleData))
+		{
+			m_sample = Sample{std::move(*buffer)};
+		}
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -307,6 +310,11 @@ gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 
 void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
+	auto buffer = SampleBuffer::fromFile(_audio_file);
+
+	// TODO: Return error back to caller
+	if (!buffer) { return; }
+
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
 		( instrumentTrack()->name() ==
@@ -318,7 +326,8 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(SampleBuffer::fromFile(_audio_file));
+	m_sample = Sample{std::move(*buffer)};
+
 	loopPointChanged();
 	ampModelChanged();
 	reverseModelChanged();

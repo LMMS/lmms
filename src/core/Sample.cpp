@@ -23,24 +23,17 @@
  */
 
 #include "Sample.h"
+#include "Engine.h"
+#include "AudioEngine.h"
 
 namespace lmms {
 
-Sample::Sample(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(data, numFrames, sampleRate))
+Sample::Sample(SampleBuffer buffer)
+	: m_buffer(std::make_shared<SampleBuffer>(std::move(buffer)))
 	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
+	, m_endFrame(m_buffer->frames())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
-{
-}
-
-Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
-	: m_buffer(buffer)
-	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
-	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
+	, m_loopEndFrame(m_buffer->frames())
 {
 }
 
@@ -165,10 +158,19 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 			break;
 		}
 
-		const auto value
-			= m_buffer->data()[m_reversed ? m_buffer->size() - state->m_frameIndex - 1 : state->m_frameIndex]
-			* m_amplification;
-		dst[frame] = value;
+		const auto index = m_reversed ? m_buffer->frames() - 1 - state->m_frameIndex : state->m_frameIndex;
+		const auto srcFrame = m_buffer->frame(index);
+
+		if (m_buffer->channels() == 1)
+		{
+			dst[frame][0] = dst[frame][1] = srcFrame[0] * m_amplification;
+		}
+		else if (m_buffer->channels() >= 2)
+		{
+			dst[frame][0] = srcFrame[0] * m_amplification;
+			dst[frame][1] = srcFrame[1] * m_amplification;
+		}
+
 		state->m_backwards ? --state->m_frameIndex : ++state->m_frameIndex;
 	}
 

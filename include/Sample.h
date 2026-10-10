@@ -27,6 +27,7 @@
 
 #include <memory>
 
+#include "AudioEngine.h"
 #include "AudioResampler.h"
 #include "Note.h"
 #include "SampleBuffer.h"
@@ -68,11 +69,9 @@ public:
 	};
 
 	Sample() = default;
-
-	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other) noexcept;
-	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
+	explicit Sample(SampleBuffer buffer);
 
 	auto operator=(const Sample&) -> Sample&;
 	auto operator=(Sample&&) noexcept -> Sample&;
@@ -83,12 +82,13 @@ public:
 	auto sampleDuration() const -> std::chrono::milliseconds;
 	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
 	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
-	auto sampleSize() const -> size_t { return m_buffer->size(); }
+	auto sampleSize() const -> size_t { return m_buffer->frames(); }
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 
-	auto data() const -> const SampleFrame* { return m_buffer->data(); }
-	auto buffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
+	auto buffer() const -> const SampleBuffer& { return *m_buffer.get(); }
+	auto shareBuffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
+
 	auto startFrame() const -> int { return m_startFrame.load(std::memory_order_relaxed); }
 	auto endFrame() const -> int { return m_endFrame.load(std::memory_order_relaxed); }
 	auto loopStartFrame() const -> int { return m_loopStartFrame.load(std::memory_order_relaxed); }

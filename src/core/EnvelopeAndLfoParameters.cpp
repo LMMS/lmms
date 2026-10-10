@@ -388,7 +388,14 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userWave = SampleBuffer::fromFile(_this.attribute("userwavefile"));
+			if (auto buffer = SampleBuffer::fromFile(userWaveFile))
+			{
+				m_userWave = std::make_shared<SampleBuffer>(std::move(*buffer));
+			}
+			else
+			{
+				Engine::getSong()->collectError(QString{"%1: %2"}.arg(tr("Failed to load sample"), userWaveFile));
+			}
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }  
 	}

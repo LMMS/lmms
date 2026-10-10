@@ -24,6 +24,7 @@
  */
 
 #include <QPainter>
+#include <QMessageBox>
 
 #include "Graph.h"
 #include "DeprecationHelper.h"
@@ -586,13 +587,18 @@ void graphModel::setWaveToNoise()
 QString graphModel::setWaveToUser()
 {
 	QString fileName = gui::FileDialog::openWaveformFile();
-	if( fileName.isEmpty() == false )
+	if (fileName.isEmpty()) { return ""; }
+
+	auto buffer = SampleBuffer::fromFile(fileName);
+	if (!buffer)
 	{
-		auto sampleBuffer = SampleBuffer::fromFile(fileName);
-		for( int i = 0; i < length(); i++ )
-		{
-			m_samples[i] = Oscillator::userWaveSample(sampleBuffer.get(), i / static_cast<float>(length()));
-		}
+		QMessageBox::warning(nullptr, tr("Error"), QString{"%1: %2"}.arg(tr("Failed to load sample"), fileName));
+		return "";
+	}
+
+	for (int i = 0; i < length(); i++)
+	{
+		m_samples[i] = Oscillator::userWaveSample(&*buffer, i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged( 0, length() - 1 );
