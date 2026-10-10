@@ -107,7 +107,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuff
 	const auto file = fopen(utf8Path.data(), "rb");
 #else
 	const auto utf16Path = audioFile.toStdWString();
-	const auto file = fopen(utf16Path.c_str(), L"rb");
+	const auto file = _wfopen(utf16Path.c_str(), L"rb");
 #endif
 
 	if (!file) { return std::nullopt; }
