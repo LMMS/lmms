@@ -69,8 +69,6 @@ public:
 	};
 
 	Sample() = default;
-
-	Sample(const SampleFrame* data, size_t numFrames, int sampleRate);
 	Sample(const Sample& other);
 	Sample(Sample&& other) noexcept;
 	explicit Sample(SampleBuffer buffer);
