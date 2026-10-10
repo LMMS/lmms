@@ -59,22 +59,23 @@ static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
 
 auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleBuffer>
 {
-	SNDFILE* sndFile = nullptr;
-	auto sfInfo = SF_INFO{};
+	auto sfinfo = SF_INFO{};
 
-	// TODO: Remove use of QFile
-	auto file = QFile{audioFile};
-	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
+#ifndef LMMS_BUILD_WIN32
+	const auto utf8Path = audioFile.toUtf8();
+	const auto sndfile = sf_open(utf8Path.data(), SFM_READ, &sfinfo);
+#else
+	const auto utf16Path = audioFile.toStdWString();
+	const auto sndfile = sf_wchar_open(utf16Path.c_str(), SFM_READ, &sfinfo);
+#endif
 
-	sndFile = sf_open_fd(file.handle(), SFM_READ, &sfInfo, false);
-	if (sf_error(sndFile) != 0) { return std::nullopt; }
+	if (!sndfile || sf_error(sndfile) != 0) { return std::nullopt; }
 
-	auto buffer = SampleBuffer{static_cast<ch_cnt_t>(sfInfo.channels), static_cast<f_cnt_t>(sfInfo.frames),
-		static_cast<sample_rate_t>(sfInfo.samplerate)};
+	auto buffer = SampleBuffer{static_cast<ch_cnt_t>(sfinfo.channels), static_cast<f_cnt_t>(sfinfo.frames),
+		static_cast<sample_rate_t>(sfinfo.samplerate)};
 
-	sf_readf_float(sndFile, buffer.data(), buffer.frames());
-	sf_close(sndFile);
-	file.close();
+	sf_readf_float(sndfile, buffer.data(), buffer.frames());
+	sf_close(sndfile);
 	return buffer;
 }
 
