@@ -72,7 +72,7 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleBuffer>
 	if (!sndfile || sf_error(sndfile) != 0) { return std::nullopt; }
 
 	auto buffer = SampleBuffer{static_cast<ch_cnt_t>(sfinfo.channels), static_cast<f_cnt_t>(sfinfo.frames),
-		static_cast<sample_rate_t>(sfinfo.samplerate)};
+		static_cast<sample_rate_t>(sfinfo.samplerate), audioFile};
 
 	sf_readf_float(sndfile, buffer.data(), buffer.frames());
 	sf_close(sndfile);
@@ -91,7 +91,7 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleBuffer>
 
 	if (frames <= 0 || !data) { return std::nullopt; }
 
-	auto result = SampleBuffer{2, static_cast<f_cnt_t>(frames), engineRate};
+	auto result = SampleBuffer{2, static_cast<f_cnt_t>(frames), engineRate, audioFile};
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
 	return result;
@@ -120,7 +120,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuff
 	const auto sampleRate = static_cast<sample_rate_t>(vorbisInfo->rate);
 	const auto numFrames = static_cast<f_cnt_t>(ov_pcm_total(&vorbisFile, 0));
 
-	auto buffer = SampleBuffer{numChannels, numFrames, sampleRate};
+	auto buffer = SampleBuffer{numChannels, numFrames, sampleRate, audioFile};
 	auto output = static_cast<float**>(nullptr);
 	auto currentSection = 0;
 	auto totalFramesRead = 0;
