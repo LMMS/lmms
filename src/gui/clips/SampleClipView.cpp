@@ -108,8 +108,7 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+	if (StringPairDrag::processDragEnterEvent(_dee, "samplefile,b64sample,sampledata") == false)
 	{
 		ClipView::dragEnterEvent( _dee );
 	}
@@ -124,12 +123,23 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 {
 	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
 	{
-		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
+		const auto file = StringPairDrag::decodeValue(_de);
+		m_clip->setSampleFile(file);
 		_de->accept();
 	}
-	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
+	else if (StringPairDrag::decodeKey(_de) == "b64sample")
 	{
-		m_clip->setSampleBuffer(SampleBuffer::fromBase64(StringPairDrag::decodeValue(_de)));
+		// planar data
+		const auto base64 = StringPairDrag::decodeValue(_de);
+		m_clip->setSampleBuffer(SampleBuffer::fromBase64(base64));
+		m_clip->updateLength();
+		update();
+		_de->accept();
+	}
+	else if (StringPairDrag::decodeKey(_de) == "sampledata")
+	{
+		// legacy interleaved data
+		m_clip->setSampleBuffer(SampleBuffer::fromLegacyBase64(StringPairDrag::decodeValue(_de)));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -286,7 +296,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
 
-	if (sample.sampleSize() > 0)
+	if (sample.frames() > 0)
 	{
 		const auto param = SampleThumbnail::VisualizeParameters{
 			.sampleRect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),

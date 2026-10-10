@@ -22,12 +22,13 @@
  *
  */
 
+#include "AudioFileFlac.h"
 
 #include <cmath>
+#include <memory>
 
-#include "AudioFileFlac.h"
-#include "endian_handling.h"
 #include "AudioEngine.h"
+#include "endian_handling.h"
 
 namespace lmms
 {
@@ -87,31 +88,34 @@ bool AudioFileFlac::startEncoding()
 	return true;
 }
 
-void AudioFileFlac::writeBuffer(const SampleFrame* _ab, f_cnt_t const frames)
+void AudioFileFlac::writeBuffer(PlanarBufferView<const float> buffer)
 {
 	OutputSettings::BitDepth depth = getOutputSettings().getBitDepth();
 	float clipvalue = std::nextafterf( -1.0f, 0.0f );
 
+	const auto frames = buffer.frames();
 	if (depth == OutputSettings::BitDepth::Depth24Bit || depth == OutputSettings::BitDepth::Depth32Bit) // Float encoding
 	{
-		auto buf = std::vector<sample_t>(frames * channels());
-		for(f_cnt_t frame = 0; frame < frames; ++frame)
+		auto buf = std::make_unique_for_overwrite<float[]>(frames * channels());
+		for (ch_cnt_t channel = 0; channel < channels(); ++channel)
 		{
-			for(ch_cnt_t channel=0; channel<channels(); ++channel)
+			for (f_cnt_t frame = 0; frame < frames; ++frame)
 			{
 				// Clip the negative side to just above -1.0 in order to prevent it from changing sign
 				// Upstream issue: https://github.com/erikd/libsndfile/issues/309
 				// When this commit is reverted libsndfile-1.0.29 must be made a requirement for FLAC
-				buf[frame*channels() + channel] = std::max(clipvalue, _ab[frame][channel]);
+				buf[frame * channels() + channel] = std::max(clipvalue, buffer[channel][frame]);
 			}
 		}
-		sf_writef_float(m_sf, static_cast<float*>(buf.data()), frames);
+
+		sf_writef_float(m_sf, buf.get(), static_cast<sf_count_t>(buffer.frames()));
 	}
 	else // integer PCM encoding
 	{
-		auto buf = std::vector<int_sample_t>(frames * channels());
-		convertToS16(_ab, frames, buf.data(), isBigEndian());
-		sf_writef_short(m_sf, static_cast<short*>(buf.data()), frames);
+		auto buf = std::make_unique_for_overwrite<int_sample_t[]>(frames * channels());
+		convertToS16(buffer, buf.get(), isBigEndian());
+
+		sf_writef_short(m_sf, buf.get(), static_cast<sf_count_t>(buffer.frames()));
 	}
 
 }

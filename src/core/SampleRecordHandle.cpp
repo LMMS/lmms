@@ -52,23 +52,18 @@ SampleRecordHandle::~SampleRecordHandle()
 {
 	if (!m_buffers.empty()) { m_clip->setSampleBuffer(createSampleBuffer()); }
 
-	while( !m_buffers.empty() )
-	{
-		delete[] m_buffers.front().first;
-		m_buffers.erase( m_buffers.begin() );
-	}
 	m_clip->setRecord( false );
 }
 
 
 
 
-void SampleRecordHandle::play( SampleFrame* /*_working_buffer*/ )
+void SampleRecordHandle::play(std::optional<PlanarBufferView<float>> /*buffer*/)
 {
-	const SampleFrame* recbuf = Engine::audioEngine()->inputBuffer();
-	const f_cnt_t frames = Engine::audioEngine()->inputBufferFrames();
-	writeBuffer( recbuf, frames );
-	m_framesRecorded += frames;
+	const auto recordBuffer = Engine::audioEngine()->inputBuffer();
+
+	writeBuffer(recordBuffer);
+	m_framesRecorded += recordBuffer.frames();
 
 	TimePos len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
 	if( len > m_minLength )
@@ -108,35 +103,47 @@ f_cnt_t SampleRecordHandle::framesRecorded() const
 std::shared_ptr<const SampleBuffer> SampleRecordHandle::createSampleBuffer()
 {
 	const f_cnt_t frames = framesRecorded();
+
 	// create buffer to store all recorded buffers in
 	auto bigBuffer = std::vector<SampleFrame>(frames);
 
 	// now copy all buffers into big buffer
-	auto framesCopied = 0;
-	for (const auto& [buf, numFrames] : m_buffers)
+	f_cnt_t framesCopied = 0;
+	for (const auto& [buf, channels, numFrames] : m_buffers)
 	{
-		std::copy_n(buf, numFrames, bigBuffer.begin() + framesCopied);
+		assert(channels == 2); // limitation of SampleBuffer and Sample
+		(void)channels;
+
+		const float* channelBuffers[2] = {buf.get(), buf.get() + numFrames};
+		auto from = PlanarBufferView<const float, 2>{channelBuffers, numFrames};
+		auto to = InterleavedBufferSpan<float, 2>{bigBuffer.data() + framesCopied, numFrames};
+
+		toInterleaved(from, to);
+
 		framesCopied += numFrames;
 	}
 
 	// create according sample-buffer out of big buffer
-	return std::make_shared<const SampleBuffer>(std::move(bigBuffer), Engine::audioEngine()->inputSampleRate());
+	// TODO: Remove unnecessary copy
+	return std::make_shared<const SampleBuffer>(bigBuffer, Engine::audioEngine()->inputSampleRate());
 }
 
 
 
 
-void SampleRecordHandle::writeBuffer( const SampleFrame* _ab, const f_cnt_t _frames )
+void SampleRecordHandle::writeBuffer(PlanarBufferView<const float> buffer)
 {
-	auto buf = new SampleFrame[_frames];
-	for( f_cnt_t frame = 0; frame < _frames; ++frame )
+	const auto channels = buffer.channels();
+	const auto frames = buffer.frames();
+	auto buf = new float[frames * channels];
+
+	float* bufPos = buf;
+	for (ch_cnt_t ch = 0; ch < channels; ++ch, bufPos += frames)
 	{
-		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-		{
-			buf[frame][chnl] = _ab[frame][chnl];
-		}
+		std::ranges::copy(buffer.buffer(ch), bufPos);
 	}
-	m_buffers.push_back( qMakePair( buf, _frames ) );
+
+	m_buffers.emplace_back(std::unique_ptr<float[]>{buf}, channels, frames);
 }
 
 

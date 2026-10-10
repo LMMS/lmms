@@ -39,7 +39,7 @@ class SlicerT : public Instrument
 	Q_OBJECT
 
 public slots:
-	void updateFile(QString file);
+	void updateFile(const QString& file);
 	void updateSlices();
 
 signals:
@@ -48,7 +48,7 @@ signals:
 public:
 	SlicerT(InstrumentTrack* instrumentTrack);
 
-	void playNote(NotePlayHandle* handle, SampleFrame* workingBuffer) override;
+	void playNote(NotePlayHandle* handle, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData(NotePlayHandle* handle) override;
 
 	void saveSettings(QDomDocument& document, QDomElement& element) override;

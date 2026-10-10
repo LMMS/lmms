@@ -25,17 +25,9 @@
 #ifndef LMMS_GUI_OSCILLOSCOPE_H
 #define LMMS_GUI_OSCILLOSCOPE_H
 
+#include <memory>
 #include <QWidget>
 #include <QPixmap>
-
-#include "LmmsTypes.h"
-
-namespace lmms
-{
-
-class SampleFrame;
-
-}
 
 namespace lmms::gui
 {
@@ -74,7 +66,7 @@ protected:
 
 
 protected slots:
-	void updateAudioBuffer(const lmms::SampleFrame* buffer);
+	void updateAudioBuffer(const float* const* buffer, unsigned short channels, unsigned long frames);
 
 private:
 	bool clips(float level) const;
@@ -83,7 +75,7 @@ private:
 	QPixmap m_background;
 	QPointF * m_points;
 
-	SampleFrame* m_buffer;
+	std::unique_ptr<float[]> m_buffer; //!< stereo, planar
 	bool m_active;
 
 	QColor m_leftChannelColor;

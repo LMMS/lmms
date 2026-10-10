@@ -22,12 +22,10 @@
  *
  */
 
-
 #include "InstrumentPlayHandle.h"
+
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "Engine.h"
-#include "AudioEngine.h"
 
 namespace lmms
 {
@@ -40,8 +38,10 @@ InstrumentPlayHandle::InstrumentPlayHandle(Instrument * instrument, InstrumentTr
 	setAudioBusHandle(instrumentTrack->audioBusHandle());
 }
 
-void InstrumentPlayHandle::play(SampleFrame* working_buffer)
+void InstrumentPlayHandle::play(std::optional<PlanarBufferView<float>> buffer)
 {
+	auto workingBuffer = buffer.value();
+
 	InstrumentTrack * instrumentTrack = m_instrument->instrumentTrack();
 
 	// ensure that all our nph's have been processed first
@@ -62,11 +62,10 @@ void InstrumentPlayHandle::play(SampleFrame* working_buffer)
 	}
 	while (nphsLeft);
 
-	m_instrument->play(working_buffer);
+	m_instrument->play(workingBuffer);
 
 	// Process the audio buffer that the instrument has just worked on...
-	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
-	instrumentTrack->processAudioBuffer(working_buffer, frames, nullptr);
+	instrumentTrack->processAudioBuffer(workingBuffer, nullptr);
 }
 
 bool InstrumentPlayHandle::isFromTrack(const Track* track) const

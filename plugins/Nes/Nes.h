@@ -94,7 +94,7 @@ public:
 	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph );
 	virtual ~NesObject() = default;
 	
-	void renderOutput( SampleFrame* buf, f_cnt_t frames );
+	void renderOutput(PlanarBufferSpan<float> out);
 	void updateVibrato( float * freq );
 	void updatePitch();
 	
@@ -203,8 +203,7 @@ public:
 	NesInstrument( InstrumentTrack * instrumentTrack );
 	~NesInstrument() override = default;
 	
-	void playNote( NotePlayHandle * n,
-						SampleFrame* workingBuffer ) override;
+	void playNote(NotePlayHandle* n, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData( NotePlayHandle * n ) override;
 
 

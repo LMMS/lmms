@@ -190,15 +190,7 @@ bool AudioJack::initJackClient()
 					clientName.toLatin1().constData(), jack_get_client_name(m_client));
 	}
 
-	resizeInputBuffer(jack_get_buffer_size(m_client));
-
-	// set buffer-size callback
-	jack_set_buffer_size_callback(m_client,
-		[](jack_nframes_t nframes, void* udata) -> int {
-			static_cast<AudioJack*>(udata)->resizeInputBuffer(nframes);
-			return 0;
-		},
-		this);
+	m_inputFrameBuffers.resize(channels());
 
 	// set process-callback
 	jack_set_process_callback(m_client, staticProcessCallback, this);
@@ -225,14 +217,6 @@ bool AudioJack::initJackClient()
 	}
 
 	return true;
-}
-
-
-
-
-void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
-{
-	m_inputFrameBuffer.resize(nframes);
 }
 
 void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port)
@@ -423,13 +407,16 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	for (int c = 0; c < channels(); ++c)
 	{
 		jack_default_audio_sample_t* jack_input_buffer = (jack_default_audio_sample_t*) jack_port_get_buffer(m_inputPorts[c], nframes);
-
-		for (jack_nframes_t frame = 0; frame < nframes; frame++)
-		{
-			m_inputFrameBuffer[frame][c] = static_cast<sample_t>(jack_input_buffer[frame]);
-		}
+		m_inputFrameBuffers.at(c) = jack_input_buffer;
 	}
-	audioEngine()->pushInputFrames (m_inputFrameBuffer.data(), nframes);
+
+	const auto inputFrameBuffers = PlanarBufferView {
+		m_inputFrameBuffers.data(),
+		static_cast<ch_cnt_t>(m_inputFrameBuffers.size()),
+		nframes
+	};
+
+	audioEngine()->pushInputFrames(inputFrameBuffers);
 	return 0;
 }
 

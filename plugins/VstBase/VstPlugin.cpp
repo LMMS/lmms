@@ -133,8 +133,6 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_version( 0 ),
 	m_currentProgram()
 {
-	setSplittedChannels( true );
-
 	auto pluginType = ExecutableType::Unknown;
 #ifdef LMMS_BUILD_LINUX
 	QFileInfo fi(m_plugin);

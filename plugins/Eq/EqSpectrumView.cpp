@@ -76,11 +76,13 @@ EqAnalyser::~EqAnalyser()
 
 
 
-void EqAnalyser::analyze( SampleFrame* buf, const f_cnt_t frames )
+void EqAnalyser::analyze(PlanarBufferView<const float> buffer)
 {
+	assert(buffer.channels() == 2);
 	//only analyse if the view is visible
 	if ( m_active )
 	{
+		const auto frames = buffer.frames();
 		m_inProgress=true;
 		const int FFT_BUFFER_SIZE = 2048;
 		f_cnt_t f = 0;
@@ -92,8 +94,7 @@ void EqAnalyser::analyze( SampleFrame* buf, const f_cnt_t frames )
 		// meger channels
 		for( ; f < frames; ++f )
 		{
-			m_buffer[m_framesFilledUp] =
-					( buf[f][0] + buf[f][1] ) * 0.5;
+			m_buffer[m_framesFilledUp] = (buffer[0][f] + buffer[1][f]) * 0.5;
 			++m_framesFilledUp;
 		}
 

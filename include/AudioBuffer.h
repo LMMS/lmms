@@ -27,8 +27,9 @@
 
 #include <bitset>
 #include <memory_resource>
+#include <vector>
 
-#include "AudioBufferView.h"
+#include "AudioBufferSpan.h"
 #include "ArrayVector.h"
 #include "LmmsTypes.h"
 #include "lmms_constants.h"
@@ -42,7 +43,7 @@ namespace lmms
  *
  * Features:
  * - Up to `MaxChannelsPerAudioBuffer` total channels
- * - Audio data in planar format (plus a temporary interleaved buffer for conversions until we use planar only)
+ * - Audio data in planar format
  * - All planar buffers are sourced from the same large buffer for better cache locality
  * - Custom allocator support
  * - Silence tracking for each channel (NOTE: requires careful use so that non-silent data is not written to a
@@ -123,7 +124,7 @@ public:
 		ch_cnt_t m_channels = 0;
 	};
 
-	AudioBuffer() = delete;
+	AudioBuffer() = default; // TODO: = delete?
 
 	AudioBuffer(const AudioBuffer&) = delete;
 	AudioBuffer(AudioBuffer&&) noexcept = default;
@@ -161,17 +162,13 @@ public:
 		setGroups(groups, std::forward<F>(groupVisitor));
 	}
 
-	//! The presence of the temporary interleaved buffer is opt-in. Call this to create it.
-	void allocateInterleavedBuffer();
-
-	auto hasInterleavedBuffer() const -> bool { return !m_interleavedBuffer.empty(); }
+	friend void swap(AudioBuffer& lhs, AudioBuffer& rhs) noexcept;
 
 	/**
 	 * @returns the number of bytes needed to allocate buffers with given frame and channel counts.
 	 *          Useful for preallocating a buffer for a shared memory resource.
 	 */
-	static auto allocationSize(f_cnt_t frames, ch_cnt_t channels,
-		bool withInterleavedBuffer = false) -> std::size_t;
+	static auto allocationSize(f_cnt_t frames, ch_cnt_t channels) -> std::size_t;
 
 	//! @returns current number of channel groups
 	auto groupCount() const -> group_cnt_t { return static_cast<group_cnt_t>(m_groups.size()); }
@@ -225,26 +222,15 @@ public:
 	//! @returns the frame count for each channel buffer
 	auto frames() const -> f_cnt_t { return m_frames; }
 
-	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
-	auto interleavedBuffer() const -> InterleavedBufferView<const float, 2>
-	{
-		assert(hasInterleavedBuffer());
-		return {m_interleavedBuffer.data(), m_frames};
-	}
-
-	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
-	auto interleavedBuffer() -> InterleavedBufferView<float, 2>
-	{
-		assert(hasInterleavedBuffer());
-		return {m_interleavedBuffer.data(), m_frames};
-	}
+	//! @returns whether the AudioBuffer is empty
+	auto empty() const -> f_cnt_t { return m_frames == 0; }
 
 	/**
 	 * @brief Adds a new channel group at the end of the list.
 	 *
-	 * If the memory resource is `SharedMemoryResource`, all buffers (source, channels,
-	 * and interleaved) will be reallocated. The number of bytes allocated will be
-	 * `allocationSize(frames(), totalChannels() + channels, hasInterleavedBuffer())`.
+	 * If the memory resource is `SharedMemoryResource`, all buffers (source + channel)
+	 * will be reallocated. The number of bytes allocated will be
+	 * `allocationSize(frames(), totalChannels() + channels)`.
 	 *
 	 * @param channels how many channels the new group should have
 	 * @returns the newly created group, or nullptr upon failure
@@ -336,7 +322,7 @@ public:
 	auto hasAnySignal() const -> bool;
 
 	/**
-	 * @brief Sanitizes @a channels of any Inf/NaN by replacing them with zeros. 
+	 * @brief Sanitizes @a channels of any Inf/NaN by replacing them with zeros.
 	 *
 	 * If any invalid values are detected within a channel, the entire channel buffer is silenced, and its
 	 * internal silence flag is set.
@@ -392,13 +378,6 @@ private:
 	 * [channel index][frame index]
 	 */
 	std::pmr::vector<float*> m_accessBuffer;
-
-	/**
-	 * Interleaved scratch buffer for conversions between interleaved and planar.
-	 *
-	 * TODO: Remove once using planar only
-	 */
-	std::pmr::vector<float> m_interleavedBuffer;
 
 	//! Divides channels into arbitrary groups
 	ArrayVector<ChannelGroup, MaxGroupsPerAudioBuffer> m_groups;

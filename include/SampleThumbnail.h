@@ -32,7 +32,6 @@
 
 #include "lmms_export.h"
 #include "SampleBuffer.h"
-#include "SampleFrame.h"
 
 class QPainter;
 
@@ -89,14 +88,7 @@ private:
 			{
 			}
 
-			Peak(const SampleFrame& frame)
-				: min(std::min(frame.left(), frame.right()))
-				, max(std::max(frame.left(), frame.right()))
-			{
-			}
-
 			Peak operator+(const Peak& other) const { return Peak(std::min(min, other.min), std::max(max, other.max)); }
-			Peak operator+(const SampleFrame& frame) const { return *this + Peak{frame}; }
 
 			float min = std::numeric_limits<float>::infinity();
 			float max = -std::numeric_limits<float>::infinity();
@@ -104,7 +96,7 @@ private:
 
 		Thumbnail() = default;
 		Thumbnail(std::vector<Peak> peaks, double samplesPerPeak);
-		Thumbnail(const float* buffer, size_t size, size_t width);
+		Thumbnail(PlanarBufferView<const float> buffer);
 
 		Thumbnail zoomOut(float factor) const;
 
@@ -112,7 +104,7 @@ private:
 		Peak& operator[](size_t index) { return m_peaks[index]; }
 		const Peak& operator[](size_t index) const { return m_peaks[index]; }
 
-		int width() const { return m_peaks.size(); }
+		std::size_t width() const { return m_peaks.size(); }
 		double samplesPerPeak() const { return m_samplesPerPeak; }
 
 	private:

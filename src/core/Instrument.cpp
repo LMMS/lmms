@@ -45,7 +45,7 @@ Instrument::Instrument(InstrumentTrack * _instrument_track,
 {
 }
 
-void Instrument::play( SampleFrame* )
+void Instrument::play(std::optional<PlanarBufferView<float>>)
 {
 }
 
@@ -89,21 +89,28 @@ bool Instrument::isFromTrack( const Track * _track ) const
 }
 
 // helper function for Instrument::applyFadeIn
-static int countZeroCrossings(SampleFrame* buf, f_cnt_t start, f_cnt_t frames)
+static std::uint16_t countZeroCrossings(PlanarBufferSpan<const float> buf)
 {
 	// zero point crossing counts of all channels
-	auto zeroCrossings = std::array<int, DEFAULT_CHANNELS>{};
+	auto zeroCrossings = std::array<std::uint16_t, MaxChannelsPerAudioBuffer>{};
+	const auto channels = buf.channels();
+	const auto frames = buf.frames();
+	assert(channels <= zeroCrossings.size());
+
 	// maximum zero point crossing of all channels
-	int maxZeroCrossings = 0;
+	std::uint16_t maxZeroCrossings = 0;
 
 	// determine the zero point crossing counts
-	for (f_cnt_t f = start; f < frames; ++f)
+	for (ch_cnt_t ch = 0; ch < channels; ++ch)
 	{
-		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
+		// We need to skip the first sample because it almost always
+		// produces a zero crossing; it's not helpful while
+		// determining the fade in length. Hence 1
+		for (f_cnt_t f = 1; f < frames; ++f)
 		{
 			// we don't want to count [-1, 0, 1] as two crossings
-			if ((buf[f - 1][ch] <= 0.0 && buf[f][ch] > 0.0) ||
-					(buf[f - 1][ch] >= 0.0 && buf[f][ch] < 0.0))
+			if ((buf[ch][f - 1] <= 0.0 && buf[ch][f] > 0.0)
+				|| (buf[ch][f - 1] >= 0.0 && buf[ch][f] < 0.0))
 			{
 				++zeroCrossings[ch];
 				if (zeroCrossings[ch] > maxZeroCrossings)
@@ -118,7 +125,7 @@ static int countZeroCrossings(SampleFrame* buf, f_cnt_t start, f_cnt_t frames)
 }
 
 // helper function for Instrument::applyFadeIn
-f_cnt_t getFadeInLength(float maxLength, f_cnt_t frames, int zeroCrossings)
+static f_cnt_t getFadeInLength(float maxLength, f_cnt_t frames, int zeroCrossings)
 {
 	// calculate the length of the fade in
 	// Length is inversely proportional to the max of zeroCrossings,
@@ -127,72 +134,74 @@ f_cnt_t getFadeInLength(float maxLength, f_cnt_t frames, int zeroCrossings)
 	return (f_cnt_t) (maxLength  / ((float) zeroCrossings / ((float) frames / 128.0f) + 1.0f));
 }
 
-
-void Instrument::applyFadeIn(SampleFrame* buf, NotePlayHandle * n)
+void Instrument::applyFadeIn(PlanarBufferView<float> inOut, NotePlayHandle* nph)
 {
 	const static float MAX_FADE_IN_LENGTH = 85.0;
-	f_cnt_t total = n->totalFramesPlayed();
+	const auto channels = inOut.channels();
+	f_cnt_t total = nph->totalFramesPlayed();
 	if (total == 0)
 	{
-		const f_cnt_t frames = n->framesLeftForCurrentPeriod();
-		const f_cnt_t offset = n->offset();
+		const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
+		const f_cnt_t offset = nph->offset();
 
-		// We need to skip the first sample because it almost always
-		// produces a zero crossing; it's not helpful while
-		// determining the fade in length. Hence 1
-		int maxZeroCrossings = countZeroCrossings(buf, offset + 1, offset + frames);
+		int maxZeroCrossings = countZeroCrossings({inOut, offset, frames});
 
 		f_cnt_t length = getFadeInLength(MAX_FADE_IN_LENGTH, frames, maxZeroCrossings);
-		n->m_fadeInLength = length;
+		nph->m_fadeInLength = length;
 
 		// apply fade in
 		length = length < frames ? length : frames;
-		for (f_cnt_t f = 0; f < length; ++f)
+		for (ch_cnt_t ch = 0; ch < channels; ++ch)
 		{
-			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
+			for (f_cnt_t f = 0; f < length; ++f)
 			{
-				buf[offset + f][ch] *= 0.5 - 0.5 * std::cos(std::numbers::pi_v<float> * static_cast<float>(f) / static_cast<float>(n->m_fadeInLength));
+				inOut[ch][offset + f] *= 0.5 - 0.5 * std::cos(
+					std::numbers::pi_v<float> * static_cast<float>(f) / static_cast<float>(nph->m_fadeInLength));
 			}
 		}
 	}
-	else if (total < n->m_fadeInLength)
+	else if (total < nph->m_fadeInLength)
 	{
-		const f_cnt_t frames = n->framesLeftForCurrentPeriod();
+		const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
 
-		int new_zc = countZeroCrossings(buf, 1, frames);
+		int new_zc = countZeroCrossings(inOut.first(frames));
 		f_cnt_t new_length = getFadeInLength(MAX_FADE_IN_LENGTH, frames, new_zc);
 
-		for (f_cnt_t f = 0; f < frames; ++f)
+		for (ch_cnt_t ch = 0; ch < channels; ++ch)
 		{
-			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
+			for (f_cnt_t f = 0; f < frames; ++f)
 			{
-				float currentLength = n->m_fadeInLength * (1.0f - (float) f / frames) + new_length * ((float) f / frames);
-				buf[f][ch] *= 0.5 - 0.5 * std::cos(std::numbers::pi_v<float> * static_cast<float>(total + f) / currentLength);
+				float currentLength = nph->m_fadeInLength * (1.0f - (float) f / frames)
+					+ new_length * ((float) f / frames);
+				inOut[ch][f] *= 0.5 - 0.5 * std::cos(
+					std::numbers::pi_v<float> * static_cast<float>(total + f) / currentLength);
 				if (total + f >= currentLength)
 				{
-					n->m_fadeInLength = currentLength;
+					nph->m_fadeInLength = currentLength;
 					return;
 				}
 			}
 		}
-		n->m_fadeInLength = new_length;
+		nph->m_fadeInLength = new_length;
 	}
 }
 
-void Instrument::applyRelease( SampleFrame* buf, const NotePlayHandle * _n )
+void Instrument::applyRelease(PlanarBufferView<float> out, const NotePlayHandle* nph)
 {
-	const auto fpp = Engine::audioEngine()->framesPerPeriod();
 	const auto releaseFrames = desiredReleaseFrames();
 
-	const auto endFrame = _n->framesLeft();
+	const auto endFrame = nph->framesLeft();
 	const auto startFrame = endFrame - std::min(endFrame, releaseFrames);
 
-	for (auto f = startFrame; f < endFrame && f < fpp; f++)
+	const auto frames = std::min(endFrame, out.frames());
+	const auto channels = out.channels();
+	for (ch_cnt_t ch = 0; ch < channels; ++ch)
 	{
-		const float fac = (float)(endFrame - f) / (float)releaseFrames;
-		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ch++)
+		float* const outPtr = out.bufferPtr(ch);
+		for (auto frame = startFrame; frame < frames; ++frame)
 		{
-			buf[f][ch] *= fac;
+			const float fac = static_cast<float>(endFrame - frame) / releaseFrames;
+			outPtr[frame] *= fac;
 		}
 	}
 }

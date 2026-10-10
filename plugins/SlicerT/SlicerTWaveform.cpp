@@ -113,7 +113,7 @@ void SlicerTWaveform::resizeEvent(QResizeEvent* event)
 void SlicerTWaveform::drawSeekerWaveform()
 {
 	m_seekerWaveform.fill(s_emptyColor);
-	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
+	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 	QPainter brush(&m_seekerWaveform);
 	brush.setPen(s_waveformColor);
 
@@ -124,8 +124,8 @@ void SlicerTWaveform::drawSeekerWaveform()
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = m_seekerWaveform.rect(),
 		.amplification = sample.amplification(),
-		.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
-		.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+		.sampleStart = static_cast<float>(sample.startFrame()) / sample.frames(),
+		.sampleEnd = static_cast<float>(sample.endFrame()) / sample.frames(),
 		.reversed = sample.reversed()
 	};
 
@@ -141,7 +141,7 @@ void SlicerTWaveform::drawSeekerWaveform()
 void SlicerTWaveform::drawSeeker()
 {
 	m_seeker.fill(s_waveformSeekerBgColor);
-	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
+	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 	QPainter brush(&m_seeker);
 	brush.drawPixmap(0, 0, m_seekerWaveform);
 
@@ -176,11 +176,11 @@ void SlicerTWaveform::drawSeeker()
 void SlicerTWaveform::drawEditorWaveform()
 {
 	m_editorWaveform.fill(s_emptyColor);
-	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
+	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 
 	QPainter brush(&m_editorWaveform);
-	size_t startFrame = m_seekerStart * m_slicerTParent->m_originalSample.sampleSize();
-	size_t endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.sampleSize();
+	size_t startFrame = m_seekerStart * m_slicerTParent->m_originalSample.frames();
+	size_t endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.frames();
 
 	brush.setPen(s_waveformColor);
 	long zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
@@ -192,8 +192,8 @@ void SlicerTWaveform::drawEditorWaveform()
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
 		.amplification = sample.amplification(),
-		.sampleStart = static_cast<float>(startFrame) / sample.sampleSize(),
-		.sampleEnd = static_cast<float>(endFrame) / sample.sampleSize(),
+		.sampleStart = static_cast<float>(startFrame) / sample.frames(),
+		.sampleEnd = static_cast<float>(endFrame) / sample.frames(),
 		.reversed = sample.reversed(),
 	};
 
@@ -211,7 +211,7 @@ void SlicerTWaveform::drawEditor()
 	QPainter brush(&m_sliceEditor);
 
 	// No sample loaded
-	if (m_slicerTParent->m_originalSample.sampleSize() <= 1)
+	if (m_slicerTParent->m_originalSample.frames() <= 1)
 	{
 		brush.setPen(s_playHighlightColor);
 		brush.setFont(QFont(brush.font().family(), 9.0f, -1, false));
@@ -372,7 +372,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 		drawEditorWaveform();
 		break;
 	case Qt::MouseButton::LeftButton:
-		if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { static_cast<SlicerTView*>(parent())->openFiles(); }
+		if (m_slicerTParent->m_originalSample.frames() <= 1) { static_cast<SlicerTView*>(parent())->openFiles(); }
 		// update seeker middle for correct movement
 		m_seekerMiddle = static_cast<float>(pos.x() - s_seekerHorMargin) / m_seekerWidth;
 		break;

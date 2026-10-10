@@ -57,8 +57,9 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 }
 
 
-Effect::ProcessStatus AmplifierEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus AmplifierEffect::processImpl(PlanarBufferView<float> inOut)
 {
+	assert(inOut.channels() == 2); // TODO: Could support arbitrary channels in the future
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -67,6 +68,7 @@ Effect::ProcessStatus AmplifierEffect::processImpl(SampleFrame* buf, const f_cnt
 	const ValueBuffer* leftBuf = m_ampControls.m_leftModel.valueBuffer();
 	const ValueBuffer* rightBuf = m_ampControls.m_rightModel.valueBuffer();
 
+	const auto frames = inOut.frames();
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		const float volume = (volumeBuf ? volumeBuf->value(f) : m_ampControls.m_volumeModel.value()) * 0.01f;
@@ -77,12 +79,15 @@ Effect::ProcessStatus AmplifierEffect::processImpl(SampleFrame* buf, const f_cnt
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);
 
-		auto& currentFrame = buf[f];
+		float& inOutL = inOut[0][f];
+		float& inOutR = inOut[1][f];
 
-		const auto s = currentFrame * SampleFrame(left * panLeft, right * panRight) * volume;
+		const auto sampleL = inOutL * left * panLeft * volume;
+		const auto sampleR = inOutR * right * panRight * volume;
 
 		// Dry/wet mix
-		currentFrame = currentFrame * d + s * w;
+		inOutL = inOutL * d + sampleL * w;
+		inOutR = inOutR * d + sampleR * w;
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

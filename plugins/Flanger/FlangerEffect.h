@@ -42,7 +42,7 @@ public:
 	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
 	~FlangerEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
+	ProcessStatus processImpl(PlanarBufferView<float> inOut) override;
 
 	EffectControls* controls() override
 	{

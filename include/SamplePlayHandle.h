@@ -42,7 +42,7 @@ class LMMS_EXPORT SamplePlayHandle : public PlayHandle
 {
 public:
 	SamplePlayHandle(Sample* sample, bool ownAudioBusHandle = true);
-	SamplePlayHandle( const QString& sampleFile );
+	SamplePlayHandle(const QString& sampleFile);
 	SamplePlayHandle( SampleClip* clip );
 	~SamplePlayHandle() override;
 
@@ -52,7 +52,7 @@ public:
 	}
 
 
-	void play( SampleFrame* buffer ) override;
+	void play(std::optional<PlanarBufferView<float>> buffer) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;

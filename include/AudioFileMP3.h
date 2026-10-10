@@ -58,7 +58,7 @@ public:
 	}
 
 protected:
-	void writeBuffer(const SampleFrame* /* _buf*/, const f_cnt_t /*_frames*/) override;
+	void writeBuffer(PlanarBufferView<const float> buffer) override;
 
 private:
 	void flushRemainingBuffers();

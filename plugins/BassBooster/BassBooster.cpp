@@ -69,7 +69,7 @@ BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPlugin
 
 
 
-Effect::ProcessStatus BassBoosterEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus BassBoosterEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	// check out changed controls
 	if( m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged() )
@@ -86,17 +86,23 @@ Effect::ProcessStatus BassBoosterEffect::processImpl(SampleFrame* buf, const f_c
 	const float d = dryLevel();
 	const float w = wetLevel();
 
+	const auto frames = inOut.frames();
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		auto& currentFrame = buf[f];
+		float& inOutL = inOut[0][f];
+		float& inOutR = inOut[1][f];
 
 		// Process copy of current sample frame
 		m_bbFX.setGain(gainBuffer ? gainBuffer->value(f) : const_gain);
-		auto s = currentFrame;
-		m_bbFX.nextSample(s);
+
+		auto sampleL = inOutL;
+		auto sampleR = inOutR;
+
+		m_bbFX.nextSample(sampleL, sampleR);
 
 		// Dry/wet mix
-		currentFrame = currentFrame * d + s * w;
+		inOutL = inOutL * d + sampleL * w;
+		inOutR = inOutR * d + sampleR * w;
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

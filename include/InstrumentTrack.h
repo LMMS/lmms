@@ -67,8 +67,7 @@ public:
 	~InstrumentTrack() override;
 
 	// used by instrument
-	void processAudioBuffer( SampleFrame* _buf, const f_cnt_t _frames,
-							NotePlayHandle * _n );
+	void processAudioBuffer(PlanarBufferView<float> buffer, NotePlayHandle* _n);
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
 
@@ -85,9 +84,16 @@ public:
 	f_cnt_t beatLen( NotePlayHandle * _n ) const;
 
 
-	// for capturing note-play-events -> need that for arpeggio,
-	// filter and so on
-	void playNote( NotePlayHandle * _n, SampleFrame* _working_buffer );
+	//! @brief For capturing (and possibly rendering) note-play events which are needed
+	//!        for arpeggio, filter, etc.
+	//!
+	//! For multi-streamed instruments, @a out has a value and the instrument is expected
+	//!     to render audio into the @a out buffer.
+	//!
+	//! For single-streamed instruments, @a out is always std::nullopt, and this method
+	//!     is analogous to @ref handleMidiEvent but for @a NotePlayHandle -based instruments,
+	//!     informing the instrument of note events but not rendering audio.
+	void playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>> out);
 
 	QString instrumentName() const;
 	const Instrument *instrument() const

@@ -75,9 +75,9 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	m_sliceSnap.setValue(0);
 }
 
-void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
+void SlicerT::playNote(NotePlayHandle* handle, std::optional<PlanarBufferView<float>> out)
 {
-	if (m_originalSample.sampleSize() <= 1) { return; }
+	if (m_originalSample.frames() <= 1) { return; }
 
 	int noteIndex = handle->key() - m_parentTrack->baseNote();
 	const f_cnt_t frames = handle->framesLeftForCurrentPeriod();
@@ -107,29 +107,34 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 		return;
 	}
 
-	const auto startFrame = static_cast<int>(sliceStart * m_originalSample.sampleSize());
-	if (!handle->m_pluginData) { handle->m_pluginData = new Sample::PlaybackState(AudioResampler::Mode::Linear, startFrame); }
+	const auto startFrame = static_cast<int>(sliceStart * m_originalSample.frames());
+	if (!handle->m_pluginData)
+	{
+		handle->m_pluginData = new Sample::PlaybackState(
+			m_originalSample.sampleChannels(), AudioResampler::Mode::Linear, startFrame);
+	}
 
 	auto playbackState = static_cast<Sample::PlaybackState*>(handle->m_pluginData);
-	const auto endFrame = sliceEnd * m_originalSample.sampleSize();
+	const auto endFrame = sliceEnd * m_originalSample.frames();
 	const auto framesLeft = endFrame - playbackState->frameIndex();
 
+	const auto buffer = PlanarBufferSpan{out.value(), offset, frames};
 	if (framesLeft > 0
-		&& m_originalSample.play(workingBuffer + offset, playbackState, frames, Sample::Loop::Off, speedRatio))
+		&& m_originalSample.play(buffer, playbackState, Sample::Loop::Off, speedRatio))
 	{
 		// exponential fade out, applyRelease() not used since it extends the note length
 		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->outputSampleRate();
-		for (auto i = std::size_t{0}; i < frames; i++)
+		for (f_cnt_t i = 0; i < frames; ++i)
 		{
 			float fadeValue = static_cast<float>(framesLeft * speedRatio - static_cast<int>(i)) / fadeOutFrames;
 			fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
 			fadeValue = cosinusInterpolate(0, 1, fadeValue);
 
-			workingBuffer[i + offset][0] *= fadeValue;
-			workingBuffer[i + offset][1] *= fadeValue;
+			buffer[0][i] *= fadeValue;
+			buffer[1][i] *= fadeValue;
 		}
 
-		const auto currentNote = static_cast<float>(playbackState->frameIndex()) / m_originalSample.sampleSize();
+		const auto currentNote = static_cast<float>(playbackState->frameIndex()) / m_originalSample.frames();
 		emit isPlaying(currentNote, sliceStart, sliceEnd);
 	}
 	else { emit isPlaying(-1, 0, 0); }
@@ -146,21 +151,36 @@ void SlicerT::deleteNotePluginData(NotePlayHandle* handle)
 // http://www.iro.umontreal.ca/~pift6080/H09/documents/papers/bello_onset_tutorial.pdf
 void SlicerT::findSlices()
 {
-	if (m_originalSample.sampleSize() <= 1) { return; }
+	if (m_originalSample.frames() <= 1) { return; }
 	m_slicePoints = {};
 
 	const int windowSize = 512;
 	const float minBeatLength = 0.05f; // in seconds, ~ 1/4 length at 220 bpm
 
-	int sampleRate = m_originalSample.sampleRate();
+	int sampleRate = static_cast<int>(m_originalSample.sampleRate());
 	int minDist = sampleRate * minBeatLength;
 
 	float maxMag = -1;
-	std::vector<float> singleChannel(m_originalSample.sampleSize(), 0);
-	for (auto i = std::size_t{0}; i < m_originalSample.sampleSize(); i++)
+	std::vector<float> singleChannel(m_originalSample.frames(), 0);
+	if (m_originalSample.sampleChannels() == 2)
 	{
-		singleChannel[i] = (m_originalSample.data()[i][0] + m_originalSample.data()[i][1]) / 2;
-		maxMag = std::max(maxMag, singleChannel[i]);
+		// Use average of left and right channels
+		const auto buffer = m_originalSample.data();
+		for (f_cnt_t i = 0; i < m_originalSample.frames(); i++)
+		{
+			singleChannel[i] = (buffer[0][i] + buffer[1][i]) / 2;
+			maxMag = std::max(maxMag, singleChannel[i]);
+		}
+	}
+	else
+	{
+		// Use just the first channel
+		const auto buffer = m_originalSample.data();
+		for (f_cnt_t i = 0; i < m_originalSample.frames(); i++)
+		{
+			singleChannel[i] = buffer[0][i];
+			maxMag = std::max(maxMag, singleChannel[i]);
+		}
 	}
 
 	// normalize and find 0 crossings
@@ -217,7 +237,7 @@ void SlicerT::findSlices()
 		spectralFlux = 1E-10f; // again for no divison by zero
 	}
 
-	m_slicePoints.push_back(m_originalSample.sampleSize());
+	m_slicePoints.push_back(m_originalSample.frames());
 
 	for (float& sliceValue : m_slicePoints)
 	{
@@ -241,7 +261,7 @@ void SlicerT::findSlices()
 
 	for (float& sliceIndex : m_slicePoints)
 	{
-		sliceIndex /= m_originalSample.sampleSize();
+		sliceIndex /= m_originalSample.frames();
 	}
 
 	m_slicePoints[0] = 0;
@@ -254,10 +274,10 @@ void SlicerT::findSlices()
 // and lies in the 100 - 200 bpm range
 void SlicerT::findBPM()
 {
-	if (m_originalSample.sampleSize() <= 1) { return; }
+	if (m_originalSample.frames() <= 1) { return; }
 
 	float sampleRate = m_originalSample.sampleRate();
-	float totalFrames = m_originalSample.sampleSize();
+	float totalFrames = m_originalSample.frames();
 	float sampleLength = totalFrames / sampleRate;
 
 	float bpmEstimate = 240.0f / sampleLength;
@@ -281,7 +301,7 @@ std::vector<Note> SlicerT::getMidi()
 	std::vector<Note> outputNotes;
 
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / Engine::getSong()->getTempo();
-	float outFrames = m_originalSample.sampleSize() * speedRatio;
+	float outFrames = m_originalSample.frames() * speedRatio;
 
 	float framesPerTick = Engine::framesPerTick();
 	float totalTicks = outFrames / framesPerTick;
@@ -304,9 +324,12 @@ std::vector<Note> SlicerT::getMidi()
 	return outputNotes;
 }
 
-void SlicerT::updateFile(QString file)
+void SlicerT::updateFile(const QString& file)
 {
-	if (auto buffer = SampleBuffer::fromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
+	if (auto buffer = SampleBuffer::fromFile(file))
+	{
+		m_originalSample = Sample(std::move(buffer));
+	}
 
 	findBPM();
 	findSlices();
@@ -327,10 +350,13 @@ void SlicerT::updateSlices()
 void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 {
 	element.setAttribute("version", "1");
-	element.setAttribute("src", m_originalSample.sampleFile());
 	if (m_originalSample.sampleFile().isEmpty())
 	{
-		element.setAttribute("sampledata", m_originalSample.toBase64());
+		element.setAttribute("b64sample", m_originalSample.toBase64());
+	}
+	else
+	{
+		element.setAttribute("src", m_originalSample.sampleFile());
 	}
 
 	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
@@ -360,9 +386,16 @@ void SlicerT::loadSettings(const QDomElement& element)
 			Engine::getSong()->collectError(message);
 		}
 	}
+	else if (auto sampleData = element.attribute("b64sample"); !sampleData.isEmpty())
+	{
+		// planar data
+		auto buffer = SampleBuffer::fromBase64(sampleData);
+		m_originalSample = Sample(std::move(buffer));
+	}
 	else if (auto sampleData = element.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		auto buffer = SampleBuffer::fromBase64(sampleData);
+		// legacy interleaved data
+		auto buffer = SampleBuffer::fromLegacyBase64(sampleData);
 		m_originalSample = Sample(std::move(buffer));
 	}
 

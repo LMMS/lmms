@@ -56,7 +56,7 @@ public:
 
 
 private:
-	void writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames) override;
+	void writeBuffer(PlanarBufferView<const float> buffer) override;
 
 	bool startEncoding();
 	void finishEncoding();

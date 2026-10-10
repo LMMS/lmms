@@ -210,7 +210,7 @@ InstrumentTrack::~InstrumentTrack()
 
 
 
-void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const f_cnt_t frames, NotePlayHandle* n )
+void InstrumentTrack::processAudioBuffer(PlanarBufferView<float> buffer, NotePlayHandle* n)
 {
 	// we must not play the sound if this InstrumentTrack is muted...
 	if( isMuted() || ( Engine::getSong()->playMode() != Song::PlayMode::MidiClip &&
@@ -223,7 +223,7 @@ void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const f_cnt_t frames
 	// We could do that in all other cases as well but the overhead for silence test is bigger than
 	// what we potentially save. While playing a note, a NotePlayHandle-driven instrument will produce sound in
 	// 99 of 100 cases so that test would be a waste of time.
-	if (m_instrument->isSingleStreamed() && MixHelpers::isSilent(buf, frames))
+	if (m_instrument->isSingleStreamed() && MixHelpers::isSilent(buffer))
 	{
 		// at least pass one silent buffer to allow
 		if( m_silentBuffersProcessed )
@@ -251,16 +251,26 @@ void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const f_cnt_t frames
 	if (!m_instrument->isSingleStreamed() && n != nullptr)
 	{
 		const f_cnt_t offset = n->noteOffset();
-		m_soundShaping.processAudioBuffer( buf + offset, frames - offset, n );
+		m_soundShaping.processAudioBuffer(PlanarBufferSpan{buffer, offset}, n);
 		const float vol = ( (float) n->getVolume() * DefaultVolumeRatio );
-		const panning_t pan = std::clamp(n->getPanning(), PanningLeft, PanningRight);
-		StereoVolumeVector vv = panningToVolumeVector( pan, vol );
-		for( f_cnt_t f = offset; f < frames; ++f )
+
+		if (buffer.channels() == 2)
 		{
-			for( int c = 0; c < 2; ++c )
+			// stereo: both panning and volume are applied
+			const panning_t pan = std::clamp(n->getPanning(), PanningLeft, PanningRight);
+			StereoVolumeVector vv = panningToVolumeVector(pan, vol);
+
+			const auto frames = buffer.frames();
+			for (f_cnt_t f = offset; f < frames; ++f)
 			{
-				buf[f][c] *= vv.vol[c];
+				buffer[0][f] *= vv.vol[0];
+				buffer[1][f] *= vv.vol[1];
 			}
+		}
+		else
+		{
+			// mono or multi-channel: no panning applied, only volume
+			MixHelpers::multiply(PlanarBufferSpan{buffer, offset}, vol);
 		}
 	}
 }
@@ -553,29 +563,30 @@ f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 
 
 
-void InstrumentTrack::playNote( NotePlayHandle* n, SampleFrame* workingBuffer )
+void InstrumentTrack::playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>> out)
 {
-	// Note: under certain circumstances the working buffer is a nullptr.
-	// These cases are triggered in PlayHandle::doProcessing when the play method is called with a nullptr.
-	// TODO: Find out if we can skip processing at a higher level if the buffer is nullptr.
+	// Note: under certain circumstances `out` is a nullopt.
+	// These cases are triggered in PlayHandle::doProcessing when the play method is called with a nullopt.
+	// TODO: Find out if we can skip processing at a higher level if the buffer is nullopt.
 
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
 	// for chords/arpeggios
-	m_noteStacking.processNote( n );
-	m_arpeggio.processNote( n );
+	m_noteStacking.processNote(nph);
+	m_arpeggio.processNote(nph);
 
-	if( n->isMasterNote() == false && m_instrument != nullptr )
+	if (nph->isMasterNote() == false && m_instrument != nullptr)
 	{
 		// all is done, so now lets play the note!
-		m_instrument->playNote( n, workingBuffer );
+		m_instrument->playNote(nph, out);
 
-		// This is effectively the same as checking if workingBuffer is not a nullptr.
-		// Calling processAudioBuffer with a nullptr leads to crashes. Hence the check.
-		if (n->usesBuffer())
+		// This is effectively the same as checking if `out` is not a nullopt.
+		// Calling processAudioBuffer with a nullopt leads to crashes. Hence the check.
+		if (nph->usesBuffer())
 		{
-			const f_cnt_t frames = n->framesLeftForCurrentPeriod();
-			const f_cnt_t offset = n->noteOffset();
-			processAudioBuffer(workingBuffer, frames + offset, n);
+			assert(out.has_value());
+			const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
+			const f_cnt_t offset = nph->noteOffset();
+			processAudioBuffer(out->first(frames + offset), nph);
 		}
 	}
 }

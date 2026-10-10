@@ -25,10 +25,9 @@
 #ifndef LMMS_AUDIO_DEVICE_H
 #define LMMS_AUDIO_DEVICE_H
 
-#include <QMutex>
-#include <samplerate.h>
+#include <atomic>
 
-#include "LmmsTypes.h"
+#include "AudioBufferSpan.h"
 
 class QThread;
 
@@ -37,8 +36,6 @@ namespace lmms
 
 class AudioEngine;
 class AudioBusHandle;
-class SampleFrame;
-
 
 class AudioDevice
 {
@@ -73,8 +70,8 @@ public:
 protected:
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	int convertToS16(const SampleFrame* _ab, const f_cnt_t _frames, int_sample_t* _output_buffer,
-		const bool _convert_endian = false);
+	int convertToS16(PlanarBufferView<const float> input, int_sample_t* output,
+		const bool convertEndian = false) const;
 
 	// clear given signed-int-16-buffer
 	void clearS16Buffer(int_sample_t* _outbuf, const f_cnt_t _frames);

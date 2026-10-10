@@ -27,6 +27,7 @@
 
 #include <array>
 
+#include "AudioBufferSpan.h"
 #include "Note.h"
 
 class Master;
@@ -36,8 +37,6 @@ namespace lmms
 {
 
 class MidiEvent;
-class SampleFrame;
-
 
 class LocalZynAddSubFx
 {
@@ -63,7 +62,7 @@ public:
 
 	void processMidiEvent( const MidiEvent& event );
 
-	void processAudio( SampleFrame* _out );
+	void processAudio(PlanarBufferView<float> out);
 
 	inline Master * master()
 	{

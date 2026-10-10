@@ -43,16 +43,49 @@ SampleThumbnail::Thumbnail::Thumbnail(std::vector<Peak> peaks, double samplesPer
 {
 }
 
-SampleThumbnail::Thumbnail::Thumbnail(const float* buffer, size_t size, size_t width)
-	: m_peaks(width)
-	, m_samplesPerPeak(std::max(static_cast<double>(size) / width, 1.0))
+SampleThumbnail::Thumbnail::Thumbnail(PlanarBufferView<const float> buffer)
 {
-	for (auto peakIndex = std::size_t{0}; peakIndex < width; ++peakIndex)
+	const auto width = buffer.frames() / AggregationPerZoomStep;
+
+	m_peaks.resize(width);
+	m_samplesPerPeak = std::max(static_cast<double>(buffer.frames()) / width, 1.0);
+
+	if (buffer.empty()) { return; }
+
+	const float* const* bufferData = buffer.data();
+	if (buffer.channels() >= 2)
 	{
-		const auto beginSample = buffer + static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
-		const auto endSample = buffer + static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak));
-		const auto [min, max] = std::minmax_element(beginSample, endSample);
-		m_peaks[peakIndex] = Peak{*min, *max};
+		// Stereo sample or multi-channel sample truncated to stereo
+		for (auto peakIndex = std::size_t{0}; peakIndex < width; ++peakIndex)
+		{
+			const auto beginOffset = static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
+			const auto endOffset = static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak));
+
+			const float* beginSample0 = bufferData[0] + beginOffset;
+			const float* endSample0 = bufferData[0] + endOffset;
+			const auto [min0, max0] = std::minmax_element(beginSample0, endSample0);
+
+			const float* beginSample1 = bufferData[1] + beginOffset;
+			const float* endSample1 = bufferData[1] + endOffset;
+			const auto [min1, max1] = std::minmax_element(beginSample1, endSample1);
+
+			m_peaks[peakIndex] = Peak{std::min(*min0, *min1), std::max(*max0, *max1)};
+		}
+	}
+	else
+	{
+		// Mono sample
+		for (auto peakIndex = std::size_t{0}; peakIndex < width; ++peakIndex)
+		{
+			const auto beginOffset = static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
+			const auto endOffset = static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak));
+
+			const float* beginSample = bufferData[0] + beginOffset;
+			const float* endSample = bufferData[0] + endOffset;
+			const auto [min, max] = std::minmax_element(beginSample, endSample);
+
+			m_peaks[peakIndex] = Peak{*min, *max};
+		}
 	}
 }
 
@@ -94,9 +127,7 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 		s_sampleThumbnailCacheMap[std::move(entry)] = m_thumbnailCache;
 	}
 
-	const auto flatBuffer = m_buffer->data()->data();
-	const auto flatBufferSize = m_buffer->size() * DEFAULT_CHANNELS;
-	m_thumbnailCache->emplace_back(flatBuffer, flatBufferSize, flatBufferSize / AggregationPerZoomStep);
+	m_thumbnailCache->emplace_back(m_buffer->data());
 
 	while (m_thumbnailCache->back().width() >= AggregationPerZoomStep)
 	{
@@ -116,32 +147,54 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	const auto sampleRange = parameters.sampleEnd - parameters.sampleStart;
 	if (sampleRange <= 0.0f || sampleRange > 1.0f) { return; }
 
-	const auto targetThumbnailWidth = static_cast<int>(sampleRect.width() / sampleRange);
+	const auto targetThumbnailWidth = static_cast<std::size_t>(sampleRect.width() / sampleRange);
 	const auto finerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
 		[&](const auto& thumbnail) { return thumbnail.width() >= targetThumbnailWidth; });
 
 	const auto useOriginalBuffer = finerThumbnail == m_thumbnailCache->rend();
-	const auto drawOriginalBuffer = static_cast<size_t>(targetThumbnailWidth) == m_buffer->size();
+	const auto drawOriginalBuffer = targetThumbnailWidth == m_buffer->frames();
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	const auto thumbnailBeginForward = std::max<int>(renderRect.x() - sampleRect.x(), parameters.sampleStart * targetThumbnailWidth);
-	const auto thumbnailEndForward = std::max<int>(renderRect.x() + renderRect.width() - sampleRect.x(), parameters.sampleEnd * targetThumbnailWidth);
+	const auto thumbnailBeginForward = std::max<std::size_t>(renderRect.x() - sampleRect.x(), parameters.sampleStart * targetThumbnailWidth);
+	const auto thumbnailEndForward = std::max<std::size_t>(renderRect.x() + renderRect.width() - sampleRect.x(), parameters.sampleEnd * targetThumbnailWidth);
 	const auto thumbnailBegin = parameters.reversed ? targetThumbnailWidth - thumbnailBeginForward - 1 : thumbnailBeginForward;
 	const auto thumbnailEnd = parameters.reversed ? targetThumbnailWidth - thumbnailEndForward : thumbnailEndForward;
 	const auto advanceThumbnailBy = parameters.reversed ? -1 : 1;
 
-	const auto finerThumbnailWidth = useOriginalBuffer ? m_buffer->size() : finerThumbnail->width();
+	const auto finerThumbnailWidth = useOriginalBuffer ? m_buffer->frames() : finerThumbnail->width();
 	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnailWidth) / targetThumbnailWidth;
 	const auto yScale = renderRect.height() / 2 * parameters.amplification;
 
-	for (auto x = renderRect.x(), i = thumbnailBegin; x < renderRect.x() + renderRect.width() && i != thumbnailEnd;
+	const float* const* buffer = m_buffer->data().data();
+
+	const auto getPoint = m_buffer->channels() >= 2
+		? +[](const float* const* b, f_cnt_t frame) -> float {
+			return (b[0][frame] + b[1][frame]) / 2;
+		}
+		: +[](const float* const* b, f_cnt_t frame) -> float {
+			return b[0][frame];
+		};
+
+	const auto getMinMax = m_buffer->channels() >= 2
+		? +[](const float* const* b, std::size_t begin, std::size_t end) -> std::pair<float, float> {
+			const auto [min0, max0] = std::minmax_element(b[0] + begin, b[0] + end);
+			const auto [min1, max1] = std::minmax_element(b[1] + begin, b[1] + end);
+			return {std::min(*min0, *min1), std::max(*max0, *max1)};
+		}
+		: +[](const float* const* b, std::size_t begin, std::size_t end) -> std::pair<float, float> {
+			const auto [min, max] = std::minmax_element(b[0] + begin, b[0] + end);
+			return {*min, *max};
+		};
+
+	auto i = thumbnailBegin;
+	for (auto x = renderRect.x(); x < renderRect.x() + renderRect.width() && i != thumbnailEnd;
 		++x, i += advanceThumbnailBy)
 	{
 		if (useOriginalBuffer && drawOriginalBuffer)
 		{
-			const auto value = m_buffer->data()->data()[i];
+			const auto value = getPoint(buffer, i);
 			painter.drawPoint(x, renderRect.center().y() - value * yScale);
 			continue;
 		}
@@ -155,10 +208,9 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 
 			if (useOriginalBuffer)
 			{
-				const auto flatBuffer = m_buffer->data()->data();
-				const auto [min, max] = std::minmax_element(flatBuffer + beginIndex, flatBuffer + endIndex);
-				minPeak = *min;
-				maxPeak = *max;
+				const auto [min, max] = getMinMax(buffer, beginIndex, endIndex);
+				minPeak = min;
+				maxPeak = max;
 			}
 			else
 			{

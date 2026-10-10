@@ -26,6 +26,7 @@
 #include <QPainterPath>
 #include <QWidget>
 
+#include "AudioBufferSpan.h"
 #include "fft_helpers.h"
 #include "LmmsTypes.h"
 
@@ -45,7 +46,7 @@ public:
 	bool getInProgress();
 	void clear();
 
-	void analyze( SampleFrame* buf, const f_cnt_t frames );
+	void analyze(PlanarBufferView<const float> buffer);
 
 	float getEnergy() const;
 	int getSampleRate() const;

@@ -43,7 +43,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying):
 	m_startFrameOffset(0)
 {
 	saveJournallingState( false );
-	setSampleFile( "" );
+	setSampleFile("");
 	restoreJournallingState();
 
 	// we need to receive bpm-change-events, because then we have to
@@ -80,7 +80,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	m_startFrameOffset(orig.m_startFrameOffset)
 {
 	saveJournallingState( false );
-	setSampleFile( "" );
+	setSampleFile("");
 	restoreJournallingState();
 
 	// we need to receive bpm-change-events, because then we have to
@@ -256,7 +256,7 @@ void SampleClip::setStartTimeOffset(const TimePos& startTimeOffset)
 
 TimePos SampleClip::sampleLength() const
 {
-	return static_cast<int>(m_sample.sampleSize() / Engine::framesPerTick(m_sample.sampleRate()));
+	return static_cast<int>(m_sample.frames() / Engine::framesPerTick(m_sample.sampleRate()));
 }
 
 
@@ -290,13 +290,15 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
-	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
 	_this.setAttribute("autoresize", QString::number(getAutoResize()));
-	if( sampleFile() == "" )
+	if (sampleFile().isEmpty())
 	{
-		QString s;
-		_this.setAttribute("data", m_sample.toBase64());
+		_this.setAttribute("b64data", m_sample.toBase64());
+	}
+	else
+	{
+		_this.setAttribute("src", sampleFile());
 	}
 
 	_this.setAttribute( "sample_rate", m_sample.sampleRate());
@@ -330,14 +332,26 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
 	}
 
-	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
+	if (sampleFile().isEmpty())
 	{
-		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
-			Engine::audioEngine()->outputSampleRate();
+		const auto sampleRate = _this.hasAttribute("sample_rate")
+			? _this.attribute("sample_rate").toUInt()
+			: Engine::audioEngine()->outputSampleRate();
 
-		auto buffer = SampleBuffer::fromBase64(_this.attribute("data"), sampleRate);
-		m_sample = Sample(std::move(buffer));
+		if (_this.hasAttribute("b64data"))
+		{
+			// planar data
+			auto buffer = SampleBuffer::fromBase64(_this.attribute("b64data"), sampleRate);
+			m_sample = Sample(std::move(buffer));
+		}
+		else if (_this.hasAttribute("data"))
+		{
+			// legacy interleaved data
+			auto buffer = SampleBuffer::fromLegacyBase64(_this.attribute("data"), sampleRate);
+			m_sample = Sample(std::move(buffer));
+		}
 	}
+
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );

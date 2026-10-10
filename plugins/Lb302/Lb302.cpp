@@ -315,7 +315,7 @@ void Lb302Synth::recalcFilter()
 }
 
 
-void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
+void Lb302Synth::process(PlanarBufferView<float> out)
 {
 	if (m_releaseFrame == 0 || !m_playingNote) { m_vcaMode = VcaMode::Decay; }
 
@@ -380,7 +380,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 	const auto decay = computeDecayFactor(0.245260770975f, gateThreshold);
 
 	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
-	for (f_cnt_t i = 0; i < size; ++i)
+	for (f_cnt_t i = 0; i < out.frames(); ++i)
 	{
 		// start decay if we're past release
 		if (i >= m_releaseFrame) { m_vcaMode = VcaMode::Decay; }
@@ -473,7 +473,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 
 		// Write out samples.
 		sample_t samp = filter.process(m_vcoK) * m_vca;
-		for (ch_cnt_t c = 0; c < DEFAULT_CHANNELS; c++) { outbuf[i][c] = samp * vv.vol[c]; }
+		for (ch_cnt_t c = 0; c < DEFAULT_CHANNELS; c++) { out[c][i] = samp * vv.vol[c]; }
 
 		// Handle Envelope
 		if (m_vcaMode == VcaMode::Attack)
@@ -495,7 +495,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 }
 
 
-void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
+void Lb302Synth::playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>>)
 {
 	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased())) { return; }
 
@@ -571,7 +571,7 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 }
 
 
-void Lb302Synth::play(SampleFrame* working_buffer)
+void Lb302Synth::play(std::optional<PlanarBufferView<float>> out)
 {
 	const auto readIdx = m_notesReadSeq.load(std::memory_order_relaxed);
 	const auto writeCommitted = m_notesWriteCommitted.load(std::memory_order_acquire);
@@ -591,7 +591,7 @@ void Lb302Synth::play(SampleFrame* working_buffer)
 	// Mark the processed notes as having been read so that playNote() calls can overwrite them
 	m_notesReadSeq.fetch_add(writeCommitted - readIdx, std::memory_order_release);
 
-	process(working_buffer, Engine::audioEngine()->framesPerPeriod());
+	process(out.value());
 }
 
 

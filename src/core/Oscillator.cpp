@@ -77,11 +77,11 @@ Oscillator::Oscillator(const IntModel *wave_shape_model,
 
 
 
-void Oscillator::update(SampleFrame* ab, const f_cnt_t frames, const ch_cnt_t chnl, bool modulator)
+void Oscillator::update(std::span<sample_t> out, bool modulator)
 {
 	if (m_freq >= Engine::audioEngine()->outputSampleRate() / 2)
 	{
-		zeroSampleFrames(ab, frames);
+		std::ranges::fill(out, 0.f);
 		return;
 	}
 	// If this oscillator is used to PM or PF modulate another oscillator, take a note.
@@ -93,25 +93,25 @@ void Oscillator::update(SampleFrame* ab, const f_cnt_t frames, const ch_cnt_t ch
 		switch (static_cast<ModulationAlgo>(m_modulationAlgoModel->value()))
 		{
 			case ModulationAlgo::PhaseModulation:
-				updatePM(ab, frames, chnl);
+				updatePM(out);
 				break;
 			case ModulationAlgo::AmplitudeModulation:
-				updateAM(ab, frames, chnl);
+				updateAM(out);
 				break;
 			case ModulationAlgo::SignalMix:
 			default:
-				updateMix(ab, frames, chnl);
+				updateMix(out);
 				break;
 			case ModulationAlgo::SynchronizedBySubOsc:
-				updateSync(ab, frames, chnl);
+				updateSync(out);
 				break;
 			case ModulationAlgo::FrequencyModulation:
-				updateFM(ab, frames, chnl);
+				updateFM(out);
 		}
 	}
 	else
 	{
-		updateNoSub(ab, frames, chnl);
+		updateNoSub(out);
 	}
 }
 
@@ -322,35 +322,34 @@ void Oscillator::generateWaveTables()
 
 
 
-void Oscillator::updateNoSub( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateNoSub(std::span<sample_t> out)
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
 	{
 		case WaveShape::Sine:
 		default:
-			updateNoSub<WaveShape::Sine>( _ab, _frames, _chnl );
+			updateNoSub<WaveShape::Sine>(out);
 			break;
 		case WaveShape::Triangle:
-			updateNoSub<WaveShape::Triangle>( _ab, _frames, _chnl );
+			updateNoSub<WaveShape::Triangle>(out);
 			break;
 		case WaveShape::Saw:
-			updateNoSub<WaveShape::Saw>( _ab, _frames, _chnl );
+			updateNoSub<WaveShape::Saw>(out);
 			break;
 		case WaveShape::Square:
-			updateNoSub<WaveShape::Square>( _ab, _frames, _chnl );
+			updateNoSub<WaveShape::Square>(out);
 			break;
 		case WaveShape::MoogSaw:
-			updateNoSub<WaveShape::MoogSaw>( _ab, _frames, _chnl );
+			updateNoSub<WaveShape::MoogSaw>(out);
 			break;
 		case WaveShape::Exponential:
-			updateNoSub<WaveShape::Exponential>( _ab, _frames, _chnl );
+			updateNoSub<WaveShape::Exponential>(out);
 			break;
 		case WaveShape::WhiteNoise:
-			updateNoSub<WaveShape::WhiteNoise>( _ab, _frames, _chnl );
+			updateNoSub<WaveShape::WhiteNoise>(out);
 			break;
 		case WaveShape::UserDefined:
-			updateNoSub<WaveShape::UserDefined>( _ab, _frames, _chnl );
+			updateNoSub<WaveShape::UserDefined>(out);
 			break;
 	}
 }
@@ -358,35 +357,34 @@ void Oscillator::updateNoSub( SampleFrame* _ab, const f_cnt_t _frames,
 
 
 
-void Oscillator::updatePM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updatePM(std::span<sample_t> out)
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
 	{
 		case WaveShape::Sine:
 		default:
-			updatePM<WaveShape::Sine>( _ab, _frames, _chnl );
+			updatePM<WaveShape::Sine>(out);
 			break;
 		case WaveShape::Triangle:
-			updatePM<WaveShape::Triangle>( _ab, _frames, _chnl );
+			updatePM<WaveShape::Triangle>(out);
 			break;
 		case WaveShape::Saw:
-			updatePM<WaveShape::Saw>( _ab, _frames, _chnl );
+			updatePM<WaveShape::Saw>(out);
 			break;
 		case WaveShape::Square:
-			updatePM<WaveShape::Square>( _ab, _frames, _chnl );
+			updatePM<WaveShape::Square>(out);
 			break;
 		case WaveShape::MoogSaw:
-			updatePM<WaveShape::MoogSaw>( _ab, _frames, _chnl );
+			updatePM<WaveShape::MoogSaw>(out);
 			break;
 		case WaveShape::Exponential:
-			updatePM<WaveShape::Exponential>( _ab, _frames, _chnl );
+			updatePM<WaveShape::Exponential>(out);
 			break;
 		case WaveShape::WhiteNoise:
-			updatePM<WaveShape::WhiteNoise>( _ab, _frames, _chnl );
+			updatePM<WaveShape::WhiteNoise>(out);
 			break;
 		case WaveShape::UserDefined:
-			updatePM<WaveShape::UserDefined>( _ab, _frames, _chnl );
+			updatePM<WaveShape::UserDefined>(out);
 			break;
 	}
 }
@@ -394,35 +392,34 @@ void Oscillator::updatePM( SampleFrame* _ab, const f_cnt_t _frames,
 
 
 
-void Oscillator::updateAM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateAM(std::span<sample_t> out)
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
 	{
 		case WaveShape::Sine:
 		default:
-			updateAM<WaveShape::Sine>( _ab, _frames, _chnl );
+			updateAM<WaveShape::Sine>(out);
 			break;
 		case WaveShape::Triangle:
-			updateAM<WaveShape::Triangle>( _ab, _frames, _chnl );
+			updateAM<WaveShape::Triangle>(out);
 			break;
 		case WaveShape::Saw:
-			updateAM<WaveShape::Saw>( _ab, _frames, _chnl );
+			updateAM<WaveShape::Saw>(out);
 			break;
 		case WaveShape::Square:
-			updateAM<WaveShape::Square>( _ab, _frames, _chnl );
+			updateAM<WaveShape::Square>(out);
 			break;
 		case WaveShape::MoogSaw:
-			updateAM<WaveShape::MoogSaw>( _ab, _frames, _chnl );
+			updateAM<WaveShape::MoogSaw>(out);
 			break;
 		case WaveShape::Exponential:
-			updateAM<WaveShape::Exponential>( _ab, _frames, _chnl );
+			updateAM<WaveShape::Exponential>(out);
 			break;
 		case WaveShape::WhiteNoise:
-			updateAM<WaveShape::WhiteNoise>( _ab, _frames, _chnl );
+			updateAM<WaveShape::WhiteNoise>(out);
 			break;
 		case WaveShape::UserDefined:
-			updateAM<WaveShape::UserDefined>( _ab, _frames, _chnl );
+			updateAM<WaveShape::UserDefined>(out);
 			break;
 	}
 }
@@ -430,35 +427,34 @@ void Oscillator::updateAM( SampleFrame* _ab, const f_cnt_t _frames,
 
 
 
-void Oscillator::updateMix( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateMix(std::span<sample_t> out)
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
 	{
 		case WaveShape::Sine:
 		default:
-			updateMix<WaveShape::Sine>( _ab, _frames, _chnl );
+			updateMix<WaveShape::Sine>(out);
 			break;
 		case WaveShape::Triangle:
-			updateMix<WaveShape::Triangle>( _ab, _frames, _chnl );
+			updateMix<WaveShape::Triangle>(out);
 			break;
 		case WaveShape::Saw:
-			updateMix<WaveShape::Saw>( _ab, _frames, _chnl );
+			updateMix<WaveShape::Saw>(out);
 			break;
 		case WaveShape::Square:
-			updateMix<WaveShape::Square>( _ab, _frames, _chnl );
+			updateMix<WaveShape::Square>(out);
 			break;
 		case WaveShape::MoogSaw:
-			updateMix<WaveShape::MoogSaw>( _ab, _frames, _chnl );
+			updateMix<WaveShape::MoogSaw>(out);
 			break;
 		case WaveShape::Exponential:
-			updateMix<WaveShape::Exponential>( _ab, _frames, _chnl );
+			updateMix<WaveShape::Exponential>(out);
 			break;
 		case WaveShape::WhiteNoise:
-			updateMix<WaveShape::WhiteNoise>( _ab, _frames, _chnl );
+			updateMix<WaveShape::WhiteNoise>(out);
 			break;
 		case WaveShape::UserDefined:
-			updateMix<WaveShape::UserDefined>( _ab, _frames, _chnl );
+			updateMix<WaveShape::UserDefined>(out);
 			break;
 	}
 }
@@ -466,35 +462,34 @@ void Oscillator::updateMix( SampleFrame* _ab, const f_cnt_t _frames,
 
 
 
-void Oscillator::updateSync( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateSync(std::span<sample_t> out)
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
 	{
 		case WaveShape::Sine:
 		default:
-			updateSync<WaveShape::Sine>( _ab, _frames, _chnl );
+			updateSync<WaveShape::Sine>(out);
 			break;
 		case WaveShape::Triangle:
-			updateSync<WaveShape::Triangle>( _ab, _frames, _chnl );
+			updateSync<WaveShape::Triangle>(out);
 			break;
 		case WaveShape::Saw:
-			updateSync<WaveShape::Saw>( _ab, _frames, _chnl );
+			updateSync<WaveShape::Saw>(out);
 			break;
 		case WaveShape::Square:
-			updateSync<WaveShape::Square>( _ab, _frames, _chnl );
+			updateSync<WaveShape::Square>(out);
 			break;
 		case WaveShape::MoogSaw:
-			updateSync<WaveShape::MoogSaw>( _ab, _frames, _chnl );
+			updateSync<WaveShape::MoogSaw>(out);
 			break;
 		case WaveShape::Exponential:
-			updateSync<WaveShape::Exponential>( _ab, _frames, _chnl );
+			updateSync<WaveShape::Exponential>(out);
 			break;
 		case WaveShape::WhiteNoise:
-			updateSync<WaveShape::WhiteNoise>( _ab, _frames, _chnl );
+			updateSync<WaveShape::WhiteNoise>(out);
 			break;
 		case WaveShape::UserDefined:
-			updateSync<WaveShape::UserDefined>( _ab, _frames, _chnl );
+			updateSync<WaveShape::UserDefined>(out);
 			break;
 	}
 }
@@ -502,35 +497,34 @@ void Oscillator::updateSync( SampleFrame* _ab, const f_cnt_t _frames,
 
 
 
-void Oscillator::updateFM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateFM(std::span<sample_t> out)
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
 	{
 		case WaveShape::Sine:
 		default:
-			updateFM<WaveShape::Sine>( _ab, _frames, _chnl );
+			updateFM<WaveShape::Sine>(out);
 			break;
 		case WaveShape::Triangle:
-			updateFM<WaveShape::Triangle>( _ab, _frames, _chnl );
+			updateFM<WaveShape::Triangle>(out);
 			break;
 		case WaveShape::Saw:
-			updateFM<WaveShape::Saw>( _ab, _frames, _chnl );
+			updateFM<WaveShape::Saw>(out);
 			break;
 		case WaveShape::Square:
-			updateFM<WaveShape::Square>( _ab, _frames, _chnl );
+			updateFM<WaveShape::Square>(out);
 			break;
 		case WaveShape::MoogSaw:
-			updateFM<WaveShape::MoogSaw>( _ab, _frames, _chnl );
+			updateFM<WaveShape::MoogSaw>(out);
 			break;
 		case WaveShape::Exponential:
-			updateFM<WaveShape::Exponential>( _ab, _frames, _chnl );
+			updateFM<WaveShape::Exponential>(out);
 			break;
 		case WaveShape::WhiteNoise:
-			updateFM<WaveShape::WhiteNoise>( _ab, _frames, _chnl );
+			updateFM<WaveShape::WhiteNoise>(out);
 			break;
 		case WaveShape::UserDefined:
-			updateFM<WaveShape::UserDefined>( _ab, _frames, _chnl );
+			updateFM<WaveShape::UserDefined>(out);
 			break;
 	}
 }
@@ -564,12 +558,11 @@ inline bool Oscillator::syncOk( float _osc_coeff )
 
 
 
-float Oscillator::syncInit( SampleFrame* _ab, const f_cnt_t _frames,
-						const ch_cnt_t _chnl )
+float Oscillator::syncInit(std::span<sample_t> out)
 {
 	if( m_subOsc != nullptr )
 	{
-		m_subOsc->update( _ab, _frames, _chnl );
+		m_subOsc->update(out);
 	}
 	recalcPhase();
 	return m_freq * m_detuning_div_samplerate;
@@ -580,15 +573,15 @@ float Oscillator::syncInit( SampleFrame* _ab, const f_cnt_t _frames,
 
 // if we have no sub-osc, we can't do any modulation... just get our samples
 template<Oscillator::WaveShape W>
-void Oscillator::updateNoSub( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateNoSub(std::span<sample_t> out)
 {
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( f_cnt_t frame = 0; frame < _frames; ++frame )
+	const auto frames = out.size();
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		_ab[frame][_chnl] = getSample<W>( m_phase ) * m_volume;
+		out[frame] = getSample<W>(m_phase) * m_volume;
 		m_phase += osc_coeff;
 	}
 }
@@ -598,18 +591,16 @@ void Oscillator::updateNoSub( SampleFrame* _ab, const f_cnt_t _frames,
 
 // do pm by using sub-osc as modulator
 template<Oscillator::WaveShape W>
-void Oscillator::updatePM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updatePM(std::span<sample_t> out)
 {
-	m_subOsc->update( _ab, _frames, _chnl, true );
+	m_subOsc->update(out, true);
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( f_cnt_t frame = 0; frame < _frames; ++frame )
+	const auto frames = out.size();
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		_ab[frame][_chnl] = getSample<W>( m_phase +
-					_ab[frame][_chnl] )
-							* m_volume;
+		out[frame] = getSample<W>(m_phase + out[frame]) * m_volume;
 		m_phase += osc_coeff;
 	}
 }
@@ -619,16 +610,16 @@ void Oscillator::updatePM( SampleFrame* _ab, const f_cnt_t _frames,
 
 // do am by using sub-osc as modulator
 template<Oscillator::WaveShape W>
-void Oscillator::updateAM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateAM(std::span<sample_t> out)
 {
-	m_subOsc->update( _ab, _frames, _chnl, false );
+	m_subOsc->update(out, false);
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( f_cnt_t frame = 0; frame < _frames; ++frame )
+	const auto frames = out.size();
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		_ab[frame][_chnl] *= getSample<W>( m_phase ) * m_volume;
+		out[frame] *= getSample<W>(m_phase) * m_volume;
 		m_phase += osc_coeff;
 	}
 }
@@ -638,16 +629,16 @@ void Oscillator::updateAM( SampleFrame* _ab, const f_cnt_t _frames,
 
 // do mix by using sub-osc as mix-sample
 template<Oscillator::WaveShape W>
-void Oscillator::updateMix( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateMix(std::span<sample_t> out)
 {
-	m_subOsc->update( _ab, _frames, _chnl, false );
+	m_subOsc->update(out, false);
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( f_cnt_t frame = 0; frame < _frames; ++frame )
+	const auto frames = out.size();
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		_ab[frame][_chnl] += getSample<W>( m_phase ) * m_volume;
+		out[frame] += getSample<W>(m_phase) * m_volume;
 		m_phase += osc_coeff;
 	}
 }
@@ -658,20 +649,20 @@ void Oscillator::updateMix( SampleFrame* _ab, const f_cnt_t _frames,
 // sync with sub-osc (every time sub-osc starts new period, we also start new
 // period)
 template<Oscillator::WaveShape W>
-void Oscillator::updateSync( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateSync(std::span<sample_t> out)
 {
-	const float sub_osc_coeff = m_subOsc->syncInit( _ab, _frames, _chnl );
+	const float sub_osc_coeff = m_subOsc->syncInit(out);
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( f_cnt_t frame = 0; frame < _frames ; ++frame )
+	const auto frames = out.size();
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
 		if( m_subOsc->syncOk( sub_osc_coeff ) )
 		{
 			m_phase = m_phaseOffset;
 		}
-		_ab[frame][_chnl] = getSample<W>( m_phase ) * m_volume;
+		out[frame] = getSample<W>(m_phase) * m_volume;
 		m_phase += osc_coeff;
 	}
 }
@@ -681,18 +672,18 @@ void Oscillator::updateSync( SampleFrame* _ab, const f_cnt_t _frames,
 
 // do fm by using sub-osc as modulator
 template<Oscillator::WaveShape W>
-void Oscillator::updateFM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::updateFM(std::span<sample_t> out)
 {
-	m_subOsc->update( _ab, _frames, _chnl, true );
+	m_subOsc->update(out, true);
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 	const float sampleRateCorrection = 44100.0f / Engine::audioEngine()->outputSampleRate();
 
-	for( f_cnt_t frame = 0; frame < _frames; ++frame )
+	const auto frames = out.size();
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		m_phase += _ab[frame][_chnl] * sampleRateCorrection;
-		_ab[frame][_chnl] = getSample<W>( m_phase ) * m_volume;
+		m_phase += out[frame] * sampleRateCorrection;
+		out[frame] = getSample<W>(m_phase) * m_volume;
 		m_phase += osc_coeff;
 	}
 }

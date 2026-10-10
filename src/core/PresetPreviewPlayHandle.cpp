@@ -145,7 +145,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 		}
 		if( i != nullptr )
 		{
-			i->loadFile( _preset_file );
+			i->loadFile(_preset_file);
 		}
 	}
 	else
@@ -206,7 +206,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 
 
 
-void PresetPreviewPlayHandle::play( SampleFrame* _working_buffer )
+void PresetPreviewPlayHandle::play(std::optional<PlanarBufferView<float>>)
 {
 	// Do nothing; the preview instrument is played by m_previewNote, which
 	// has been added to the audio engine

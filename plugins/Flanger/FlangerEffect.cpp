@@ -88,7 +88,7 @@ FlangerEffect::~FlangerEffect()
 
 
 
-Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus FlangerEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -101,30 +101,31 @@ Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const f_cnt_t
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	auto dryS = std::array<sample_t, 2>{};
-	for( f_cnt_t f = 0; f < frames; ++f )
+	for (f_cnt_t f = 0; f < inOut.frames(); ++f)
 	{
 		float leftLfo;
 		float rightLfo;
 
-		buf[f][0] += fastRandInc(-1.f, 1.f) * noise;
-		buf[f][1] += fastRandInc(-1.f, 1.f) * noise;
-		dryS[0] = buf[f][0];
-		dryS[1] = buf[f][1];
+		inOut[0][f] += fastRandInc(-1.f, 1.f) * noise;
+		inOut[1][f] += fastRandInc(-1.f, 1.f) * noise;
+		dryS[0] = inOut[0][f];
+		dryS[1] = inOut[1][f];
 		m_lfo->tick(&leftLfo, &rightLfo);
 		m_lDelay->setLength( ( float )length + amplitude * (leftLfo+1.0)  );
 		m_rDelay->setLength( ( float )length + amplitude * (rightLfo+1.0)  );
-		if(invertFeedback)
+		if (invertFeedback)
 		{
-			m_lDelay->tick( &buf[f][1] );
-			m_rDelay->tick(&buf[f][0] );
-		} else
+			m_lDelay->tick(&inOut[1][f]);
+			m_rDelay->tick(&inOut[0][f]);
+		}
+		else
 		{
-			m_lDelay->tick( &buf[f][0] );
-			m_rDelay->tick( &buf[f][1] );
+			m_lDelay->tick(&inOut[0][f]);
+			m_rDelay->tick(&inOut[1][f]);
 		}
 
-		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
-		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
+		inOut[0][f] = (d * dryS[0]) + (w * inOut[0][f]);
+		inOut[1][f] = (d * dryS[1]) + (w * inOut[1][f]);
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

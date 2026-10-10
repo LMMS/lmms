@@ -91,17 +91,17 @@ void BitcrushEffect::sampleRateChanged()
 }
 
 
-inline float BitcrushEffect::depthCrush( float in )
+inline float BitcrushEffect::depthCrush(float in) const
 {
 	return roundf( in * (float) m_levels ) * m_levelsRatio;
 }
 
-inline float BitcrushEffect::noise( float amt )
+inline float BitcrushEffect::noise(float amt) const
 {
 	return fastRandInc(-amt, +amt);
 }
 
-Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus BitcrushEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	// update values
 	if( m_needsUpdate || m_controls.m_rateEnabled.isValueChanged() )
@@ -145,6 +145,7 @@ Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const f_cnt_
 	m_needsUpdate = false;
 
 	const float noiseAmt = m_controls.m_inNoise.value() * 0.01f;
+	const auto frames = inOut.frames();
 
 	// read input buffer and write it to oversampled buffer
 	if( m_rateEnabled ) // rate crushing enabled so do that
@@ -161,15 +162,15 @@ Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const f_cnt_
 				{
 					m_bitCounterL -= m_rateCoeffL;
 					m_left = m_depthEnabled
-						? depthCrush( buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt ) )
-						: buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt );
+						? depthCrush(inOut[0][f] * m_inGain + noise(inOut[0][f] * noiseAmt))
+						: inOut[0][f] * m_inGain + noise(inOut[0][f] * noiseAmt);
 				}
 				if( m_bitCounterR > m_rateCoeffR )
 				{
 					m_bitCounterR -= m_rateCoeffR;
 					m_right = m_depthEnabled
-						? depthCrush( buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt ) )
-						: buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt );
+						? depthCrush(inOut[1][f] * m_inGain + noise(inOut[1][f] * noiseAmt))
+						: inOut[1][f] * m_inGain + noise(inOut[1][f] * noiseAmt);
 				}
 			}
 		}
@@ -181,11 +182,11 @@ Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const f_cnt_
 			for( int o = 0; o < OS_RATE; ++o )
 			{
 				m_buffer[f * OS_RATE + o][0] = m_depthEnabled
-					? depthCrush( buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt ) )
-					: buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt );
+					? depthCrush(inOut[0][f] * m_inGain + noise(inOut[0][f] * noiseAmt))
+					: inOut[0][f] * m_inGain + noise(inOut[0][f] * noiseAmt);
 				m_buffer[f * OS_RATE + o][1] = m_depthEnabled
-					? depthCrush( buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt ) )
-					: buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt );
+					? depthCrush(inOut[1][f] * m_inGain + noise(inOut[1][f] * noiseAmt))
+					: inOut[1][f] * m_inGain + noise(inOut[1][f] * noiseAmt);
 			}
 		}
 	}
@@ -229,8 +230,8 @@ Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const f_cnt_
 			lsum += m_buffer[f * OS_RATE + o][0] * OS_RESAMPLE[o];
 			rsum += m_buffer[f * OS_RATE + o][1] * OS_RESAMPLE[o];
 		}
-		buf[f][0] = d * buf[f][0] + w * qBound( -m_outClip, lsum, m_outClip ) * m_outGain;
-		buf[f][1] = d * buf[f][1] + w * qBound( -m_outClip, rsum, m_outClip ) * m_outGain;
+		inOut[0][f] = d * inOut[0][f] + w * qBound(-m_outClip, lsum, m_outClip) * m_outGain;
+		inOut[1][f] = d * inOut[1][f] + w * qBound(-m_outClip, rsum, m_outClip) * m_outGain;
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

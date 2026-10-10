@@ -42,7 +42,7 @@ public:
 	*/
 	Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
 
-	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
+	ProcessStatus processImpl(PlanarBufferView<float> inOut) override;
 
 	EffectControls* controls() override { return &m_controls; }
 
@@ -51,7 +51,6 @@ public:
 
 private:
 	Lv2FxControls m_controls;
-	std::vector<SampleFrame> m_tmpOutputSmps;
 };
 
 

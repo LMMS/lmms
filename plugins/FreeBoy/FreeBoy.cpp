@@ -228,7 +228,7 @@ float FreeBoyInstrument::desiredReleaseTimeMs() const
 
 
 
-void FreeBoyInstrument::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
+void FreeBoyInstrument::playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>> out)
 {
 	const f_cnt_t tfp = nph->totalFramesPlayed();
 	const int samplerate = Engine::audioEngine()->outputSampleRate();
@@ -400,7 +400,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				sample_t s = static_cast<float>(buf[(frame * 2) + ch]) / 32768.0f;
-				workingBuffer[frames - framesLeft + frame + offset][ch] = s;
+				(*out)[ch][frames - framesLeft + frame + offset] = s;
 			}
 		}
 		framesLeft -= count;

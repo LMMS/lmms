@@ -58,6 +58,14 @@ public:
 		if (notify) {LocklessRingBuffer<T>::m_notifier.wakeAll();}
 		return written;
 	}
+	template<class Copier>
+	std::size_t writeFunc(Copier& copier, std::size_t cnt, bool notify = false)
+	{
+		std::size_t written = LocklessRingBuffer<T>::m_buffer.write_func(copier, cnt);
+		// Let all waiting readers know new data are available.
+		if (notify) { LocklessRingBuffer<T>::m_notifier.wakeAll(); }
+		return written;
+	}
 	void mlock() { m_buffer.mlock(); }
 
 protected:
