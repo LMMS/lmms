@@ -46,7 +46,7 @@ QString SampleBuffer::toBase64() const
 {
 	// TODO: Replace with non-Qt equivalent
 	const auto data = reinterpret_cast<const char*>(m_data.data());
-	const auto size = static_cast<int>(m_data.size() * sizeof(SampleFrame));
+	const auto size = static_cast<int>(m_data.size());
 	const auto byteArray = QByteArray{data, size};
 	return byteArray.toBase64();
 }
@@ -67,7 +67,7 @@ auto SampleBuffer::fromFile(const QString& filePath) -> std::optional<SampleBuff
 auto SampleBuffer::fromBase64(const QString& str, ch_cnt_t channels, sample_rate_t sampleRate) -> std::optional<SampleBuffer>
 {
 	const auto result = QByteArray::fromBase64Encoding(str.toUtf8(), QByteArray::AbortOnBase64DecodingErrors);
-	if (!result || result.decoded.size() % sizeof(SampleFrame) != 0) { return std::nullopt; }
+	if (!result || result.decoded.size() % channels != 0) { return std::nullopt; }
 
 	auto buffer = SampleBuffer{channels, result.decoded.size() / sizeof(SampleFrame), sampleRate};
 	std::memcpy(buffer.data(), result.decoded.data(), result.decoded.size());
