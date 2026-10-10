@@ -48,11 +48,11 @@ public:
 	 */
 	enum class Mode : std::uint8_t
 	{
-		ZOH,		 //!< Zero Order Hold (nearest-neighbor) interpolation.
-		Linear,		 //!< Linear interpolation.
+		ZOH,         //!< Zero Order Hold (nearest-neighbor) interpolation.
+		Linear,      //!< Linear interpolation.
 		SincFastest, //!< Fastest sinc-based resampling.
-		SincMedium,	 //!< Medium quality sinc-based resampling.
-		SincBest	 //!< Highest quality sinc-based resampling.
+		SincMedium,  //!< Medium quality sinc-based resampling.
+		SincBest     //!< Highest quality sinc-based resampling.
 	};
 
 	/**
@@ -61,7 +61,7 @@ public:
 	 */
 	struct Result
 	{
-		f_cnt_t inputFramesUsed;	   //!< The number of input frames used during processing.
+		f_cnt_t inputFramesUsed;       //!< The number of input frames used during processing.
 		f_cnt_t outputFramesGenerated; //!< The number of output frames generated during processing.
 	};
 

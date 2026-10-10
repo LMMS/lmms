@@ -43,7 +43,6 @@ namespace lmms
 
 class Lv2Proc;
 class PluginIssue;
-class SampleFrame;
 
 /**
 	Common base class for Lv2 plugins

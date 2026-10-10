@@ -37,7 +37,6 @@
 #include "AudioDevice.h"
 #include "LmmsTypes.h"
 #include "MixHelpers.h"
-#include "SampleFrame.h"
 #include "LocklessList.h"
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"
@@ -56,7 +55,6 @@ constexpr f_cnt_t MAXIMUM_BUFFER_SIZE = 4096;
 
 constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
 constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
-constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
 constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 

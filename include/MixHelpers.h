@@ -169,11 +169,8 @@ LMMS_EXPORT void add(PlanarBufferView<float> dst, PlanarBufferView<const float> 
 //! @brief Add samples from src to dst
 LMMS_EXPORT void add(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src);
 
-//! @brief Multiply samples from `dst` by `coeff` starting at `offset`
-LMMS_EXPORT void multiply(PlanarBufferView<float> dst, float coeff, f_cnt_t offset);
-
 //! @brief Multiply samples from `dst` by `coeff`
-LMMS_EXPORT void multiply(PlanarBufferView<float> dst, float coeff);
+LMMS_EXPORT void multiply(PlanarBufferSpan<float> dst, float coeff);
 
 //! @brief Add samples from src multiplied by coeffSrc to dst
 LMMS_EXPORT void addMultiplied(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float coeffSrc);

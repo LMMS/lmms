@@ -32,10 +32,8 @@
 namespace lmms
 {
 
-
 class InstrumentTrack;
 class NotePlayHandle;
-class SampleFrame;
 
 namespace gui
 {

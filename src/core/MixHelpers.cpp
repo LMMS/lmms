@@ -294,26 +294,10 @@ void addMultiplied(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> sr
 	}
 }
 
-void multiply(PlanarBufferView<float> dst, float coeff, f_cnt_t offset)
+void multiply(PlanarBufferSpan<float> dst, float coeff)
 {
-	assert(offset < dst.frames());
-
-	const ch_cnt_t channels = dst.channels();
-	const f_cnt_t frames = dst.frames();
-	for (ch_cnt_t ch = 0; ch < channels; ++ch)
-	{
-		float* dstPtr = dst.bufferPtr(ch);
-		for (f_cnt_t frame = offset; frame < frames; ++frame)
-		{
-			dstPtr[frame] *= coeff;
-		}
-	}
-}
-
-void multiply(PlanarBufferView<float> dst, float coeff)
-{
-	const ch_cnt_t channels = dst.channels();
-	const f_cnt_t frames = dst.frames();
+	const auto channels = dst.channels();
+	const auto frames = dst.frames();
 	for (ch_cnt_t ch = 0; ch < channels; ++ch)
 	{
 		float* dstPtr = dst.bufferPtr(ch);

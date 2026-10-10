@@ -270,7 +270,7 @@ void InstrumentTrack::processAudioBuffer(PlanarBufferView<float> buffer, NotePla
 		else
 		{
 			// mono or multi-channel: no panning applied, only volume
-			MixHelpers::multiply(buffer, vol, offset);
+			MixHelpers::multiply(PlanarBufferSpan{buffer, offset}, vol);
 		}
 	}
 }

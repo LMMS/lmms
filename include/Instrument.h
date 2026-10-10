@@ -48,7 +48,6 @@ class InstrumentTrack;
 class MidiEvent;
 class NotePlayHandle;
 class Track;
-class SampleFrame;
 
 
 class LMMS_EXPORT Instrument : public Plugin

@@ -192,8 +192,6 @@ struct Audio : public VisitablePort<Audio, PortBase>
 
 	//! @brief Copy our ports into buffers passed by LMMS
 	//! @param lmmsBuf The buffer to copy into
-	//! @param wet the wet level
-	//! @param dry the dry level
 	void copyBuffersToCore(std::span<float> lmmsBuf) const;
 
 	//! @brief Copy our ports into buffers passed by LMMS, performing wet/dry mixing

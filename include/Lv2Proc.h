@@ -50,7 +50,6 @@ namespace lmms
 {
 
 class PluginIssue;
-class SampleFrame;
 
 // forward declare port structs/enums
 namespace Lv2Ports
@@ -140,8 +139,6 @@ public:
 	//! This marks the first sample in each sample frame where we write to.
 	//! If we are the 2nd of 2 mono procs, this can be greater than 0.
 	//! @param num Number of channels we must write to @p buf (starting at @p firstChan)
-	//! @param wet the wet level
-	//! @param dry the dry level
 	void copyBuffersToCore(PlanarBufferView<float> buf, unsigned firstChan, unsigned num) const;
 
 	//! @brief Copy our ports into buffers passed by the core, performing wet/dry mixing
