@@ -220,7 +220,7 @@ void LfoControllerDialog::askUserDefWave()
 	}
 	else
 	{
-		QMessageBox::warning(nullptr, tr("Error"), QString{"%1: %2"}.arg(tr("Failed to load sample"), fileName));
+		QMessageBox::warning(nullptr, tr("Error"), tr("Failed to load sample: %1").arg(fileName));
 	}
 }
 
