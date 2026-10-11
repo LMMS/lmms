@@ -144,17 +144,9 @@ public:
 	//! @note Feature detection runs only during the first function call and results are cached for subsequent calls.
 	static LMMS_INLINE auto runtimeCpuFeatures() noexcept -> std::uint32_t
 	{
-		if (m_cachedFeatures != LMMS_CPU_FEATURE_INVALID) [[likely]] { return m_cachedFeatures; }
-		m_cachedFeatures = determineRuntimeCpuFeatures();
-		return m_cachedFeatures;
-	}
-
-	//! @brief A faster version of @ref runtimeCpuFeatures which simply returns the cached value
-	//! @warning Do not call until after @ref runtimeCpuFeatures has been called once
-	static LMMS_INLINE auto fastRuntimeCpuFeatures() noexcept -> std::uint32_t
-	{
-		assert(m_cachedFeatures != LMMS_CPU_FEATURE_INVALID);
-		return m_cachedFeatures;
+		if (s_cachedFeatures != LMMS_CPU_FEATURE_INVALID) [[likely]] { return s_cachedFeatures; }
+		s_cachedFeatures = determineRuntimeCpuFeatures();
+		return s_cachedFeatures;
 	}
 
 	//! @brief Checks whether the current CPU meets the baseline CPU requirements for this particular LMMS build
@@ -171,7 +163,7 @@ public:
 
 private:
 	static auto determineRuntimeCpuFeatures() noexcept -> std::uint32_t;
-	static inline std::uint32_t m_cachedFeatures = LMMS_CPU_FEATURE_INVALID;
+	static inline std::uint32_t s_cachedFeatures = LMMS_CPU_FEATURE_INVALID;
 };
 
 } // namespace lmms
@@ -184,6 +176,6 @@ private:
 //! Checks if the specified CPU features are supported due to the compile-time microarchitecture target
 //! or if support is detected on the current CPU at runtime.
 #define LMMS_RUNTIME_CPU_SUPPORTS(features) \
-	(LMMS_CPU_SUPPORTS((features)) || ((features) & ::lmms::FeatureDetection::fastRuntimeCpuFeatures()) == (features))
+	(LMMS_CPU_SUPPORTS((features)) || ((features) & ::lmms::FeatureDetection::runtimeCpuFeatures()) == (features))
 
 #endif // LMMS_FEATURE_DETECTION_H

@@ -87,7 +87,6 @@ void add( SampleFrame* dst, const SampleFrame* src, int frames )
 
 namespace {
 
-#if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_ARM64)
 LMMS_SIMD_BEGIN_DISPATCH_TARGET_IMPL
 
 template<std::uint8_t lanes>
@@ -140,29 +139,27 @@ void addImpl<4>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRI
 
 #endif
 
-LMMS_SIMD_END_DISPATCH_TARGET_IMPL
+const auto addDispatcher = SimdDispatcher {
+		SimdDispatchConfig {
+#if defined(LMMS_HOST_X86_64)
+		.avx512f = addImpl<16>,
+		.avx     = addImpl<8>,
+#elif defined(LMMS_HOST_ARM64)
+		.neon    = addImpl<4>,
 #endif
+		.scalar  = addImpl<1>
+	}
+};
+
+LMMS_SIMD_END_DISPATCH_TARGET_IMPL
 
 } // namespace
 
 void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 {
-	assert(dst.channels() == src.channels());
-	assert(dst.frames() == src.frames());
-
-	static auto dispatcher = SimdDispatcher {
-			SimdDispatchConfig {
-#if defined(LMMS_HOST_X86_64)
-			.avx512f = addImpl<16>,
-			.avx     = addImpl<8>,
-#elif defined(LMMS_HOST_ARM64)
-			.neon    = addImpl<4>,
-#endif
-			.scalar  = addImpl<1>
-		}
-	};
-
-	dispatcher(dst.data(), src.data(), dst.channels(), dst.frames());
+	assert(dst.channels() >= src.channels());
+	assert(dst.frames() >= src.frames());
+	addDispatcher(dst.data(), src.data(), src.channels(), src.frames());
 }
 
 

@@ -159,7 +159,7 @@ private:
 
 	auto resolvePreferManual() const noexcept -> TargetRef
 	{
-		switch (FeatureDetection::fastRuntimeCpuFeatures() & m_highestImplementedTarget)
+		switch (FeatureDetection::runtimeCpuFeatures() & m_highestImplementedTarget)
 		{
 #if defined(LMMS_HOST_X86_64)
 			case LMMS_CPU_FEATURE_AVX512F:   if (m_config.avx512f) { return *m_config.avx512f; } [[fallthrough]];
@@ -181,7 +181,7 @@ private:
 
 	auto resolvePreferAutoVectorization() const noexcept -> TargetRef
 	{
-		switch (FeatureDetection::fastRuntimeCpuFeatures() & m_highestImplementedTarget)
+		switch (FeatureDetection::runtimeCpuFeatures() & m_highestImplementedTarget)
 		{
 #if defined(LMMS_HOST_X86_64)
 			case LMMS_CPU_FEATURE_AVX512F:
