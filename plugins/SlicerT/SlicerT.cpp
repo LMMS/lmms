@@ -377,7 +377,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 		}
 		else
 		{
-			const auto message = tr("Failed to load sample: <Base64 data>");
+			const auto message = tr("Failed to load Base64 sample");
 			Engine::getSong()->collectError(message);
 		}
 	}
