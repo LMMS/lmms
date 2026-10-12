@@ -138,7 +138,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuff
 
 		for (ch_cnt_t channel = 0; channel < numChannels; ++channel)
 		{
-			for (auto frame = 0; frame < framesRead; ++frame)
+			for (f_cnt_t frame = 0; frame < framesRead; ++frame)
 			{
 				buffer[totalFramesRead + frame][channel] = output[channel][frame];
 			}
