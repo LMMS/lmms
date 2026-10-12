@@ -111,29 +111,29 @@ auto decodeSampleOggVorbis(const std::filesystem::path& path) -> std::optional<S
 	const auto vorbisInfo = ov_info(&vorbisFile, -1);
 	if (vorbisInfo == nullptr) { return std::nullopt; }
 
-	const auto numChannels = static_cast<ch_cnt_t>(vorbisInfo->channels);
-	const auto sampleRate = static_cast<sample_rate_t>(vorbisInfo->rate);
-	const auto numFrames = static_cast<f_cnt_t>(ov_pcm_total(&vorbisFile, 0));
+	const auto numChannels = vorbisInfo->channels;
+	const auto sampleRate = vorbisInfo->rate;
+	const auto numFrames = ov_pcm_total(&vorbisFile, 0);
 
-	auto buffer = SampleBuffer{numChannels, numFrames, sampleRate};
+	auto buffer = SampleBuffer{
+		static_cast<ch_cnt_t>(numChannels), static_cast<f_cnt_t>(numFrames), static_cast<sample_rate_t>(sampleRate)};
 	auto output = static_cast<float**>(nullptr);
-	auto currentSection = 0;
-	auto totalFramesRead = 0;
-	auto framesRead = 0;
+
+	int currentSection = 0;
+	long totalFramesRead = 0;
+	long framesRead = 0;
 
 	while ((framesRead = ov_read_float(&vorbisFile, &output, numFrames - totalFramesRead, &currentSection)) > 0)
 	{
 		const auto info = ov_info(&vorbisFile, currentSection);
-		const auto channels = static_cast<ch_cnt_t>(info->channels);
-		const auto rate = static_cast<sample_rate_t>(info->rate);
 
 		// Vorbis files can contain multiple bitstreams of different channels and sample rates
 		// We ignore any bitstreams that differ in channel count and sample rate from the first one seen
-		if (channels != numChannels || rate != sampleRate) { break; }
+		if (info->channels != numChannels || info->rate != sampleRate) { break; }
 
-		for (ch_cnt_t channel = 0; channel < numChannels; ++channel)
+		for (int channel = 0; channel < numChannels; ++channel)
 		{
-			for (f_cnt_t frame = 0; frame < framesRead; ++frame)
+			for (long frame = 0; frame < framesRead; ++frame)
 			{
 				buffer[totalFramesRead + frame][channel] = output[channel][frame];
 			}
