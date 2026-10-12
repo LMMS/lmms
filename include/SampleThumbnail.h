@@ -28,11 +28,10 @@
 
 #include <QDateTime>
 #include <QRect>
-#include <memory>
 
-#include "lmms_export.h"
 #include "SampleBuffer.h"
 #include "SampleFrame.h"
+#include "lmms_export.h"
 
 class QPainter;
 
@@ -73,7 +72,7 @@ public:
 	};
 
 	SampleThumbnail() = default;
-	SampleThumbnail(const Sample& sample);
+	SampleThumbnail(const SampleBuffer& buffer);
 	void visualize(VisualizeParameters parameters, QPainter& painter) const;
 
 private:
@@ -82,65 +81,38 @@ private:
 	public:
 		struct Peak
 		{
-			Peak() = default;
-
-			Peak(float min, float max)
-				: min(min)
-				, max(max)
-			{
-			}
-
-			Peak(const SampleFrame& frame)
-				: min(std::min(frame.left(), frame.right()))
-				, max(std::max(frame.left(), frame.right()))
-			{
-			}
-
-			Peak operator+(const Peak& other) const { return Peak(std::min(min, other.min), std::max(max, other.max)); }
-			Peak operator+(const SampleFrame& frame) const { return *this + Peak{frame}; }
+			auto operator+(const Peak& other) const -> Peak
+			{ return Peak{std::min(min, other.min), std::max(max, other.max)}; }
 
 			float min = std::numeric_limits<float>::infinity();
 			float max = -std::numeric_limits<float>::infinity();
 		};
 
-		Thumbnail() = default;
-		Thumbnail(std::vector<Peak> peaks, double samplesPerPeak);
-		Thumbnail(const float* buffer, size_t size, size_t width);
+		explicit Thumbnail(int width)
+			: m_peaks(width)
+		{
+		}
 
-		Thumbnail zoomOut(float factor) const;
+		auto compress(int factor) const -> Thumbnail;
 
-		Peak* data() { return m_peaks.data(); }
-		Peak& operator[](size_t index) { return m_peaks[index]; }
-		const Peak& operator[](size_t index) const { return m_peaks[index]; }
+		auto operator[](std::size_t index) -> Peak& { return m_peaks[index]; }
+		auto operator[](std::size_t index) const -> const Peak& { return m_peaks[index]; }
 
-		int width() const { return m_peaks.size(); }
-		double samplesPerPeak() const { return m_samplesPerPeak; }
+		auto begin() { return m_peaks.begin(); }
+		auto begin() const { return m_peaks.begin(); }
+
+		auto end() { return m_peaks.end(); }
+		auto end() const { return m_peaks.end(); }
+
+		auto width() const -> int { return m_peaks.size(); }
 
 	private:
 		std::vector<Peak> m_peaks;
-		double m_samplesPerPeak = 0.0;
 	};
 
-	struct SampleThumbnailEntry
-	{
-		QString filePath;
-		QDateTime lastModified;
-
-		friend bool operator==(const SampleThumbnailEntry& first, const SampleThumbnailEntry& second)
-		{
-			return first.filePath == second.filePath && first.lastModified == second.lastModified;
-		}
-	};
-
-	struct Hash
-	{
-		std::size_t operator()(const SampleThumbnailEntry& entry) const noexcept { return qHash(entry.filePath); }
-	};
-
-	using ThumbnailCache = std::vector<Thumbnail>;
-	std::shared_ptr<ThumbnailCache> m_thumbnailCache = std::make_shared<ThumbnailCache>();
-	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
-	inline static std::unordered_map<SampleThumbnailEntry, std::shared_ptr<ThumbnailCache>, Hash> s_sampleThumbnailCacheMap;
+	// Thumbnails are to be in a sorted order (lowest to highest resolution)
+	// These thumbnails are representative of the entire sample data
+	std::vector<Thumbnail> m_thumbnails;
 };
 
 } // namespace lmms::gui
