@@ -136,7 +136,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuff
 		// We ignore any bitstreams that differ in channel count and sample rate from the first one seen
 		if (channels != numChannels || rate != sampleRate) { break; }
 
-		for (auto channel = 0; channel < numChannels; ++channel)
+		for (ch_cnt_t channel = 0; channel < numChannels; ++channel)
 		{
 			for (auto frame = 0; frame < framesRead; ++frame)
 			{
