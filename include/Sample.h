@@ -79,12 +79,13 @@ public:
 	auto play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loopMode = Loop::Off,
 		double ratio = 1.0) const -> bool;
 
-	auto sampleDuration() const -> std::chrono::milliseconds;
-	auto sampleFile() const -> const QString& { return m_buffer->path(); }
-	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
-	auto sampleSize() const -> size_t { return m_buffer->frames(); }
+	auto duration() const -> std::chrono::milliseconds;
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
+
+	auto path() const -> const QString& { return m_buffer->path(); }
+	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
+	auto frames() const -> size_t { return m_buffer->frames(); }
 
 	auto buffer() const -> const SampleBuffer& { return *m_buffer.get(); }
 	auto shareBuffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }

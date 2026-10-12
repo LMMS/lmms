@@ -130,12 +130,12 @@ void SampleClip::changeLength( const TimePos & _length )
 
 const QString& SampleClip::sampleFile() const
 {
-	return m_sample.sampleFile();
+	return m_sample.path();
 }
 
 bool SampleClip::hasSampleFileLoaded(const QString & filename) const
 {
-	return m_sample.sampleFile() == filename;
+	return m_sample.path() == filename;
 }
 
 void SampleClip::setSampleBuffer(SampleBuffer buffer)
@@ -259,7 +259,7 @@ void SampleClip::setStartTimeOffset(const TimePos& startTimeOffset)
 
 TimePos SampleClip::sampleLength() const
 {
-	return static_cast<int>(m_sample.sampleSize() / Engine::framesPerTick(m_sample.sampleRate()));
+	return static_cast<int>(m_sample.frames() / Engine::framesPerTick(m_sample.sampleRate()));
 }
 
 

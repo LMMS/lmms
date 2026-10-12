@@ -71,8 +71,8 @@ void SampleClipView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
+		!m_clip->m_sample.path().isEmpty()
+			? PathUtil::toAbsolute(m_clip->m_sample.path())
 			: tr("Double-click to open sample")
 	);
 }
@@ -291,7 +291,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
 
-	if (sample.sampleSize() > 0)
+	if (sample.frames() > 0)
 	{
 		const auto param = SampleThumbnail::VisualizeParameters{
 			.sampleRect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
@@ -303,7 +303,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		m_sampleThumbnail.visualize(param, p);
 	}
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+	QString name = PathUtil::cleanName(m_clip->m_sample.path());
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed

@@ -177,7 +177,7 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 	return size;
 }
 
-auto Sample::sampleDuration() const -> std::chrono::milliseconds
+auto Sample::duration() const -> std::chrono::milliseconds
 {
 	const auto numFrames = endFrame() - startFrame();
 	const auto duration = numFrames / static_cast<float>(m_buffer->sampleRate()) * 1000;
