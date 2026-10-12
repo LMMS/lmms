@@ -80,7 +80,7 @@ public:
 		double ratio = 1.0) const -> bool;
 
 	auto sampleDuration() const -> std::chrono::milliseconds;
-	auto sampleFile() const -> const QString& { return m_buffer->audioFile(); }
+	auto sampleFile() const -> const QString& { return m_buffer->path(); }
 	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
 	auto sampleSize() const -> size_t { return m_buffer->frames(); }
 

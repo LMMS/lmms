@@ -45,10 +45,10 @@ namespace {
 
 using Decoder = std::optional<SampleBuffer> (*)(const QString&);
 
-auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleBuffer>;
-auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleBuffer>;
+auto decodeSampleSF(const QString& path) -> std::optional<SampleBuffer>;
+auto decodeSampleDS(const QString& path) -> std::optional<SampleBuffer>;
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuffer>;
+auto decodeSampleOggVorbis(const QString& path) -> std::optional<SampleBuffer>;
 #endif
 
 static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
@@ -57,56 +57,56 @@ static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
 #endif
 	&decodeSampleDS};
 
-auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleBuffer>
+auto decodeSampleSF(const QString& path) -> std::optional<SampleBuffer>
 {
 	auto sfinfo = SF_INFO{};
 
 #ifndef LMMS_BUILD_WIN32
-	const auto utf8Path = audioFile.toUtf8();
+	const auto utf8Path = path.toUtf8();
 	const auto sndfile = sf_open(utf8Path.data(), SFM_READ, &sfinfo);
 #else
-	const auto utf16Path = audioFile.toStdWString();
+	const auto utf16Path = path.toStdWString();
 	const auto sndfile = sf_wchar_open(utf16Path.c_str(), SFM_READ, &sfinfo);
 #endif
 
 	if (!sndfile || sf_error(sndfile) != 0) { return std::nullopt; }
 
 	auto buffer = SampleBuffer{static_cast<ch_cnt_t>(sfinfo.channels), static_cast<f_cnt_t>(sfinfo.frames),
-		static_cast<sample_rate_t>(sfinfo.samplerate), audioFile};
+		static_cast<sample_rate_t>(sfinfo.samplerate)};
 
 	sf_readf_float(sndfile, buffer.data(), buffer.frames());
 	sf_close(sndfile);
 	return buffer;
 }
 
-auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleBuffer>
+auto decodeSampleDS(const QString& path) -> std::optional<SampleBuffer>
 {
 	// Populated by DrumSynth::GetDSFileSamples
 	int_sample_t* dataPtr = nullptr;
 
 	auto ds = DrumSynth{};
 	const auto engineRate = Engine::audioEngine()->outputSampleRate();
-	const auto frames = ds.GetDSFileSamples(audioFile, dataPtr, DEFAULT_CHANNELS, engineRate);
+	const auto frames = ds.GetDSFileSamples(path, dataPtr, DEFAULT_CHANNELS, engineRate);
 	const auto data = std::unique_ptr<int_sample_t[]>{dataPtr}; // NOLINT, we have to use a C-style array here
 
 	if (frames <= 0 || !data) { return std::nullopt; }
 
-	auto result = SampleBuffer{2, static_cast<f_cnt_t>(frames), engineRate, audioFile};
+	auto result = SampleBuffer{2, static_cast<f_cnt_t>(frames), engineRate};
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
 	return result;
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuffer>
+auto decodeSampleOggVorbis(const QString& path) -> std::optional<SampleBuffer>
 {
 	auto vorbisFile = OggVorbis_File{};
 
 #ifndef LMMS_BUILD_WIN32
-	const auto utf8Path = audioFile.toUtf8();
+	const auto utf8Path = path.toUtf8();
 	const auto file = fopen(utf8Path.data(), "rb");
 #else
-	const auto utf16Path = audioFile.toStdWString();
+	const auto utf16Path = path.toStdWString();
 	const auto file = _wfopen(utf16Path.c_str(), L"rb");
 #endif
 
@@ -120,7 +120,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleBuff
 	const auto sampleRate = static_cast<sample_rate_t>(vorbisInfo->rate);
 	const auto numFrames = static_cast<f_cnt_t>(ov_pcm_total(&vorbisFile, 0));
 
-	auto buffer = SampleBuffer{numChannels, numFrames, sampleRate, audioFile};
+	auto buffer = SampleBuffer{numChannels, numFrames, sampleRate};
 	auto output = static_cast<float**>(nullptr);
 	auto currentSection = 0;
 	auto totalFramesRead = 0;
@@ -188,12 +188,12 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 	return s_audioTypes;
 }
 
-auto SampleDecoder::decode(const QString& audioFile) -> std::optional<SampleBuffer>
+auto SampleDecoder::decode(const QString& path) -> std::optional<SampleBuffer>
 {
 	auto result = std::optional<SampleBuffer>{};
 	for (const auto& decoder : decoders)
 	{
-		result = decoder(audioFile);
+		result = decoder(path);
 		if (result) { break; }
 	}
 

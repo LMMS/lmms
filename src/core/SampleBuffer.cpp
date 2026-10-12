@@ -33,11 +33,10 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(ch_cnt_t channels, f_cnt_t frames, sample_rate_t sampleRate, const QString& audioFile)
+SampleBuffer::SampleBuffer(ch_cnt_t channels, f_cnt_t frames, sample_rate_t sampleRate)
 	: m_data(frames * channels)
 	, m_channels{channels}
 	, m_sampleRate{sampleRate}
-	, m_audioFile(audioFile)
 {
 	assert(channels > 0 && "channel count must be greater than 0");
 }
@@ -57,11 +56,13 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 	return s_buffer;
 }
 
-auto SampleBuffer::fromFile(const QString& filePath) -> std::optional<SampleBuffer>
+auto SampleBuffer::fromFile(const QString& path) -> std::optional<SampleBuffer>
 {
-	const auto absolutePath = PathUtil::toAbsolute(filePath);
-	const auto storedPath = PathUtil::toShortestRelative(filePath);
-	return SampleDecoder::decode(absolutePath);
+	const auto absolutePath = PathUtil::toAbsolute(path);
+	const auto storedPath = PathUtil::toShortestRelative(path);
+	auto buffer = SampleDecoder::decode(absolutePath);
+	if (buffer) { buffer->m_path = path; }
+	return buffer;
 }
 
 auto SampleBuffer::fromBase64(const QString& str, ch_cnt_t channels, sample_rate_t sampleRate) -> std::optional<SampleBuffer>

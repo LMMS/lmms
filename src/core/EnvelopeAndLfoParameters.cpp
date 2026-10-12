@@ -352,7 +352,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 	m_lfoAmountModel.saveSettings( _doc, _parent, "lamt" );
 	m_x100Model.saveSettings( _doc, _parent, "x100" );
 	m_controlEnvAmountModel.saveSettings( _doc, _parent, "ctlenvamt" );
-	_parent.setAttribute("userwavefile", m_userWave->audioFile());
+	_parent.setAttribute("userwavefile", m_userWave->path());
 }
 
 

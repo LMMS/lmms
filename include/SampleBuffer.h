@@ -26,6 +26,7 @@
 #define LMMS_SAMPLE_BUFFER_H
 
 #include <QString>
+#include <filesystem>
 #include <memory>
 #include <vector>
 
@@ -66,10 +67,8 @@ public:
 	 * @param channels The number of channels
 	 * @param frames The number of frames
 	 * @param sampleRate The sample rate
-	 * @param audioFile The audio file specified (optional)
 	 */
-	SampleBuffer(
-		ch_cnt_t channels, f_cnt_t frames, sample_rate_t sampleRate = DefaultSampleRate, const QString& audioFile = "");
+	SampleBuffer(ch_cnt_t channels, f_cnt_t frames, sample_rate_t sampleRate = DefaultSampleRate);
 
 	//! @returns A pointer to the frame at the given frame index
 	auto operator[](f_cnt_t frameIndex) -> float* { return &m_data[frameIndex * m_channels]; }
@@ -123,8 +122,8 @@ public:
 	//! @returns The sample rate of the buffer
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
-	//! @returns The audio file (if any) associated with the buffer
-	auto audioFile() const -> const QString& { return m_audioFile; }
+	//! @returns The path to the audio file associated with the buffer, or a null string when no path is associated.
+	auto path() const -> const QString& { return m_path; }
 
 	//! @brief Converts the buffer's audio into a Base64 string
 	auto toBase64() const -> QString;
@@ -155,7 +154,7 @@ private:
 	std::vector<float> m_data;
 	ch_cnt_t m_channels = DefaultChannels;
 	sample_rate_t m_sampleRate = DefaultSampleRate;
-	QString m_audioFile;
+	QString m_path;
 };
 
 } // namespace lmms
