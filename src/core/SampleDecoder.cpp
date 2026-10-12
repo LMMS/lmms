@@ -24,10 +24,9 @@
 
 #include "SampleDecoder.h"
 
-#include <QFile>
-#include <QString>
 #include <memory>
 #include <sndfile.h>
+#include "PathUtil.h"
 #include "SampleBuffer.h"
 
 #ifdef LMMS_HAVE_OGGVORBIS
@@ -43,12 +42,12 @@ namespace lmms {
 
 namespace {
 
-using Decoder = std::optional<SampleBuffer> (*)(const QString&);
+using Decoder = std::optional<SampleBuffer> (*)(const std::filesystem::path&);
 
-auto decodeSampleSF(const QString& path) -> std::optional<SampleBuffer>;
-auto decodeSampleDS(const QString& path) -> std::optional<SampleBuffer>;
+auto decodeSampleSF(const std::filesystem::path& path) -> std::optional<SampleBuffer>;
+auto decodeSampleDS(const std::filesystem::path& path) -> std::optional<SampleBuffer>;
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& path) -> std::optional<SampleBuffer>;
+auto decodeSampleOggVorbis(const std::filesystem::path& path) -> std::optional<SampleBuffer>;
 #endif
 
 static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
@@ -57,16 +56,14 @@ static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
 #endif
 	&decodeSampleDS};
 
-auto decodeSampleSF(const QString& path) -> std::optional<SampleBuffer>
+auto decodeSampleSF(const std::filesystem::path& path) -> std::optional<SampleBuffer>
 {
 	auto sfinfo = SF_INFO{};
 
 #ifndef LMMS_BUILD_WIN32
-	const auto utf8Path = path.toUtf8();
-	const auto sndfile = sf_open(utf8Path.data(), SFM_READ, &sfinfo);
+	const auto sndfile = sf_open(path.c_str(), SFM_READ, &sfinfo);
 #else
-	const auto utf16Path = path.toStdWString();
-	const auto sndfile = sf_wchar_open(utf16Path.c_str(), SFM_READ, &sfinfo);
+	const auto sndfile = sf_wchar_open(path.c_str(), SFM_READ, &sfinfo);
 #endif
 
 	if (!sndfile || sf_error(sndfile) != 0) { return std::nullopt; }
@@ -79,14 +76,14 @@ auto decodeSampleSF(const QString& path) -> std::optional<SampleBuffer>
 	return buffer;
 }
 
-auto decodeSampleDS(const QString& path) -> std::optional<SampleBuffer>
+auto decodeSampleDS(const std::filesystem::path& path) -> std::optional<SampleBuffer>
 {
 	// Populated by DrumSynth::GetDSFileSamples
 	int_sample_t* dataPtr = nullptr;
 
 	auto ds = DrumSynth{};
 	const auto engineRate = Engine::audioEngine()->outputSampleRate();
-	const auto frames = ds.GetDSFileSamples(path, dataPtr, DEFAULT_CHANNELS, engineRate);
+	const auto frames = ds.GetDSFileSamples(PathUtil::stringFromPath(path), dataPtr, DEFAULT_CHANNELS, engineRate);
 	const auto data = std::unique_ptr<int_sample_t[]>{dataPtr}; // NOLINT, we have to use a C-style array here
 
 	if (frames <= 0 || !data) { return std::nullopt; }
@@ -98,16 +95,14 @@ auto decodeSampleDS(const QString& path) -> std::optional<SampleBuffer>
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& path) -> std::optional<SampleBuffer>
+auto decodeSampleOggVorbis(const std::filesystem::path& path) -> std::optional<SampleBuffer>
 {
 	auto vorbisFile = OggVorbis_File{};
 
 #ifndef LMMS_BUILD_WIN32
-	const auto utf8Path = path.toUtf8();
-	const auto file = fopen(utf8Path.data(), "rb");
+	const auto file = fopen(path.c_str(), "rb");
 #else
-	const auto utf16Path = path.toStdWString();
-	const auto file = _wfopen(utf16Path.c_str(), L"rb");
+	const auto file = _wfopen(path.c_str(), L"rb");
 #endif
 
 	if (!file) { return std::nullopt; }
@@ -188,7 +183,7 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 	return s_audioTypes;
 }
 
-auto SampleDecoder::decode(const QString& path) -> std::optional<SampleBuffer>
+auto SampleDecoder::decode(const std::filesystem::path& path) -> std::optional<SampleBuffer>
 {
 	auto result = std::optional<SampleBuffer>{};
 	for (const auto& decoder : decoders)

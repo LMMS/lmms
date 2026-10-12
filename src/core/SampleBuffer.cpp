@@ -60,7 +60,7 @@ auto SampleBuffer::fromFile(const QString& path) -> std::optional<SampleBuffer>
 {
 	const auto absolutePath = PathUtil::toAbsolute(path);
 	const auto storedPath = PathUtil::toShortestRelative(path);
-	auto buffer = SampleDecoder::decode(absolutePath);
+	auto buffer = SampleDecoder::decode(PathUtil::stringToPath(absolutePath));
 	if (buffer) { buffer->m_path = path; }
 	return buffer;
 }
