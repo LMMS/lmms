@@ -74,7 +74,8 @@ auto SampleBuffer::fromBase64(const QString& str, ch_cnt_t channels, sample_rate
 	const auto result = QByteArray::fromBase64Encoding(str.toUtf8(), QByteArray::AbortOnBase64DecodingErrors);
 	if (!result || result.decoded.size() % channels != 0) { return std::nullopt; }
 
-	auto buffer = SampleBuffer{channels, result.decoded.size() / sizeof(SampleFrame), sampleRate};
+	const auto frames = result.decoded.size() / (sizeof(float) * channels);
+	auto buffer = SampleBuffer{channels, frames, sampleRate};
 	std::memcpy(buffer.data(), result.decoded.data(), result.decoded.size());
 	return buffer;
 }
