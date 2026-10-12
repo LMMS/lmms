@@ -59,10 +59,14 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 auto SampleBuffer::fromFile(const QString& path) -> std::optional<SampleBuffer>
 {
 	const auto absolutePath = PathUtil::toAbsolute(path);
-	const auto storedPath = PathUtil::toShortestRelative(path);
-	auto buffer = SampleDecoder::decode(PathUtil::stringToPath(absolutePath));
-	if (buffer) { buffer->m_path = path; }
-	return buffer;
+
+	if (auto buffer = SampleDecoder::decode(PathUtil::stringToPath(absolutePath)))
+	{
+		buffer->m_path = path;
+		return buffer;
+	}
+
+	return std::nullopt;
 }
 
 auto SampleBuffer::fromBase64(const QString& str, ch_cnt_t channels, sample_rate_t sampleRate) -> std::optional<SampleBuffer>
