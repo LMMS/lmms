@@ -28,6 +28,7 @@
 #include <array>
 #include <chrono>
 
+#include "Metronome.h"
 #include "TapTempoView.h"
 #include "ToolPlugin.h"
 
@@ -57,6 +58,7 @@ private:
 	int m_beat = 0;
 	int m_taps = 0;
 	double m_bpm = 0;
+	Metronome m_metronome;
 };
 } // namespace lmms
 

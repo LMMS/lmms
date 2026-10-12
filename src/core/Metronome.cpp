@@ -30,16 +30,32 @@
 namespace lmms {
 void Metronome::processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset)
 {
+	std::call_once(s_initFlag, &Metronome::init, this);
+
 	const auto ticksPerBeat = ticksPerBar / beatsPerBar;
 	if (currentTick % ticksPerBeat != 0 || !m_active) { return; }
 
-	const auto handle = currentTick % ticksPerBar == 0 ? SamplePlayHandle::fromFile("misc/metronome02.ogg")
-													   : SamplePlayHandle::fromFile("misc/metronome01.ogg");
-
-	if (handle)
-	{
-		handle->setOffset(bufferOffset);
-		Engine::audioEngine()->addPlayHandle(handle);
-	}
+	const auto handle = currentTick % ticksPerBar == 0 ? new SamplePlayHandle{&s_strong}
+													   : new SamplePlayHandle{&s_weak};
+	handle->setOffset(bufferOffset);
+	Engine::audioEngine()->addPlayHandle(handle);
 }
+
+void Metronome::processBeat(int currentBeat, int numBeats)
+{
+	std::call_once(s_initFlag, &Metronome::init, this);
+
+	const auto handle = currentBeat % numBeats == 0 ? new SamplePlayHandle{&s_strong}
+													: new SamplePlayHandle{&s_weak};
+	Engine::audioEngine()->addPlayHandle(handle);
+}
+
+void Metronome::init()
+{
+	// The metronome sounds should always load successfully, otherwise something is wrong with the installation
+	// We opt to throw an exception instead of handling the error in this case
+	s_strong = Sample{SampleBuffer::fromFile("misc/metronome02.ogg").value()};
+	s_weak = Sample{SampleBuffer::fromFile("misc/metronome01.ogg").value()};
+}
+
 } // namespace lmms
