@@ -342,14 +342,11 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			}
 		}
 
-		auto buffer = SampleBuffer{SampleBuffer::DefaultChannels, frames, sample_rate};
+		auto buffer = SampleBuffer{1, frames, sample_rate};
 
 		for (f_cnt_t frame = 0; frame < frames; ++frame)
 		{
-			for (ch_cnt_t chnl = 0; chnl < SampleBuffer::DefaultChannels; ++chnl)
-			{
-				buffer[frame][chnl] = wave_samples[frame];
-			}
+			buffer[frame][0] = wave_samples[frame];
 		}
 
 		auto psample = std::make_shared<Sample>(std::move(buffer));
