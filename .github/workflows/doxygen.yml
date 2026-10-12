@@ -1,6 +1,11 @@
 ---
 name: doxygen
-'on': [push] # only auto-run on pushing to a branch
+on:
+  workflow_dispatch: # allow manual run
+  push:
+    branches: # only auto-run on pushing to main|master branch
+      - main
+      - master
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -9,38 +14,36 @@ permissions:
   pages: write
   id-token: write
 jobs:
-  linux-x86_64:
-    name: linux-x86_64
+  deploy:
+    name: Deploy Doxygen docs to Github Pages
     runs-on: ubuntu-latest
-    env:
-      MAKEFLAGS: -j2
     steps:
-      - name: Configure git
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           submodules: recursive
       - name: Install packages
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends cmake make
+          sudo apt-get install -y --no-install-recommends --no-install-suggests graphviz
       - name: Install doxygen
         uses: ssciwr/doxygen-install@v2
         with:
-          version: "1.16.1"
+          version: "1.18.0"
       - name: Configure
         run: |
-          cmake -S doc -B build $CMAKE_OPTS
+          cmake -S doc -B build
       - name: Build docs
         run: cmake --build build --target doc
       - name: Setup Pages
+        id: setup_pages
+        continue-on-error: true
         uses: actions/configure-pages@v5
       - name: Upload generated website
+        if: ${{ steps.setup_pages.outcome == 'success' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'build/doc/html'
       - name: Deploy to GitHub Pages
-        id: deployment
+        if: ${{ steps.setup_pages.outcome == 'success' }}
         uses: actions/deploy-pages@v5

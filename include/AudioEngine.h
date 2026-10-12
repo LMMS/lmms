@@ -274,7 +274,7 @@ public:
 	/**
 	 * @brief Renders an audio buffer into @a dst.
 	 *
-	 * Renders @ref renderNextAudioPeriod() "audio periods" into @a dst. If @a dst is not a multiple of the period
+	 * Renders @ref renderNextPeriod() "audio periods" into @a dst. If @a dst is not a multiple of the period
 	 * size, the remaining frames are partially rendered (an extra period may be rendered in such cases, which can
 	 * degrade performance).
 	 *

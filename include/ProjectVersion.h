@@ -56,7 +56,11 @@ public:
 	CompareType getCompareType() const { return m_compareType; }
 	ProjectVersion setCompareType(CompareType compareType) { m_compareType = compareType; return * this; }
 
+	//! @param a A version to compare
+	//! @param b A version to compare
+	//! @param c Determines the number of identifiers to check when comparing
 	static int compare(const ProjectVersion& a, const ProjectVersion& b, CompareType c);
+
 	static int compare(ProjectVersion v1, ProjectVersion v2);
 
 private:
