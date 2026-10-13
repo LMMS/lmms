@@ -65,7 +65,7 @@ protected:
 
 private:
 	SampleClip * m_clip;
-	SampleThumbnail m_sampleThumbnail;
+	SampleThumbnailCache m_sampleThumbnail;
 	QPixmap m_paintPixmap;
 	long m_paintPixmapXPosition;
 } ;

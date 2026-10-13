@@ -34,7 +34,7 @@ constexpr auto AggregationPerZoomStep = 10;
 
 namespace lmms::gui {
 
-SampleThumbnail::SampleThumbnail(const SampleBuffer& buffer)
+SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 {
 	if (buffer.empty()) { return; }
 
@@ -53,7 +53,7 @@ SampleThumbnail::SampleThumbnail(const SampleBuffer& buffer)
 	}
 }
 
-auto SampleThumbnail::Thumbnail::compress(int factor) const -> Thumbnail
+auto SampleThumbnailCache::Thumbnail::compress(int factor) const -> Thumbnail
 {
 	assert(factor > 0 && "factor must be greater than 0");
 
@@ -70,7 +70,7 @@ auto SampleThumbnail::Thumbnail::compress(int factor) const -> Thumbnail
 	return compressedThumbnail;
 }
 
-void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painter) const
+void SampleThumbnailCache::visualize(VisualizeParameters parameters, QPainter& painter) const
 {
 	const auto& sampleRect = parameters.sampleRect;
 	const auto& viewportRect = parameters.viewportRect.isNull() ? sampleRect : parameters.viewportRect;

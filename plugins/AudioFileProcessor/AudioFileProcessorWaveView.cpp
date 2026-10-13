@@ -345,9 +345,9 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 
-	m_sampleThumbnail = SampleThumbnail{*m_sample->buffer()};
+	m_sampleThumbnail = SampleThumbnailCache{*m_sample->buffer()};
 
-	const auto param = SampleThumbnail::VisualizeParameters{
+	const auto param = SampleThumbnailCache::VisualizeParameters{
 		.sampleRect = m_graph.rect(),
 		.amplification = m_sample->amplification(),
 		.sampleStart = static_cast<float>(m_from) / m_sample->sampleSize(),

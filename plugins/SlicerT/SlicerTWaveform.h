@@ -107,7 +107,7 @@ private:
 	QPixmap m_sliceEditor;
 	QPixmap m_emptySampleIcon;
 	
-	SampleThumbnail m_sampleThumbnail;
+	SampleThumbnailCache m_sampleThumbnail;
 
 	SlicerT* m_slicerTParent;
 

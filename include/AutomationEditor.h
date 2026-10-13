@@ -292,7 +292,7 @@ private:
 	QColor m_ghostSampleColor;
 	QColor m_outOfBoundsShade;
 	
-	SampleThumbnail m_sampleThumbnail;
+	SampleThumbnailCache m_sampleThumbnail;
 
 	friend class AutomationEditorWindow;
 

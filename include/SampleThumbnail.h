@@ -52,7 +52,7 @@ namespace lmms::gui {
    the visualization however (i.e., we are not reading from original sample data when drawing), this provides a
    significant performance boost that wouldn't be possible otherwise.
  */
-class LMMS_EXPORT SampleThumbnail
+class LMMS_EXPORT SampleThumbnailCache
 {
 public:
 	struct VisualizeParameters
@@ -71,8 +71,8 @@ public:
 		bool reversed = false; //!< Determines if the waveform is drawn in reverse or not.
 	};
 
-	SampleThumbnail() = default;
-	SampleThumbnail(const SampleBuffer& buffer);
+	SampleThumbnailCache() = default;
+	SampleThumbnailCache(const SampleBuffer& buffer);
 	void visualize(VisualizeParameters parameters, QPainter& painter) const;
 
 private:
