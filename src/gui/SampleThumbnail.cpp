@@ -53,6 +53,22 @@ SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 	}
 }
 
+auto SampleThumbnailCache::thumbnailForWidth(int width) -> Thumbnail&
+{
+	assert(1 <= width && width <= m_thumbnails.begin()->width() && "invalid width");
+
+	const auto it = std::lower_bound(m_thumbnails.begin(), m_thumbnails.end(), width,
+		[](const Thumbnail& thumbnail, int width) { return thumbnail.width() < width; });
+
+	// This should not happen, the finest resolution stored is always 1 sample per pixel
+	assert(it != m_thumbnails.end());
+
+	if (it->width() == width) { return *it; }
+
+	auto thumbnail = it->compress(it->width() / width);
+	return *m_thumbnails.insert(it, std::move(thumbnail));
+}
+
 auto SampleThumbnailCache::Thumbnail::compress(int factor) const -> Thumbnail
 {
 	assert(factor > 0 && "factor must be greater than 0");
