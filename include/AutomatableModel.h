@@ -135,15 +135,19 @@ public:
 	template<class T>
 	static T castValue( const float v )
 	{
-		return (T)( v );
+		if constexpr (std::is_same_v<T, int>)
+		{
+			return static_cast<int>(std::round(v));
+		}
+		else if constexpr (std::is_same_v<T, bool>)
+		{
+			return std::round(v) != 0;
+		}
+		else
+		{
+			return static_cast<T>(v);
+		}
 	}
-
-	template<bool>
-	static bool castValue( const float v )
-	{
-		return (std::round(v) != 0);
-	}
-
 
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
