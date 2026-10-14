@@ -35,17 +35,21 @@ constexpr auto AggregationPerZoomStep = 10;
 namespace lmms::gui {
 
 SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
+	: m_sampleCount{buffer.size()}
 {
 	if (buffer.empty()) { return; }
 
-	auto highestResolutionThumbnail = Thumbnail{static_cast<int>(buffer.size())};
+	auto highestResolutionThumbnail = Thumbnail{static_cast<int>(m_sampleCount)};
 	for (auto i = 0; i < highestResolutionThumbnail.width(); ++i)
 	{
 		const auto value = buffer.data()[i].average();
 		highestResolutionThumbnail[i] = Thumbnail::Peak{value, value};
 	}
 
+	// The thumbnail with the highest resolution is the entire sample buffer summed down to mono
 	m_thumbnails.emplace_back(std::move(highestResolutionThumbnail));
+
+	// The thumbnails after it are increasingly compressed via the peaks being aggregated
 	while (m_thumbnails.back().width() >= AggregationPerZoomStep)
 	{
 		auto thumbnail = m_thumbnails.back().compress(AggregationPerZoomStep);
@@ -55,18 +59,32 @@ SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 
 auto SampleThumbnailCache::thumbnailForWidth(int width) -> Thumbnail&
 {
-	assert(1 <= width && width <= m_thumbnails.begin()->width() && "invalid width");
+	assert(1 <= width && width <= m_sampleCount && "invalid width");
 
+	// The thumbnails are in descending order, starting from the largest width to the smallest
+	// We want to find the last element that is still greater than the requested width
+	// This is the same as finding the first element smaller than the requested width and moving back one
 	const auto it = std::lower_bound(m_thumbnails.begin(), m_thumbnails.end(), width,
-		[](const Thumbnail& thumbnail, int width) { return thumbnail.width() < width; });
+		[](const Thumbnail& thumbnail, int width) { return thumbnail.width() > width; });
 
-	// This should not happen, the finest resolution stored is always 1 sample per pixel
+	// It should exist, the highest resolution stored is always the longest possible width
 	assert(it != m_thumbnails.end());
 
+	// Check if the one we found is equal before moving back
 	if (it->width() == width) { return *it; }
 
-	auto thumbnail = it->compress(it->width() / width);
+	// Move back by one to get the nearest larger thumbnail
+	const auto nearest = std::prev(it);
+
+	auto thumbnail = nearest->compress(nearest->width() / width);
 	return *m_thumbnails.insert(it, std::move(thumbnail));
+}
+
+auto SampleThumbnailCache::thumbnailForSamplesPerPixel(int samplesPerPixel) -> Thumbnail&
+{
+	assert(1 <= samplesPerPixel && samplesPerPixel <= m_sampleCount && "invalid samples per pixel");
+	const auto width = (m_sampleCount + samplesPerPixel - 1) / samplesPerPixel;
+	return thumbnailForWidth(width);
 }
 
 auto SampleThumbnailCache::Thumbnail::compress(int factor) const -> Thumbnail
@@ -86,58 +104,39 @@ auto SampleThumbnailCache::Thumbnail::compress(int factor) const -> Thumbnail
 	return compressedThumbnail;
 }
 
-void SampleThumbnailCache::visualize(VisualizeParameters parameters, QPainter& painter) const
+void SampleThumbnailCache::visualize(VisualizeParameters parameters, QPainter& painter)
 {
-	const auto& sampleRect = parameters.sampleRect;
-	const auto& viewportRect = parameters.viewportRect.isNull() ? sampleRect : parameters.viewportRect;
+	parameters.sampleEnd = std::min(parameters.sampleEnd, m_sampleCount);
 
-	const auto renderRect = sampleRect.intersected(viewportRect);
-	if (renderRect.isNull()) { return; }
+	if (parameters.sampleStart >= m_sampleCount || parameters.sampleEnd <= parameters.sampleStart) { return; }
 
-	const auto sampleRange = parameters.sampleEnd - parameters.sampleStart;
-	if (sampleRange <= 0.0f || sampleRange > 1.0f) { return; }
+	const auto numSamples = parameters.sampleEnd - parameters.sampleStart;
+	const auto samplesPerPixel = numSamples / parameters.rect.width();
+	const auto& thumbnail = thumbnailForSamplesPerPixel(samplesPerPixel);
 
-	const auto targetThumbnailWidth = static_cast<int>(sampleRect.width() / sampleRange);
-	const auto finerThumbnail = std::find_if(m_thumbnails.rbegin(), m_thumbnails.rend(),
-		[&](const auto& thumbnail) { return thumbnail.width() >= targetThumbnailWidth; });
+	const auto drawStart = std::max(parameters.viewportStart, parameters.rect.x());
+	const auto drawEnd = std::max(parameters.viewportEnd, parameters.rect.x() + parameters.rect.width());
 
-	if (finerThumbnail == m_thumbnails.rend()) { return; }
+	const auto yScale = parameters.rect.height() / 2 * parameters.amplification;
+	const auto yCenter = parameters.rect.center().y();
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	const auto thumbnailBeginForward
-		= std::max<int>(renderRect.x() - sampleRect.x(), parameters.sampleStart * targetThumbnailWidth);
-	const auto thumbnailEndForward = std::max<int>(
-		renderRect.x() + renderRect.width() - sampleRect.x(), parameters.sampleEnd * targetThumbnailWidth);
-	const auto thumbnailBegin
-		= parameters.reversed ? targetThumbnailWidth - thumbnailBeginForward - 1 : thumbnailBeginForward;
-	const auto thumbnailEnd = parameters.reversed ? targetThumbnailWidth - thumbnailEndForward : thumbnailEndForward;
-	const auto advanceThumbnailBy = parameters.reversed ? -1 : 1;
-
-	const auto finerThumbnailScaleFactor = static_cast<double>(finerThumbnail->width()) / targetThumbnailWidth;
-	const auto yScale = renderRect.height() / 2 * parameters.amplification;
-
-	for (auto x = renderRect.x(), i = thumbnailBegin; x < renderRect.x() + renderRect.width() && i != thumbnailEnd;
-		++x, i += advanceThumbnailBy)
+	for (auto x = drawStart; x <= drawEnd; ++x)
 	{
-		const auto beginIndex
-			= std::clamp<size_t>(std::floor(i * finerThumbnailScaleFactor), 0, finerThumbnail->width() - 1);
-		const auto endIndex
-			= std::clamp<size_t>(std::ceil((i + 1) * finerThumbnailScaleFactor), 0, finerThumbnail->width() - 1);
+		const auto peakIndex = x - parameters.rect.x();
 
-		auto minPeak = 0.f;
-		auto maxPeak = 0.f;
-
-		const auto beginAggregationAt = finerThumbnail->begin() + beginIndex;
-		const auto endAggregationAt = finerThumbnail->begin() + endIndex;
-		const auto peak = std::accumulate(beginAggregationAt, endAggregationAt, Thumbnail::Peak{});
-		minPeak = peak.min;
-		maxPeak = peak.max;
-
-		const auto yMin = renderRect.center().y() - minPeak * yScale;
-		const auto yMax = renderRect.center().y() - maxPeak * yScale;
-		painter.drawLine(x, yMin, x, yMax);
+		if (0 <= peakIndex && peakIndex < thumbnail.width())
+		{
+			const auto yMin = yCenter - thumbnail[peakIndex].min * yScale;
+			const auto yMax = yCenter - thumbnail[peakIndex].max * yScale;
+			painter.drawLine(x, yMin, x, yMax);
+		}
+		else
+		{
+			painter.drawLine(x, yCenter, x, yCenter);
+		}
 	}
 
 	painter.restore();
