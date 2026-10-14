@@ -289,8 +289,9 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	if (sample.sampleSize() > 0)
 	{
 		const auto param = SampleThumbnailCache::VisualizeParameters{
-			.sampleRect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
-			.viewportRect = viewPortRect,
+			.rect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
+			.viewportStart = viewPortRect.x(),
+			.viewportEnd = viewPortRect.width(),
 			.amplification = sample.amplification(),
 			.reversed = sample.reversed()
 		};

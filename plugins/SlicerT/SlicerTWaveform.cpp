@@ -122,10 +122,9 @@ void SlicerTWaveform::drawSeekerWaveform()
 	m_sampleThumbnail = SampleThumbnailCache{*sample.buffer()};
 
 	const auto param = SampleThumbnailCache::VisualizeParameters{
-		.sampleRect = m_seekerWaveform.rect(),
+		.sampleStart = static_cast<f_cnt_t>(sample.startFrame()),
+		.sampleEnd = static_cast<f_cnt_t>(sample.endFrame()),
 		.amplification = sample.amplification(),
-		.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
-		.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
 		.reversed = sample.reversed()
 	};
 
@@ -190,10 +189,10 @@ void SlicerTWaveform::drawEditorWaveform()
 	m_sampleThumbnail = SampleThumbnailCache{*sample.buffer()};
 
 	const auto param = SampleThumbnailCache::VisualizeParameters{
-		.sampleRect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
+		.rect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
+		.sampleStart = startFrame,
+		.sampleEnd = endFrame,
 		.amplification = sample.amplification(),
-		.sampleStart = static_cast<float>(startFrame) / sample.sampleSize(),
-		.sampleEnd = static_cast<float>(endFrame) / sample.sampleSize(),
 		.reversed = sample.reversed(),
 	};
 
