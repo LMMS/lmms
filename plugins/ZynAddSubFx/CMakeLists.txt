@@ -115,7 +115,7 @@ set_target_properties(zynaddsubfx_synth PROPERTIES SYSTEM TRUE)
 # Relative include paths don't work automatically for the GUI, because the
 # generated C++ files aren't in the source directory. Thus, add the expected
 # source directory as an additional include directory.
-target_include_directories(zynaddsubfx_gui PUBLIC zynaddsubfx/src/UI /usr/include/cairo)
+target_include_directories(zynaddsubfx_gui PUBLIC zynaddsubfx/src/UI)
 
 add_library(ZynAddSubFxCore STATIC
 	LocalZynAddSubFx.cpp
@@ -191,6 +191,15 @@ IF(FLTK_CONFIG AND NOT (LMMS_BUILD_APPLE OR LMMS_BUILD_WIN32))
 	LIST(REMOVE_ITEM FLTK_FILTERED_LDFLAGS -lX11)
 ENDIF()
 target_link_libraries(RemoteZynAddSubFx ${FLTK_FILTERED_LDFLAGS})
+
+# Ensure zynaddsubfx_gui has the include directories it needs (#8535)
+if(FLTK_CONFIG AND NOT LMMS_BUILD_WIN32)
+	execute_process(COMMAND ${FLTK_CONFIG} --cxxflags OUTPUT_VARIABLE _fltk_include_dirs OUTPUT_STRIP_TRAILING_WHITESPACE)
+	string(REPLACE " " ";" _fltk_include_dirs ${_fltk_include_dirs})
+	list(FILTER _fltk_include_dirs INCLUDE REGEX "^-I.+")
+	list(TRANSFORM _fltk_include_dirs REPLACE "^-I(.+)" "\\1")
+	target_include_directories(zynaddsubfx_gui SYSTEM PUBLIC ${_fltk_include_dirs})
+endif()
 
 if(LMMS_HAVE_LIBRT)
 	target_link_libraries(RemoteZynAddSubFx rt)
