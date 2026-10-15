@@ -38,6 +38,7 @@
 
 #include "ConfigManager.h"
 #include "Vst3Module.h"
+#include "Vst3NativeModule.h"
 
 namespace lmms::vst3
 {
@@ -192,6 +193,15 @@ void Vst3Manager::scanModule(const QString& path)
 	process.start(scanner, {binary, result.fileName()});
 	if (!process.waitForStarted(5000) || !process.waitForFinished(30000))
 	{
+#ifdef Q_OS_LINUX
+		// LMMS is a child subreaper, so Wine hosts the scanner leaves behind
+		// would become ours and outlive LMMS if they hang
+		const auto scannerPid = static_cast<pid_t>(process.processId());
+		for (const pid_t host : Vst3StuckHostReaper::yabridgeHosts(scannerPid, false))
+		{
+			::kill(host, SIGKILL);
+		}
+#endif
 		process.kill();
 		process.waitForFinished(1000);
 		qWarning() << "VST3: scanner could not finish for" << path << process.errorString();

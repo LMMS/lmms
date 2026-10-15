@@ -12,9 +12,125 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <Security/Security.h>
 #endif
+#ifdef Q_OS_LINUX
+#include <QDebug>
+#include <chrono>
+#include <condition_variable>
+#include <csignal>
+#include <cstdio>
+#include <cstring>
+#include <dirent.h>
+#include <map>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <unistd.h>
+#include <vector>
+#endif
 
 namespace lmms::vst3
 {
+#ifdef Q_OS_LINUX
+//! Wine sometimes tears a yabridge host down only halfway: the main thread
+//! exits but a socket thread keeps spinning at 100% CPU, so the process
+//! never finishes. yabridge waits for its host when a module unloads, which
+//! then hangs forever, and a host orphaned this way outlives LMMS. While one
+//! of these is alive, SIGKILL the yabridge hosts among our children that stay
+//! in that state - a process whose main thread is gone can only be exiting.
+class Vst3StuckHostReaper
+{
+public:
+	Vst3StuckHostReaper() : m_thread{[this] { run(); }} {}
+	Vst3StuckHostReaper(const Vst3StuckHostReaper&) = delete;
+	Vst3StuckHostReaper& operator=(const Vst3StuckHostReaper&) = delete;
+	~Vst3StuckHostReaper()
+	{
+		{
+			std::lock_guard<std::mutex> lock{m_mutex};
+			m_done = true;
+		}
+		m_wake.notify_one();
+		m_thread.join();
+	}
+
+	//! yabridge host processes whose parent is @p parent; with @p stuckOnly
+	//! only those whose main thread exited while other threads still run
+	static std::vector<pid_t> yabridgeHosts(pid_t parent, bool stuckOnly)
+	{
+		std::vector<pid_t> result;
+		DIR* proc = opendir("/proc");
+		if (!proc) { return result; }
+		while (const dirent* entry = readdir(proc))
+		{
+			char* end = nullptr;
+			const long pid = std::strtol(entry->d_name, &end, 10);
+			if (pid <= 0 || *end != '\0') { continue; }
+
+			char path[64];
+			std::snprintf(path, sizeof(path), "/proc/%ld/stat", pid);
+			FILE* file = std::fopen(path, "r");
+			if (!file) { continue; }
+			char stat[1024];
+			const size_t size = std::fread(stat, 1, sizeof(stat) - 1, file);
+			std::fclose(file);
+			stat[size] = '\0';
+
+			// "pid (comm) state ppid ...", where comm may contain anything
+			const char* open = std::strchr(stat, '(');
+			const char* close = std::strrchr(stat, ')');
+			if (!open || !close || close < open) { continue; }
+			const std::string comm(open + 1, close);
+			// group hosts may serve other plugins: only take them when stuck
+			const bool group = comm.rfind("yabridge-group", 0) == 0;
+			if (comm.rfind("yabridge-host", 0) != 0 && !(group && stuckOnly)) { continue; }
+
+			char state = 0;
+			int ppid = 0;
+			long threads = 0;
+			// fields after comm: state(3) ppid(4) ... num_threads(20)
+			if (std::sscanf(close + 1, " %c %d %*d %*d %*d %*d %*u %*u %*u %*u %*u %*u %*u %*d %*d %*d %*d %ld",
+				&state, &ppid, &threads) != 3) { continue; }
+			if (ppid != parent) { continue; }
+			if (stuckOnly && !(state == 'Z' && threads > 1)) { continue; }
+			result.push_back(static_cast<pid_t>(pid));
+		}
+		closedir(proc);
+		return result;
+	}
+
+private:
+	void run()
+	{
+		using namespace std::chrono_literals;
+		// a normal exit passes through this state for a moment, too
+		constexpr int StuckPolls = 4;
+		std::map<pid_t, int> stuck;
+		std::unique_lock<std::mutex> lock{m_mutex};
+		while (!m_wake.wait_for(lock, 250ms, [this] { return m_done; }))
+		{
+			std::map<pid_t, int> polls;
+			for (const pid_t pid : yabridgeHosts(getpid(), true))
+			{
+				const auto it = stuck.find(pid);
+				const int count = (it == stuck.end() ? 0 : it->second) + 1;
+				if (count < StuckPolls) { polls[pid] = count; }
+				else
+				{
+					qWarning() << "VST3: killing stuck yabridge host" << pid;
+					::kill(pid, SIGKILL);
+				}
+			}
+			stuck = std::move(polls);
+		}
+	}
+
+	std::mutex m_mutex;
+	std::condition_variable m_wake;
+	bool m_done = false;
+	std::thread m_thread;
+};
+#endif
+
 class Vst3NativeModule
 {
 public:
@@ -23,6 +139,10 @@ public:
 	Vst3NativeModule& operator=(const Vst3NativeModule&) = delete;
 	~Vst3NativeModule()
 	{
+#ifdef Q_OS_LINUX
+		// yabridge stops and waits for its Wine host in ModuleExit()
+		const Vst3StuckHostReaper reaper;
+#endif
 		if (m_entered)
 		{
 			if (auto exit = reinterpret_cast<bool (*)()>(symbol(exitName()))) { exit(); }
