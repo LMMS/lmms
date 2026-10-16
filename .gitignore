@@ -14,3 +14,5 @@ Brewfile.lock.json
 compile_commands.json
 .vscode/
 .vs/
+# CocoIndex Code (ccc)
+/.cocoindex_code/

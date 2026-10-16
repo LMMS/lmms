@@ -2,6 +2,10 @@ lmmsicon ICON cmake/nsis/icon.ico
 lmmsprojecticon ICON cmake/nsis/project.ico
 #include <windows.h>
 
+#ifndef _MSC_VER
+1 24 "cmake/nsis/lmms.exe.manifest"
+#endif
+
 VS_VERSION_INFO VERSIONINFO
   FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
   FILEOS        VOS_NT_WINDOWS32

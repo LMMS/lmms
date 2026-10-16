@@ -34,6 +34,7 @@
 #include <QString>
 
 #include "DeprecationHelper.h"
+#include "DpiContext.h"
 #include "fft_helpers.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -354,7 +355,7 @@ void SaSpectrumView::updateBuffers(const float *spectrum, float *displayBuffer, 
 QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float resolution = 1.0)
 {
 	// convert resolution to number of path points per logical pixel
-	float pixel_limit = resolution * window()->devicePixelRatio();
+	float pixel_limit = resolution * static_cast<float>(Dpi::effectiveDevicePixelRatio(this));
 
 	QPainterPath path;
 	path.moveTo(m_displayLeft, m_displayBottom);

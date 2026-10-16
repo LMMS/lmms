@@ -24,6 +24,7 @@
 
 #include "Draggable.h"
 #include "SimpleTextFloat.h"
+#include "embed.h"
 #include "interpolation.h"
 
 #include <QPixmap>
@@ -50,7 +51,7 @@ Draggable::Draggable(DirectionOfManipulation directionOfManipulation,
 
 QSize Draggable::sizeHint() const
 {
-	return m_pixmap.size();
+	return embed::logicalSize(m_pixmap);
 }
 
 void Draggable::setPixmap(const QPixmap& pixmap)
@@ -74,11 +75,11 @@ void Draggable::paintEvent(QPaintEvent* event)
 	
 	if (m_hasDefaultValPixmap && model()->value() == m_defaultValue)
 	{
-		painter.drawPixmap(rect(), m_defaultValPixmap, m_defaultValPixmap.rect());
+		painter.drawPixmap(0, 0, m_defaultValPixmap);
 	}
 	else
 	{
-		painter.drawPixmap(rect(), m_pixmap, m_pixmap.rect());
+		painter.drawPixmap(0, 0, m_pixmap);
 	}
 }
 
@@ -116,13 +117,14 @@ void Draggable::mouseMoveEvent(QMouseEvent* me)
 void Draggable::handleMovement()
 {
 	float newCoord = std::lerp(m_pointA, m_pointB, (model()->value() - model()->minValue()) / (model()->maxValue() - model()->minValue()));
+	const QSize logicalSize = embed::logicalSize(m_pixmap);
 	if (directionOfManipulation() == DirectionOfManipulation::Vertical)
 	{
-		move(x(), newCoord - m_pixmap.height() / 2.f);
+		move(x(), newCoord - logicalSize.height() / 2.f);
 	}
 	else if (directionOfManipulation() == DirectionOfManipulation::Horizontal)
 	{
-		move(newCoord - m_pixmap.width() / 2.f, y());
+		move(newCoord - logicalSize.width() / 2.f, y());
 	}
 }
 

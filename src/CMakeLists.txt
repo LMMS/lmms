@@ -58,7 +58,7 @@ ELSEIF(WIN32)
 					"-I\"${CMAKE_SOURCE_DIR}\""
 					"-o\"${CMAKE_BINARY_DIR}/lmmsrc.obj\""
 					"-i\"${CMAKE_BINARY_DIR}/lmms.rc\""
-				DEPENDS "${CMAKE_BINARY_DIR}/lmms.rc")
+				DEPENDS "${CMAKE_BINARY_DIR}/lmms.rc" "${CMAKE_SOURCE_DIR}/cmake/nsis/lmms.exe.manifest")
 ENDIF()
 
 INCLUDE(GenQrc)
@@ -115,6 +115,9 @@ ADD_EXECUTABLE(lmms
 	core/main.cpp
 	"${WINRC}"
 )
+IF(WIN32 AND MSVC)
+	TARGET_SOURCES(lmms PRIVATE "${CMAKE_SOURCE_DIR}/cmake/nsis/lmms.exe.manifest")
+ENDIF()
 TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
 )

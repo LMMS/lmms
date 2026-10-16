@@ -33,6 +33,7 @@
 
 #include "ComboBox.h"
 #include "ComboBoxModel.h"
+#include "DpiContext.h"
 #include "FontHelper.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
@@ -79,40 +80,30 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls_layout->addWidget(config_widget);
 	controls_layout->setStretchFactor(config_widget, 10);
 
-	// Pre-compute target pixmap size based on monitor DPI.
-	// Using setDevicePixelRatio() on pixmap allows the SVG image to be razor
-	// sharp on High-DPI screens, but the desired size must be manually
-	// enlarged. No idea how to make Qt do it in a more reasonable way.
-	QSize iconSize = QSize(22.0 * devicePixelRatio(), 22.0 * devicePixelRatio());
-	QSize buttonSize = 1.2 * iconSize;
-	QSize advButtonSize = QSize((m_configHeight * devicePixelRatio()) / 3, m_configHeight * devicePixelRatio());
-
+	const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
+	const int baseIconDim = 22;
+	const int baseButtonDim = static_cast<int>(std::round(1.2 * baseIconDim)); // 26
+	const QSize iconSize(baseIconDim, baseIconDim);
+	const QSize buttonSize(baseButtonDim, baseButtonDim);
+	const QSize advButtonSize(m_configHeight / 3, m_configHeight);
 
 	// pause and freeze buttons
 	auto pauseButton = new PixmapButton(this, tr("Pause"));
 	pauseButton->setToolTip(tr("Pause data acquisition"));
-	static auto s_pauseOnPixmap
-		= PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	static auto s_pauseOffPixmap
-		= PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	s_pauseOnPixmap.setDevicePixelRatio(devicePixelRatio());
-	s_pauseOffPixmap.setDevicePixelRatio(devicePixelRatio());
-	pauseButton->setActiveGraphic(s_pauseOnPixmap);
-	pauseButton->setInactiveGraphic(s_pauseOffPixmap);
+	auto pauseOnPixmap = PLUGIN_NAME::getIconPixmap("play", dpr, buttonSize.width(), buttonSize.height());
+	auto pauseOffPixmap = PLUGIN_NAME::getIconPixmap("pause", dpr, buttonSize.width(), buttonSize.height());
+	pauseButton->setActiveGraphic(pauseOnPixmap);
+	pauseButton->setInactiveGraphic(pauseOffPixmap);
 	pauseButton->setCheckable(true);
 	pauseButton->setModel(&controls->m_pauseModel);
 	config_layout->addWidget(pauseButton, 0, 0, 2, 1, Qt::AlignHCenter);
 
 	auto refFreezeButton = new PixmapButton(this, tr("Reference freeze"));
 	refFreezeButton->setToolTip(tr("Freeze current input as a reference / disable falloff in peak-hold mode."));
-	static auto s_freezeOnPixmap
-		= PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	static auto s_freezeOffPixmap
-		= PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	s_freezeOnPixmap.setDevicePixelRatio(devicePixelRatio());
-	s_freezeOffPixmap.setDevicePixelRatio(devicePixelRatio());
-	refFreezeButton->setActiveGraphic(s_freezeOnPixmap);
-	refFreezeButton->setInactiveGraphic(s_freezeOffPixmap);
+	auto freezeOnPixmap = PLUGIN_NAME::getIconPixmap("freeze", dpr, buttonSize.width(), buttonSize.height());
+	auto freezeOffPixmap = PLUGIN_NAME::getIconPixmap("freeze_off", dpr, buttonSize.width(), buttonSize.height());
+	refFreezeButton->setActiveGraphic(freezeOnPixmap);
+	refFreezeButton->setInactiveGraphic(freezeOffPixmap);
 	refFreezeButton->setCheckable(true);
 	refFreezeButton->setModel(&controls->m_refFreezeModel);
 	config_layout->addWidget(refFreezeButton, 2, 0, 2, 1, Qt::AlignHCenter);
@@ -149,14 +140,12 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// frequency: linear / log. switch and range selector
 	auto logXButton = new PixmapButton(this, tr("Logarithmic frequency"));
 	logXButton->setToolTip(tr("Switch between logarithmic and linear frequency scale"));
-	static auto s_logXOnPixmap
-		= PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	static auto s_logXOffPixmap
-		= PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	s_logXOnPixmap.setDevicePixelRatio(devicePixelRatio());
-	s_logXOffPixmap.setDevicePixelRatio(devicePixelRatio());
-	logXButton->setActiveGraphic(s_logXOnPixmap);
-	logXButton->setInactiveGraphic(s_logXOffPixmap);
+	auto logXOnPixmap
+		= PLUGIN_NAME::getIconPixmap("x_log", dpr, iconSize.width(), iconSize.height());
+	auto logXOffPixmap
+		= PLUGIN_NAME::getIconPixmap("x_linear", dpr, iconSize.width(), iconSize.height());
+	logXButton->setActiveGraphic(logXOnPixmap);
+	logXButton->setInactiveGraphic(logXOffPixmap);
 	logXButton->setCheckable(true);
 	logXButton->setModel(&controls->m_logXModel);
 	config_layout->addWidget(logXButton, 0, 2, 2, 1, Qt::AlignRight);
@@ -171,14 +160,12 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// amplitude: linear / log switch and range selector
 	auto logYButton = new PixmapButton(this, tr("Logarithmic amplitude"));
 	logYButton->setToolTip(tr("Switch between logarithmic and linear amplitude scale"));
-	static auto s_logYOnPixmap
-		= PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	static auto s_logYOffPixmap
-		= PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	s_logYOnPixmap.setDevicePixelRatio(devicePixelRatio());
-	s_logYOffPixmap.setDevicePixelRatio(devicePixelRatio());
-	logYButton->setActiveGraphic(s_logYOnPixmap);
-	logYButton->setInactiveGraphic(s_logYOffPixmap);
+	auto logYOnPixmap
+		= PLUGIN_NAME::getIconPixmap("y_log", dpr, iconSize.width(), iconSize.height());
+	auto logYOffPixmap
+		= PLUGIN_NAME::getIconPixmap("y_linear", dpr, iconSize.width(), iconSize.height());
+	logYButton->setActiveGraphic(logYOnPixmap);
+	logYButton->setInactiveGraphic(logYOffPixmap);
 	logYButton->setCheckable(true);
 	logYButton->setModel(&controls->m_logYModel);
 	config_layout->addWidget(logYButton, 2, 2, 2, 1, Qt::AlignRight);
@@ -192,9 +179,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// FFT: block size: icon and selector
 	auto blockSizeLabel = new QLabel("", this);
-	static auto s_blockSizeIcon = PLUGIN_NAME::getIconPixmap("block_size");
-	s_blockSizeIcon.setDevicePixelRatio(devicePixelRatio());
-	blockSizeLabel->setPixmap(s_blockSizeIcon.scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	auto blockSizeIcon = PLUGIN_NAME::getIconPixmap("block_size", dpr, iconSize.width(), iconSize.height());
+	blockSizeLabel->setPixmap(blockSizeIcon);
 	config_layout->addWidget(blockSizeLabel, 0, 4, 2, 1, Qt::AlignRight);
 
 	auto blockSizeCombo = new ComboBox(this, tr("FFT block size"));
@@ -208,9 +194,8 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// FFT: window type: icon and selector
 	auto windowLabel = new QLabel("", this);
-	static auto s_windowIcon = PLUGIN_NAME::getIconPixmap("window");
-	s_windowIcon.setDevicePixelRatio(devicePixelRatio());
-	windowLabel->setPixmap(s_windowIcon.scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	auto windowIcon = PLUGIN_NAME::getIconPixmap("window", dpr, iconSize.width(), iconSize.height());
+	windowLabel->setPixmap(windowIcon);
 	config_layout->addWidget(windowLabel, 2, 4, 2, 1, Qt::AlignRight);
 
 	auto windowCombo = new ComboBox(this, tr("FFT window type"));
@@ -301,14 +286,10 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Advanced settings button
 	auto advancedButton = new PixmapButton(this, tr("Advanced settings"));
 	advancedButton->setToolTip(tr("Access advanced settings"));
-	static auto s_advancedOnPixmap = PLUGIN_NAME::getIconPixmap("advanced_on")
-											.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	static auto s_advancedOffPixmap = PLUGIN_NAME::getIconPixmap("advanced_off")
-											 .scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	s_advancedOnPixmap.setDevicePixelRatio(devicePixelRatio());
-	s_advancedOffPixmap.setDevicePixelRatio(devicePixelRatio());
-	advancedButton->setActiveGraphic(s_advancedOnPixmap);
-	advancedButton->setInactiveGraphic(s_advancedOffPixmap);
+	auto advancedOnPixmap = PLUGIN_NAME::getIconPixmap("advanced_on", dpr, advButtonSize.width(), advButtonSize.height());
+	auto advancedOffPixmap = PLUGIN_NAME::getIconPixmap("advanced_off", dpr, advButtonSize.width(), advButtonSize.height());
+	advancedButton->setActiveGraphic(advancedOnPixmap);
+	advancedButton->setInactiveGraphic(advancedOffPixmap);
 	advancedButton->setCheckable(true);
 	controls_layout->addStretch(0);
 	controls_layout->addWidget(advancedButton);

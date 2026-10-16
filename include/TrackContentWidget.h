@@ -218,6 +218,7 @@ private:
 	clipViewVector m_clipViews;
 
 	QPixmap m_background;
+	qreal m_cachedDpr = 1.0;
 
 	// qproperty fields
 	QBrush m_darkerColor;

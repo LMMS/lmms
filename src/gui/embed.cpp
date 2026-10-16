@@ -23,8 +23,10 @@
  */
 
 #include "embed.h"
+#include "DpiContext.h"
 
 #include <QDir>
+#include <QFile>
 #include <QGuiApplication>
 #include <QImageReader>
 #include <QPainter>
@@ -37,8 +39,8 @@ namespace lmms::embed {
 
 namespace {
 
-// QPixmapCache and HiDPI compatible SVG-->QPixmap wrapper
-auto loadSvgPixmap(const QString& resourceName, int width, int height) -> QPixmap
+// QPixmapCache and HiDPI compatible SVG-->QPixmap wrapper with explicit DPR
+auto loadSvgPixmap(const QString& resourceName, int width, int height, qreal dpr) -> QPixmap
 {
 	// QFile requires the file extension to be present, unlike QImageReader
 	QString fileName = resourceName;
@@ -59,67 +61,153 @@ auto loadSvgPixmap(const QString& resourceName, int width, int height) -> QPixma
 	}
 
 	// Get the default size of the SVG (without scaling)
-	QSize svgSize = renderer.defaultSize();
+	QSize logicalSize = renderer.defaultSize();
 
-	// If width/height are provided, use them
-	if (width > 0 && height > 0) { svgSize.scale(width, height, Qt::IgnoreAspectRatio); }
+	// If width and/or height are provided, compute target logical size
+	if (width > 0 && height > 0)
+	{
+		logicalSize = QSize(width, height);
+	}
+	else if (width > 0 && logicalSize.width() > 0)
+	{
+		logicalSize = QSize(width, (width * logicalSize.height()) / logicalSize.width());
+	}
+	else if (height > 0 && logicalSize.height() > 0)
+	{
+		logicalSize = QSize((height * logicalSize.width()) / logicalSize.height(), height);
+	}
 
-	// Scale the svg
-	qreal devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
-	svgSize *= devicePixelRatio;
+	const qreal effectiveDpr = dpr > 0.0 ? dpr : 1.0;
+	const QSize physSize = gui::Dpi::rasterSizeFor(logicalSize, effectiveDpr);
 
-	QImage image(svgSize, QImage::Format_ARGB32);
+	QImage image(physSize, QImage::Format_ARGB32_Premultiplied);
 	image.fill(Qt::transparent);
 	QPainter painter(&image);
-	renderer.render(&painter);
+	renderer.render(&painter, QRectF(QPointF(0, 0), QSizeF(physSize)));
 	painter.end();
 
 	auto pixmap = QPixmap::fromImage(image);
-	pixmap.setDevicePixelRatio(devicePixelRatio);
+	pixmap.setDevicePixelRatio(effectiveDpr);
 
 	return pixmap;
 }
 
-auto loadPixmap(const QString& name, int width, int height, const char* const* xpm) -> QPixmap
+auto loadPixmap(const QString& name, int width, int height, qreal dpr, const char* const* xpm) -> QPixmap
 {
-	if (xpm) { return QPixmap{xpm}; }
+	const qreal effectiveDpr = dpr > 0.0 ? dpr : 1.0;
+
+	if (xpm)
+	{
+		QPixmap pixmap{xpm};
+		if (width > 0 && height > 0)
+		{
+			const QSize physSize = gui::Dpi::rasterSizeFor(QSize(width, height), effectiveDpr);
+			pixmap = pixmap.scaled(physSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+			pixmap.setDevicePixelRatio(effectiveDpr);
+		}
+		return pixmap;
+	}
 
 	const auto resourceName = QDir::isAbsolutePath(name) ? name : "artwork:" + name;
+
+	if (resourceName.endsWith(".svg", Qt::CaseInsensitive))
+	{
+		return loadSvgPixmap(resourceName, width, height, effectiveDpr);
+	}
+
 	auto reader = QImageReader{resourceName};
 
 	if (reader.format().toLower() == "svg")
 	{
-		return loadSvgPixmap(resourceName, width, height);
+		return loadSvgPixmap(resourceName, width, height, effectiveDpr);
 	}
 
-	if (width > 0 && height > 0) { reader.setScaledSize(QSize{width, height}); }
+	// Check for @2x high-resolution asset variant when scaling factor warrants it
+	if (effectiveDpr > 1.2)
+	{
+		QString name2x = resourceName;
+		const int dotIdx = name2x.lastIndexOf('.');
+		if (dotIdx > 0)
+		{
+			name2x.insert(dotIdx, "@2x");
+		}
+		else
+		{
+			name2x += "@2x";
+		}
 
-	const auto pixmap = QPixmap::fromImageReader(&reader);
-	if (pixmap.isNull()) {
+		if (QFile::exists(name2x) || QResource(name2x).isValid())
+		{
+			QImageReader reader2x(name2x);
+			if (width > 0 && height > 0)
+			{
+				const QSize physSize = gui::Dpi::rasterSizeFor(QSize(width, height), effectiveDpr);
+				reader2x.setScaledSize(physSize);
+			}
+			auto pm2x = QPixmap::fromImageReader(&reader2x);
+			if (!pm2x.isNull())
+			{
+				pm2x.setDevicePixelRatio(effectiveDpr);
+				return pm2x;
+			}
+		}
+	}
+
+	if (width > 0 && height > 0)
+	{
+		const QSize physSize = gui::Dpi::rasterSizeFor(QSize(width, height), effectiveDpr);
+		reader.setScaledSize(physSize);
+	}
+
+	auto pixmap = QPixmap::fromImageReader(&reader);
+	if (pixmap.isNull())
+	{
 		qWarning().nospace() << "Error loading icon pixmap " << name << ": " << reader.errorString();
 		return QPixmap{1, 1};
+	}
+
+	if (width > 0 && height > 0)
+	{
+		pixmap.setDevicePixelRatio(effectiveDpr);
 	}
 	return pixmap;
 }
 
 } // namespace
 
-auto getIconPixmap(std::string_view name, int width, int height, const char* const* xpm) -> QPixmap
+auto getIconPixmap(std::string_view name, qreal dpr, int width, int height, const char* const* xpm) -> QPixmap
 {
 	if (name.empty()) { return QPixmap{}; }
 
 	const auto pixmapName = QString::fromUtf8(name.data(), name.size());
-	const auto cacheName = (width > 0 && height > 0)
-		? QStringLiteral("%1_%2_%3").arg(pixmapName).arg(width).arg(height)
-		: pixmapName;
+	const qreal effectiveDpr = dpr > 0.0 ? dpr : 1.0;
+
+	const auto cacheName = QStringLiteral("%1_w%2_h%3_dpr%4")
+		.arg(pixmapName)
+		.arg(width)
+		.arg(height)
+		.arg(QString::number(effectiveDpr, 'f', 2));
 
 	// Return cached pixmap if it exists
-	if (auto pixmap = QPixmap{}; QPixmapCache::find(cacheName, &pixmap)) { return pixmap; }
+	if (auto pixmap = QPixmap{}; QPixmapCache::find(cacheName, &pixmap))
+	{
+		return pixmap;
+	}
 
 	// Load the pixmap and cache it before returning
-	const auto pixmap = loadPixmap(pixmapName, width, height, xpm);
+	const auto pixmap = loadPixmap(pixmapName, width, height, effectiveDpr, xpm);
 	QPixmapCache::insert(cacheName, pixmap);
 	return pixmap;
+}
+
+auto getIconPixmap(std::string_view name, int width, int height, const char* const* xpm) -> QPixmap
+{
+	return getIconPixmap(name, 1.0, width, height, xpm);
+}
+
+auto getIconPixmap(std::string_view name, const PixmapRequest& request, const char* const* xpm) -> QPixmap
+{
+	return getIconPixmap(name, request.devicePixelRatio, request.logicalSize.width(), request.logicalSize.height(), xpm);
 }
 
 auto getText(std::string_view name) -> QString

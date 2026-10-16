@@ -28,8 +28,10 @@
 #include <QStyleOptionFrame>
 #include <QPainter>
 
+#include <cmath>
 #include "LcdWidget.h"
 #include "DeprecationHelper.h"
+#include "DpiContext.h"
 #include "embed.h"
 #include "FontHelper.h"
 
@@ -136,16 +138,31 @@ void LcdWidget::setTextShadowColor( const QColor & c )
 
 void LcdWidget::paintEvent( QPaintEvent* )
 {
+	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
+	if (!m_style.isEmpty() && std::abs(m_cachedDpr - currentDpr) > 0.001)
+	{
+		m_cachedDpr = currentDpr;
+		m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + m_style).toUtf8().constData(), m_cachedDpr);
+	}
+
 	QPainter p( this );
 
 	QSize cellSize( m_cellWidth, m_cellHeight );
-
 	QRect cellRect( 0, 0, m_cellWidth, m_cellHeight );
 
-	int margin = 1;  // QStyle::PM_DefaultFrameWidth;
-	//int lcdWidth = m_cellWidth * m_numDigits + (margin*m_marginWidth)*2;
+	const qreal dpr = m_lcdPixmap.devicePixelRatio() > 0.0 ? m_lcdPixmap.devicePixelRatio() : 1.0;
+	auto srcRect = [dpr](int x, int y, int w, int h) -> QRect
+	{
+		return QRect(
+			static_cast<int>(std::round(x * dpr)),
+			static_cast<int>(std::round(y * dpr)),
+			static_cast<int>(std::round(w * dpr)),
+			static_cast<int>(std::round(h * dpr))
+		);
+	};
 
-//	p.translate( width() / 2 - lcdWidth / 2, 0 ); 
+	int margin = 1;  // QStyle::PM_DefaultFrameWidth;
+
 	p.save();
 
 	// Don't skip any space and don't draw margin on the left side in seamless mode
@@ -158,7 +175,7 @@ void LcdWidget::paintEvent( QPaintEvent* )
 		p.translate(margin, margin);
 		// Left Margin
 		p.drawPixmap(cellRect, m_lcdPixmap,
-			QRect(QPoint(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize));
+			srcRect(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight, m_cellWidth, m_cellHeight));
 
 		p.translate(m_marginWidth, 0);
 	}
@@ -166,7 +183,7 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	// Padding
 	for( int i=0; i < m_numDigits - m_display.length(); i++ ) 
 	{
-		p.drawPixmap(cellRect, m_lcdPixmap, QRect(QPoint(10 * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize));
+		p.drawPixmap(cellRect, m_lcdPixmap, srcRect(10 * m_cellWidth, isEnabled() ? 0 : m_cellHeight, m_cellWidth, m_cellHeight));
 		p.translate( m_cellWidth, 0 );
 	}
 
@@ -180,13 +197,13 @@ void LcdWidget::paintEvent( QPaintEvent* )
 			else
 				val = 10;
 		}
-		p.drawPixmap(cellRect, m_lcdPixmap, QRect(QPoint(val * m_cellWidth, isEnabled() ? 0 : m_cellHeight), cellSize));
+		p.drawPixmap(cellRect, m_lcdPixmap, srcRect(val * m_cellWidth, isEnabled() ? 0 : m_cellHeight, m_cellWidth, m_cellHeight));
 		p.translate( m_cellWidth, 0 );
 	}
 
 	// Right Margin
 	p.drawPixmap(QRect(0, 0, m_seamlessRight ? 0 : m_marginWidth - 1, m_cellHeight), m_lcdPixmap,
-		QRect(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight, m_cellWidth / 2, m_cellHeight));
+		srcRect(charsPerPixmap * m_cellWidth, isEnabled() ? 0 : m_cellHeight, m_cellWidth / 2, m_cellHeight));
 
 	p.restore();
 
@@ -279,13 +296,12 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 
 	setWindowTitle( name );
 
-	// We should make a factory for these or something.
-	//m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData());
-	//m_lcdPixmap = embed::getIconPixmap("lcd_19green"); // TODO!!
-
-	m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData());
-	m_cellWidth = m_lcdPixmap.size().width() / LcdWidget::charsPerPixmap;
-	m_cellHeight = m_lcdPixmap.size().height() / 2;
+	m_style = style;
+	m_cachedDpr = Dpi::effectiveDevicePixelRatio(this);
+	m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData(), m_cachedDpr);
+	const QSize logicalLcdSize = embed::logicalSize(m_lcdPixmap);
+	m_cellWidth = logicalLcdSize.width() / LcdWidget::charsPerPixmap;
+	m_cellHeight = logicalLcdSize.height() / 2;
 
 	m_marginWidth =  m_cellWidth / 2;
 

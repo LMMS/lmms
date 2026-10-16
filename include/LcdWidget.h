@@ -97,6 +97,8 @@ private:
 
 	QString m_label;
 	QPixmap m_lcdPixmap;
+	QString m_style;
+	qreal m_cachedDpr = 1.0;
 
 	QColor m_textColor;
 	QColor m_textShadowColor;

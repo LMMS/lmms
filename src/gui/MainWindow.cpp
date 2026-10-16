@@ -24,14 +24,17 @@
 
 #include "MainWindow.h"
 
+#include <algorithm>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QDomElement>
 #include <QFileInfo>
+#include <QGuiApplication>
 #include <QMdiArea>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QScreen>
 #include <QShortcut>
 #include <QSplitter>
 
@@ -702,12 +705,60 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 		if (!win) { return; }
 	}
 
-	const auto normalGeometry = QRect{
+	auto normalGeometry = QRect{
 		de.attribute("x").toInt(),
 		de.attribute("y").toInt(),
 		de.attribute("width").toInt(),
 		de.attribute("height").toInt(),
 	};
+
+	// Ensure minimum sensible dimensions
+	if (normalGeometry.width() < 50) { normalGeometry.setWidth(300); }
+	if (normalGeometry.height() < 50) { normalGeometry.setHeight(200); }
+
+	if (win->isDetached())
+	{
+		// Detached floating window: check against active screens
+		bool onScreen = false;
+		for (const auto* screen : QGuiApplication::screens())
+		{
+			if (screen && screen->availableGeometry().intersects(normalGeometry))
+			{
+				onScreen = true;
+				break;
+			}
+		}
+
+		if (!onScreen)
+		{
+			if (auto* primary = QGuiApplication::primaryScreen())
+			{
+				const QRect avail = primary->availableGeometry();
+				normalGeometry.moveTo(
+					std::clamp(normalGeometry.x(), avail.left(), std::max(avail.left(), avail.right() - normalGeometry.width())),
+					std::clamp(normalGeometry.y(), avail.top(), std::max(avail.top(), avail.bottom() - normalGeometry.height()))
+				);
+			}
+		}
+	}
+	else
+	{
+		// MDI subwindow: avoid negative offscreen placement
+		if (normalGeometry.x() < 0) { normalGeometry.moveLeft(0); }
+		if (normalGeometry.y() < 0) { normalGeometry.moveTop(0); }
+
+		if (win->mdiArea() && win->mdiArea()->width() > 100 && win->mdiArea()->height() > 100)
+		{
+			if (normalGeometry.x() >= win->mdiArea()->width())
+			{
+				normalGeometry.moveLeft(std::max(0, win->mdiArea()->width() - normalGeometry.width()));
+			}
+			if (normalGeometry.y() >= win->mdiArea()->height())
+			{
+				normalGeometry.moveTop(std::max(0, win->mdiArea()->height() - normalGeometry.height()));
+			}
+		}
+	}
 
 	// First restore the window, as attempting to resize a maximized window can cause graphical glitches.
 	win->setWindowState(win->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));

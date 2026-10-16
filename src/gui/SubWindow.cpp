@@ -310,6 +310,7 @@ void SubWindow::detach()
 	if (shown) { widget()->show(); }
 
 	widget()->move(pos);
+	widget()->update();
 }
 
 void SubWindow::attach()
@@ -355,6 +356,8 @@ void SubWindow::attach()
 	{
 		setGeometry(frame);
 	}
+	widget()->update();
+	update();
 }
 
 

@@ -316,6 +316,7 @@ private:
 	QColor m_markerColor;
 
 	bool m_needsUpdate;
+	qreal m_cachedDpr = 0.0;
 	inline void setInitialPos( QPoint pos )
 	{
 		m_initialMousePos = pos;

@@ -69,6 +69,7 @@ private:
 	QTimer m_updateTimer;
 
 	int m_stepSize = 1;
+	qreal m_cachedDpr = 1.0;
 
 } ;
 

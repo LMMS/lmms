@@ -31,6 +31,7 @@
 #include "FileDialog.h"
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
+#include "DpiContext.h"
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
@@ -210,6 +211,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 {
 	QPainter painter( this );
 
+	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
+	if (std::abs(m_cachedDpr - currentDpr) > 0.001)
+	{
+		setNeedsUpdate(true);
+	}
+
 	if( !needsUpdate() )
 	{
 		painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
@@ -217,6 +224,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	}
 
 	setNeedsUpdate( false );
+	m_cachedDpr = currentDpr;
 
 	const auto trackViewWidth = getTrackView()->rect().width();
 
@@ -225,9 +233,11 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	m_paintPixmapXPosition = std::max(0, pe->rect().x() - trackViewWidth);
 
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != viewPortRect.size())
+	const QSize physSize = Dpi::rasterSizeFor(viewPortRect.size(), currentDpr);
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || std::abs(m_paintPixmap.devicePixelRatio() - currentDpr) > 0.001)
 	{
-		m_paintPixmap = QPixmap(viewPortRect.size());
+		m_paintPixmap = QPixmap(physSize);
+		m_paintPixmap.setDevicePixelRatio(currentDpr);
 	}
 
 	QPainter p( &m_paintPixmap );

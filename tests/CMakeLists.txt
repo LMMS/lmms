@@ -12,6 +12,10 @@ set(LMMS_TESTS
 	src/core/RelativePathsTest.cpp
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp
+	src/gui/DpiRasterTest.cpp
+	src/gui/EmbedDpiTest.cpp
+	src/gui/DpiCacheTest.cpp
+	src/gui/WindowGeometryTest.cpp
 )
 
 foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)

@@ -28,6 +28,7 @@
 #include <QMenu>
 #include <QPainter>
 
+#include "DpiContext.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -92,6 +93,12 @@ void PatternClipView::paintEvent(QPaintEvent*)
 {
 	QPainter painter( this );
 
+	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
+	if (std::abs(m_cachedDpr - currentDpr) > 0.001)
+	{
+		setNeedsUpdate(true);
+	}
+
 	if( !needsUpdate() )
 	{
 		painter.drawPixmap( 0, 0, m_paintPixmap );
@@ -99,10 +106,13 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	}
 
 	setNeedsUpdate( false );
+	m_cachedDpr = currentDpr;
 
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
+	const QSize physSize = Dpi::rasterSizeFor(size(), currentDpr);
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || std::abs(m_paintPixmap.devicePixelRatio() - currentDpr) > 0.001)
 	{
-		m_paintPixmap = QPixmap(size());
+		m_paintPixmap = QPixmap(physSize);
+		m_paintPixmap.setDevicePixelRatio(currentDpr);
 	}
 
 	QPainter p( &m_paintPixmap );

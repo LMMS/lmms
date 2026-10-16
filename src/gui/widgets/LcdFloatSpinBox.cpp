@@ -39,6 +39,7 @@
 
 #include "CaptionMenu.h"
 #include "DeprecationHelper.h"
+#include "DpiContext.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "FontHelper.h"
@@ -89,8 +90,10 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	lcdLayout->addWidget(&m_wholeDisplay);
 
 	auto dotLabel = new QLabel("", this);
-	QPixmap dotPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData()));
-	dotLabel->setPixmap(dotPixmap.copy(0, 0, dotPixmap.size().width(), dotPixmap.size().height() / 2));
+	QPixmap dotPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData(), Dpi::effectiveDevicePixelRatio(this)));
+	QPixmap croppedDot = dotPixmap.copy(0, 0, dotPixmap.width(), dotPixmap.height() / 2);
+	croppedDot.setDevicePixelRatio(dotPixmap.devicePixelRatio());
+	dotLabel->setPixmap(croppedDot);
 	lcdLayout->addWidget(dotLabel);
 
 	lcdLayout->addWidget(&m_fractionDisplay);

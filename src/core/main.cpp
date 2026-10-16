@@ -33,8 +33,10 @@
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
+#include <QGuiApplication>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QScreen>
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
@@ -361,13 +363,34 @@ int main( int argc, char * * argv )
 #endif
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-	// High-DPI scaling is always enabled in Qt >= 6.0
+	// High-DPI scaling and pixmaps in Qt 5
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+	QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+	// Preserve fractional scaling factors (125%, 150%, 175%, etc.) without rounding to whole integers
+	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(
+		Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 #endif
 
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);
+
+	if (!coreOnly)
+	{
+		qInfo() << "LMMS High-DPI initialized:"
+				<< "Qt" << QT_VERSION_STR
+				<< "| Platform:" << QGuiApplication::platformName();
+		if (const auto* primary = QGuiApplication::primaryScreen())
+		{
+			qInfo() << "Primary screen:" << primary->name()
+					<< "| Geometry:" << primary->geometry()
+					<< "| DPR:" << primary->devicePixelRatio()
+					<< "| Logical DPI:" << primary->logicalDotsPerInch();
+		}
+	}
 
 	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo);
 	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;

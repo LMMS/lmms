@@ -427,9 +427,18 @@ bool VstPlugin::processMessage( const message & _m )
 		break;
 
 	case IdVstPluginEditorGeometry:
-		m_pluginGeometry = QSize( _m.getInt( 0 ),
-								  _m.getInt( 1 ) );
-			break;
+	{
+		const QSize newGeom(_m.getInt(0), _m.getInt(1));
+		if (newGeom.isValid() && m_pluginGeometry != newGeom)
+		{
+			m_pluginGeometry = newGeom;
+			if (m_pluginWidget && m_pluginWidget->size() != m_pluginGeometry)
+			{
+				m_pluginWidget->setFixedSize(m_pluginGeometry);
+			}
+		}
+		break;
+	}
 
 		case IdVstPluginName:
 			m_name = _m.getQString();
@@ -841,6 +850,10 @@ void VstPlugin::createUI( QWidget * parent )
 		return;
 	}
 
+	// DPI Boundary Contract:
+	// External VST plugins report editor dimensions in native HWND pixels via effEditGetRect.
+	// Qt containers (via QWidget::createWindowContainer or win32 child HWND SetParent)
+	// scope the child window without recursive re-scaling loops.
 	container->setFixedSize( m_pluginGeometry );
 	container->setWindowTitle( name() );
 

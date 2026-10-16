@@ -40,7 +40,13 @@ namespace lmms {
 
 namespace embed {
 
-//! @brief Return an image for the icon pixmap cache.
+struct PixmapRequest
+{
+	QSize logicalSize = QSize(-1, -1);
+	qreal devicePixelRatio = 1.0;
+};
+
+//! @brief Return an image for the icon pixmap cache with default DPR.
 //! @param name Identifier for the pixmap. If it is not in the icon pixmap cache, it will be loaded from the artwork
 //! QDir search paths (exceptions are compiled-in XPMs, you need to provide @p xpm for loading them).
 //! @param width A specific pixmap width. When this and @p height are provided, the pixmap is cached.
@@ -53,17 +59,49 @@ auto LMMS_EXPORT getIconPixmap(
 	const char* const* xpm = nullptr
 ) -> QPixmap;
 
+//! @brief Return an image for the icon pixmap cache with explicit device pixel ratio.
+auto LMMS_EXPORT getIconPixmap(
+	std::string_view name,
+	qreal dpr,
+	int width = -1,
+	int height = -1,
+	const char* const* xpm = nullptr
+) -> QPixmap;
+
+//! @brief Return an image for the icon pixmap cache using a PixmapRequest.
+auto LMMS_EXPORT getIconPixmap(
+	std::string_view name,
+	const PixmapRequest& request,
+	const char* const* xpm = nullptr
+) -> QPixmap;
+
 auto LMMS_EXPORT getText(std::string_view name) -> QString;
 
-//! @brief Temporary shim for QPixmap::deviceIndependentSize.
+//! @brief Safe device-independent logical size helper for QPixmap.
 //! @param pixmap The pixmap to get the size of.
-//! @return The device-independent size of the pixmap.
-inline auto logicalSize(const QPixmap& pixmap) noexcept
+//! @return The device-independent logical size of the pixmap.
+inline auto logicalSize(const QPixmap& pixmap) noexcept -> QSize
 {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	return pixmap.deviceIndependentSize().toSize();
 #else
-	return pixmap.isNull() ? QSize(0, 0) : pixmap.size() / pixmap.devicePixelRatio();
+	return pixmap.size();
+#endif
+}
+
+//! @brief Safe device-independent logical size helper for QImage.
+inline auto logicalSize(const QImage& image) noexcept -> QSize
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+	return image.deviceIndependentSize().toSize();
+#else
+	if (image.isNull()) { return QSize(0, 0); }
+	const qreal dpr = image.devicePixelRatio();
+	if (dpr <= 0.0) { return image.size(); }
+	return QSize(
+		static_cast<int>(std::round(image.width() / dpr)),
+		static_cast<int>(std::round(image.height() / dpr))
+	);
 #endif
 }
 
@@ -84,6 +122,11 @@ public:
 	auto pixmap(int width = -1, int height = -1) const -> QPixmap
 	{
 		return embed::getIconPixmap(m_name, width, height, m_xpm);
+	}
+
+	auto pixmap(qreal dpr, int width = -1, int height = -1) const -> QPixmap
+	{
+		return embed::getIconPixmap(m_name, dpr, width, height, m_xpm);
 	}
 
 	auto pixmapName() const -> const std::string& { return m_name; }
@@ -111,6 +154,12 @@ inline auto getIconPixmap(std::string_view name,
 	int width = -1, int height = -1, const char* const* xpm = nullptr) -> QPixmap
 {
 	return PluginPixmapLoader{std::string{name}, xpm}.pixmap(width, height);
+}
+
+inline auto getIconPixmap(std::string_view name,
+	qreal dpr, int width = -1, int height = -1, const char* const* xpm = nullptr) -> QPixmap
+{
+	return PluginPixmapLoader{std::string{name}, xpm}.pixmap(dpr, width, height);
 }
 
 } // namespace PLUGIN_NAME

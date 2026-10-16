@@ -211,15 +211,16 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	}
 
 	const QPixmap& marker = !m_isRecording ? m_posMarkerPixmap : m_recordingPosMarkerPixmap;
+	const QSize markerSize = embed::logicalSize(marker);
 
 	// Only draw the position marker if the position line is in view
-	if (m_isPlayheadVisible && markerX(m_timeline->pos()) >= m_xOffset && markerX(m_timeline->pos()) < width() - marker.width() / 2)
+	if (m_isPlayheadVisible && markerX(m_timeline->pos()) >= m_xOffset && markerX(m_timeline->pos()) < width() - markerSize.width() / 2)
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
 		p.setOpacity(0.6);
-		p.drawPixmap(markerX(m_timeline->pos()) - (marker.width() / 2),
-			height() - marker.height(), marker);
+		p.drawPixmap(markerX(m_timeline->pos()) - (markerSize.width() / 2),
+			height() - markerSize.height(), marker);
 	}
 }
 

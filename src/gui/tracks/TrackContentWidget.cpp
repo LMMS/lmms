@@ -29,10 +29,12 @@
 #include <QMenu>
 #include <QPainter>
 
+#include <cmath>
 #include "AutomationClip.h"
 #include "Clipboard.h"
 #include "DataFile.h"
 #include "DeprecationHelper.h"
+#include "DpiContext.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "PatternEditor.h"
@@ -112,7 +114,10 @@ void TrackContentWidget::updateBackground()
 
 	int w = ppb * BARS_PER_GROUP;
 	int h = height();
-	m_background = QPixmap( w * 2, height() );
+	m_cachedDpr = Dpi::effectiveDevicePixelRatio(this);
+	const QSize physSize = Dpi::rasterSizeFor(QSize(w * 2, h), m_cachedDpr);
+	m_background = QPixmap( physSize );
+	m_background.setDevicePixelRatio( m_cachedDpr );
 	QPainter pmp( &m_background );
 
 	pmp.fillRect( 0, 0, w, h, darkerColor() );
@@ -544,6 +549,11 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	const TrackContainerView * tcv = m_trackView->trackContainerView();
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
+	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
+	if (std::abs(m_cachedDpr - currentDpr) > 0.001)
+	{
+		updateBackground();
+	}
 	QPainter p( this );
 	// Don't draw background on Pattern Editor
 	if (m_trackView->trackContainerView() != getGUI()->patternEditor()->m_editor)
