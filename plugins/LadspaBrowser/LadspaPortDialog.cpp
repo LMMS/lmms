@@ -41,7 +41,7 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 {
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
-	setWindowIcon( embed::getIconPixmap( "ports" ) );
+	setWindowIcon( embed::getIcon("ports") );
 	setWindowTitle( tr( "Ports" ) );
 	setModal( true );
 

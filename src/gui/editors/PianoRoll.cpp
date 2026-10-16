@@ -5191,10 +5191,10 @@ PianoRollWindow::PianoRollWindow() :
 
 	// init edit-buttons at the top
 	auto editModeGroup = new ActionGroup(this);
-	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw mode (Shift+D)" ) );
-	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
-	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
-	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch Bend mode (Shift+T)" ) );
+	QAction* drawAction = editModeGroup->addAction( embed::getIcon("edit_draw"), tr( "Draw mode (Shift+D)" ) );
+	QAction* eraseAction = editModeGroup->addAction( embed::getIcon("edit_erase"), tr("Erase mode (Shift+E)" ) );
+	QAction* selectAction = editModeGroup->addAction( embed::getIcon("edit_select"), tr( "Select mode (Shift+S)" ) );
+	QAction* pitchBendAction = editModeGroup->addAction( embed::getIcon("automation"), tr("Pitch Bend mode (Shift+T)" ) );
 
 	drawAction->setChecked( true );
 
@@ -5235,7 +5235,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// -- File ToolButton
 	m_fileToolsButton = new QToolButton(m_toolBar);
-	m_fileToolsButton->setIcon(embed::getIconPixmap("file"));
+	m_fileToolsButton->setIcon(embed::getIcon("file"));
 	m_fileToolsButton->setPopupMode(QToolButton::InstantPopup);
 
 	// Import / export
@@ -5278,7 +5278,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// -- Note modifier tools
 	auto noteToolsButton = new QToolButton(m_toolBar);
-	noteToolsButton->setIcon(embed::getIconPixmap("tool"));
+	noteToolsButton->setIcon(embed::getIcon("tool"));
 	noteToolsButton->setPopupMode(QToolButton::InstantPopup);
 
 	auto glueAction = new QAction(embed::getIconPixmap("glue"), tr("Glue"), noteToolsButton);
@@ -5396,7 +5396,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// -- Clear ghost MIDI clip button
 	m_clearGhostButton = new QPushButton( m_toolBar );
-	m_clearGhostButton->setIcon( embed::getIconPixmap( "clear_ghost_note" ) );
+	m_clearGhostButton->setIcon( embed::getIcon("clear_ghost_note") );
 	m_clearGhostButton->setToolTip( tr( "Clear ghost notes" ) );
 	m_clearGhostButton->setEnabled( false );
 	connect( m_clearGhostButton, SIGNAL(clicked()), m_editor, SLOT(clearGhostClip()));
@@ -5473,7 +5473,7 @@ PianoRollWindow::PianoRollWindow() :
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
-	setWindowIcon( embed::getIconPixmap( "piano" ) );
+	setWindowIcon( embed::getIcon("piano") );
 	setCurrentMidiClip( nullptr );
 
 	// Connections
@@ -5882,11 +5882,11 @@ void PianoRollWindow::updateStepRecordingIcon()
 {
 	if(m_editor->isStepRecording())
 	{
-		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_on"));
+		m_toggleStepRecordingAction->setIcon(embed::getIcon("record_step_on"));
 	}
 	else
 	{
-		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_off"));
+		m_toggleStepRecordingAction->setIcon(embed::getIcon("record_step_off"));
 	}
 }
 

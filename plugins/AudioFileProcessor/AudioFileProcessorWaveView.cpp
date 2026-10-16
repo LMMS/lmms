@@ -23,6 +23,8 @@
  */
 
 #include "AudioFileProcessorWaveView.h"
+#include "DpiContext.h"
+#include <limits>
 
 #include "Sample.h"
 #include "ConfigManager.h"
@@ -87,6 +89,14 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, i
 	m_sampleThumbnail(*buf)
 {
 	setFixedSize(w, h);
+	Dpi::watch(this, [this] {
+		const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
+		m_graph = QPixmap(Dpi::rasterSizeFor(QSize(width() - 2 * s_padding, height() - 2 * s_padding), dpr));
+		m_graph.setDevicePixelRatio(dpr);
+		m_graph.fill(Qt::transparent);
+		m_last_amp = std::numeric_limits<float>::quiet_NaN();
+		updateGraph();
+	});
 	setMouseTracking(true);
 
 	configureKnobRelationsAndWaveViews();
@@ -283,7 +293,7 @@ void AudioFileProcessorWaveView::paintEvent(QPaintEvent * pe)
 	g.setColorAt(0, c);
 	g.setColorAt(0.4, c);
 	g.setColorAt(1,  Qt::transparent);
-	p.fillRect(s_padding, s_padding, m_graph.width(), 14, g);
+	p.fillRect(s_padding, s_padding, width() - 2 * s_padding, 14, g);
 
 	p.setPen(QColor(255, 255, 255));
 	p.setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
@@ -349,7 +359,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	m_sampleThumbnail = SampleThumbnail{*m_sample};
 
 	const auto param = SampleThumbnail::VisualizeParameters{
-		.sampleRect = m_graph.rect(),
+		.sampleRect = QRect(0, 0, width() - 2 * s_padding, height() - 2 * s_padding),
 		.amplification = m_sample->amplification(),
 		.sampleStart = static_cast<float>(m_from) / m_sample->sampleSize(),
 		.sampleEnd = static_cast<float>(m_to) / m_sample->sampleSize(),

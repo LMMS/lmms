@@ -143,7 +143,7 @@ GranularPitchShifterHelpView::GranularPitchShifterHelpView():QTextEdit(s_helpTex
 	setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 	getGUI()->mainWindow()->addWindowedWidget(this);
 	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
-	parentWidget()->setWindowIcon(PLUGIN_NAME::getIconPixmap("logo"));
+	parentWidget()->setWindowIcon(PLUGIN_NAME::getIcon("logo"));
 	
 	// No maximize button
 	Qt::WindowFlags flags = parentWidget()->windowFlags();

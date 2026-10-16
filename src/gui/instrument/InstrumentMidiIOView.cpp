@@ -128,7 +128,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		m_rpBtn = new QToolButton;
 		m_rpBtn->setMinimumSize( 32, 32 );
 		m_rpBtn->setText( tr( "MIDI devices to receive MIDI events from" ) );
-		m_rpBtn->setIcon( embed::getIconPixmap( "piano" ) );
+		m_rpBtn->setIcon( embed::getIcon("piano") );
 		m_rpBtn->setPopupMode( QToolButton::InstantPopup );
 		midiInputLayout->insertSpacing( 0, 4 );
 		midiInputLayout->insertWidget( 0, m_rpBtn );
@@ -136,7 +136,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		m_wpBtn = new QToolButton;
 		m_wpBtn->setMinimumSize( 32, 32 );
 		m_wpBtn->setText( tr( "MIDI devices to send MIDI events to" ) );
-		m_wpBtn->setIcon( embed::getIconPixmap( "piano" ) );
+		m_wpBtn->setIcon( embed::getIcon("piano") );
 		m_wpBtn->setPopupMode( QToolButton::InstantPopup );
 		midiOutputLayout->insertSpacing( 0, 4 );
 		midiOutputLayout->insertWidget( 0, m_wpBtn );

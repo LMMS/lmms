@@ -20,6 +20,7 @@
  *
  */
 
+#include <limits>
 #include <QGuiApplication>
 #include <QImage>
 #include <QObject>
@@ -75,6 +76,11 @@ private slots:
 		QCOMPARE(Dpi::rasterSizeFor(QSize(0, 0), 1.5), QSize(0, 0));
 		QCOMPARE(Dpi::rasterSizeFor(QSize(-10, -5), 1.5), QSize(0, 0));
 
+		QCOMPARE(Dpi::rasterSizeFor(QSize(100, 32), 1.5625), QSize(157, 50));
+		QCOMPARE(Dpi::rasterSizeFor(QSizeF(std::numeric_limits<qreal>::infinity(), 10), 1), QSize(0, 0));
+		QCOMPARE(Dpi::rasterSizeFor(QSize(100, 10), std::numeric_limits<qreal>::infinity()), QSize(100, 10));
+		QCOMPARE(Dpi::rasterSizeFor(QSize(100, 10), std::numeric_limits<qreal>::quiet_NaN()), QSize(100, 10));
+		QCOMPARE(Dpi::rasterSizeFor(QSize(std::numeric_limits<int>::max(), 10), 2), QSize(0, 0));
 		// DPR <= 0 defaults to 1.0
 		QCOMPARE(Dpi::rasterSizeFor(QSize(100, 50), 0.0), QSize(100, 50));
 		QCOMPARE(Dpi::rasterSizeFor(QSize(100, 50), -1.25), QSize(100, 50));
@@ -108,5 +114,6 @@ private slots:
 	}
 };
 
-QTEST_MAIN(DpiRasterTest)
+#include "DpiTestMain.h"
+LMMS_DPI_TEST_MAIN(DpiRasterTest)
 #include "DpiRasterTest.moc"

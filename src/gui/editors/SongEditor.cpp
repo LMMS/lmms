@@ -920,7 +920,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_snapSizeLabel( new QLabel( m_toolBar ) )
 {
 	setWindowTitle( tr( "Song-Editor" ) );
-	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
+	setWindowIcon( embed::getIcon("songeditor") );
 
 	setCentralWidget(m_editor);
 	setAcceptDrops(true);
@@ -960,9 +960,9 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
 
 	m_editModeGroup = new ActionGroup(this);
-	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
-	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split clips)"));
-	m_selectModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
+	m_drawModeAction = m_editModeGroup->addAction(embed::getIcon("edit_draw"), tr("Draw mode"));
+	m_knifeModeAction = m_editModeGroup->addAction(embed::getIcon("edit_knife"), tr("Knife mode (split clips)"));
+	m_selectModeAction = m_editModeGroup->addAction(embed::getIcon("edit_select"), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 
 	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));

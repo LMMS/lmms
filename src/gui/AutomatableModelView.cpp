@@ -58,14 +58,14 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 	auto amvSlots = new AutomatableModelViewSlots(this, menu);
 
-	menu->addAction( embed::getIconPixmap( "reload" ),
+	menu->addAction( embed::getIcon("reload"),
 						AutomatableModel::tr( "&Reset (%1%2)" ).
 							arg( model->initValue<float>() * m_conversionFactor ).
 							arg( m_unit ),
 						model, SLOT(reset()));
 
 	menu->addSeparator();
-	menu->addAction( embed::getIconPixmap( "edit_copy" ),
+	menu->addAction( embed::getIcon("edit_copy"),
 						AutomatableModel::tr( "&Copy value (%1%2)" ).
 							arg( model->value<float>() * m_conversionFactor ).
 							arg( m_unit ),
@@ -78,7 +78,7 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 						arg( valueToPaste ).
 						arg( m_unit )
 					: AutomatableModel::tr( "&Paste value");
-	QAction* pasteAction = menu->addAction( embed::getIconPixmap( "edit_paste" ),
+	QAction* pasteAction = menu->addAction( embed::getIcon("edit_paste"),
 						pasteDesc, amvSlots, SLOT(pasteFromClipboard()));
 	pasteAction->setEnabled(canPaste);
 
@@ -86,7 +86,7 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 	if (model->isLinked())
 	{
-		menu->addAction(embed::getIconPixmap("edit_unlink"),
+		menu->addAction(embed::getIcon("edit_unlink"),
 							AutomatableModel::tr("Remove all linked controls"),
 							model, SLOT(unlink()));
 		menu->addSeparator();
@@ -107,16 +107,16 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 		QMenu* contMenu = menu->addMenu( embed::getIconPixmap( "controller" ), controllerTxt );
 
-		contMenu->addAction( embed::getIconPixmap( "controller" ),
+		contMenu->addAction( embed::getIcon("controller"),
 								AutomatableModel::tr("Edit connection..."),
 								amvSlots, SLOT(execConnectionDialog()));
-		contMenu->addAction( embed::getIconPixmap( "cancel" ),
+		contMenu->addAction( embed::getIcon("cancel"),
 								AutomatableModel::tr("Remove connection"),
 								amvSlots, SLOT(removeConnection()));
 	}
 	else
 	{
-		menu->addAction( embed::getIconPixmap( "controller" ),
+		menu->addAction( embed::getIcon("controller"),
 							AutomatableModel::tr("Connect to controller..."),
 							amvSlots, SLOT(execConnectionDialog()));
 	}

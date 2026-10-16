@@ -36,7 +36,8 @@ namespace lmms::gui
 
 
 SimpleTextFloat::SimpleTextFloat() :
-	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
+	// Widgets can be constructed in an isolated QApplication before the full LMMS GUI.
+	QWidget(getGUI() ? getGUI()->mainWindow() : nullptr, Qt::ToolTip)
 {
 	QHBoxLayout * layout = new QHBoxLayout(this);
 	layout->setContentsMargins(3, 3, 3, 3);

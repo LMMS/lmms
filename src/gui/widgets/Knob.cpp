@@ -78,6 +78,11 @@ Knob::Knob( QWidget * _parent, const QString & _name ) :
 void Knob::initUi( const QString & _name )
 {
 	onKnobNumUpdated();
+	Dpi::watch(this, [this] {
+		m_cache = QImage();
+		onKnobNumUpdated();
+		updateFixedSize();
+	});
 	setTotalAngle( 270.0f );
 	setInnerRadius( 1.0f );
 	setOuterRadius( 10.0f );
@@ -136,12 +141,14 @@ void Knob::onKnobNumUpdated()
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
 		const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
-		m_knobPixmap = std::make_unique<QPixmap>(embed::getIconPixmap(knobFilename.toUtf8().constData(), dpr));
+		const auto resource = embed::getIconResource(knobFilename.toStdString(), {QSize(-1, -1), dpr});
+		m_knobLogicalSize = resource.logicalSize;
+		m_knobPixmap = std::make_unique<QPixmap>(resource.pixmap);
 		if (!this->isEnabled())
 		{
 			convertPixmapToGrayScale(*m_knobPixmap.get());
 		}
-		const QSize logicalKnobSize = embed::logicalSize(*m_knobPixmap);
+		const QSize logicalKnobSize = m_knobLogicalSize;
 		setFixedSize( logicalKnobSize.width(), logicalKnobSize.height() );
 	}
 }
@@ -178,7 +185,7 @@ void Knob::updateFixedSize()
 	{
 		if (m_knobPixmap)
 		{
-			const QSize logicalKnobSize = embed::logicalSize(*m_knobPixmap);
+			const QSize logicalKnobSize = m_knobLogicalSize;
 			// In legacy mode only the width of the label is taken into account while the height is not
 			const int labelWidth = QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)).horizontalAdvance(m_label);
 			const int width = std::max(logicalKnobSize.width(), labelWidth);
@@ -197,7 +204,7 @@ void Knob::updateFixedSize()
 			return;
 		}
 
-		QSize pixmapSize = m_knobPixmap ? embed::logicalSize(*m_knobPixmap) : QSize(0, 0);
+		QSize pixmapSize = m_knobPixmap ? m_knobLogicalSize : QSize(0, 0);
 
 		auto fm = QFontMetrics(font());
 
@@ -388,8 +395,13 @@ void Knob::drawKnob( QPainter * _p )
 	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
 
 	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
+	if (m_knobPixmap && !qFuzzyCompare(m_knobPixmap->devicePixelRatio(), currentDpr))
+	{
+		onKnobNumUpdated();
+		updateFixedSize();
+	}
 
-	if( updateAngle() == false && !m_cache.isNull() && std::abs(m_cachedDpr - currentDpr) < 0.001 && m_cachedSize == size() )
+	if( updateAngle() == false && !m_cache.isNull() && qFuzzyCompare(m_cachedDpr, currentDpr) && m_cachedSize == size() )
 	{
 		_p->drawImage( 0, 0, m_cache );
 		return;
@@ -437,13 +449,12 @@ void Knob::drawKnob( QPainter * _p )
 
 
 	// Old-skool knobs
-	const QSize logicalKnobSize = m_knobPixmap ? embed::logicalSize(*m_knobPixmap) : QSize(0, 0);
+	const QSize logicalKnobSize = m_knobPixmap ? m_knobLogicalSize : QSize(0, 0);
 	const float radius = logicalKnobSize.width() / 2.0f - 1;
 	mid = QPoint( width() / 2, logicalKnobSize.height() / 2 );
 
-	p.drawPixmap( static_cast<int>(
-				width() / 2 - logicalKnobSize.width() / 2 ), 0,
-				*m_knobPixmap );
+	p.drawPixmap(QRect(QPoint(width() / 2 - logicalKnobSize.width() / 2, 0), logicalKnobSize),
+		*m_knobPixmap, m_knobPixmap->rect());
 
 	p.setRenderHint( QPainter::Antialiasing );
 

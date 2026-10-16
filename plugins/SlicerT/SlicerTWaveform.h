@@ -112,6 +112,7 @@ private:
 	SlicerT* m_slicerTParent;
 
 	QElapsedTimer m_updateTimer;
+	void rebuildBuffers();
 	void drawSeekerWaveform();
 	void drawSeeker();
 	void drawEditorWaveform();

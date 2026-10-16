@@ -60,7 +60,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	setWindowTitle(tr("Add effect"));
 	resize(640, 480);
 	
-	setWindowIcon(embed::getIconPixmap("setup_audio"));
+	setWindowIcon(embed::getIcon("setup_audio"));
 
 	// Query effects
 	EffectKeyList subPluginEffectKeys;
@@ -139,7 +139,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	m_filterEdit->setFocusPolicy(Qt::StrongFocus);
 	m_filterEdit->setPlaceholderText(tr("Search"));
 	m_filterEdit->setClearButtonEnabled(true);
-	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+	m_filterEdit->addAction(embed::getIcon("zoom"), QLineEdit::LeadingPosition);
 
 	m_pluginList->setModel(&m_model);
 	m_pluginList->setEditTriggers(QAbstractItemView::NoEditTriggers);

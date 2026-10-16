@@ -93,7 +93,7 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 		if (removable)
 		{
 			auto removeBtn = new QPushButton;
-			removeBtn->setIcon( embed::getIconPixmap( "discard" ) );
+			removeBtn->setIcon( embed::getIcon("discard") );
 			QObject::connect(removeBtn, &QPushButton::clicked,
 				this, [this,ctrl](bool){
 					AutomatableModel* controlModel = ctrl->model();

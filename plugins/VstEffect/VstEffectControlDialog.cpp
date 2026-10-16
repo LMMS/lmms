@@ -66,6 +66,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 				m_plugin->createUI(this);
 			}
 			m_pluginWidget = m_plugin->pluginWidget();
+			embed_vst = m_plugin->embedMethod() != "none" && m_pluginWidget;
 		}
 	}
 

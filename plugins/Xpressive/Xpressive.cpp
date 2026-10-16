@@ -865,7 +865,7 @@ XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
 	getGUI()->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
-	parentWidget()->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
+	parentWidget()->setWindowIcon( PLUGIN_NAME::getIcon("logo") );
 	parentWidget()->setFixedSize( 300, 500);
 	
 	// No maximize button

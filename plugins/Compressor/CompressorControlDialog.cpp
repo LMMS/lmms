@@ -24,6 +24,7 @@
 
 #include "Compressor.h"
 #include "CompressorControlDialog.h"
+#include "DpiContext.h"
 #include "CompressorControls.h"
 
 #include <cmath>
@@ -53,6 +54,11 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	setMinimumSize(MIN_COMP_SCREEN_X, MIN_COMP_SCREEN_Y);
 	resize(COMP_SCREEN_X, COMP_SCREEN_Y);
 
+	Dpi::watch(this, [this] {
+		resetCompressorView();
+		redrawKnee();
+		drawMiscPixmap();
+	});
 	m_graphPixmap.fill(QColor("transparent"));
 
 	m_visPixmap.fill(QColor("transparent"));
@@ -562,7 +568,8 @@ void CompressorControlDialog::drawKneePixmap2()
 	if (kneePoint > m_lastKneePoint)
 	{
 		QRectF knee2Rect = QRect(m_lastKneePoint, 0, kneePoint - m_lastKneePoint, m_kneeWindowSizeY);
-		m_p.drawPixmap(knee2Rect, m_kneePixmap, knee2Rect);
+		const qreal dpr = m_kneePixmap.devicePixelRatio();
+		m_p.drawPixmap(knee2Rect, m_kneePixmap, QRectF(knee2Rect.topLeft() * dpr, knee2Rect.size() * dpr));
 	}
 	else
 	{
@@ -762,6 +769,17 @@ void CompressorControlDialog::setGuiVisibility(bool isVisible)
 
 void CompressorControlDialog::resetCompressorView()
 {
+	const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
+	const QSize raster = Dpi::rasterSizeFor(size(), dpr);
+	for (auto* buffer : {&m_visPixmap, &m_kneePixmap, &m_kneePixmap2, &m_miscPixmap, &m_graphPixmap})
+	{
+		if (buffer->size() != raster || !qFuzzyCompare(buffer->devicePixelRatio(), dpr))
+		{
+			*buffer = QPixmap(raster);
+			buffer->setDevicePixelRatio(dpr);
+			buffer->fill(Qt::transparent);
+		}
+	}
 	m_windowSizeX = size().width();
 	m_windowSizeY = size().height();
 	m_kneeWindowSizeX = m_windowSizeY;

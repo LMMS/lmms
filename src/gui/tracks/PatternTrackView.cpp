@@ -44,7 +44,7 @@ PatternTrackView::PatternTrackView(PatternTrack* pt, TrackContainerView* tcv) :
 	setAcceptDrops( false );
 
 	m_trackLabel = new TrackLabelButton( this, getTrackSettingsWidget() );
-	m_trackLabel->setIcon( embed::getIconPixmap("pattern_track"));
+	m_trackLabel->setIcon( embed::getIcon("pattern_track"));
 	m_trackLabel->move( 3, 1 );
 	m_trackLabel->show();
 	connect( m_trackLabel, SIGNAL(clicked(bool)),

@@ -42,7 +42,7 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 {
         setFixedHeight( 32 );
 		auto tlb = new TrackLabelButton(this, getTrackSettingsWidget());
-		tlb->setIcon(embed::getIconPixmap("automation_track"));
+		tlb->setIcon(embed::getIcon("automation_track"));
 		tlb->move(3, 1);
 		tlb->show();
 		setModel(_at);

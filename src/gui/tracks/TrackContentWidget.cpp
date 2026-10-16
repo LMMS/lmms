@@ -70,6 +70,7 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	m_embossWidth(0),
 	m_embossOffset(0)
 {
+	Dpi::watch(this, [this] { m_cachedDpr = 0; });
 	setAcceptDrops( true );
 
 	// Update background if snap size changes
@@ -550,7 +551,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	const TrackContainerView * tcv = m_trackView->trackContainerView();
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
-	if (std::abs(m_cachedDpr - currentDpr) > 0.001)
+	if (!qFuzzyCompare(m_cachedDpr, currentDpr))
 	{
 		updateBackground();
 	}
@@ -558,8 +559,20 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	// Don't draw background on Pattern Editor
 	if (m_trackView->trackContainerView() != getGUI()->patternEditor()->m_editor)
 	{
-		p.drawTiledPixmap(rect(), m_background, QPoint(
-				tcv->currentPosition().getTicks() * ppb / TimePos::ticksPerBar(), 0));
+		const int tileWidth = ppb * BARS_PER_GROUP * 2;
+		if (tileWidth > 0)
+		{
+			const int offset = tcv->currentPosition().getTicks() * ppb / TimePos::ticksPerBar();
+			const int firstX = -((offset % tileWidth + tileWidth) % tileWidth);
+			const qreal dpr = m_background.devicePixelRatio();
+			// Crop any ceil-rounded padding instead of deriving the musical grid period
+			// from physicalWidth / DPR (which can be fractional).
+			const QRectF source(0, 0, tileWidth * dpr, height() * dpr);
+			for (int x = firstX; x < width(); x += tileWidth)
+			{
+				p.drawPixmap(QRectF(x, 0, tileWidth, height()), m_background, source);
+			}
+		}
 	}
 }
 
@@ -610,7 +623,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 	}
 
 	QMenu contextMenu( this );
-	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
+	QAction *pasteA = contextMenu.addAction( embed::getIcon("edit_paste"),
 					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, ContextMenuAction::Paste ); } );
 	// If we can't paste in the current TCW for some reason, disable the action so the user knows
 	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), getMimeData() ) ? true : false );

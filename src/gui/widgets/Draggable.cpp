@@ -25,6 +25,7 @@
 #include "Draggable.h"
 #include "SimpleTextFloat.h"
 #include "embed.h"
+#include "DpiContext.h"
 #include "interpolation.h"
 
 #include <QPixmap>
@@ -44,6 +45,14 @@ Draggable::Draggable(DirectionOfManipulation directionOfManipulation,
 	  m_defaultValue(0),
 	  m_hasDefaultValPixmap(false)
 {
+	m_resource = embed::describePixmap(pixmap);
+	Dpi::watch(this, [this] {
+		const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
+		m_resource = m_resource.atDpr(dpr);
+		m_defaultResource = m_defaultResource.atDpr(dpr);
+		m_pixmap = m_resource.pixmap;
+		m_defaultValPixmap = m_defaultResource.pixmap;
+	});
 	setModel(floatModel);
 	connect(model(), &FloatModel::dataChanged, this, &Draggable::handleMovement);
 	handleMovement();
@@ -51,17 +60,19 @@ Draggable::Draggable(DirectionOfManipulation directionOfManipulation,
 
 QSize Draggable::sizeHint() const
 {
-	return embed::logicalSize(m_pixmap);
+	return m_resource.logicalSize;
 }
 
 void Draggable::setPixmap(const QPixmap& pixmap)
 {
+	m_resource = embed::describePixmap(pixmap);
 	m_pixmap = pixmap;
 	update();
 }
 
 void Draggable::setDefaultValPixmap(const QPixmap& pixmap, float value)
 {
+	m_defaultResource = embed::describePixmap(pixmap);
 	m_defaultValPixmap = pixmap;
 	m_defaultValue = value;
 	m_hasDefaultValPixmap = true;
@@ -75,11 +86,11 @@ void Draggable::paintEvent(QPaintEvent* event)
 	
 	if (m_hasDefaultValPixmap && model()->value() == m_defaultValue)
 	{
-		painter.drawPixmap(0, 0, m_defaultValPixmap);
+		painter.drawPixmap(QRect(QPoint(), m_defaultResource.logicalSize), m_defaultValPixmap, m_defaultValPixmap.rect());
 	}
 	else
 	{
-		painter.drawPixmap(0, 0, m_pixmap);
+		painter.drawPixmap(QRect(QPoint(), m_resource.logicalSize), m_pixmap, m_pixmap.rect());
 	}
 }
 
@@ -117,7 +128,7 @@ void Draggable::mouseMoveEvent(QMouseEvent* me)
 void Draggable::handleMovement()
 {
 	float newCoord = std::lerp(m_pointA, m_pointB, (model()->value() - model()->minValue()) / (model()->maxValue() - model()->minValue()));
-	const QSize logicalSize = embed::logicalSize(m_pixmap);
+	const QSize logicalSize = m_resource.logicalSize;
 	if (directionOfManipulation() == DirectionOfManipulation::Vertical)
 	{
 		move(x(), newCoord - logicalSize.height() / 2.f);

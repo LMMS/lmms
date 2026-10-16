@@ -274,6 +274,14 @@ protected slots:
 	//! has changed the track view's length.
 	void updatePosition();
 
+protected:
+	bool updateCachedDpr(qreal dpr)
+	{
+		const bool changed = !qFuzzyCompare(m_cachedDpr, dpr);
+		m_cachedDpr = dpr;
+		return changed;
+	}
+
 private:
 	enum class Action
 	{

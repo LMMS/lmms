@@ -17,7 +17,7 @@ namespace lmms::gui
 RecentProjectsMenu::RecentProjectsMenu(QWidget *parent) :
 	QMenu(tr( "&Recently Opened Projects" ), parent)
 {
-	setIcon(embed::getIconPixmap( "project_open_recent" ));
+	setIcon(embed::getIcon("project_open_recent"));
 
 	connect( this, SIGNAL(aboutToShow()),
 			 this, SLOT(fillMenu()));

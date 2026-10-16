@@ -142,7 +142,7 @@ const QStringList& FileRevealer::getSelectCommand()
 	if (supportsArg(getDefaultFileManager(), "--select"))
 	{
 		s_canSelect = true;
-		selectCommandCache = {"--select"};
+		selectCommandCache = QStringList{"--select"};
 		return selectCommandCache.value();
 	}
 

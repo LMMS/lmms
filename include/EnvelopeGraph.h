@@ -69,7 +69,7 @@ private:
 	void toggleAmountModel();
 
 private:
-	QPixmap m_envGraph = embed::getIconPixmap("envelope_graph");
+	embed::PixmapResource m_envGraph = embed::getIconResource("envelope_graph");
 
 	EnvelopeAndLfoParameters* m_params = nullptr;
 

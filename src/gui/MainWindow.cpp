@@ -23,6 +23,7 @@
  */
 
 #include "MainWindow.h"
+#include "DpiContext.h"
 
 #include <algorithm>
 #include <QApplication>
@@ -268,15 +269,15 @@ MainWindow::~MainWindow()
 void MainWindow::finalize()
 {
 	resetWindowTitle();
-	setWindowIcon( embed::getIconPixmap( "icon_small" ) );
+	setWindowIcon( embed::getIcon("icon_small") );
 
 	auto addAction = [this](QMenu* menu, std::string_view icon, const QString& text,
 		const QKeySequence& shortcut, auto(MainWindow::* slot)()) -> QAction*
 	{
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 3, 0))
-		return menu->addAction(embed::getIconPixmap(icon), text, shortcut, this, slot);
+		return menu->addAction(embed::getIcon(icon), text, shortcut, this, slot);
 #else
-		return menu->addAction(embed::getIconPixmap(icon), text, this, slot, shortcut);
+		return menu->addAction(embed::getIcon(icon), text, this, slot, shortcut);
 #endif
 	};
 
@@ -304,12 +305,12 @@ void MainWindow::finalize()
 	addAction(project_menu, "project_save", tr("Save as New &Version"),
 		keySequence(Qt::CTRL, Qt::ALT, Qt::Key_S), &MainWindow::saveProjectAsNewVersion);
 
-	project_menu->addAction(embed::getIconPixmap("project_save"), tr("Save as default template"),
+	project_menu->addAction(embed::getIcon("project_save"), tr("Save as default template"),
 		this, &MainWindow::saveProjectAsDefaultTemplate);
 
 	project_menu->addSeparator();
 
-	project_menu->addAction(embed::getIconPixmap("project_import"), tr("Import..."),
+	project_menu->addAction(embed::getIcon("project_import"), tr("Import..."),
 		this, &MainWindow::onImportProject);
 
 	addAction(project_menu, "project_export", tr("E&xport..."),
@@ -323,7 +324,7 @@ void MainWindow::finalize()
 
 	project_menu->addSeparator();
 
-	project_menu->addAction(embed::getIconPixmap("exit"), tr("&Quit"),
+	project_menu->addAction(embed::getIcon("exit"), tr("&Quit"),
 		qApp, SLOT(closeAllWindows()))->setShortcut(keySequence(Qt::CTRL, Qt::Key_Q));
 
 	auto edit_menu = new QMenu(this);
@@ -339,9 +340,9 @@ void MainWindow::finalize()
 	m_redoAction->setShortcutContext(Qt::ApplicationShortcut);
 
 	edit_menu->addSeparator();
-	edit_menu->addAction(embed::getIconPixmap("microtuner"), tr("Scales and keymaps"),
+	edit_menu->addAction(embed::getIcon("microtuner"), tr("Scales and keymaps"),
 		this, SLOT(toggleMicrotunerWin()));
-	edit_menu->addAction(embed::getIconPixmap("setup_general"), tr("Settings"),
+	edit_menu->addAction(embed::getIcon("setup_general"), tr("Settings"),
 		this, SLOT(showSettingsDialog()));
 
 	connect(edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()));
@@ -376,19 +377,19 @@ void MainWindow::finalize()
 	// May use offline help
 	if( true )
 	{
-		help_menu->addAction( embed::getIconPixmap( "help" ),
+		help_menu->addAction( embed::getIcon("help"),
 						tr( "Online Help" ),
 						this, SLOT(browseHelp()));
 	}
 	else
 	{
-		help_menu->addAction( embed::getIconPixmap( "help" ),
+		help_menu->addAction( embed::getIcon("help"),
 							tr( "Help" ),
 							this, SLOT(help()));
 	}
 
 	help_menu->addSeparator();
-	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
+	help_menu->addAction( embed::getIcon("icon_small"), tr( "About" ),
 				  this, SLOT(aboutLMMS()));
 
 	// create tool-buttons
@@ -683,9 +684,10 @@ void MainWindow::saveWidgetState(QWidget* w, QDomElement& de)
 	}
 
 	de.setAttribute("visible", bool{win->widget() && win->widget()->isVisible()});
-	de.setAttribute("maximized", win->isMaximized());
+	de.setAttribute("maximized", win->isDetached() ? win->widget()->isMaximized() : win->isMaximized());
 
-	QRect normalGeometry = win->getTrueNormalGeometry();
+	QRect normalGeometry = win->isDetached() ? win->widget()->normalGeometry() : win->getTrueNormalGeometry();
+	if (win->isDetached() && !win->widget()->isMaximized()) { normalGeometry = win->widget()->geometry(); }
 	de.setAttribute("x", normalGeometry.x());
 	de.setAttribute("y", normalGeometry.y() );
 	de.setAttribute("width", normalGeometry.width());
@@ -712,64 +714,35 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 		de.attribute("height").toInt(),
 	};
 
-	// Ensure minimum sensible dimensions
-	if (normalGeometry.width() < 50) { normalGeometry.setWidth(300); }
-	if (normalGeometry.height() < 50) { normalGeometry.setHeight(200); }
-
+	QWidget* target = win->isDetached() ? win->widget() : win;
+	QList<QRect> areas;
 	if (win->isDetached())
 	{
-		// Detached floating window: check against active screens
-		bool onScreen = false;
-		for (const auto* screen : QGuiApplication::screens())
-		{
-			if (screen && screen->availableGeometry().intersects(normalGeometry))
-			{
-				onScreen = true;
-				break;
-			}
-		}
-
-		if (!onScreen)
-		{
-			if (auto* primary = QGuiApplication::primaryScreen())
-			{
-				const QRect avail = primary->availableGeometry();
-				normalGeometry.moveTo(
-					std::clamp(normalGeometry.x(), avail.left(), std::max(avail.left(), avail.right() - normalGeometry.width())),
-					std::clamp(normalGeometry.y(), avail.top(), std::max(avail.top(), avail.bottom() - normalGeometry.height()))
-				);
-			}
-		}
+		for (const auto* screen : QGuiApplication::screens()) { areas.append(screen->availableGeometry()); }
 	}
-	else
+	else if (win->mdiArea()) { areas.append(win->mdiArea()->viewport()->rect()); }
+	if (win->isDetached())
 	{
-		// MDI subwindow: avoid negative offscreen placement
-		if (normalGeometry.x() < 0) { normalGeometry.moveLeft(0); }
-		if (normalGeometry.y() < 0) { normalGeometry.moveTop(0); }
-
-		if (win->mdiArea() && win->mdiArea()->width() > 100 && win->mdiArea()->height() > 100)
-		{
-			if (normalGeometry.x() >= win->mdiArea()->width())
-			{
-				normalGeometry.moveLeft(std::max(0, win->mdiArea()->width() - normalGeometry.width()));
-			}
-			if (normalGeometry.y() >= win->mdiArea()->height())
-			{
-				normalGeometry.moveTop(std::max(0, win->mdiArea()->height() - normalGeometry.height()));
-			}
-		}
+		QMargins margins;
+		if (target->windowHandle()) { margins = target->windowHandle()->frameMargins(); }
+		if (margins.isNull()) { margins = QMargins(0, target->style()->pixelMetric(QStyle::PM_TitleBarHeight), 0, 0); }
+		const QSize frameSize(margins.left() + margins.right(), margins.top() + margins.bottom());
+		normalGeometry = Dpi::reachableGeometry(normalGeometry.marginsAdded(margins), areas,
+			target->minimumSize() + frameSize).marginsRemoved(margins);
 	}
+	else { normalGeometry = Dpi::reachableGeometry(normalGeometry, areas, target->minimumSize()); }
 
 	// First restore the window, as attempting to resize a maximized window can cause graphical glitches.
-	win->setWindowState(win->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
+	target->setWindowState(target->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
 
 	// Then resize it. `QWidget::setGeometry` adjusts the size if it is invalid / under the minimum size.
-	win->setGeometry(normalGeometry);
+	if (win->isDetached() && QGuiApplication::platformName() == "wayland") { target->resize(normalGeometry.size()); }
+	else { target->setGeometry(normalGeometry); }
 
 	// Set the window to its correct "maximized?" state.
-	auto winState = win->windowState();
+	auto winState = target->windowState();
 	winState.setFlag(Qt::WindowMaximized, de.attribute("maximized").toInt());
-	win->setWindowState(winState);
+	target->setWindowState(winState);
 
 	if (const auto visible = de.attribute("visible"); !visible.isEmpty())
 	{
@@ -1094,51 +1067,51 @@ void MainWindow::updateViewMenu()
 	// TODO: get current visibility for these and indicate in menu?
 	// Not that it's straight visible <-> invisible, more like
 	// not on top -> top <-> invisible
-	m_viewMenu->addAction(embed::getIconPixmap( "songeditor" ),
+	m_viewMenu->addAction(embed::getIcon("songeditor"),
 			      tr( "Song Editor" ) + "\tCtrl+1",
 			      this, SLOT(toggleSongEditorWin())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap("pattern_track"),
+	m_viewMenu->addAction(embed::getIcon("pattern_track"),
 					tr("Pattern Editor") + "\tCtrl+2",
 					this, SLOT(togglePatternEditorWin())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "piano" ),
+	m_viewMenu->addAction(embed::getIcon("piano"),
 			      tr( "Piano Roll" ) + "\tCtrl+3",
 			      this, SLOT(togglePianoRollWin())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "automation" ),
+	m_viewMenu->addAction(embed::getIcon("automation"),
 			      tr( "Automation Editor" ) + "\tCtrl+4",
 			      this,
 			      SLOT(toggleAutomationEditorWin())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "mixer" ),
+	m_viewMenu->addAction(embed::getIcon("mixer"),
 			      tr( "Mixer" ) + "\tCtrl+5",
 			      this, SLOT(toggleMixerWin())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
+	m_viewMenu->addAction(embed::getIcon("controller"),
 			      tr( "Controller Rack" ) + "\tCtrl+6",
 			      this, SLOT(toggleControllerRack())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
+	m_viewMenu->addAction(embed::getIcon("project_notes"),
 			      tr( "Project Notes" ) + "\tCtrl+7",
 			      this, SLOT(toggleProjectNotesWin())
 		);
 
 	m_viewMenu->addSeparator();
 	
-	m_viewMenu->addAction(embed::getIconPixmap( "fullscreen" ),
+	m_viewMenu->addAction(embed::getIcon("fullscreen"),
 				tr( "Fullscreen" ) + "\tF11",
 				this, SLOT(toggleFullscreen())
 		);
 
 	m_viewMenu->addSeparator();
 
-	auto detachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
+	auto detachAllAction = m_viewMenu->addAction(embed::getIcon("detach"),
 		tr("Detach all subwindows"),
 		this, [this](){ setAllSubWindowsDetached(true); },
 		QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_D}
 	);
-	auto attachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
+	auto attachAllAction = m_viewMenu->addAction(embed::getIcon("detach"),
 		tr("Attach all subwindows"),
 		this, [this](){ setAllSubWindowsDetached(false); },
 		QKeySequence{Qt::CTRL | Qt::ALT | Qt::SHIFT | Qt::Key_D}

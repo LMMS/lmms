@@ -162,12 +162,12 @@ private:
 	//! @brief Return model and title of the marker closest to the given key
 	IntModel *getNearestMarker(int key, QString* title = nullptr);
 
-	QPixmap m_whiteKeyPm = embed::getIconPixmap("white_key");
-	QPixmap m_blackKeyPm = embed::getIconPixmap("black_key");
-	QPixmap m_whiteKeyPressedPm = embed::getIconPixmap("white_key_pressed");
-	QPixmap m_blackKeyPressedPm = embed::getIconPixmap("black_key_pressed");
-	QPixmap m_whiteKeyDisabledPm = embed::getIconPixmap("white_key_disabled");
-	QPixmap m_blackKeyDisabledPm = embed::getIconPixmap("black_key_disabled");
+	embed::PixmapResource m_whiteKeyPm = embed::getIconResource("white_key");
+	embed::PixmapResource m_blackKeyPm = embed::getIconResource("black_key");
+	embed::PixmapResource m_whiteKeyPressedPm = embed::getIconResource("white_key_pressed");
+	embed::PixmapResource m_blackKeyPressedPm = embed::getIconResource("black_key_pressed");
+	embed::PixmapResource m_whiteKeyDisabledPm = embed::getIconResource("white_key_disabled");
+	embed::PixmapResource m_blackKeyDisabledPm = embed::getIconResource("black_key_disabled");
 
 	Piano* m_piano = nullptr;
 

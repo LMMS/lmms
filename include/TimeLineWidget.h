@@ -197,8 +197,8 @@ private:
 	auto getLoopAction(QMouseEvent* event) const -> Action;
 	auto actionCursor(Action action) const -> QCursor;
 
-	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
-	QPixmap m_recordingPosMarkerPixmap = embed::getIconPixmap("recording_playpos_marker");
+	embed::PixmapResource m_posMarker = embed::getIconResource("playpos_marker");
+	embed::PixmapResource m_recordingPosMarker = embed::getIconResource("recording_playpos_marker");
 
 	QColor m_inactiveLoopColor = QColor{52, 63, 53, 64};
 	QBrush m_inactiveLoopBrush = QColor{255, 255, 255, 32};

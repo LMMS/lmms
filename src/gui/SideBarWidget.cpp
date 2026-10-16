@@ -46,7 +46,7 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 	m_layout = new QVBoxLayout( m_contents );
 	m_layout->setSpacing( 5 );
 	m_layout->setContentsMargins(0, 0, 0, 0);
-	m_closeBtn = new QPushButton(embed::getIconPixmap("close"), QString(), this);
+	m_closeBtn = new QPushButton(embed::getIcon("close"), QString(), this);
 	m_closeBtn->resize(m_buttonSize);
 	m_closeBtn->setToolTip(tr("Close"));
 	connect(m_closeBtn, &QPushButton::clicked,

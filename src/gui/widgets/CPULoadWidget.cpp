@@ -50,10 +50,12 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	m_cachedDpr( 1.0 )
 {
 	m_cachedDpr = Dpi::effectiveDevicePixelRatio(this);
-	m_background = embed::getIconPixmap( "cpuload_bg", m_cachedDpr );
-	m_leds = embed::getIconPixmap( "cpuload_leds", m_cachedDpr );
+	m_backgroundResource = embed::getIconResource("cpuload_bg", {QSize(-1, -1), m_cachedDpr});
+	m_background = m_backgroundResource.pixmap;
+	m_ledsResource = embed::getIconResource("cpuload_leds", {QSize(-1, -1), m_cachedDpr});
+	m_leds = m_ledsResource.pixmap;
 
-	const QSize logicalBgSize = embed::logicalSize(m_background);
+	const QSize logicalBgSize = m_backgroundResource.logicalSize;
 	setFixedSize( logicalBgSize.width(), logicalBgSize.height() );
 
 	const QSize physSize = Dpi::rasterSizeFor(size(), m_cachedDpr);
@@ -62,6 +64,7 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 
 	connect( &m_updateTimer, SIGNAL(timeout()),
 					this, SLOT(updateCpuLoad()));
+	Dpi::watch(this, [this] { m_changed = true; });
 	m_updateTimer.start( 100 );	// update cpu-load at 10 fps
 }
 
@@ -74,11 +77,13 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 void CPULoadWidget::paintEvent( QPaintEvent *  )
 {
 	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
-	if (std::abs(m_cachedDpr - currentDpr) > 0.001)
+	if (!qFuzzyCompare(m_cachedDpr, currentDpr))
 	{
 		m_cachedDpr = currentDpr;
-		m_background = embed::getIconPixmap("cpuload_bg", m_cachedDpr);
-		m_leds = embed::getIconPixmap("cpuload_leds", m_cachedDpr);
+		m_backgroundResource = m_backgroundResource.atDpr(m_cachedDpr);
+		m_background = m_backgroundResource.pixmap;
+		m_ledsResource = m_ledsResource.atDpr(m_cachedDpr);
+		m_leds = m_ledsResource.pixmap;
 		const QSize physSize = Dpi::rasterSizeFor(size(), m_cachedDpr);
 		m_temp = QPixmap(physSize);
 		m_temp.setDevicePixelRatio(m_cachedDpr);
@@ -93,7 +98,7 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 		QPainter p( &m_temp );
 		p.drawPixmap( 0, 0, m_background );
 
-		const QSize logicalLedsSize = embed::logicalSize(m_leds);
+		const QSize logicalLedsSize = m_ledsResource.logicalSize;
 		const qreal ledsDpr = m_leds.devicePixelRatio() > 0.0 ? m_leds.devicePixelRatio() : 1.0;
 
 		// Normally the CPU load indicator moves smoothly, with 1 pixel resolution. However, some themes may want to

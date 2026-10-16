@@ -86,7 +86,10 @@ enum VstRemoteMessageIDs
 	IdVstPluginUniqueID,
 	IdVstSetParameter,
 	IdVstParameterCount,
-	IdVstParameterDump
+	IdVstParameterDump,
+
+	// Appended to preserve existing IDs. Host/helper from the same build are deployed together.
+	IdVstUseSeparateUI
 
 } ;
 

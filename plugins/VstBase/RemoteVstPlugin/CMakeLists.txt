@@ -46,6 +46,13 @@ add_executable(${EXE_NAME} WIN32
 	${LMMS_COMMON_SRCS}
 )
 if(IS_WIN)
+	if(MSVC)
+		target_sources(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.manifest")
+	else()
+		enable_language(RC)
+		target_sources(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.rc")
+		target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+	endif()
 	target_link_libraries(${EXE_NAME} ole32)
 else()
 	target_link_libraries(${EXE_NAME} dl X11)

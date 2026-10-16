@@ -60,7 +60,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	title.append( _model->name() );
 	title.append( ")" );
 	setWindowTitle( title );
-	setWindowIcon( embed::getIconPixmap( "controller" ) );
+	setWindowIcon( embed::getIcon("controller") );
 	setFixedSize( 240, 58 );
 	
 	m_baseKnob = new Knob(KnobType::Bright26, tr("BASE"), SMALL_FONT_SIZE, this);
@@ -228,14 +228,14 @@ void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 		// ^ if this ever gets activated again:
 		//   a47a36c86e4473af862df58d2b59f6cb8620b9ee says that publicName
 		//   should be replaced by Model::displayName
-	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ),
+	contextMenu->addAction( embed::getIcon("arp_up_on"),
 						tr( "Move &up" ),
 						this, SLOT(moveUp()));
-	contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ),
+	contextMenu->addAction( embed::getIcon("arp_down_on"),
 						tr( "Move &down" ),
 						this, SLOT(moveDown()));
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
+	contextMenu->addAction( embed::getIcon("cancel"),
 						tr( "&Remove this plugin" ),
 						this, SLOT(deletePlugin()));
 	contextMenu->exec( QCursor::pos() );

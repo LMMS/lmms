@@ -617,6 +617,23 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			init( _m.getString() );
 			break;
 
+		case IdVstUseSeparateUI:
+#ifndef NATIVE_LINUX_VST
+			if (m_window)
+			{
+				// Runs in the helper GUI thread, so AdjustWindowRect and SetWindowPos
+				// use the same coordinate/DPI context as effEditGetRect.
+				const DWORD style = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX;
+				SetWindowLongPtr(m_window, GWL_STYLE, style);
+				RECT bounds = {0, 0, m_windowWidth, m_windowHeight};
+				AdjustWindowRect(&bounds, style, false);
+				SetWindowPos(m_window, nullptr, 0, 0, bounds.right - bounds.left, bounds.bottom - bounds.top,
+					SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+			}
+#endif
+			EMBED = EMBED_X11 = EMBED_WIN32 = false;
+			break;
+
 		case IdVstSetTempo:
 			setBPM( _m.getInt() );
 			break;

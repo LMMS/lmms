@@ -123,7 +123,7 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 
 	m_filterEdit->setPlaceholderText(tr("Search"));
 	m_filterEdit->setClearButtonEnabled(true);
-	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+	m_filterEdit->addAction(embed::getIcon("zoom"), QLineEdit::LeadingPosition);
 
 	// Configure focus (only allow for search bar and dialog buttons)
 	m_filterEdit->setFocus();

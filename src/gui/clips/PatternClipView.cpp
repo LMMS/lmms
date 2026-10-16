@@ -49,6 +49,7 @@ PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
 	m_paintPixmap()
 {
+	Dpi::watch(this, [this] { setNeedsUpdate(true); });
 	connect( _clip->getTrack(), SIGNAL(dataChanged()), 
 			this, SLOT(update()));
 	connect(Engine::patternStore(), &TrackContainer::trackAdded,
@@ -69,9 +70,9 @@ void PatternClipView::constructContextMenu(QMenu* _cm)
 			this, SLOT(openInPatternEditor()));
 	_cm->insertSeparator( _cm->actions()[1] );
 	_cm->addSeparator();
-	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
+	_cm->addAction( embed::getIcon("reload"), tr( "Reset name" ),
 						this, SLOT(resetName()));
-	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
+	_cm->addAction( embed::getIcon("edit_rename"),
 						tr( "Change name" ),
 						this, SLOT(changeName()));
 }
@@ -94,7 +95,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	QPainter painter( this );
 
 	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
-	if (std::abs(m_cachedDpr - currentDpr) > 0.001)
+	if (updateCachedDpr(currentDpr))
 	{
 		setNeedsUpdate(true);
 	}
@@ -106,10 +107,9 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	}
 
 	setNeedsUpdate( false );
-	m_cachedDpr = currentDpr;
 
 	const QSize physSize = Dpi::rasterSizeFor(size(), currentDpr);
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || std::abs(m_paintPixmap.devicePixelRatio() - currentDpr) > 0.001)
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || !qFuzzyCompare(m_paintPixmap.devicePixelRatio(), currentDpr))
 	{
 		m_paintPixmap = QPixmap(physSize);
 		m_paintPixmap.setDevicePixelRatio(currentDpr);

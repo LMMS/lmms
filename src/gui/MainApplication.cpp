@@ -27,6 +27,7 @@
 #include <QFileOpenEvent>
 
 #include "Engine.h"
+#include "DpiContext.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Song.h"
@@ -39,6 +40,7 @@ MainApplication::MainApplication(int& argc, char** argv) :
 	QApplication(argc, argv),
 	m_queuedFile()
 {
+	installEventFilter(this);
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 	// Work around a bug of KXmlGui < 5.55
 	// which breaks the recent files menu
@@ -55,6 +57,22 @@ MainApplication::MainApplication(int& argc, char** argv) :
 #if defined(LMMS_BUILD_WIN32)
 	installNativeEventFilter(this);
 #endif
+}
+
+bool MainApplication::eventFilter(QObject* object, QEvent* event)
+{
+	if (event->type() == QEvent::ParentChange)
+	{
+		if (auto* widget = qobject_cast<QWidget*>(object)) { Dpi::refresh(widget); }
+	}
+	else if (event->type() == QEvent::Show || event->type() == QEvent::WinIdChange)
+	{
+		if (auto* widget = qobject_cast<QWidget*>(object); widget && widget->isWindow())
+		{
+			DpiContext::forWidget(widget);
+		}
+	}
+	return QApplication::eventFilter(object, event);
 }
 
 bool MainApplication::event(QEvent* event)

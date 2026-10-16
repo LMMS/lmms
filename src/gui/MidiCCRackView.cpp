@@ -46,7 +46,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	QWidget(),
 	m_track(track)
 {
-	setWindowIcon(embed::getIconPixmap("midi_cc_rack"));
+	setWindowIcon(embed::getIcon("midi_cc_rack"));
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 
 	SubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget(this);

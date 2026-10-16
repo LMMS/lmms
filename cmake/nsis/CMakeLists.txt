@@ -26,9 +26,6 @@ SET(CPACK_PACKAGE_FILE_NAME             "${CMAKE_PROJECT_NAME}-${VERSION}-${WIN_
 SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS   "
   \\\${registerExtension} \\\"$INSTDIR\\\\${CMAKE_PROJECT_NAME}.exe\\\" \\\".mmp\\\" \\\"${PROJECT_NAME_UCASE} Project\\\"
   \\\${registerExtension} \\\"$INSTDIR\\\\${CMAKE_PROJECT_NAME}.exe\\\" \\\".mmpz\\\" \\\"${PROJECT_NAME_UCASE} Project (compressed)\\\"
-  \\\${IfNot} \\\${AtMostWin7}
-    WriteRegDWORD HKLM \\\"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\SideBySide\\\" \\\"PreferExternalManifest\\\" \\\"1\\\"
-  \\\${EndIf}
   " PARENT_SCOPE)
 SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
   \\\${unregisterExtension} \\\".mmp\\\" \\\"${PROJECT_NAME_UCASE} Project\\\"
@@ -65,10 +62,14 @@ if(CPACK_DEBUG)
 	set(CPACK_NSIS_EXECUTABLE_PRE_ARGUMENTS "-V4")
 endif()
 
-# Windows resource compilers
+# Windows resource compilers: rc.exe does not define the C++ compiler macro _MSC_VER.
+set(LMMS_MANIFEST_FROM_LINKER ${MSVC})
 CONFIGURE_FILE("lmms.rc.in"             "${CMAKE_BINARY_DIR}/lmms.rc")
 CONFIGURE_FILE("zynaddsubfx.rc.in"      "${CMAKE_BINARY_DIR}/plugins/ZynAddSubFx/zynaddsubfx.rc")
 
+# Also overwrite the old adjacent manifest on upgrades: older installers enabled
+# PreferExternalManifest globally, so leaving an old dpiAware=false file is unsafe.
+# New installers do not change that machine-wide registry setting.
 INSTALL(FILES "lmms.exe.manifest" DESTINATION .)
 INSTALL(FILES "lmms.VisualElementsManifest.xml" DESTINATION .)
 INSTALL(DIRECTORY "assets" DESTINATION .)

@@ -41,9 +41,9 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
 	if (displayPauseIcon)
-		m_playAction->setIcon(embed::getIconPixmap("pause"));
+		m_playAction->setIcon(embed::getIcon("pause"));
 	else
-		m_playAction->setIcon(embed::getIconPixmap("play"));
+		m_playAction->setIcon(embed::getIcon("play"));
 }
 
 DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)

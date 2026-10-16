@@ -71,7 +71,7 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	searchBar->setPlaceholderText(tr("Search"));
 	searchBar->setMaxLength(64);
 	searchBar->setClearButtonEnabled(true);
-	searchBar->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+	searchBar->addAction(embed::getIcon("zoom"), QLineEdit::LeadingPosition);
 
 	m_descTree = new QTreeWidget( m_view );
 	m_descTree->setColumnCount( 1 );

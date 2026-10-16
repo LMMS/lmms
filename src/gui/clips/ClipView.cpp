@@ -883,7 +883,7 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	if( fixedClips() == false )
 	{
 		contextMenu.addAction(
-			embed::getIconPixmap( "cancel" ),
+			embed::getIcon("cancel"),
 			individualClip
 				? tr("Delete (middle mousebutton)")
 				: tr("Delete selection (middle mousebutton)"),
@@ -892,7 +892,7 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		contextMenu.addSeparator();
 
 		contextMenu.addAction(
-			embed::getIconPixmap( "edit_cut" ),
+			embed::getIcon("edit_cut"),
 			individualClip
 				? tr("Cut")
 				: tr("Cut selection"),
@@ -900,14 +900,14 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	}
 
 	contextMenu.addAction(
-		embed::getIconPixmap( "edit_copy" ),
+		embed::getIcon("edit_copy"),
 		individualClip
 			? tr("Copy")
 			: tr("Copy selection"),
 		[this](){ contextMenuAction( ContextMenuAction::Copy ); } );
 
 	auto pasteAction = contextMenu.addAction(
-		embed::getIconPixmap("edit_paste"),
+		embed::getIcon("edit_paste"),
 		tr("Paste"),
 		[this](){ contextMenuAction(ContextMenuAction::Paste); }
 	);
@@ -920,7 +920,7 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	contextMenu.addSeparator();
 
 	contextMenu.addAction(
-		embed::getIconPixmap( "muted" ),
+		embed::getIcon("muted"),
 		(individualClip
 			? tr("Mute/unmute (<%1> + middle click)")
 			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
@@ -929,7 +929,7 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	contextMenu.addSeparator();
 
 	QMenu colorMenu (tr("Clip color"), this);
-	colorMenu.setIcon(embed::getIconPixmap("colorize"));
+	colorMenu.setIcon(embed::getIcon("colorize"));
 	colorMenu.addAction(tr("Change"), this, SLOT(selectColor()));
 	colorMenu.addAction(tr("Reset"), this, SLOT(resetColor()));
 	colorMenu.addAction(tr("Pick random"), this, SLOT(randomizeColor()));

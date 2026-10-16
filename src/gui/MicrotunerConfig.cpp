@@ -64,7 +64,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_baseKeyModel(DefaultBaseKey, 0, NumKeys - 1, nullptr, tr("Base key")),
 	m_baseFreqModel(DefaultBaseFreq, 0.1f, 9999.999f, 0.001f, nullptr, tr("Base note frequency"))
 {
-	setWindowIcon(embed::getIconPixmap("microtuner"));
+	setWindowIcon(embed::getIcon("microtuner"));
 	setWindowTitle(tr("Microtuner Configuration"));
 
 	// Organize into 2 main columns: scales and keymaps

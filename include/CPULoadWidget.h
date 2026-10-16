@@ -32,6 +32,7 @@
 #include <QWidget>
 
 #include "LmmsTypes.h"
+#include "embed.h"
 
 
 namespace lmms::gui
@@ -61,6 +62,8 @@ private:
 	int m_currentLoad;
 
 	QPixmap m_temp;
+	embed::PixmapResource m_backgroundResource;
+	embed::PixmapResource m_ledsResource;
 	QPixmap m_background;
 	QPixmap m_leds;
 

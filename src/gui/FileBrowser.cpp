@@ -105,14 +105,14 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 	m_filterEdit = new QLineEdit(searchWidget);
 	m_filterEdit->setPlaceholderText(tr("Search"));
 	m_filterEdit->setClearButtonEnabled(true);
-	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+	m_filterEdit->addAction(embed::getIcon("zoom"), QLineEdit::LeadingPosition);
 
 	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
 	connect(&m_searchJob, &FileSearchJob::started, this, &FileBrowser::onSearchStarted, Qt::QueuedConnection);
 	connect(&m_searchJob, &FileSearchJob::finished, this, &FileBrowser::onSearchFinished, Qt::QueuedConnection);
 	connect(&m_searchJob, &FileSearchJob::foundMatch, this, &FileBrowser::onSearchMatch, Qt::QueuedConnection);
 
-	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
+	auto reload_btn = new QPushButton(embed::getIcon("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
 	connect( reload_btn, SIGNAL(clicked()), this, SLOT(reloadTree()));
 

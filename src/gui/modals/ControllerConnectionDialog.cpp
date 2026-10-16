@@ -134,7 +134,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	m_targetModel( _target_model ),
 	m_midiController( nullptr )
 {
-	setWindowIcon( embed::getIconPixmap( "setup_audio" ) );
+	setWindowIcon( embed::getIcon("setup_audio") );
 	setWindowTitle( tr( "Connection Settings" ) );
 	setModal( true );
 
@@ -175,7 +175,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 		auto rp_btn = new ToolButton(m_midiGroupBox);
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
-		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
+		rp_btn->setIcon( embed::getIcon("piano") );
 		rp_btn->setGeometry( 160, 24, 32, 32 );
 		rp_btn->setMenu( m_readablePorts );
 		rp_btn->setPopupMode( QToolButton::InstantPopup );
@@ -217,11 +217,11 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	btn_layout->setSpacing( 0 );
 	btn_layout->setContentsMargins(0, 0, 0, 0);
 
-	auto select_btn = new QPushButton(embed::getIconPixmap("add"), tr("OK"), buttons);
+	auto select_btn = new QPushButton(embed::getIcon("add"), tr("OK"), buttons);
 	connect( select_btn, SIGNAL(clicked()), 
 				this, SLOT(selectController()));
 
-	auto cancel_btn = new QPushButton(embed::getIconPixmap("cancel"), tr("Cancel"), buttons);
+	auto cancel_btn = new QPushButton(embed::getIcon("cancel"), tr("Cancel"), buttons);
 	connect( cancel_btn, SIGNAL(clicked()),
 				this, SLOT(reject()));
 

@@ -626,7 +626,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
     m_toggleUIButton->setCheckable( true );
     m_toggleUIButton->setChecked( false );
-    m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
+    m_toggleUIButton->setIcon( embed::getIcon("zoom") );
     m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), SMALL_FONT_SIZE));
     connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
 
@@ -635,7 +635,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
 
     // Open params sub window button
     m_toggleParamsWindowButton = new QPushButton(tr("Params"), this);
-    m_toggleParamsWindowButton->setIcon(embed::getIconPixmap("controller"));
+    m_toggleParamsWindowButton->setIcon(embed::getIcon("controller"));
     m_toggleParamsWindowButton->setCheckable(true);
     m_toggleParamsWindowButton->setFont(adjustedToPixelSize(m_toggleParamsWindowButton->font(), SMALL_FONT_SIZE));
 #if CARLA_VERSION_HEX < CARLA_MIN_PARAM_VERSION
@@ -760,14 +760,14 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 
 	// Clear filter line edit button
 	m_clearFilterButton = new QPushButton(tr(""), this);
-	m_clearFilterButton->setIcon(embed::getIconPixmap("edit_erase"));
+	m_clearFilterButton->setIcon(embed::getIcon("edit_erase"));
 	m_clearFilterButton->setToolTip(tr("Clear filter text"));
 	sizePolicy.setHeightForWidth(m_clearFilterButton->sizePolicy().hasHeightForWidth());
 	m_clearFilterButton->setSizePolicy(sizePolicy);
 
 	// Show automated only button
 	m_automatedOnlyButton = new QPushButton(tr(""), this);
-	m_automatedOnlyButton->setIcon(embed::getIconPixmap("automation"));
+	m_automatedOnlyButton->setIcon(embed::getIcon("automation"));
 	m_automatedOnlyButton->setToolTip(
 				tr("Only show knobs with a connection."));
 	m_automatedOnlyButton->setCheckable(true);

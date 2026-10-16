@@ -31,6 +31,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QScrollArea>
+#include <QScreen>
 
 #include "AudioEngine.h"
 #include "embed.h"
@@ -158,7 +159,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_themeDir(QDir::toNativeSeparators(ConfigManager::inst()->themeDir())),
 	m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile()))
 {
-	setWindowIcon(embed::getIconPixmap("setup_general"));
+	setWindowIcon(embed::getIcon("setup_general"));
 	setWindowTitle(tr("Settings"));
 	setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 	setModal(true);
@@ -404,7 +405,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	connect(m_saveIntervalSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(setAutoSaveInterval(int)));
 
-	auto autoSaveResetBtn = new QPushButton(embed::getIconPixmap("reload"), "", autoSaveBox);
+	auto autoSaveResetBtn = new QPushButton(embed::getIcon("reload"), "", autoSaveBox);
 	autoSaveResetBtn->setFixedSize(32, 32);
 	connect(autoSaveResetBtn, SIGNAL(clicked()),
 		this, SLOT(resetAutoSave()));
@@ -622,7 +623,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			this, SLOT(showRestartWarning()));
 	bufferSizeSubLayout->addWidget(m_bufferSizeSlider, 1);
 
-	auto bufferSize_reset_btn = new QPushButton(embed::getIconPixmap("reload"), "", bufferSizeBox);
+	auto bufferSize_reset_btn = new QPushButton(embed::getIcon("reload"), "", bufferSizeBox);
 	bufferSize_reset_btn->setFixedSize(32, 32);
 	connect(bufferSize_reset_btn, SIGNAL(clicked()),
 		this, SLOT(resetBufferSize()));
@@ -878,19 +879,19 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	// Major tabs ordering.
 	m_tabBar->addTab(general_w,
 			tr("General"), 0, false, true, false)->setIcon(
-					embed::getIconPixmap("setup_general"));
+					embed::getIcon("setup_general"));
 	m_tabBar->addTab(performance_w,
 			tr("Performance"), 1, false, true, false)->setIcon(
-					embed::getIconPixmap("setup_performance"));
+					embed::getIcon("setup_performance"));
 	m_tabBar->addTab(audio_w,
 			tr("Audio"), 2, false, true, false)->setIcon(
-					embed::getIconPixmap("setup_audio"));
+					embed::getIcon("setup_audio"));
 	m_tabBar->addTab(midi_w,
 			tr("MIDI"), 3, false, true, false)->setIcon(
-					embed::getIconPixmap("setup_midi"));
+					embed::getIcon("setup_midi"));
 	m_tabBar->addTab(paths_w,
 			tr("Paths"), 4, true, true, false)->setIcon(
-					embed::getIconPixmap("setup_directories"));
+					embed::getIcon("setup_directories"));
 
 	m_tabBar->setActiveTab(static_cast<int>(tab_to_open));
 
@@ -913,12 +914,12 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	restartWarningLbl->hide();
 
 	// OK button.
-	auto ok_btn = new QPushButton(embed::getIconPixmap("apply"), tr("OK"), extras_w);
+	auto ok_btn = new QPushButton(embed::getIcon("apply"), tr("OK"), extras_w);
 	connect(ok_btn, SIGNAL(clicked()),
 			this, SLOT(accept()));
 
 	// Cancel button.
-	auto cancel_btn = new QPushButton(embed::getIconPixmap("cancel"), tr("Cancel"), extras_w);
+	auto cancel_btn = new QPushButton(embed::getIcon("cancel"), tr("Cancel"), extras_w);
 	connect(cancel_btn, SIGNAL(clicked()),
 			this, SLOT(reject()));
 
@@ -932,13 +933,20 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	extras_layout->addSpacing(10);
 
 	// Vertical layout ordering.
-	vlayout->addWidget(main_w, 1);
+	auto bodyScroll = new QScrollArea(this);
+	bodyScroll->setWidgetResizable(true);
+	bodyScroll->setFrameShape(QFrame::NoFrame);
+	bodyScroll->setWidget(main_w);
+	vlayout->addWidget(bodyScroll, 1);
 	vlayout->addSpacing(10);
 	vlayout->addWidget(extras_w);
 	vlayout->addSpacing(10);
 
-	// Ensure that we cannot make the dialog smaller than it wants to be
-	setMinimumWidth(width());
+	// Keep the actions outside the scrolling body; Qt's screen geometry is logical.
+	if (const auto* screen = this->screen())
+	{
+		resize(sizeHint().boundedTo(screen->availableGeometry().size() * 0.9));
+	}
 
 	show();
 }

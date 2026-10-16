@@ -122,48 +122,48 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 	connect( syncMenu, SIGNAL(triggered(QAction*)),
 			model(), SLOT(setTempoSync(QAction*)));
-	syncMenu->addAction( embed::getIconPixmap( "note_none" ),
+	syncMenu->addAction( embed::getIcon("note_none"),
 		tr( "No Sync" ) )->setData( (int) TempoSyncKnobModel::SyncMode::None );
 	if( limit / 0.125f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_double_whole" ),
+		syncMenu->addAction( embed::getIcon("note_double_whole"),
 				tr( "Eight beats" ) )->setData(
 				(int) TempoSyncKnobModel::SyncMode::DoubleWholeNote );
 	}
 	if( limit / 0.25f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_whole" ),
+		syncMenu->addAction( embed::getIcon("note_whole"),
 					tr( "Whole note" ) )->setData(
 					(int) TempoSyncKnobModel::SyncMode::WholeNote );
 	}
 	if( limit / 0.5f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_half" ),
+		syncMenu->addAction( embed::getIcon("note_half"),
 					tr( "Half note" ) )->setData(
 					(int) TempoSyncKnobModel::SyncMode::HalfNote );
 	}
 	if( limit <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_quarter" ),
+		syncMenu->addAction( embed::getIcon("note_quarter"),
 					tr( "Quarter note" ) )->setData(
 				(int) TempoSyncKnobModel::SyncMode::QuarterNote );
 	}
 	if( limit / 2.0f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_eighth" ),
+		syncMenu->addAction( embed::getIcon("note_eighth"),
 					tr( "8th note" ) )->setData(
 				(int) TempoSyncKnobModel::SyncMode::EighthNote );
 	}
 	if( limit / 4.0f <= model()->maxValue() )
 	{
-		syncMenu->addAction( embed::getIconPixmap( "note_sixteenth" ),
+		syncMenu->addAction( embed::getIcon("note_sixteenth"),
 					tr( "16th note" ) )->setData(
 				(int) TempoSyncKnobModel::SyncMode::SixteenthNote );
 	}
-	syncMenu->addAction( embed::getIconPixmap( "note_thirtysecond" ),
+	syncMenu->addAction( embed::getIcon("note_thirtysecond"),
 					tr( "32nd note" ) )->setData(
 				(int) TempoSyncKnobModel::SyncMode::ThirtysecondNote );
-	syncMenu->addAction( embed::getIconPixmap( "dont_know" ),
+	syncMenu->addAction( embed::getIcon("dont_know"),
 				tr( "Custom..." ),
 				this, SLOT(showCustom())
 						)->setData(

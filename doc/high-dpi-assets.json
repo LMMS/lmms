@@ -1,0 +1,4414 @@
+{
+  "default": [
+    {
+      "file": "add.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "add_automation.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "add_folder.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "add_pattern_track.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "add_sample_track.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "analysis.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "apply-selected.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "apply.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_down.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_free.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_random.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_sort.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_sync.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_up.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_up_and_down.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "auto_resize.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "auto_resize_disable.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "automation.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "automation_ghost_note.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "automation_track.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "autoscroll_continuous_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "autoscroll_off.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "autoscroll_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "autoscroll_stepped_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "back_to_start.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "back_to_zero.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "black_key.png",
+      "pixels": [
+        10,
+        37
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "black_key_disabled.png",
+      "pixels": [
+        10,
+        37
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "black_key_pressed.png",
+      "pixels": [
+        10,
+        37
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cancel.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "chord.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clear_ghost_note.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clear_notes_out_of_bounds.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clip_rec.png",
+      "pixels": [
+        40,
+        15
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clock.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clone_pattern_track_clip.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "close.png",
+      "pixels": [
+        17,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "closed_branch.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "colorize.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "combobox_arrow.png",
+      "pixels": [
+        11,
+        15
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "combobox_arrow_selected.png",
+      "pixels": [
+        11,
+        15
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "combobox_bg.png",
+      "pixels": [
+        50,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "computer.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "controller.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cpuload_bg.png",
+      "pixels": [
+        112,
+        11
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cpuload_leds.png",
+      "pixels": [
+        86,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cursor_select_left.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cursor_select_right.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cut_overlaps.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "discard.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "dont_know.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_copy.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_cut.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_draw.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_draw_outvalue.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_draw_small.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_erase.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_merge.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_move.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_paste.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_redo.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_rename.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_select.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_tangent.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_undo.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "effect_plugin.png",
+      "pixels": [
+        214,
+        57
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "env_lfo_tab.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "envelope_graph.png",
+      "pixels": [
+        182,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "error.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "exit.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "exp_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "exp_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "factory_files.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "file.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "fill.png",
+      "pixels": [
+        19,
+        18
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_2lp.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_ap.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_bp.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_hp.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_lp.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_notch.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "flip_x.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "flip_y.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "folder.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "folder_locked.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "folder_opened.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "fullscreen.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "func_tab.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "fx_tab.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "ghost_note.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "glue.png",
+      "pixels": [
+        22,
+        21
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "gridmode.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "help.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "hint.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "home.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "horizontal_slider.png",
+      "pixels": [
+        10,
+        26
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "icon.png",
+      "pixels": [
+        128,
+        128
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "icon_small.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "ignore.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "insert_bar.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "instrument_track.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "keep_stop_position.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "knob01.png",
+      "pixels": [
+        29,
+        29
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "knob02.png",
+      "pixels": [
+        27,
+        27
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "knob03.png",
+      "pixels": [
+        19,
+        19
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "knob05.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_11green.png",
+      "pixels": [
+        78,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_11green_dot.png",
+      "pixels": [
+        6,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19green.png",
+      "pixels": [
+        143,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19green_dot.png",
+      "pixels": [
+        4,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19pink_dot.png",
+      "pixels": [
+        4,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19purple.png",
+      "pixels": [
+        143,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19purple_dot.png",
+      "pixels": [
+        4,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19red.png",
+      "pixels": [
+        143,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19red_dot.png",
+      "pixels": [
+        4,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_21pink.png",
+      "pixels": [
+        143,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "led_blue.png",
+      "pixels": [
+        16,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "led_green.png",
+      "pixels": [
+        16,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "led_off.png",
+      "pixels": [
+        16,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "led_red.png",
+      "pixels": [
+        16,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "led_yellow.png",
+      "pixels": [
+        16,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_controller_artwork.png",
+      "pixels": [
+        240,
+        58
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_d100_active.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_d100_inactive.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_graph.png",
+      "pixels": [
+        95,
+        47
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_x100_active.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_x100_inactive.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_x1_active.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_x1_inactive.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "loop_point.png",
+      "pixels": [
+        13,
+        13
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "loop_points_off.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "loop_points_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "main_slider.png",
+      "pixels": [
+        26,
+        10
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "master_pitch.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "master_volume.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "max_length.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "maximize.png",
+      "pixels": [
+        17,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "metronome.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "microtuner.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "midi_cc_rack.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "midi_file.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "midi_tab.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "min_length.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "misc_tab.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "mixer.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "mixer_send_off.png",
+      "pixels": [
+        29,
+        19
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "mixer_send_on.png",
+      "pixels": [
+        29,
+        19
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "moog_saw_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "moog_saw_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "muted.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "new_channel.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_double_whole.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_eight.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_eighth.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_half.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_none.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_quarter.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_sixteenth.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_thirtysecond.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_tripleteighth.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_triplethalf.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_tripletquarter.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_tripletsixteenth.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_tripletthirtysecond.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_whole.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "open_branch.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "output_graph.png",
+      "pixels": [
+        110,
+        46
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pattern_track.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pattern_track_btn.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pause.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "vector alternative available"
+    },
+    {
+      "file": "piano.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "play.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "vector alternative available"
+    },
+    {
+      "file": "playpos_marker.png",
+      "pixels": [
+        17,
+        9
+      ],
+      "assessment": "vector alternative available"
+    },
+    {
+      "file": "plugin_tab.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "plugins.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "ports.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_black_key.png",
+      "pixels": [
+        41,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_black_key_pressed.png",
+      "pixels": [
+        41,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_white_key_big.png",
+      "pixels": [
+        64,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_white_key_big_pressed.png",
+      "pixels": [
+        64,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_white_key_small.png",
+      "pixels": [
+        64,
+        18
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_white_key_small_pressed.png",
+      "pixels": [
+        64,
+        18
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "preset_file.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "progression_cubic_hermite.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "progression_discrete.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "progression_linear.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_export.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_file.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_import.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_new.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_new_from_template.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_notes.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_open.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_open_recent.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_save.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_saveas.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "proportional_snap.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "quantize.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "random_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "random_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "receive_bg_arrow.png",
+      "pixels": [
+        11,
+        8
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "record.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "vector alternative available"
+    },
+    {
+      "file": "record_accompany.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "record_step_off.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "record_step_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "recording_playpos_marker.png",
+      "pixels": [
+        17,
+        9
+      ],
+      "assessment": "vector alternative available"
+    },
+    {
+      "file": "recover.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "reload.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "remove_bar.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "restore.png",
+      "pixels": [
+        17,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "round_square_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "round_square_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sample_file.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sample_track.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "saw_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "saw_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_down.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_down_d.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_left.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_left_d.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_right.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_right_d.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_up.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_up_d.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "scale.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "send_bg_arrow.png",
+      "pixels": [
+        11,
+        8
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_audio.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_directories.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_general.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_midi.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_performance.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "shadow_c.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "shadow_p.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sin_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sin_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "songeditor.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "soundfont_file.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "splash.png",
+      "pixels": [
+        681,
+        573
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "square_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "square_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "star.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_add.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_duplicate.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_highlight.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_off.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_off_light.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_on_0.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_on_200.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_remove.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "stop.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "vector alternative available"
+    },
+    {
+      "file": "tempo_sync.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_block.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_bold.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_center.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_italic.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_left.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_right.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_under.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "tool.png",
+      "pixels": [
+        22,
+        21
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "toolbar_bg.png",
+      "pixels": [
+        1,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "track_op_grip.png",
+      "pixels": [
+        6,
+        25
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "track_op_grip_c.png",
+      "pixels": [
+        6,
+        25
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "track_shadow_c.png",
+      "pixels": [
+        158,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "track_shadow_p.png",
+      "pixels": [
+        158,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "triangle_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "triangle_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "tuning_tab.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "uhoh.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "unavailable_sound.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "unknown_file.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "usr_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "usr_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "vst_plugin_file.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "whatsthis.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_key.png",
+      "pixels": [
+        10,
+        57
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_key_disabled.png",
+      "pixels": [
+        10,
+        57
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_key_pressed.png",
+      "pixels": [
+        10,
+        57
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_noise_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_noise_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "zoom.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "zoom_x.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "zoom_y.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    }
+  ],
+  "classic": [
+    {
+      "file": "add.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "add_automation.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "add_folder.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "add_pattern_track.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "add_sample_track.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "analysis.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "apply-selected.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "apply.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_down.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_free.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_random.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_sort.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_sync.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_up.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "arp_up_and_down.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "auto_resize.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "auto_resize_disable.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "automation.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "automation_ghost_note.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "automation_track.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "autoscroll_continuous_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "autoscroll_off.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "autoscroll_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "autoscroll_stepped_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "back_to_start.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "back_to_zero.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "background_artwork.png",
+      "pixels": [
+        80,
+        80
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "black_key.png",
+      "pixels": [
+        10,
+        37
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "black_key_disabled.png",
+      "pixels": [
+        10,
+        37
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "black_key_pressed.png",
+      "pixels": [
+        10,
+        37
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cancel.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "chord.png",
+      "pixels": [
+        22,
+        23
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clear_ghost_note.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clear_notes_out_of_bounds.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clip_rec.png",
+      "pixels": [
+        40,
+        15
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clock.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "clone_pattern_track_clip.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "close.png",
+      "pixels": [
+        17,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "colorize.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "combobox_arrow.png",
+      "pixels": [
+        11,
+        15
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "combobox_arrow_selected.png",
+      "pixels": [
+        11,
+        15
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "combobox_bg.png",
+      "pixels": [
+        50,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "computer.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "controller.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cpuload_bg.png",
+      "pixels": [
+        112,
+        11
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cpuload_leds.png",
+      "pixels": [
+        86,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cursor_select_left.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cursor_select_right.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "cut_overlaps.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "dont_know.png",
+      "pixels": [
+        14,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "drum.png",
+      "pixels": [
+        48,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_copy.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_cut.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_draw.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_draw_outvalue.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_erase.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_knife.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_merge.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_move.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_paste.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_redo.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_rename.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_select.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_tangent.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "edit_undo.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "effect_plugin.png",
+      "pixels": [
+        211,
+        60
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "envelope_graph.png",
+      "pixels": [
+        182,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "error.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "exit.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "exp_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "exp_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "factory_files.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "fader_knob.png",
+      "pixels": [
+        23,
+        30
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "file.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "fill.png",
+      "pixels": [
+        19,
+        18
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_2lp.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_ap.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_bp.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_hp.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_lp.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "filter_notch.png",
+      "pixels": [
+        22,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "flip_x.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "flip_y.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "folder.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "folder_locked.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "folder_opened.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "freeze.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "frozen.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "ghost_note.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "glue.png",
+      "pixels": [
+        22,
+        21
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "gridmode.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "help.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "hint.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "home.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "horizontal_slider.png",
+      "pixels": [
+        10,
+        26
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "icon.png",
+      "pixels": [
+        512,
+        512
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "icon_small.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "insert_bar.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "instrument_track.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "keep_stop_position.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "knob01.png",
+      "pixels": [
+        29,
+        29
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "knob02.png",
+      "pixels": [
+        27,
+        27
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "knob03.png",
+      "pixels": [
+        19,
+        19
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "knob05.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_11green.png",
+      "pixels": [
+        78,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_11green_dot.png",
+      "pixels": [
+        6,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19green.png",
+      "pixels": [
+        143,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19green_dot.png",
+      "pixels": [
+        4,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19pink_dot.png",
+      "pixels": [
+        4,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19red.png",
+      "pixels": [
+        143,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_19red_dot.png",
+      "pixels": [
+        4,
+        38
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lcd_21pink.png",
+      "pixels": [
+        143,
+        42
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "led_green.png",
+      "pixels": [
+        16,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "led_off.png",
+      "pixels": [
+        16,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "led_red.png",
+      "pixels": [
+        16,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "led_yellow.png",
+      "pixels": [
+        16,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_controller_artwork.png",
+      "pixels": [
+        240,
+        80
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_d100_active.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_d100_inactive.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_graph.png",
+      "pixels": [
+        95,
+        47
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_x100_active.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_x100_inactive.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_x1_active.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "lfo_x1_inactive.png",
+      "pixels": [
+        29,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "loop_points_off.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "loop_points_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "main_slider.png",
+      "pixels": [
+        26,
+        10
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "master_pitch.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "master_volume.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "max_length.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "maximize.png",
+      "pixels": [
+        17,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "metronome.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "microtuner.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "midi_cc_rack.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "midi_file.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "min_length.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "mixer.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "mixer_send_off.png",
+      "pixels": [
+        29,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "mixer_send_on.png",
+      "pixels": [
+        29,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "moog_saw_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "moog_saw_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "muted.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "new_channel.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_double_whole.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_eighth.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_half.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_none.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_quarter.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_sixteenth.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_thirtysecond.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_tripleteighth.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_triplethalf.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_tripletquarter.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_tripletsixteenth.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_tripletthirtysecond.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "note_whole.png",
+      "pixels": [
+        16,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "output_graph.png",
+      "pixels": [
+        112,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pattern_track.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pattern_track_btn.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pause.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "piano.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "play.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "playpos_marker.png",
+      "pixels": [
+        17,
+        9
+      ],
+      "assessment": "vector alternative available"
+    },
+    {
+      "file": "plugins.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "ports.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_black_key.png",
+      "pixels": [
+        41,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_black_key_pressed.png",
+      "pixels": [
+        41,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_white_key_big.png",
+      "pixels": [
+        64,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_white_key_big_pressed.png",
+      "pixels": [
+        64,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_white_key_small.png",
+      "pixels": [
+        64,
+        18
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "pr_white_key_small_pressed.png",
+      "pixels": [
+        64,
+        18
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "preset_file.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "progression_cubic_hermite.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "progression_discrete.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "progression_linear.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_export.png",
+      "pixels": [
+        13,
+        19
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_file.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_import.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_new.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_new_from_template.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_notes.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_open.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_open_down.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_open_recent.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_save.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "project_saveas.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "proportional_snap.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "quantize.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "random_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "random_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "receive_bg_arrow.png",
+      "pixels": [
+        29,
+        29
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "record.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "record_accompany.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "record_step_off.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "record_step_on.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "recording_playpos_marker.png",
+      "pixels": [
+        17,
+        9
+      ],
+      "assessment": "vector alternative available"
+    },
+    {
+      "file": "reload.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "remove_bar.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "restore.png",
+      "pixels": [
+        17,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "round_square_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "round_square_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sample_file.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sample_track.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "saw_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "saw_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_down.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_down_d.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_left.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_left_d.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_right.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_right_d.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_up.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sbarrow_up_d.png",
+      "pixels": [
+        5,
+        5
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "scale.png",
+      "pixels": [
+        22,
+        23
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "send_bg_arrow.png",
+      "pixels": [
+        15,
+        8
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_audio.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_directories.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_general.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_midi.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "setup_performance.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sin_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "sin_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "songeditor.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "soundfont_file.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "splash.png",
+      "pixels": [
+        681,
+        573
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "square_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "square_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "star.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_add.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_duplicate.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_off.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_off_light.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_on_0.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_on_200.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "step_btn_remove.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "stop.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "tempo_sync.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_block.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_bold.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_center.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_italic.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_left.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_right.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "text_under.png",
+      "pixels": [
+        22,
+        22
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "tool.png",
+      "pixels": [
+        22,
+        21
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "track_op_grip.png",
+      "pixels": [
+        7,
+        26
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "trackop.png",
+      "pixels": [
+        17,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "trackop_c.png",
+      "pixels": [
+        17,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "trackop_h.png",
+      "pixels": [
+        17,
+        17
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "triangle_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "triangle_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "uhoh.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "unavailable_sound.png",
+      "pixels": [
+        48,
+        48
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "unfreeze.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "unknown_file.png",
+      "pixels": [
+        16,
+        16
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "usr_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "usr_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "vst_plugin_file.png",
+      "pixels": [
+        32,
+        32
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "whatsthis.png",
+      "pixels": [
+        20,
+        20
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_key.png",
+      "pixels": [
+        10,
+        57
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_key_disabled.png",
+      "pixels": [
+        10,
+        57
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_key_pressed.png",
+      "pixels": [
+        10,
+        57
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_noise_wave_active.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "white_noise_wave_inactive.png",
+      "pixels": [
+        14,
+        14
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "zoom.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "zoom_x.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    },
+    {
+      "file": "zoom_y.png",
+      "pixels": [
+        24,
+        24
+      ],
+      "assessment": "1x raster fallback; visual acceptance pending"
+    }
+  ]
+}

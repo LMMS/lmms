@@ -70,7 +70,7 @@ MixerView::MixerView(Mixer* mixer) :
 	setAutoFillBackground(true);
 
 	setWindowTitle(tr("Mixer"));
-	setWindowIcon(embed::getIconPixmap("mixer"));
+	setWindowIcon(embed::getIcon("mixer"));
 
 	// main-layout
 	auto ml = new QHBoxLayout{this};
@@ -141,7 +141,7 @@ MixerView::MixerView(Mixer* mixer) :
 	ml->addWidget(channelArea, 1);
 
 	// show the add new mixer channel button
-	auto newChannelBtn = new QPushButton(embed::getIconPixmap("new_channel"), QString(), this);
+	auto newChannelBtn = new QPushButton(embed::getIcon("new_channel"), QString(), this);
 	newChannelBtn->setObjectName("newChannelBtn");
 	newChannelBtn->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
 	newChannelBtn->setFixedWidth(mixerChannelSize.width());

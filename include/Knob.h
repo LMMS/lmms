@@ -216,6 +216,7 @@ private:
 
 	float m_totalAngle;
 	int m_angle;
+	QSize m_knobLogicalSize;
 	QImage m_cache;
 	qreal m_cachedDpr = 0.0;
 	QSize m_cachedSize;

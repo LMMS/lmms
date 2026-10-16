@@ -30,6 +30,8 @@
 
 
 #include "StringPairDrag.h"
+#include "DpiContext.h"
+#include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Clipboard.h"
@@ -48,14 +50,17 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 
 	if( _icon.isNull() && _w )
 	{
-		setPixmap( _w->grab().scaled(
-						64, 64,
+		const qreal dpr = Dpi::effectiveDevicePixelRatio(_w);
+		QPixmap preview = _w->grab().scaled(
+						Dpi::rasterSizeFor(QSize(64, 64), dpr),
 						Qt::KeepAspectRatio,
-						Qt::SmoothTransformation ) );
+						Qt::SmoothTransformation );
+		preview.setDevicePixelRatio(dpr);
+		setPixmap(preview);
 	}
 	else
 	{
-		setPixmap( _icon );
+		setPixmap(embed::describePixmap(_icon).atDpr(Dpi::effectiveDevicePixelRatio(_w)).pixmap);
 	}
 	QString txt = _key + ":" + _value;
 	auto m = new QMimeData();

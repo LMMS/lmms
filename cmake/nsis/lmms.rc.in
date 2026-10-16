@@ -2,7 +2,8 @@ lmmsicon ICON cmake/nsis/icon.ico
 lmmsprojecticon ICON cmake/nsis/project.ico
 #include <windows.h>
 
-#ifndef _MSC_VER
+#cmakedefine LMMS_MANIFEST_FROM_LINKER
+#ifndef LMMS_MANIFEST_FROM_LINKER
 1 24 "cmake/nsis/lmms.exe.manifest"
 #endif
 

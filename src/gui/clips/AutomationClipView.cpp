@@ -53,6 +53,7 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 	m_clip( _clip ),
 	m_paintPixmap()
 {
+	Dpi::watch(this, [this] { setNeedsUpdate(true); });
 	connect( m_clip, SIGNAL(dataChanged()),
 			this, SLOT(update()));
 	connect( getGUI()->automationEditor(), SIGNAL(currentClipChanged()),
@@ -168,22 +169,22 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 
 	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
+	_cm->addAction( embed::getIcon("edit_erase"),
 			tr( "Clear" ), m_clip, SLOT(clear()));
 	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
+	_cm->addAction( embed::getIcon("reload"), tr( "Reset name" ),
 						this, SLOT(resetName()));
-	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
+	_cm->addAction( embed::getIcon("edit_rename"),
 						tr( "Change name" ),
 						this, SLOT(changeName()));
-	_cm->addAction( embed::getIconPixmap( "record" ),
+	_cm->addAction( embed::getIcon("record"),
 						tr( "Set/clear record" ),
 						this, SLOT(toggleRecording()));
-	_cm->addAction( embed::getIconPixmap( "flip_y" ),
+	_cm->addAction( embed::getIcon("flip_y"),
 						tr( "Flip Vertically (Visible)" ),
 						this, SLOT(flipY()));
-	_cm->addAction( embed::getIconPixmap( "flip_x" ),
+	_cm->addAction( embed::getIcon("flip_x"),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT(flipX()));
 	
@@ -229,7 +230,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	QPainter painter( this );
 
 	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
-	if (std::abs(m_cachedDpr - currentDpr) > 0.001)
+	if (updateCachedDpr(currentDpr))
 	{
 		setNeedsUpdate(true);
 	}
@@ -241,10 +242,9 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	}
 
 	setNeedsUpdate( false );
-	m_cachedDpr = currentDpr;
 
 	const QSize physSize = Dpi::rasterSizeFor(size(), currentDpr);
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || std::abs(m_paintPixmap.devicePixelRatio() - currentDpr) > 0.001)
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || !qFuzzyCompare(m_paintPixmap.devicePixelRatio(), currentDpr))
 	{
 		m_paintPixmap = QPixmap(physSize);
 		m_paintPixmap.setDevicePixelRatio(currentDpr);

@@ -51,6 +51,7 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	m_paintPixmap(),
 	m_paintPixmapXPosition(0)
 {
+	Dpi::watch(this, [this] { setNeedsUpdate(true); });
 	// update UI and tooltip
 	updateSample();
 
@@ -84,19 +85,19 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 {
 	cm->addSeparator();
 
-	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
+	/*contextMenu.addAction( embed::getIcon("record"),
 				tr( "Set/clear record" ),
 						m_clip, SLOT(toggleRecord()));*/
 
 	cm->addAction(
-		embed::getIconPixmap("flip_x"),
+		embed::getIcon("flip_x"),
 		tr("Reverse sample"),
 		this,
 		SLOT(reverseSample())
 	);
 
 	cm->addAction(
-		embed::getIconPixmap("automation_ghost_note"),
+		embed::getIcon("automation_ghost_note"),
 		tr("Set as ghost in automation editor"),
 		this,
 		SLOT(setAutomationGhost())
@@ -212,7 +213,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	QPainter painter( this );
 
 	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
-	if (std::abs(m_cachedDpr - currentDpr) > 0.001)
+	if (updateCachedDpr(currentDpr))
 	{
 		setNeedsUpdate(true);
 	}
@@ -224,7 +225,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	}
 
 	setNeedsUpdate( false );
-	m_cachedDpr = currentDpr;
 
 	const auto trackViewWidth = getTrackView()->rect().width();
 
@@ -234,7 +234,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	m_paintPixmapXPosition = std::max(0, pe->rect().x() - trackViewWidth);
 
 	const QSize physSize = Dpi::rasterSizeFor(viewPortRect.size(), currentDpr);
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || std::abs(m_paintPixmap.devicePixelRatio() - currentDpr) > 0.001)
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || !qFuzzyCompare(m_paintPixmap.devicePixelRatio(), currentDpr))
 	{
 		m_paintPixmap = QPixmap(physSize);
 		m_paintPixmap.setDevicePixelRatio(currentDpr);

@@ -48,6 +48,7 @@ class MainApplication : public QApplication
 public:
 	MainApplication(int& argc, char** argv);
 	bool event(QEvent* event) override;
+	bool eventFilter(QObject* object, QEvent* event) override;
 #ifdef LMMS_BUILD_WIN32
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	using FilterResult = long;

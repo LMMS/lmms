@@ -45,6 +45,7 @@
  */
 
 #include "Fader.h"
+#include "DpiContext.h"
 
 #include <QInputDialog>
 #include <QMouseEvent>
@@ -81,6 +82,12 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool model
 		s_textFloat = new SimpleTextFloat;
 	}
 
+	m_knobResource = embed::describePixmap(m_knob);
+	Dpi::watch(this, [this] {
+		m_knobResource = m_knobResource.atDpr(Dpi::effectiveDevicePixelRatio(this));
+		m_knob = m_knobResource.pixmap;
+		m_knobSize = m_knobResource.logicalSize;
+	});
 	setWindowTitle(name);
 	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
 	constexpr QSize minimumSize(23, 116);
@@ -109,6 +116,8 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPix
 	Fader(model, name, parent, modelIsLinear)
 {
 	m_knob = knob;
+	m_knobResource = embed::describePixmap(knob);
+	m_knobSize = m_knobResource.logicalSize;
 }
 
 void Fader::adjust(const Qt::KeyboardModifiers & modifiers, AdjustmentDirection direction)
@@ -558,7 +567,7 @@ void Fader::paintEvent(QPaintEvent* ev)
 	}
 
 	// Draw the knob
-	painter.drawPixmap((width() - m_knobSize.width()) / 2, calculateKnobPosYFromModel() - m_knobSize.height(), m_knob);
+	painter.drawPixmap(QRect(QPoint((width() - m_knobSize.width()) / 2, calculateKnobPosYFromModel() - m_knobSize.height()), m_knobSize), m_knob, m_knob.rect());
 }
 
 void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)

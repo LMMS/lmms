@@ -40,7 +40,7 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 	ControllerDialog( _model, _parent )
 {
 	setWindowTitle( tr( "PEAK" ) );
-	setWindowIcon( embed::getIconPixmap( "controller" ) );
+	setWindowIcon( embed::getIcon("controller") );
 	setFixedSize( 256, 64 );
 	
 	setToolTip(tr("LFO Controller"));

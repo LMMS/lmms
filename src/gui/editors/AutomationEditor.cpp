@@ -2018,18 +2018,18 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
 
 	auto editModeGroup = new ActionGroup(this);
-	m_drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
+	m_drawAction = editModeGroup->addAction(embed::getIcon("edit_draw"), tr("Draw mode (Shift+D)"));
 
 	m_drawAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_D));
 	m_drawAction->setChecked(true);
 
-	m_eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
+	m_eraseAction = editModeGroup->addAction(embed::getIcon("edit_erase"), tr("Erase mode (Shift+E)"));
 	m_eraseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_E));
 
-	m_drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
+	m_drawOutAction = editModeGroup->addAction(embed::getIcon("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
 	m_drawOutAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_C));
 
-	m_editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
+	m_editTanAction = editModeGroup->addAction(embed::getIcon("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
 	m_editTanAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_T));
 	m_editTanAction->setEnabled(false);
 
@@ -2051,13 +2051,13 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	auto progression_type_group = new ActionGroup(this);
 
 	m_discreteAction = progression_type_group->addAction(
-				embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
+				embed::getIcon("progression_discrete"), tr("Discrete progression"));
 	m_discreteAction->setChecked(true);
 
 	m_linearAction = progression_type_group->addAction(
-				embed::getIconPixmap("progression_linear"), tr("Linear progression"));
+				embed::getIcon("progression_linear"), tr("Linear progression"));
 	m_cubicHermiteAction = progression_type_group->addAction(
-				embed::getIconPixmap("progression_cubic_hermite"), tr( "Cubic Hermite progression"));
+				embed::getIcon("progression_cubic_hermite"), tr( "Cubic Hermite progression"));
 
 	connect(progression_type_group, SIGNAL(triggered(int)), this, SLOT(setProgressionType(int)));
 
@@ -2142,7 +2142,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
 
 	m_resetGhostNotes = new QPushButton(m_toolBar);
-	m_resetGhostNotes->setIcon(embed::getIconPixmap("clear_ghost_note"));
+	m_resetGhostNotes->setIcon(embed::getIcon("clear_ghost_note"));
 	m_resetGhostNotes->setToolTip(tr("Clear ghost notes"));
 	m_resetGhostNotes->setEnabled(true);
 
@@ -2154,7 +2154,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// Setup our actual window
 	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
-	setWindowIcon( embed::getIconPixmap( "automation" ) );
+	setWindowIcon( embed::getIcon("automation") );
 	setAcceptDrops( true );
 	m_toolBar->setAcceptDrops( true );
 }

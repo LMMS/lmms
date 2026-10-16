@@ -49,7 +49,7 @@ ControllerRackView::ControllerRackView()
 	: QWidget{}
 	, m_nextIndex{0}
 {
-	setWindowIcon( embed::getIconPixmap( "controller" ) );
+	setWindowIcon( embed::getIcon("controller") );
 	setWindowTitle( tr( "Controller Rack" ) );
 
 	m_scrollArea = new QScrollArea( this );

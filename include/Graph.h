@@ -31,6 +31,7 @@
 #include <QCursor>
 
 #include "Model.h"
+#include "embed.h"
 #include "ModelView.h"
 #include "LmmsTypes.h"
 
@@ -111,7 +112,7 @@ private:
 	void drawLineAt( int _x, int _y, int _lastx );
 
 
-	QPixmap m_foreground;
+	embed::PixmapResource m_foreground;
 	QColor m_graphColor;
 
 	Style m_graphStyle;

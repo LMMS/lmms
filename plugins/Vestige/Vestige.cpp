@@ -130,7 +130,8 @@ public:
 		if ( embedMethod() != "none" ) {
 			m_pluginSubWindow.reset(new gui::vstSubWin( gui::getGUI()->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
-			m_pluginSubWindow->setWidget(pluginWidget());
+			if (pluginWidget()) { m_pluginSubWindow->setWidget(pluginWidget()); }
+			else { m_pluginSubWindow.reset(); }
 		} else {
 			VstPlugin::createUI( nullptr );
 		}
@@ -574,7 +575,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
 	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
-	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
+	m_toggleGUIButton->setIcon( embed::getIcon("zoom") );
 	m_toggleGUIButton->setFont(adjustedToPixelSize(m_toggleGUIButton->font(), LARGE_FONT_SIZE));
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
@@ -583,7 +584,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 											   "notes"),
 		this);
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
-	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
+	note_off_all_btn->setIcon( embed::getIcon("stop") );
 	note_off_all_btn->setFont(adjustedToPixelSize(note_off_all_btn->font(), LARGE_FONT_SIZE));
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
@@ -699,7 +700,7 @@ void VestigeInstrumentView::openPlugin()
 		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
 		{
 			m_vi->m_plugin->pluginWidget()->setWindowIcon(
-									PLUGIN_NAME::getIconPixmap( "logo" ) );
+									PLUGIN_NAME::getIcon("logo") );
 		}
 	}
 }
@@ -917,7 +918,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_scrollArea->setMinimumHeight(300);
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );
-	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
+	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIcon("logo") );
 	m_vi->m_subWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 
 

@@ -62,7 +62,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_tlb->setCheckable(true);
 	connect(m_tlb, SIGNAL(clicked(bool)),
 			this, SLOT(showEffects()));
-	m_tlb->setIcon(embed::getIconPixmap("sample_track"));
+	m_tlb->setIcon(embed::getIcon("sample_track"));
 	m_tlb->show();
 
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);

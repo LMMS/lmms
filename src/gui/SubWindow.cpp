@@ -27,6 +27,7 @@
  */
 
 #include "SubWindow.h"
+#include "DpiContext.h"
 
 #include <algorithm>
 
@@ -310,6 +311,7 @@ void SubWindow::detach()
 	if (shown) { widget()->show(); }
 
 	widget()->move(pos);
+	Dpi::refresh(widget());
 	widget()->update();
 }
 
@@ -356,6 +358,7 @@ void SubWindow::attach()
 	{
 		setGeometry(frame);
 	}
+	Dpi::refresh(widget());
 	widget()->update();
 	update();
 }

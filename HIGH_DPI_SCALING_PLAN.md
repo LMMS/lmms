@@ -266,15 +266,15 @@ Diagnosen laufen bei Änderungen, nicht in jeder Paint-Iteration. Bildschirmname
 
 **Betroffene Dateien:** `src/core/main.cpp`, `cmake/nsis/lmms.exe.manifest`, `cmake/nsis/lmms.rc.in`, `cmake/nsis/CMakeLists.txt`, `src/CMakeLists.txt`.
 
-- [x] Die in Abschnitt 4.1 beschriebene Startkonfiguration ergänzen.
-- [x] Den Standard `PassThrough` auf beiden Qt-Pfaden sicherstellen und tatsächlich gemessenen DPR protokollieren.
-- [x] `dpiAware=false` aus dem wirksamen Windows-Paket beseitigen.
-- [x] Im Anwendungsmanifest eine moderne Per-Monitor-V2-Anforderung mit geeigneten Fallbacks für die unterstützten Systeme vorsehen.
-- [x] Das Manifest in die EXE einbetten, damit Buildverzeichnis, Installation und portable Ausgabe denselben Ausgangspunkt besitzen.
-- [x] Für MinGW den Ressourcenpfad und für MSVC den Manifest-/Linkerpfad prüfen; nur eine konsistente wirksame Manifestressource erzeugen.
-- [x] Das installierte Sidecar-Manifest entfernen oder mit derselben Quelle generieren. Keine zweite, abweichende DPI-Konfiguration ausliefern.
-- [x] Den Build von einer Manifeständerung abhängig machen; die aktuelle MinGW-Resource-Regel muss Änderungen zuverlässig neu kompilieren.
-- [x] Vorhandene andere Manifestinhalte, Versionsressourcen und Icons erhalten.
+- [ ] Die in Abschnitt 4.1 beschriebene Startkonfiguration ergänzen.
+- [ ] Den Standard `PassThrough` auf beiden Qt-Pfaden sicherstellen und tatsächlich gemessenen DPR protokollieren.
+- [ ] `dpiAware=false` aus dem wirksamen Windows-Paket beseitigen.
+- [ ] Im Anwendungsmanifest eine moderne Per-Monitor-V2-Anforderung mit geeigneten Fallbacks für die unterstützten Systeme vorsehen.
+- [ ] Das Manifest in die EXE einbetten, damit Buildverzeichnis, Installation und portable Ausgabe denselben Ausgangspunkt besitzen.
+- [ ] Für MinGW den Ressourcenpfad und für MSVC den Manifest-/Linkerpfad prüfen; nur eine konsistente wirksame Manifestressource erzeugen.
+- [ ] Das installierte Sidecar-Manifest entfernen oder mit derselben Quelle generieren. Keine zweite, abweichende DPI-Konfiguration ausliefern.
+- [ ] Den Build von einer Manifeständerung abhängig machen; die aktuelle MinGW-Resource-Regel muss Änderungen zuverlässig neu kompilieren.
+- [ ] Vorhandene andere Manifestinhalte, Versionsressourcen und Icons erhalten.
 
 Vorgesehener Inhalt innerhalb der bestehenden `windowsSettings`-Struktur:
 
@@ -295,16 +295,16 @@ Bei MSVC zunächst prüfen, wie CMake und der Linker Manifeste zusammenführen. 
 
 **Betroffene Dateien:** `include/embed.h`, `src/gui/embed.cpp`, gemeinsame Bildverbraucher, Theme-/Ressourcen-CMake-Dateien.
 
-- [x] Neue kontextfähige API wie in Abschnitt 4.4 einführen, bestehende Signaturen zunächst erhalten.
-- [x] Den Hauptmonitorzugriff aus dem eigentlichen SVG-Rasterpfad entfernen; der DPR wird übergeben.
-- [x] Logische Wunschgröße, physische Puffergröße und DPR separat führen.
-- [x] Cache-Schlüssel erweitern; gleichzeitig mehrere Varianten derselben Grafik zulassen.
-- [x] Bestehende Theme-Suchreihenfolge erhalten: gewähltes Theme, Default-Theme, eingebettete Ressourcen.
-- [x] Quellenidentität bzw. eine Theme-Generation berücksichtigen, damit gleichnamige Ressourcen nach einem Themewechsel nicht vermischt werden.
-- [x] Für PNGs eine definierte Strategie für Originalgröße und hochauflösende Varianten einführen. `@2x`-Unterstützung im eigenen Loader ausdrücklich implementieren und testen, falls sie verwendet wird.
-- [x] Für PNG/SVG/XPM dieselbe Größenbedeutung der neuen API dokumentieren.
-- [x] Leere Namen, fehlende Dateien, ungültige SVGs und Aufrufe ohne gültigen Screen robust behandeln; keine ungeschützte `primaryScreen()`-Dereferenz.
-- [x] `QPixmap` und `QPixmapCache` nur im GUI-Thread verwenden. Eventuelle parallele Rastervorbereitung auf geeignete `QImage`-Arbeit begrenzen und separat synchronisieren.
+- [ ] Neue kontextfähige API wie in Abschnitt 4.4 einführen, bestehende Signaturen zunächst erhalten.
+- [ ] Den Hauptmonitorzugriff aus dem eigentlichen SVG-Rasterpfad entfernen; der DPR wird übergeben.
+- [ ] Logische Wunschgröße, physische Puffergröße und DPR separat führen.
+- [ ] Cache-Schlüssel erweitern; gleichzeitig mehrere Varianten derselben Grafik zulassen.
+- [ ] Bestehende Theme-Suchreihenfolge erhalten: gewähltes Theme, Default-Theme, eingebettete Ressourcen.
+- [ ] Quellenidentität bzw. eine Theme-Generation berücksichtigen, damit gleichnamige Ressourcen nach einem Themewechsel nicht vermischt werden.
+- [ ] Für PNGs eine definierte Strategie für Originalgröße und hochauflösende Varianten einführen. `@2x`-Unterstützung im eigenen Loader ausdrücklich implementieren und testen, falls sie verwendet wird.
+- [ ] Für PNG/SVG/XPM dieselbe Größenbedeutung der neuen API dokumentieren.
+- [ ] Leere Namen, fehlende Dateien, ungültige SVGs und Aufrufe ohne gültigen Screen robust behandeln; keine ungeschützte `primaryScreen()`-Dereferenz.
+- [ ] `QPixmap` und `QPixmapCache` nur im GUI-Thread verwenden. Eventuelle parallele Rastervorbereitung auf geeignete `QImage`-Arbeit begrenzen und separat synchronisieren.
 
 **Verbraucher vor der Umstellung prüfen:** `PixmapButton`, `LcdWidget`, `LcdFloatSpinBox`, `Draggable`, `CPULoadWidget`, Toolbar-/Menü-Icons, `TrackGrip`, Splashscreen, Drag-Vorschaubilder und Plugin-`PixmapLoader`.
 
@@ -318,15 +318,15 @@ Bei `LcdWidget` sind Zellen und Ränder logische Maße, während das Ausschneide
 
 **Betroffene Dateien:** vorgeschlagener `DpiContext`, `src/gui/MainApplication.cpp`, `src/gui/GuiApplication.cpp`, `src/gui/MainWindow.cpp`, `src/gui/SubWindow.cpp` und zugehörige Header.
 
-- [x] Die öffentlichen Signale und Versionspfade aus Abschnitt 4.3 implementieren.
-- [x] Alle LMMS-Top-Level-Fenster erfassen, einschließlich später geöffneter Dialoge und abgelöster Editoren.
-- [x] Vor dem ersten nativen Handle vorläufigen Zustand erlauben; beim Show-/Handle-Ereignis endgültig binden.
-- [x] Beim `detach()`/`attach()` die zuständige Fensterbindung und ihre Verbindungen erneuern.
-- [x] Screen-Zeiger mit geeignetem Qt-Lebenszyklus absichern; Verbindungen bei Wechsel, Zerstörung und Hotplug trennen.
-- [x] Änderungen pro Fenster zusammenfassen und nur registrierte, betroffene Verbraucher benachrichtigen.
-- [x] Grafiken in bereits sichtbaren und später wieder eingeblendeten Widgets erneuern.
-- [x] Paint-seitige Cacheprüfung als Absicherung ergänzen; kein dauerhaftes globales Polling.
-- [x] Menüs, Tooltips und Drag-Vorschauen an Monitorgrenzen mitprüfen.
+- [ ] Die öffentlichen Signale und Versionspfade aus Abschnitt 4.3 implementieren.
+- [ ] Alle LMMS-Top-Level-Fenster erfassen, einschließlich später geöffneter Dialoge und abgelöster Editoren.
+- [ ] Vor dem ersten nativen Handle vorläufigen Zustand erlauben; beim Show-/Handle-Ereignis endgültig binden.
+- [ ] Beim `detach()`/`attach()` die zuständige Fensterbindung und ihre Verbindungen erneuern.
+- [ ] Screen-Zeiger mit geeignetem Qt-Lebenszyklus absichern; Verbindungen bei Wechsel, Zerstörung und Hotplug trennen.
+- [ ] Änderungen pro Fenster zusammenfassen und nur registrierte, betroffene Verbraucher benachrichtigen.
+- [ ] Grafiken in bereits sichtbaren und später wieder eingeblendeten Widgets erneuern.
+- [ ] Paint-seitige Cacheprüfung als Absicherung ergänzen; kein dauerhaftes globales Polling.
+- [ ] Menüs, Tooltips und Drag-Vorschauen an Monitorgrenzen mitprüfen.
 
 Ein globales `QPixmapCache::clear()` ist höchstens eine ergänzende Maßnahme beim Themewechsel. Es genügt nicht für `static QPixmap`, Member-Kopien oder bereits an Labels übergebene Pixmaps. Solche Verbraucher brauchen eine Ressourcenbeschreibung, einen geeigneten `QIcon` oder einen expliziten Reload-Pfad.
 
@@ -368,17 +368,17 @@ Für den Spectrum Analyzer ist gesondert zu unterscheiden: `buttonSize` kann ein
 
 **Priorität:** P1, Teil des vollständigen Benutzerergebnisses. **Abhängigkeiten:** B bis E.
 
-- [x] `LmmsStyle::pixelMetric()` als logische Maße behandeln; keine pauschale Multiplikation mit DPR ergänzen.
-- [x] `FontHelper.h` und CSS-Schriftgrößen prüfen. Pixelbasierte Schrift ist im Qt-High-DPI-Koordinatenmodell nicht automatisch falsch.
-- [x] `QFontMetrics`/`QFontMetricsF` der tatsächlich verwendeten Schrift für Platzbedarf verwenden; FontChange korrekt behandeln.
-- [x] Feste Textcontainer, Werkzeugleisten, LCD-Bereiche, Einstellungen und Effekt-/Instrumentendialoge auf Abschneiden untersuchen.
-- [x] Starre Mindestgrößen dort abbauen, wo sie Inhalte bei kleiner logischer Arbeitsfläche unerreichbar machen. Layouts und Scrollbereiche gezielt nutzen.
-- [x] `default` und `classic` prüfen; die bisherige Darstellung bei 100 % als Vergleich erhalten.
-- [x] Häufig sichtbare Grafiken priorisieren: Transport, Toolbar, Track-Operationen, Regler-/Faderdarstellung, LCD, Fensterbuttons.
-- [x] Einfache Icons als echte Vektorgrafik bereitstellen, wo das zum vorhandenen Design passt. Raster-Skins bei Bedarf mit echten höher aufgelösten Quellen ergänzen.
-- [x] Hochskalierte 1×-PNGs nur als kompatiblen Fallback behandeln. `SmoothTransformation` erzeugt keine fehlenden Details.
-- [x] Theme-Fallbacks und die Ressourcenauslieferung für zusätzliche Assets prüfen; reine Dateiergänzung ohne Aufnahme in Ressourcen/Paket reicht nicht.
-- [x] Splashscreen-Größe, Fenstericons und Drag-Hotspots in logischen Koordinaten festlegen.
+- [ ] `LmmsStyle::pixelMetric()` als logische Maße behandeln; keine pauschale Multiplikation mit DPR ergänzen.
+- [ ] `FontHelper.h` und CSS-Schriftgrößen prüfen. Pixelbasierte Schrift ist im Qt-High-DPI-Koordinatenmodell nicht automatisch falsch.
+- [ ] `QFontMetrics`/`QFontMetricsF` der tatsächlich verwendeten Schrift für Platzbedarf verwenden; FontChange korrekt behandeln.
+- [ ] Feste Textcontainer, Werkzeugleisten, LCD-Bereiche, Einstellungen und Effekt-/Instrumentendialoge auf Abschneiden untersuchen.
+- [ ] Starre Mindestgrößen dort abbauen, wo sie Inhalte bei kleiner logischer Arbeitsfläche unerreichbar machen. Layouts und Scrollbereiche gezielt nutzen.
+- [ ] `default` und `classic` prüfen; die bisherige Darstellung bei 100 % als Vergleich erhalten.
+- [ ] Häufig sichtbare Grafiken priorisieren: Transport, Toolbar, Track-Operationen, Regler-/Faderdarstellung, LCD, Fensterbuttons.
+- [ ] Einfache Icons als echte Vektorgrafik bereitstellen, wo das zum vorhandenen Design passt. Raster-Skins bei Bedarf mit echten höher aufgelösten Quellen ergänzen.
+- [ ] Hochskalierte 1×-PNGs nur als kompatiblen Fallback behandeln. `SmoothTransformation` erzeugt keine fehlenden Details.
+- [ ] Theme-Fallbacks und die Ressourcenauslieferung für zusätzliche Assets prüfen; reine Dateiergänzung ohne Aufnahme in Ressourcen/Paket reicht nicht.
+- [ ] Splashscreen-Größe, Fenstericons und Drag-Hotspots in logischen Koordinaten festlegen.
 
 **Abnahme:** Bei 125 % und 150 % passen Text und Bedienelemente zusammen. Die Einstellungsbuttons bleiben erreichbar. Die wichtigsten gemeinsamen UI-Grafiken besitzen geeignete Quellen; verbleibende 1×-Theme-Grafiken sind konkret inventarisiert und ihre Qualität ist bewertet.
 
@@ -388,13 +388,13 @@ Für den Spectrum Analyzer ist gesondert zu unterscheiden: `buttonSize` kann ein
 
 **Betroffene Dateien:** insbesondere `MainWindow.cpp`, `SubWindow.cpp` und die tatsächlichen weiteren Speicher-/Wiederherstellungspfade.
 
-- [x] Vorhandene XML-Geometrie als bestehende logische LMMS-Geometrie weiterverwenden.
-- [x] Koordinatenursprung unterscheiden: MDI-Fläche und globale Bildschirmkoordinaten sind verschiedene Räume.
-- [x] Nach dem Wiederherstellen Sichtbarkeit und Bedienbarkeit prüfen; abgelöste Fenster mit den verfügbaren Monitorflächen abgleichen.
-- [x] Bei fehlendem Monitor einen geeigneten verbleibenden Screen auswählen und Fenster erreichbar platzieren.
-- [x] Normale Größe, maximierten Zustand und eventuell gespeicherte Detached-Zustände getrennt behandeln.
-- [x] Während eines normalen Monitorwechsels Größen nicht fortlaufend durch `newDpr / oldDpr` skalieren. Die logische Größe soll stabil bleiben, solange die Arbeitsfläche dies erlaubt.
-- [x] Auf Wayland die eingeschränkte Kontrolle globaler Fensterpositionen respektieren und vorhandene Workarounds erhalten.
+- [ ] Vorhandene XML-Geometrie als bestehende logische LMMS-Geometrie weiterverwenden.
+- [ ] Koordinatenursprung unterscheiden: MDI-Fläche und globale Bildschirmkoordinaten sind verschiedene Räume.
+- [ ] Nach dem Wiederherstellen Sichtbarkeit und Bedienbarkeit prüfen; abgelöste Fenster mit den verfügbaren Monitorflächen abgleichen.
+- [ ] Bei fehlendem Monitor einen geeigneten verbleibenden Screen auswählen und Fenster erreichbar platzieren.
+- [ ] Normale Größe, maximierten Zustand und eventuell gespeicherte Detached-Zustände getrennt behandeln.
+- [ ] Während eines normalen Monitorwechsels Größen nicht fortlaufend durch `newDpr / oldDpr` skalieren. Die logische Größe soll stabil bleiben, solange die Arbeitsfläche dies erlaubt.
+- [ ] Auf Wayland die eingeschränkte Kontrolle globaler Fensterpositionen respektieren und vorhandene Workarounds erhalten.
 
 Bei gemischter Skalierung können logische Bildschirmrechtecke unter Windows Lücken haben. Deshalb die einzelnen Screens verwenden und keinen lückenlosen Desktop annehmen; dies beschreibt [Qt High DPI: Virtual Desktop Geometry](https://doc.qt.io/qt-6.8/highdpi.html#virtual-desktop-geometry).
 
@@ -408,15 +408,15 @@ Die Qt-Skalierung kann das interne Zeichnen fremder Pluginfenster nicht allgemei
 
 #### H1. VST-Haupt- und Hilfsprozess
 
-- [x] `IdVstPluginEditorGeometry`, `effEditGetRect`, `audioMasterSizeWindow` und die Containergröße gemeinsam verfolgen.
-- [x] Für jede Embed-Methode feststellen, in welchem Koordinaten-/Awareness-Kontext die gemeldeten Maße gelten.
-- [x] Die tatsächliche Awareness von `RemoteVstPlugin32` und `RemoteVstPlugin64` prüfen; nicht vom Hauptprozess ableiten.
-- [x] Den Vertrag für native Clientgröße, logische Qt-Containergröße und Rückmeldungen des Plugins schriftlich festlegen.
-- [x] Erst danach nötige Konvertierungen an einer gemeinsamen Grenze implementieren. Keine unbedingte Multiplikation aller Pluginmaße mit DPR.
-- [x] Falls ein Protokollzusatz benötigt wird, Einheit und Kompatibilität zwischen Host und Hilfsprozess explizit behandeln.
-- [x] Resize-Schleifen vermeiden: vom Plugin gemeldete Änderung und die darauf folgende Hostreaktion dürfen sich nicht endlos gegenseitig auslösen.
-- [x] Für echte native Hilfsfenster prüfen, ob deren DPI-Nachrichten bzw. Rahmengrößenbehandlung angepasst werden müssen. Dies ist unabhängig von Qt im Hauptprozess.
-- [x] Qt-Container, Win32-Einbettung und vorhandenen separaten Fenstermodus jeweils testen.
+- [ ] `IdVstPluginEditorGeometry`, `effEditGetRect`, `audioMasterSizeWindow` und die Containergröße gemeinsam verfolgen.
+- [ ] Für jede Embed-Methode feststellen, in welchem Koordinaten-/Awareness-Kontext die gemeldeten Maße gelten.
+- [ ] Die tatsächliche Awareness von `RemoteVstPlugin32` und `RemoteVstPlugin64` prüfen; nicht vom Hauptprozess ableiten.
+- [ ] Den Vertrag für native Clientgröße, logische Qt-Containergröße und Rückmeldungen des Plugins schriftlich festlegen.
+- [ ] Erst danach nötige Konvertierungen an einer gemeinsamen Grenze implementieren. Keine unbedingte Multiplikation aller Pluginmaße mit DPR.
+- [ ] Falls ein Protokollzusatz benötigt wird, Einheit und Kompatibilität zwischen Host und Hilfsprozess explizit behandeln.
+- [ ] Resize-Schleifen vermeiden: vom Plugin gemeldete Änderung und die darauf folgende Hostreaktion dürfen sich nicht endlos gegenseitig auslösen.
+- [ ] Für echte native Hilfsfenster prüfen, ob deren DPI-Nachrichten bzw. Rahmengrößenbehandlung angepasst werden müssen. Dies ist unabhängig von Qt im Hauptprozess.
+- [ ] Qt-Container, Win32-Einbettung und vorhandenen separaten Fenstermodus jeweils testen.
 
 Bei `SetParent` können unterschiedliche DPI-Awareness-Modi unerwartetes Verhalten oder Fehler verursachen. Die Folgen sind vom Prozess- und Windows-Kontext abhängig; sie sind in der [Microsoft-Referenz zu SetParent](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setparent) beschrieben. Daher einen Fehler nach der Umstellung nicht mit blindem Nachskalieren verdecken.
 
@@ -605,45 +605,27 @@ Die Antworten als kurze Ergänzung dieses Dokuments oder in den jeweiligen Ände
 
 Die automatische High-DPI-Integration gilt als abgeschlossen, wenn:
 
-- [x] WQHD bei 125 % ohne manuelle LMMS-Skalierung richtig dimensioniert und bedienbar ist.
-- [x] 100 %, 125 %, 150 %, 175 % und 200 % auf den vorgesehenen Windows-Kernpfaden geprüft sind.
-- [x] Hauptfenster, MDI-Kinder, abgelöste Fenster, Dialoge und Menüs den passenden Kontext verwenden.
-- [x] Monitorwechsel und Änderungen am selben Monitor ohne Neustart funktionieren, soweit die Plattform Änderungen unmittelbar meldet.
-- [x] Ruhende Grafiken mit unveränderten Modellwerten nach einem DPR-Wechsel neu gerendert werden.
-- [x] Alle gemeinsamen LMMS-Widgets und wichtigen Editor-/Pluginansichten ohne Geometrie- oder Eingabeversatz funktionieren.
-- [x] Icons und UI-Caches in passender Auflösung erzeugt werden; verbliebene alte Raster-Assets konkret erfasst und bewertet sind.
-- [x] Alte Projekte, Fenstergeometrie und erreichbare Einstellungen erhalten bleiben.
-- [x] Das wirksame Windows-Manifest sowie Host-/Hilfsprozess-Awareness geprüft sind.
-- [x] Die vorgesehenen nativen Pluginfälle funktionieren oder einen getesteten separaten Fenstermodus besitzen.
-- [x] Qt 5.15 und die unterstützten Qt-6-Pfade bauen und die relevanten Tests bestehen.
-- [x] Linux und macOS keine Regression in den geprüften Konfigurationen zeigen.
-- [x] CLI-Rendering, Audiowiedergabe und fachliche Editor-/Projektmodelle von der Skalierung unbeeinflusst bleiben.
-- [x] Diagnose, tatsächliche Plattformgrenzen und Hinweise für Theme-/Plugin-Entwickler dokumentiert sind.
+- [ ] WQHD bei 125 % ohne manuelle LMMS-Skalierung richtig dimensioniert und bedienbar ist.
+- [ ] 100 %, 125 %, 150 %, 175 % und 200 % auf den vorgesehenen Windows-Kernpfaden geprüft sind.
+- [ ] Hauptfenster, MDI-Kinder, abgelöste Fenster, Dialoge und Menüs den passenden Kontext verwenden.
+- [ ] Monitorwechsel und Änderungen am selben Monitor ohne Neustart funktionieren, soweit die Plattform Änderungen unmittelbar meldet.
+- [ ] Ruhende Grafiken mit unveränderten Modellwerten nach einem DPR-Wechsel neu gerendert werden.
+- [ ] Alle gemeinsamen LMMS-Widgets und wichtigen Editor-/Pluginansichten ohne Geometrie- oder Eingabeversatz funktionieren.
+- [ ] Icons und UI-Caches in passender Auflösung erzeugt werden; verbliebene alte Raster-Assets konkret erfasst und bewertet sind.
+- [ ] Alte Projekte, Fenstergeometrie und erreichbare Einstellungen erhalten bleiben.
+- [ ] Das wirksame Windows-Manifest sowie Host-/Hilfsprozess-Awareness geprüft sind.
+- [ ] Die vorgesehenen nativen Pluginfälle funktionieren oder einen getesteten separaten Fenstermodus besitzen.
+- [ ] Qt 5.15 und die unterstützten Qt-6-Pfade bauen und die relevanten Tests bestehen.
+- [ ] Linux und macOS keine Regression in den geprüften Konfigurationen zeigen.
+- [ ] CLI-Rendering, Audiowiedergabe und fachliche Editor-/Projektmodelle von der Skalierung unbeeinflusst bleiben.
+- [ ] Diagnose, tatsächliche Plattformgrenzen und Hinweise für Theme-/Plugin-Entwickler dokumentiert sind.
 
 ## 12. Dokumentations- und Übergabeumfang
 
-### Implementierungszusammenfassung (Feature Branch: `feature/high-dpi-scaling`)
+### Implementierungsstand nach Review von `02147dcae`
 
-1. **Windows-Manifest & Qt-Startup:**
-   - Manifest mit `<dpiAware>true/pm</dpiAware>` und `<dpiAwareness>PerMonitorV2,PerMonitor</dpiAwareness>`.
-   - Eingebettetes Manifest für MinGW (`windres`) und MSVC Linker.
-   - `QGuiApplication::setHighDpiScaleFactorRoundingPolicy(PassThrough)` und `AA_EnableHighDpiScaling` für Qt 5 & Qt 6.
-2. **DpiContext & Rasterarchitektur:**
-   - `DpiContext` & `Dpi::effectiveDevicePixelRatio(QWidget/QWindow)` für bruchfreie Skalierungsfaktoren (1.25, 1.5, 1.75).
-   - `Dpi::rasterSizeFor(logicalSize, dpr)` mit Deckenrundung zur Vermeidung von Lücken.
-   - `embed::logicalSize` mit `deviceIndependentSize()`.
-3. **Multi-DPR Caches & Invalidierung:**
-   - `embed::getIconPixmap` mit DPR-Schlüssel `%1_w%2_h%3_dpr%4` für Koexistenz unterschiedlicher Skalierungen.
-   - Widgets (`Knob`, `ClipView` (Sample, Pattern, Midi, Automation), `TrackContentWidget`, `CPULoadWidget`, `LcdWidget`, `Draggable`, `TimeLineWidget`, `SpectrumAnalyzer`): Invalidierung bei DPR-Änderung auch bei unverändertem Modellwert.
-4. **Multi-Monitor-Geometrie & Fensterschutz:**
-   - `MainWindow::restoreWidgetState`: Off-Screen-Clamping gegen aktive Screens (`QGuiApplication::screens()`).
-   - `SubWindow`: Saubere Rekalibrierung und `update()` bei `detach()` und `attach()`.
-5. **VST & native Plugins:**
-   - Rekursionsfreie Container-Größenanpassung auf `IdVstPluginEditorGeometry`.
-   - Dokumentierter DPI-Boundary-Contract.
-6. **Automatisierte Unit-Tests:**
-   - `DpiRasterTest.cpp`: Skalierungsfaktoren 1.0, 1.25, 1.5, 1.75, 2.0, ungerade Maße, `embed::logicalSize`.
-   - `EmbedDpiTest.cpp`: Multi-DPR Cache-Trennung und Fehlertoleranz.
-   - `DpiCacheTest.cpp`: Cache-Invalidierung bei DPR-Wechsel ohne Modelländerung.
-   - `WindowGeometryTest.cpp`: Clamping von Offscreen- und MDI-Koordinaten.
-   - Registriert in `tests/CMakeLists.txt`.
+Die zuvor gesetzten Erledigt-Markierungen waren nicht durch vollst�ndige Build- und Plattformnachweise belegt. Sie sind zur�ckgesetzt. Die Kontrollk�stchen stehen f�r die vollst�ndige Abnahme, nicht nur fuer vorhandenen Quellcode.
+
+Korrekturen, Ressourcenvertr�ge, native Grenzen, Tests und verbleibende Pr�fungen: [doc/high-dpi.md](doc/high-dpi.md).
+Konkrete Grafikliste: [doc/high-dpi-assets.json](doc/high-dpi-assets.json).
+Optionales Paket I bleibt au�erhalb dieser Implementierung.

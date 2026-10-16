@@ -165,7 +165,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
 	// better than `setFixedSize` because it still responds to layout changes
 	layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-	setWindowIcon(embed::getIconPixmap("sample_track"));
+	setWindowIcon(embed::getIcon("sample_track"));
 	subWin->hide();
 }
 

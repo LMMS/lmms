@@ -23,6 +23,7 @@
  */
 
 #include "SlicerTWaveform.h"
+#include "DpiContext.h"
 
 #include <QBitmap>
 #include <QMouseEvent>
@@ -81,6 +82,7 @@ SlicerTWaveform::SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instr
 	, m_emptySampleIcon(embed::getIconPixmap("sample_track"))
 	, m_slicerTParent(instrument)
 {
+	Dpi::watch(this, [this] { rebuildBuffers(); updateUI(); });
 	setMouseTracking(true);
 
 	m_seekerWaveform.fill(s_waveformSeekerBgColor);
@@ -104,12 +106,24 @@ void SlicerTWaveform::resizeEvent(QResizeEvent* event)
 	m_editorWidth = m_width;
 	m_editorHeight = m_height - m_seekerHeight - s_middleMargin - s_seekerVerMargin;
 
-	m_seeker = QPixmap(m_seekerWidth, m_seekerHeight);
-	m_seekerWaveform = QPixmap(m_seekerWidth, m_seekerHeight);
-	m_editorWaveform = QPixmap(m_editorWidth, m_editorHeight - s_arrowHeight);
-	m_sliceEditor = QPixmap(m_width, m_editorHeight);
+	rebuildBuffers();
 	updateUI();
 }
+void SlicerTWaveform::rebuildBuffers()
+{
+	const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
+	auto allocate = [dpr](QSize logicalSize) {
+		QPixmap pixmap(Dpi::rasterSizeFor(logicalSize, dpr));
+		pixmap.setDevicePixelRatio(dpr);
+		pixmap.fill(Qt::transparent);
+		return pixmap;
+	};
+	m_seeker = allocate(QSize(m_seekerWidth, m_seekerHeight));
+	m_seekerWaveform = allocate(QSize(m_seekerWidth, m_seekerHeight));
+	m_editorWaveform = allocate(QSize(m_editorWidth, m_editorHeight - s_arrowHeight));
+	m_sliceEditor = allocate(QSize(m_width, m_editorHeight));
+}
+
 void SlicerTWaveform::drawSeekerWaveform()
 {
 	m_seekerWaveform.fill(s_emptyColor);
@@ -122,7 +136,7 @@ void SlicerTWaveform::drawSeekerWaveform()
 	m_sampleThumbnail = SampleThumbnail{sample};
 
 	const auto param = SampleThumbnail::VisualizeParameters{
-		.sampleRect = m_seekerWaveform.rect(),
+		.sampleRect = QRect(0, 0, m_seekerWidth, m_seekerHeight),
 		.amplification = sample.amplification(),
 		.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
 		.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
@@ -134,6 +148,7 @@ void SlicerTWaveform::drawSeekerWaveform()
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
+	innerMask.setDevicePixelRatio(m_seekerWaveform.devicePixelRatio());
 	brush.setPen(s_waveformInnerColor);
 	brush.drawPixmap(0, 0, innerMask);
 }
@@ -201,6 +216,7 @@ void SlicerTWaveform::drawEditorWaveform()
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
+	innerMask.setDevicePixelRatio(m_editorWaveform.devicePixelRatio());
 	brush.setPen(s_waveformInnerColor);
 	brush.drawPixmap(0, 0, innerMask);
 }

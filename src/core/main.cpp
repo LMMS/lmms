@@ -383,6 +383,11 @@ int main( int argc, char * * argv )
 		qInfo() << "LMMS High-DPI initialized:"
 				<< "Qt" << QT_VERSION_STR
 				<< "| Platform:" << QGuiApplication::platformName();
+		for (const auto* name : {"QT_SCALE_FACTOR", "QT_SCREEN_SCALE_FACTORS", "QT_AUTO_SCREEN_SCALE_FACTOR",
+			"QT_ENABLE_HIGHDPI_SCALING", "QT_SCALE_FACTOR_ROUNDING_POLICY"})
+		{
+			if (qEnvironmentVariableIsSet(name)) { qInfo() << name << '=' << qgetenv(name); }
+		}
 		if (const auto* primary = QGuiApplication::primaryScreen())
 		{
 			qInfo() << "Primary screen:" << primary->name()

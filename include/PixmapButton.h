@@ -26,6 +26,7 @@
 #define LMMS_GUI_PIXMAP_BUTTON_H
 
 #include <QPixmap>
+#include "embed.h"
 
 #include "AutomatableButton.h"
 
@@ -61,6 +62,8 @@ private:
 	bool isActive() const;
 
 private:
+	embed::PixmapResource m_activeResource;
+	embed::PixmapResource m_inactiveResource;
 	QPixmap m_activePixmap;
 	QPixmap m_inactivePixmap;
 	bool	m_pressed;

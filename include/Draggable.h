@@ -26,6 +26,7 @@
 #define LMMS_GUI_DRAGGABLE_H
 
 #include "FloatModelEditorBase.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -63,6 +64,8 @@ protected slots:
 	void handleMovement();
 
 private:
+	embed::PixmapResource m_resource;
+	embed::PixmapResource m_defaultResource;
 	QPixmap m_pixmap;
 	QPixmap m_defaultValPixmap;
 	float m_pointA;

@@ -34,7 +34,6 @@
 #include <QString>
 
 #include "DeprecationHelper.h"
-#include "DpiContext.h"
 #include "EffectControlDialog.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -150,14 +149,12 @@ void SaWaterfallView::paintEvent(QPaintEvent *event)
 							 m_processor->waterfallWidth(),		// width = number of frequency bins
 							 m_processor->waterfallHeight(),	// height = number of history lines
 							 QImage::Format_RGB32);
+		// The processor may reallocate its history after unlock. Keep a private snapshot
+		// while Qt maps the data image to the logical display rectangle.
+		const QImage frame = temp.copy();
 		lock.unlock();
-		const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
-		const QSize rasterSize = Dpi::rasterSizeFor(QSize(m_displayWidth, m_displayHeight), dpr);
-		QImage scaledTemp = temp.scaled(rasterSize,
-									  Qt::IgnoreAspectRatio,
-									  Qt::SmoothTransformation);
-		scaledTemp.setDevicePixelRatio(dpr);
-		painter.drawImage(m_displayLeft, m_displayTop, scaledTemp);
+		painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+		painter.drawImage(QRect(m_displayLeft, m_displayTop, m_displayWidth, m_displayHeight), frame);
 		m_processor->flipRequest();
 	}
 	else

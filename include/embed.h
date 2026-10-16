@@ -28,8 +28,12 @@
 #include <string>
 #include <string_view>
 
+#include <QIcon>
+#include <QImage>
 #include <QPixmap>
 #include <QString>
+#include <QSize>
+#include <QSizeF>
 
 #include "lmms_export.h"
 #ifdef PLUGIN_NAME
@@ -75,34 +79,31 @@ auto LMMS_EXPORT getIconPixmap(
 	const char* const* xpm = nullptr
 ) -> QPixmap;
 
+//! Native file-backed icons let Qt request the appropriate raster for menus/toolbars/windows.
+auto LMMS_EXPORT getIcon(std::string_view name, const char* const* xpm = nullptr) -> QIcon;
+auto LMMS_EXPORT iconForPixmap(const QPixmap& pixmap) -> QIcon;
 auto LMMS_EXPORT getText(std::string_view name) -> QString;
 
-//! @brief Safe device-independent logical size helper for QPixmap.
-//! @param pixmap The pixmap to get the size of.
-//! @return The device-independent logical size of the pixmap.
-inline auto logicalSize(const QPixmap& pixmap) noexcept -> QSize
+// A resource retains its requested logical size independently of ceil-rounded raster dimensions.
+// Keep this descriptor in widgets that must reload a resource after a monitor change.
+struct LMMS_EXPORT PixmapResource
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-	return pixmap.deviceIndependentSize().toSize();
-#else
-	return pixmap.size();
-#endif
-}
+	QPixmap pixmap;
+	QSize logicalSize = QSize(0, 0);
+	std::string name;
+	QImage rasterSource; // Own XPM pixels; callers need not keep their input strings alive.
 
-//! @brief Safe device-independent logical size helper for QImage.
+	auto atDpr(qreal dpr) const -> PixmapResource;
+};
+
+auto LMMS_EXPORT getIconResource(std::string_view name, const PixmapRequest& request = {},
+	const char* const* xpm = nullptr) -> PixmapResource;
+auto LMMS_EXPORT describePixmap(const QPixmap& pixmap) -> PixmapResource;
+auto LMMS_EXPORT logicalSize(const QPixmap& pixmap) -> QSize;
+
 inline auto logicalSize(const QImage& image) noexcept -> QSize
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-	return image.deviceIndependentSize().toSize();
-#else
-	if (image.isNull()) { return QSize(0, 0); }
-	const qreal dpr = image.devicePixelRatio();
-	if (dpr <= 0.0) { return image.size(); }
-	return QSize(
-		static_cast<int>(std::round(image.width() / dpr)),
-		static_cast<int>(std::round(image.height() / dpr))
-	);
-#endif
+	return image.isNull() ? QSize(0, 0) : (QSizeF(image.size()) / image.devicePixelRatio()).toSize();
 }
 
 } // namespace embed
@@ -129,6 +130,7 @@ public:
 		return embed::getIconPixmap(m_name, dpr, width, height, m_xpm);
 	}
 
+	auto icon() const -> QIcon { return embed::getIcon(m_name, m_xpm); }
 	auto pixmapName() const -> const std::string& { return m_name; }
 
 private:
@@ -149,6 +151,11 @@ public:
 };
 
 namespace PLUGIN_NAME {
+
+inline auto getIcon(std::string_view name) -> QIcon
+{
+	return PluginPixmapLoader{std::string{name}}.icon();
+}
 
 inline auto getIconPixmap(std::string_view name,
 	int width = -1, int height = -1, const char* const* xpm = nullptr) -> QPixmap

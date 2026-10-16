@@ -47,6 +47,7 @@
 #include "AutomatableModelView.h"
 #include "DeprecationHelper.h"
 #include "PianoView.h"
+#include "DpiContext.h"
 #include "Piano.h"
 #include "CaptionMenu.h"
 #include "Engine.h"
@@ -81,6 +82,14 @@ PianoView::PianoView(QWidget *parent)
 	, ModelView(nullptr, this)
 	, m_startKey{Octave::Octave_3 + Key::C}
 {
+	Dpi::watch(this, [this] {
+		const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
+		for (auto* key : {&m_whiteKeyPm, &m_blackKeyPm, &m_whiteKeyPressedPm,
+			&m_blackKeyPressedPm, &m_whiteKeyDisabledPm, &m_blackKeyDisabledPm})
+		{
+			*key = key->atDpr(dpr);
+		}
+	});
 	setFocusPolicy(Qt::StrongFocus);
 
 	// Black keys are drawn halfway between successive white keys, so they do not
@@ -685,6 +694,9 @@ IntModel* PianoView::getNearestMarker(int key, QString* title)
 void PianoView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
+	auto drawKey = [&p](int x, int y, const embed::PixmapResource& key) {
+		p.drawPixmap(QRect(QPoint(x, y), key.logicalSize), key.pixmap, key.pixmap.rect());
+	};
 
 	// set smaller font for printing number of every octave
 	p.setFont(adjustedToPixelSize(p.font(), LABEL_TEXT_SIZE));
@@ -740,16 +752,16 @@ void PianoView::paintEvent( QPaintEvent * )
 		{
 			if (m_piano && m_piano->isKeyPressed(cur_key))
 			{
-				p.drawPixmap(x, PIANO_BASE, m_whiteKeyPressedPm);
+				drawKey(x, PIANO_BASE, m_whiteKeyPressedPm);
 			}
 			else
 			{
-				p.drawPixmap(x, PIANO_BASE, m_whiteKeyPm);
+				drawKey(x, PIANO_BASE, m_whiteKeyPm);
 			}
 		}
 		else
 		{
-			p.drawPixmap(x, PIANO_BASE, m_whiteKeyDisabledPm);
+			drawKey(x, PIANO_BASE, m_whiteKeyDisabledPm);
 		}
 
 		x += PW_WHITE_KEY_WIDTH;
@@ -774,16 +786,16 @@ void PianoView::paintEvent( QPaintEvent * )
 		{
 			if (m_piano && m_piano->isKeyPressed(startKey))
 			{
-				p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyPressedPm);
+				drawKey(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyPressedPm);
 			}
 			else
 			{
-				p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyPm);
+				drawKey(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyPm);
 			}
 		}
 		else
 		{
-			p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyDisabledPm);
+			drawKey(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyDisabledPm);
 		}
 	}
 
@@ -797,16 +809,16 @@ void PianoView::paintEvent( QPaintEvent * )
 			{
 				if (m_piano && m_piano->isKeyPressed(cur_key))
 				{
-					p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyPressedPm);
+					drawKey(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyPressedPm);
 				}
 				else
 				{
-					p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyPm);
+					drawKey(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyPm);
 				}
 			}
 			else
 			{
-				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyDisabledPm);
+				drawKey(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, m_blackKeyDisabledPm);
 			}
 			x += PW_WHITE_KEY_WIDTH;
 			white_cnt = 0;

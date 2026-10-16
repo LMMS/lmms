@@ -62,6 +62,7 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	// TODO if this option is ever added to the GUI, rename it to legacysepattern
 	m_legacySEPattern(ConfigManager::inst()->value("ui", "legacysebb", "0").toInt())
 {
+	Dpi::watch(this, [this] { setNeedsUpdate(true); });
 	connect( getGUI()->pianoRoll(), SIGNAL(currentMidiClipChanged()),
 			this, SLOT(update()));
 	update();
@@ -216,29 +217,29 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 	_cm->insertSeparator(_cm->actions()[3]);
 	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
+	_cm->addAction( embed::getIcon("edit_erase"),
 			tr( "Clear all notes" ), m_clip, SLOT(clear()));
 
 	if (canMergeSelection(getClickedClips()))
 	{
 		_cm->addAction(
-			embed::getIconPixmap("edit_merge"),
+			embed::getIcon("edit_merge"),
 			tr("Merge Selection"),
 			[this]() { mergeClips(getClickedClips()); }
 		);
 	}
 
-	_cm->addAction(embed::getIconPixmap("clear_notes_out_of_bounds"), tr("Clear notes out of bounds"), [this]() { bulkClearNotesOutOfBounds(getClickedClips()); });
+	_cm->addAction(embed::getIcon("clear_notes_out_of_bounds"), tr("Clear notes out of bounds"), [this]() { bulkClearNotesOutOfBounds(getClickedClips()); });
 
 	if (!isBeat)
 	{
-		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
+		_cm->addAction(embed::getIcon("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
 	}
 	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
+	_cm->addAction( embed::getIcon("reload"), tr( "Reset name" ),
 						this, SLOT(resetName()));
-	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
+	_cm->addAction( embed::getIcon("edit_rename"),
 						tr( "Change name" ),
 						this, SLOT(changeName()));
 
@@ -246,11 +247,11 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 	{
 		_cm->addSeparator();
 
-		_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
+		_cm->addAction( embed::getIcon("step_btn_add"),
 			tr( "Add steps" ), m_clip, SLOT(addSteps()));
-		_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
+		_cm->addAction( embed::getIcon("step_btn_remove"),
 			tr( "Remove steps" ), m_clip, SLOT(removeSteps()));
-		_cm->addAction( embed::getIconPixmap( "step_btn_duplicate" ),
+		_cm->addAction( embed::getIcon("step_btn_duplicate"),
 			tr( "Clone Steps" ), m_clip, SLOT(cloneSteps()));
 	}
 }
@@ -555,7 +556,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	QPainter painter( this );
 
 	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
-	if (std::abs(m_cachedDpr - currentDpr) > 0.001)
+	if (updateCachedDpr(currentDpr))
 	{
 		setNeedsUpdate(true);
 	}
@@ -567,10 +568,9 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 
 	setNeedsUpdate( false );
-	m_cachedDpr = currentDpr;
 
 	const QSize physSize = Dpi::rasterSizeFor(size(), currentDpr);
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || std::abs(m_paintPixmap.devicePixelRatio() - currentDpr) > 0.001)
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != physSize || !qFuzzyCompare(m_paintPixmap.devicePixelRatio(), currentDpr))
 	{
 		m_paintPixmap = QPixmap(physSize);
 		m_paintPixmap.setDevicePixelRatio(currentDpr);

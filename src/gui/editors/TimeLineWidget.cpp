@@ -34,6 +34,7 @@
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
+#include "DpiContext.h"
 #include "KeyboardShortcuts.h"
 #include "NStateButton.h"
 #include "TextFloat.h"
@@ -54,6 +55,11 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_timeline{&timeline},
 	m_begin{begin}
 {
+	Dpi::watch(this, [this] {
+		const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
+		m_posMarker = m_posMarker.atDpr(dpr);
+		m_recordingPosMarker = m_recordingPosMarker.atDpr(dpr);
+	});
 	move( 0, yoff );
 
 	setMouseTracking(true);
@@ -210,8 +216,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 		p.fillRect(rightHandle, color);
 	}
 
-	const QPixmap& marker = !m_isRecording ? m_posMarkerPixmap : m_recordingPosMarkerPixmap;
-	const QSize markerSize = embed::logicalSize(marker);
+	const auto& resource = !m_isRecording ? m_posMarker : m_recordingPosMarker;
+	const QSize markerSize = resource.logicalSize;
 
 	// Only draw the position marker if the position line is in view
 	if (m_isPlayheadVisible && markerX(m_timeline->pos()) >= m_xOffset && markerX(m_timeline->pos()) < width() - markerSize.width() / 2)
@@ -219,8 +225,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 		// Let the position marker extrude to the left
 		p.setClipping(false);
 		p.setOpacity(0.6);
-		p.drawPixmap(markerX(m_timeline->pos()) - (markerSize.width() / 2),
-			height() - markerSize.height(), marker);
+		p.drawPixmap(QRect(QPoint(markerX(m_timeline->pos()) - markerSize.width() / 2,
+			height() - markerSize.height()), markerSize), resource.pixmap, resource.pixmap.rect());
 	}
 }
 

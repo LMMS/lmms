@@ -26,6 +26,7 @@
 #include <QPainter>
 
 #include "Graph.h"
+#include "DpiContext.h"
 #include "DeprecationHelper.h"
 #include "FileDialog.h"
 #include "StringPairDrag.h"
@@ -44,6 +45,9 @@ Graph::Graph( QWidget * _parent, Style _style, int _width,
 	ModelView( new graphModel( -1.0, 1.0, 128, nullptr, true ), this ),
 	m_graphStyle( _style )
 {
+	Dpi::watch(this, [this] {
+		m_foreground = m_foreground.atDpr(Dpi::effectiveDevicePixelRatio(this));
+	});
 	m_mouseDown = false;
 	m_graphColor = QColor( 0xFF, 0xAA, 0x00 );
 
@@ -62,7 +66,8 @@ Graph::Graph( QWidget * _parent, Style _style, int _width,
 
 void Graph::setForeground( const QPixmap &_pixmap )
 {
-	m_foreground = _pixmap;
+	m_foreground = embed::describePixmap(_pixmap).atDpr(Dpi::effectiveDevicePixelRatio(this));
+	update();
 }
 
 void Graph::setGraphColor( QColor _graphcol )
@@ -407,7 +412,7 @@ void Graph::paintEvent( QPaintEvent * )
 		p.drawLine( 2, cursor.y(), width()-2, cursor.y() );
 		p.drawLine( cursor.x(), 2, cursor.x(), height()-2 );
 	}
-	p.drawPixmap( 0, 0, m_foreground );
+	p.drawPixmap(QRect(QPoint(), m_foreground.logicalSize), m_foreground.pixmap, m_foreground.pixmap.rect());
 }
 
 

@@ -22,6 +22,7 @@
  *
  */
 #include "EqCurve.h"
+#include "DpiContext.h"
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
@@ -668,7 +669,8 @@ QRectF EqCurve::boundingRect() const
 void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
 	painter->setRenderHint( QPainter::Antialiasing, true );
-	if( m_modelChanged )
+	const qreal dpr = painter->device()->devicePixelRatioF();
+	if( m_modelChanged || !qFuzzyCompare(m_curvePixmapCache.devicePixelRatio(), dpr) )
 	{
 		setModelChanged( false );
 		//counts the active bands
@@ -728,7 +730,8 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 			}
 		}
 		//we cache the curve painting in a pixmap for saving cpu
-		QPixmap cacheMap( boundingRect().size().toSize() );
+		QPixmap cacheMap(gui::Dpi::rasterSizeFor(boundingRect().size(), dpr));
+		cacheMap.setDevicePixelRatio(dpr);
 		cacheMap.fill( QColor( 0, 0, 0, 0 ) );
 		QPainter cachePainter( &cacheMap );
 		cachePainter.setRenderHint( QPainter::Antialiasing, true );

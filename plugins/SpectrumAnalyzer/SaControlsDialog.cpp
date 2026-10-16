@@ -181,6 +181,9 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	auto blockSizeLabel = new QLabel("", this);
 	auto blockSizeIcon = PLUGIN_NAME::getIconPixmap("block_size", dpr, iconSize.width(), iconSize.height());
 	blockSizeLabel->setPixmap(blockSizeIcon);
+	Dpi::watch(blockSizeLabel, [blockSizeLabel, source = embed::describePixmap(blockSizeIcon)] {
+		blockSizeLabel->setPixmap(source.atDpr(Dpi::effectiveDevicePixelRatio(blockSizeLabel)).pixmap);
+	});
 	config_layout->addWidget(blockSizeLabel, 0, 4, 2, 1, Qt::AlignRight);
 
 	auto blockSizeCombo = new ComboBox(this, tr("FFT block size"));
@@ -196,6 +199,9 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	auto windowLabel = new QLabel("", this);
 	auto windowIcon = PLUGIN_NAME::getIconPixmap("window", dpr, iconSize.width(), iconSize.height());
 	windowLabel->setPixmap(windowIcon);
+	Dpi::watch(windowLabel, [windowLabel, source = embed::describePixmap(windowIcon)] {
+		windowLabel->setPixmap(source.atDpr(Dpi::effectiveDevicePixelRatio(windowLabel)).pixmap);
+	});
 	config_layout->addWidget(windowLabel, 2, 4, 2, 1, Qt::AlignRight);
 
 	auto windowCombo = new ComboBox(this, tr("FFT window type"));

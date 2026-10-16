@@ -29,6 +29,7 @@
 
 #include "PixmapButton.h"
 #include "embed.h"
+#include "DpiContext.h"
 
 namespace lmms::gui
 {
@@ -42,6 +43,13 @@ PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
 {
 	setActiveGraphic( embed::getIconPixmap( "led_yellow" ) );
 	setInactiveGraphic( embed::getIconPixmap( "led_off" ), false );
+	Dpi::watch(this, [this] {
+		const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
+		m_activeResource = m_activeResource.atDpr(dpr);
+		m_inactiveResource = m_inactiveResource.atDpr(dpr);
+		m_activePixmap = m_activeResource.pixmap;
+		m_inactivePixmap = m_inactiveResource.pixmap;
+	});
 }
 
 
@@ -58,7 +66,8 @@ void PixmapButton::paintEvent(QPaintEvent*)
 
 	if (!pixmapToDraw->isNull())
 	{
-		p.drawPixmap(0, 0, *pixmapToDraw);
+		const QSize target = isActive() ? m_activeResource.logicalSize : m_inactiveResource.logicalSize;
+		p.drawPixmap(QRect(QPoint(), target), *pixmapToDraw, pixmapToDraw->rect());
 	}
 }
 
@@ -104,6 +113,7 @@ void PixmapButton::mouseDoubleClickEvent( QMouseEvent * _me )
 
 void PixmapButton::setActiveGraphic(const QPixmap &pm)
 {
+	m_activeResource = embed::describePixmap(pm);
 	m_activePixmap = pm;
 	resize(embed::logicalSize(m_activePixmap));
 }
@@ -111,6 +121,7 @@ void PixmapButton::setActiveGraphic(const QPixmap &pm)
 
 void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 {
+	m_inactiveResource = embed::describePixmap(_pm);
 	m_inactivePixmap = _pm;
 	if( _update )
 	{
@@ -125,8 +136,7 @@ QSize PixmapButton::sizeHint() const
 
 QSize PixmapButton::minimumSizeHint() const
 {
-	return embed::logicalSize(m_activePixmap)
-		.expandedTo(embed::logicalSize(m_inactivePixmap));
+	return m_activeResource.logicalSize.expandedTo(m_inactiveResource.logicalSize);
 }
 
 bool PixmapButton::isActive() const

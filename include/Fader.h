@@ -171,6 +171,7 @@ private:
 	QElapsedTimer m_lastPeakTimer_R;
 
 	QPixmap m_knob {embed::getIconPixmap("fader_knob")};
+	embed::PixmapResource m_knobResource;
 	QSize m_knobSize;
 
 	/**

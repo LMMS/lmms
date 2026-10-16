@@ -1,5 +1,5 @@
 /*
- * WindowGeometryTest.cpp
+ * DpiRasterTest.cpp
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -20,124 +20,38 @@
  *
  */
 
-#include <algorithm>
-#include <QList>
-#include <QObject>
-#include <QRect>
 #include <QtTest>
+#include "DpiContext.h"
 
-namespace {
-
-QRect clampGeometryToScreens(QRect geom, const QList<QRect>& screenGeoms, const QRect& primaryGeom)
-{
-	// Minimum sensible dimensions
-	if (geom.width() < 50) { geom.setWidth(300); }
-	if (geom.height() < 50) { geom.setHeight(200); }
-
-	bool onScreen = false;
-	for (const auto& screen : screenGeoms)
-	{
-		if (screen.intersects(geom))
-		{
-			onScreen = true;
-			break;
-		}
-	}
-
-	if (!onScreen)
-	{
-		geom.moveTo(
-			std::clamp(geom.x(), primaryGeom.left(), std::max(primaryGeom.left(), primaryGeom.right() - geom.width())),
-			std::clamp(geom.y(), primaryGeom.top(), std::max(primaryGeom.top(), primaryGeom.bottom() - geom.height()))
-		);
-	}
-	return geom;
-}
-
-QRect clampSubWindowToMdi(QRect geom, const QRect& mdiRect)
-{
-	if (geom.width() < 50) { geom.setWidth(300); }
-	if (geom.height() < 50) { geom.setHeight(200); }
-
-	if (geom.x() < 0) { geom.moveLeft(0); }
-	if (geom.y() < 0) { geom.moveTop(0); }
-
-	if (mdiRect.width() > 100 && mdiRect.height() > 100)
-	{
-		if (geom.x() >= mdiRect.width())
-		{
-			geom.moveLeft(std::max(0, mdiRect.width() - geom.width()));
-		}
-		if (geom.y() >= mdiRect.height())
-		{
-			geom.moveTop(std::max(0, mdiRect.height() - geom.height()));
-		}
-	}
-	return geom;
-}
-
-} // namespace
-
+using lmms::gui::Dpi::reachableGeometry;
 class WindowGeometryTest : public QObject
 {
 	Q_OBJECT
 private slots:
-	void testNormalWindowWithinBounds()
-	{
-		const QRect screen(0, 0, 1920, 1080);
-		const QRect win(100, 100, 800, 600);
-
-		const QRect result = clampGeometryToScreens(win, {screen}, screen);
-		QCOMPARE(result, win);
-	}
-
-	void testOffScreenDisconnectedMonitor()
-	{
-		// Old project saved on disconnected 4K screen at (2560, 100)
-		const QRect primary(0, 0, 1920, 1080);
-		const QRect win(2560, 100, 800, 600);
-
-		const QRect result = clampGeometryToScreens(win, {primary}, primary);
-		// Clamped onto primary screen
-		QVERIFY(primary.contains(result));
-		QCOMPARE(result.size(), win.size());
-	}
-
-	void testNegativeOffScreenCoordinates()
+	void screenEdgesAndGaps()
 	{
 		const QRect primary(0, 0, 1920, 1080);
-		const QRect win(-800, -600, 500, 400);
-
-		const QRect result = clampGeometryToScreens(win, {primary}, primary);
-		QVERIFY(primary.contains(result));
+		const QRect secondary(-1600, 100, 1280, 800);
+		QCOMPARE(reachableGeometry(QRect(100, 100, 800, 600), {primary, secondary}), QRect(100, 100, 800, 600));
+		for (const QRect geometry : {QRect(1919, -590, 800, 600), QRect(2560, 100, 800, 600),
+			QRect(-300, 100, 200, 200), QRect(-1800, -900, 200, 200), QRect(0, 0, 8000, 5000)})
+		{
+			const QRect result = reachableGeometry(geometry, {primary, secondary});
+			QVERIFY(primary.contains(result) || secondary.contains(result));
+			QCOMPARE(reachableGeometry(result, {primary, secondary}), result);
+		}
 	}
-
-	void testSubWindowNegativeAndOverflowClamping()
+	void minimumAndMdi()
 	{
-		const QRect mdi(0, 0, 1600, 900);
-
-		// Negative coordinates clamped to 0
-		const QRect negWin(-100, -50, 400, 300);
-		const QRect negResult = clampSubWindowToMdi(negWin, mdi);
-		QCOMPARE(negResult.topLeft(), QPoint(0, 0));
-
-		// Far right overflow clamped to inside MDI area
-		const QRect farWin(2000, 1500, 400, 300);
-		const QRect farResult = clampSubWindowToMdi(farWin, mdi);
-		QCOMPARE(farResult.right() <= mdi.width(), true);
-		QCOMPARE(farResult.bottom() <= mdi.height(), true);
-	}
-
-	void testMinimumWindowSizeEnforcement()
-	{
-		const QRect screen(0, 0, 1920, 1080);
-		const QRect tinyWin(50, 50, 10, 5);
-
-		const QRect result = clampGeometryToScreens(tinyWin, {screen}, screen);
-		QCOMPARE(result.width() >= 50, true);
-		QCOMPARE(result.height() >= 50, true);
+		const QRect mdi(0, 0, 400, 300);
+		QCOMPARE(reachableGeometry(QRect(-20, -30, 100, 100), {mdi}).topLeft(), QPoint(0, 0));
+		QCOMPARE(reachableGeometry(QRect(399, 299, 100, 100), {mdi}), QRect(300, 200, 100, 100));
+		const QRect oversized = reachableGeometry(QRect(2000, 2000, 800, 600), {mdi}, QSize(500, 400));
+		QCOMPARE(oversized.topLeft(), QPoint(0, 0));
+		QCOMPARE(oversized.size(), QSize(500, 400));
+		QCOMPARE(reachableGeometry(QRect(10, 10, 0, 0), {mdi}).size(), QSize(300, 200));
+		QCOMPARE(reachableGeometry(QRect(-20, 10, 30, 40), {}), QRect(-20, 10, 30, 40));
 	}
 };
-
 QTEST_GUILESS_MAIN(WindowGeometryTest)
 #include "WindowGeometryTest.moc"

@@ -116,21 +116,19 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 
 	m_tabBar->addTab( available, tr( "Available Effects" ), 
 				0, false, true 
-			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
+			)->setIcon( embed::getIcon("setup_audio") );
 	m_tabBar->addTab( unavailable, tr( "Unavailable Effects" ), 
 				1, false, true 
-			)->setIcon( embed::getIconPixmap(
-						"unavailable_sound" ) );
+			)->setIcon( embed::getIcon("unavailable_sound") );
 	m_tabBar->addTab( instruments, tr( "Instruments" ), 
 				2, false, true 
-			)->setIcon( embed::getIconPixmap(
-							"setup_midi" ) );
+			)->setIcon( embed::getIcon("setup_midi") );
 	m_tabBar->addTab( analysis, tr( "Analysis Tools" ), 
 				3, false, true
-			)->setIcon( embed::getIconPixmap( "analysis" ) );
+			)->setIcon( embed::getIcon("analysis") );
 	m_tabBar->addTab( other, tr( "Don't know" ), 
 				4, true, true
-			)->setIcon( embed::getIconPixmap( "uhoh" ) );
+			)->setIcon( embed::getIcon("uhoh") );
 
 
 	m_tabBar->setActiveTab( 0 );

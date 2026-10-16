@@ -28,6 +28,7 @@
 #include <QStyleOptionFrame>
 #include <QPainter>
 
+#include <algorithm>
 #include <cmath>
 #include "LcdWidget.h"
 #include "DeprecationHelper.h"
@@ -139,7 +140,7 @@ void LcdWidget::setTextShadowColor( const QColor & c )
 void LcdWidget::paintEvent( QPaintEvent* )
 {
 	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
-	if (!m_style.isEmpty() && std::abs(m_cachedDpr - currentDpr) > 0.001)
+	if (!m_style.isEmpty() && !qFuzzyCompare(m_cachedDpr, currentDpr))
 	{
 		m_cachedDpr = currentDpr;
 		m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + m_style).toUtf8().constData(), m_cachedDpr);
@@ -147,18 +148,13 @@ void LcdWidget::paintEvent( QPaintEvent* )
 
 	QPainter p( this );
 
-	QSize cellSize( m_cellWidth, m_cellHeight );
 	QRect cellRect( 0, 0, m_cellWidth, m_cellHeight );
 
-	const qreal dpr = m_lcdPixmap.devicePixelRatio() > 0.0 ? m_lcdPixmap.devicePixelRatio() : 1.0;
-	auto srcRect = [dpr](int x, int y, int w, int h) -> QRect
+	const qreal scaleX = qreal(m_lcdPixmap.width()) / std::max(1, charsPerPixmap * m_cellWidth);
+	const qreal scaleY = qreal(m_lcdPixmap.height()) / std::max(1, 2 * m_cellHeight);
+	auto srcRect = [scaleX, scaleY](int x, int y, int w, int h) -> QRectF
 	{
-		return QRect(
-			static_cast<int>(std::round(x * dpr)),
-			static_cast<int>(std::round(y * dpr)),
-			static_cast<int>(std::round(w * dpr)),
-			static_cast<int>(std::round(h * dpr))
-		);
+		return QRectF(x * scaleX, y * scaleY, w * scaleX, h * scaleY);
 	};
 
 	int margin = 1;  // QStyle::PM_DefaultFrameWidth;
@@ -296,6 +292,7 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 
 	setWindowTitle( name );
 
+	Dpi::watch(this, [this] { m_cachedDpr = 0; updateSize(); });
 	m_style = style;
 	m_cachedDpr = Dpi::effectiveDevicePixelRatio(this);
 	m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData(), m_cachedDpr);

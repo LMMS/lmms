@@ -177,16 +177,16 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 	if (!isMasterChannel()) // no remove-option in master
 	{
 		contextMenu->addAction(
-			embed::getIconPixmap("cancel"), tr("R&emove channel"), this, &MixerChannelView::removeChannel);
+			embed::getIcon("cancel"), tr("R&emove channel"), this, &MixerChannelView::removeChannel);
 		contextMenu->addSeparator();
 	}
 
 	contextMenu->addAction(
-		embed::getIconPixmap("cancel"), tr("Remove &unused channels"), this, &MixerChannelView::removeUnusedChannels);
+		embed::getIcon("cancel"), tr("Remove &unused channels"), this, &MixerChannelView::removeUnusedChannels);
 	contextMenu->addSeparator();
 
 	auto colorMenu = QMenu{tr("Color"), this};
-	colorMenu.setIcon(embed::getIconPixmap("colorize"));
+	colorMenu.setIcon(embed::getIcon("colorize"));
 	colorMenu.addAction(tr("Change"), this, &MixerChannelView::selectColor);
 	colorMenu.addAction(tr("Reset"), this, &MixerChannelView::resetColor);
 	colorMenu.addAction(tr("Pick random"), this, &MixerChannelView::randomizeColor);

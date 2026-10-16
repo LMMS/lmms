@@ -24,6 +24,7 @@
  */
 
 #include "EnvelopeGraph.h"
+#include "DpiContext.h"
 
 #include <QMouseEvent>
 #include <QPainter>
@@ -49,7 +50,10 @@ EnvelopeGraph::EnvelopeGraph(QWidget* parent) :
 	m_markerFillColor(153, 175, 255),
 	m_markerOutlineColor(0, 0, 0)
 {
-	setMinimumSize(m_envGraph.size());
+	setMinimumSize(m_envGraph.logicalSize);
+	Dpi::watch(this, [this] {
+		m_envGraph = embed::getIconResource("envelope_graph", {size(), Dpi::effectiveDevicePixelRatio(this)});
+	});
 }
 
 void EnvelopeGraph::modelChanged()
@@ -107,7 +111,12 @@ void EnvelopeGraph::paintEvent(QPaintEvent*)
 	p.setRenderHint(QPainter::Antialiasing);
 
 	// Draw the graph background
-	p.drawPixmap(rect(), m_envGraph);
+	const qreal dpr = Dpi::effectiveDevicePixelRatio(this);
+	if (m_envGraph.logicalSize != size() || !qFuzzyCompare(m_envGraph.pixmap.devicePixelRatio(), dpr))
+	{
+		m_envGraph = embed::getIconResource("envelope_graph", {size(), dpr});
+	}
+	p.drawPixmap(rect(), m_envGraph.pixmap, m_envGraph.pixmap.rect());
 
 	const auto* params = castModel<EnvelopeAndLfoParameters>();
 	if (!params) { return; }

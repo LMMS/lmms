@@ -213,7 +213,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->addWidget(label, 1, 7);
 	basicControlsLayout->setAlignment( label, labelAlignment );
 
-	auto saveSettingsBtn = new QPushButton(embed::getIconPixmap("project_save"), QString());
+	auto saveSettingsBtn = new QPushButton(embed::getIcon("project_save"), QString());
 	saveSettingsBtn->setMinimumSize( 32, 32 );
 
 	connect( saveSettingsBtn, SIGNAL(clicked()), this, SLOT(saveSettingsBtnClicked()));

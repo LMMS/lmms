@@ -534,7 +534,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
 	m_toggleUIButton->setCheckable( true );
 	m_toggleUIButton->setChecked( false );
-	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
+	m_toggleUIButton->setIcon( embed::getIcon("zoom") );
 	QFont f = m_toggleUIButton->font();
 	m_toggleUIButton->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 

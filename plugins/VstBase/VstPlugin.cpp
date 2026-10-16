@@ -25,6 +25,7 @@
 #include "VstPlugin.h"
 
 #include "communication.h"
+#include "DpiContext.h"
 
 #include <QtEndian>
 #include <QDebug>
@@ -429,13 +430,17 @@ bool VstPlugin::processMessage( const message & _m )
 	case IdVstPluginEditorGeometry:
 	{
 		const QSize newGeom(_m.getInt(0), _m.getInt(1));
-		if (newGeom.isValid() && m_pluginGeometry != newGeom)
+		if (newGeom.width() > 0 && newGeom.height() > 0)
 		{
-			m_pluginGeometry = newGeom;
-			if (m_pluginWidget && m_pluginWidget->size() != m_pluginGeometry)
-			{
-				m_pluginWidget->setFixedSize(m_pluginGeometry);
-			}
+			// Messages can be consumed while the audio thread waits for a processing reply.
+			// Both the geometry state and QWidget access belong to this object's GUI thread.
+			QMetaObject::invokeMethod(this, [this, newGeom] {
+				if (m_pluginGeometry != newGeom)
+				{
+					m_pluginGeometry = newGeom;
+					applyEditorGeometry();
+				}
+			}, Qt::QueuedConnection);
 		}
 		break;
 	}
@@ -779,8 +784,32 @@ void VstPlugin::toggleEditorVisibility( int visible )
 	w->setVisible( visible );
 }
 
+void VstPlugin::useSeparateEditor(const char* reason)
+{
+	qWarning() << "VST uses a separate editor:" << reason;
+	m_embedMethod = "none";
+	lock();
+	sendMessage(IdVstUseSeparateUI);
+	unlock();
+	RemotePlugin::showUI();
+}
+
+void VstPlugin::applyEditorGeometry()
+{
+	if (!m_pluginWidget || m_pluginGeometry.isEmpty()) { return; }
+	QSize logical = m_pluginGeometry;
+#ifdef LMMS_BUILD_WIN32
+	// Only matched per-monitor HWND contexts are embedded (see createUI).
+	// effEditGetRect/audioMasterSizeWindow are native client pixels in that case.
+	// Qt geometry is logical, including any explicit Qt scale-factor override.
+	logical = (QSizeF(m_pluginGeometry) / gui::Dpi::effectiveDevicePixelRatio(m_pluginWidget)).toSize();
+#endif
+	if (m_pluginWidget->size() != logical) { m_pluginWidget->setFixedSize(logical); }
+}
+
 void VstPlugin::createUI( QWidget * parent )
 {
+	if (m_embedMethod == "none" || m_embedMethod == "headless") { return; }
 	if ( m_pluginWidget ) {
 		qWarning() << "VstPlugin::createUI called twice";
 		m_pluginWidget->setParent( parent );
@@ -793,10 +822,41 @@ void VstPlugin::createUI( QWidget * parent )
 	}
 
 	QWidget* container = nullptr;
+#ifdef LMMS_BUILD_WIN32
+	if (m_embedMethod == "qt" || m_embedMethod == "win32")
+	{
+		// Cross-process SetParent may reset the helper's DPI awareness when contexts
+		// differ. Check before either embedding mechanism touches the foreign HWND.
+		using GetContext = HANDLE (WINAPI*)(HWND);
+		using ContextsEqual = BOOL (WINAPI*)(HANDLE, HANDLE);
+		using GetAwareness = int (WINAPI*)(HANDLE);
+		const HMODULE user32 = GetModuleHandleW(L"user32.dll");
+		const auto getContext = reinterpret_cast<GetContext>(GetProcAddress(user32, "GetWindowDpiAwarenessContext"));
+		const auto equal = reinterpret_cast<ContextsEqual>(GetProcAddress(user32, "AreDpiAwarenessContextsEqual"));
+		const auto awareness = reinterpret_cast<GetAwareness>(GetProcAddress(user32, "GetAwarenessFromDpiAwarenessContext"));
+		const HWND plugin = reinterpret_cast<HWND>(static_cast<intptr_t>(m_pluginWindowID));
+		const HWND host = parent ? reinterpret_cast<HWND>(parent->winId()) : nullptr;
+		if (getContext && awareness && host)
+		{
+			qInfo() << "VST host/helper DPI awareness (0=unaware, 1=system, 2=per-monitor):"
+				<< awareness(getContext(host)) << awareness(getContext(plugin));
+		}
+		if (!getContext || !equal || !awareness || !host || !IsWindow(plugin)
+			|| awareness(getContext(host)) != 2
+			|| !equal(getContext(host), getContext(plugin)))
+		{
+			useSeparateEditor("incompatible or unavailable HWND DPI context");
+			return;
+		}
+		qDebug() << "VST matched host/helper DPI context" << getContext(host) << getContext(plugin);
+	}
+#endif
+
 
 	if (m_embedMethod == "qt" )
 	{
 		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
+		if (!vw) { useSeparateEditor("cannot wrap foreign window"); return; }
 		container = QWidget::createWindowContainer(vw, parent );
 		container->installEventFilter(this);
 	} else
@@ -804,7 +864,7 @@ void VstPlugin::createUI( QWidget * parent )
 #ifdef LMMS_BUILD_WIN32
 	if (m_embedMethod == "win32" )
 	{
-		QWidget * helper = new QWidget;
+		QWidget * helper = new QWidget(parent);
 		QHBoxLayout * l = new QHBoxLayout( helper );
 		QWidget * target = new QWidget( helper );
 		l->setSpacing( 0 );
@@ -820,7 +880,14 @@ void VstPlugin::createUI( QWidget * parent )
 		style = style & ~(WS_POPUP);
 		style = style | WS_CHILD;
 		SetWindowLong(pluginHandle, GWL_STYLE, style);
-		SetParent(pluginHandle, targetHandle);
+		SetLastError(ERROR_SUCCESS);
+		if (!SetParent(pluginHandle, targetHandle) && GetLastError() != ERROR_SUCCESS)
+		{
+			SetWindowLong(pluginHandle, GWL_STYLE, style | WS_POPUP);
+			delete helper;
+			useSeparateEditor("SetParent failed");
+			return;
+		}
 
 		DWORD threadId = GetWindowThreadProcessId(pluginHandle, nullptr);
 		DWORD currentThreadId = GetCurrentThreadId();
@@ -850,14 +917,10 @@ void VstPlugin::createUI( QWidget * parent )
 		return;
 	}
 
-	// DPI Boundary Contract:
-	// External VST plugins report editor dimensions in native HWND pixels via effEditGetRect.
-	// Qt containers (via QWidget::createWindowContainer or win32 child HWND SetParent)
-	// scope the child window without recursive re-scaling loops.
-	container->setFixedSize( m_pluginGeometry );
-	container->setWindowTitle( name() );
-
 	m_pluginWidget = container;
+	container->setWindowTitle(name());
+	applyEditorGeometry();
+	gui::Dpi::watch(container, [this] { applyEditorGeometry(); });
 }
 
 bool VstPlugin::eventFilter(QObject *obj, QEvent *event)

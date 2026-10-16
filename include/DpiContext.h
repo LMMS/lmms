@@ -26,7 +26,14 @@
 #define LMMS_GUI_DPI_CONTEXT_H
 
 #include <cmath>
+#include <functional>
 #include <QObject>
+#include <QPointer>
+#include <QRect>
+#include <QList>
+#include <QWidget>
+#include <QWindow>
+#include <QScreen>
 #include <QSize>
 #include <QSizeF>
 
@@ -53,6 +60,14 @@ LMMS_EXPORT auto effectiveDevicePixelRatio(const QWindow* window) -> qreal;
 LMMS_EXPORT auto rasterSizeFor(const QSizeF& logicalSize, qreal dpr) -> QSize;
 LMMS_EXPORT auto rasterSizeFor(const QSize& logicalSize, qreal dpr) -> QSize;
 
+//! GUI-thread registration. Callback also runs after show/reparent and visual style changes.
+LMMS_EXPORT void watch(QWidget* widget, std::function<void()> refresh);
+LMMS_EXPORT void refresh(QWidget* subtree);
+
+//! Pure logical-coordinate helper shared by window restoration and tests.
+LMMS_EXPORT auto reachableGeometry(QRect geometry, const QList<QRect>& areas,
+	QSize minimumSize = QSize(1, 1)) -> QRect;
+
 } // namespace Dpi
 
 class LMMS_EXPORT DpiContext : public QObject
@@ -61,6 +76,7 @@ class LMMS_EXPORT DpiContext : public QObject
 public:
 	explicit DpiContext(QWidget* targetWidget, QObject* parent = nullptr);
 	~DpiContext() override;
+	static auto forWidget(QWidget* widget) -> DpiContext*;
 
 	auto targetWidget() const -> QWidget* { return m_widget; }
 	auto devicePixelRatio() const -> qreal { return m_currentDpr; }
@@ -78,11 +94,15 @@ private:
 	void bindToWindow(QWindow* window);
 	void unbindFromWindow();
 	void onScreenChanged(QScreen* newScreen);
+	void scheduleCheck();
+	void scheduleGeometryCheck();
 
-	QWidget* m_widget = nullptr;
-	QWindow* m_window = nullptr;
-	QScreen* m_screen = nullptr;
+	QPointer<QWidget> m_widget;
+	QPointer<QWindow> m_window;
+	QPointer<QScreen> m_screen;
 	qreal m_currentDpr = 1.0;
+	bool m_checkPending = false;
+	bool m_geometryCheckPending = true;
 };
 
 } // namespace lmms::gui
