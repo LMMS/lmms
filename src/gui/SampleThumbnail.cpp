@@ -52,7 +52,7 @@ SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 	// The thumbnails after it are increasingly compressed via the peaks being aggregated
 	while (m_thumbnails.back().width() >= AggregationPerZoomStep)
 	{
-		auto thumbnail = m_thumbnails.back().compress(m_thumbnails.back().width() / 10);
+		auto thumbnail = m_thumbnails.back().compress(m_thumbnails.back().width() / AggregationPerZoomStep);
 		m_thumbnails.emplace_back(std::move(thumbnail));
 	}
 }
