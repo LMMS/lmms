@@ -105,18 +105,15 @@ void SampleThumbnailCache::visualize(VisualizeParameters parameters, QPainter& p
 	const auto samplesPerPixel = std::max(numSamples / parameters.rect.width(), f_cnt_t{1});
 	const auto& thumbnail = nearestThumbnailForWidth(m_sampleCount / samplesPerPixel);
 
-	const auto drawStart = std::min(parameters.viewportStart, parameters.rect.x());
-	const auto drawEnd = std::max(parameters.viewportEnd, parameters.rect.x() + parameters.rect.width());
-
 	const auto yScale = parameters.rect.height() / 2 * parameters.amplification;
 	const auto yCenter = parameters.rect.center().y();
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	for (auto x = drawStart; x <= drawEnd; ++x)
+	for (auto x = parameters.rect.x(); x <= parameters.rect.x() + parameters.rect.width(); ++x)
 	{
-		const auto peakIndex = x - drawStart;
+		const auto peakIndex = x - parameters.rect.x();
 		if (0 <= peakIndex && peakIndex < thumbnail.width())
 		{
 			const auto yMin = yCenter - thumbnail[peakIndex].min * yScale;

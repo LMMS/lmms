@@ -60,13 +60,6 @@ public:
 		//!< @a rect must share the same coordinate system as that of the painter in which it is drawn with.
 		QRect rect;
 
-		//!< The start of the viewport relative to @a rect.
-		int viewportStart = 0;
-
-		//!< The end of the viewport relative to @a rect.
-		//!< May extend beyond the width of @a rect.
-		int viewportEnd = rect.width();
-
 		//!< Where the sample begins for drawing.
 		f_cnt_t sampleStart = 0;
 
