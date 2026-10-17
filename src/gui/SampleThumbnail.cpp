@@ -29,7 +29,7 @@
 #include <QPainter>
 
 namespace {
-constexpr auto AggregationPerZoomStep = 10;
+constexpr auto AggregationPerZoomStep = 4;
 } // namespace
 
 namespace lmms::gui {
