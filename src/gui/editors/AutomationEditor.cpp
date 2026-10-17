@@ -1216,6 +1216,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 			const auto param = SampleThumbnailCache::VisualizeParameters{
 				.rect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+				.sampleStart = static_cast<f_cnt_t>(sample.startFrame()),
 				.sampleEnd = static_cast<f_cnt_t>(sample.endFrame()),
 				.amplification = sample.amplification(),
 				.reversed = sample.reversed()
