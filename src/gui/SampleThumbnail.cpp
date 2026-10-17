@@ -52,7 +52,7 @@ SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 	// The thumbnails after it are increasingly compressed via the peaks being aggregated
 	while (m_thumbnails.back().width() >= AggregationPerZoomStep)
 	{
-		auto thumbnail = m_thumbnails.back().compress(AggregationPerZoomStep);
+		auto thumbnail = m_thumbnails.back().compress(m_thumbnails.back().width() / 10);
 		m_thumbnails.emplace_back(std::move(thumbnail));
 	}
 }
@@ -76,29 +76,22 @@ auto SampleThumbnailCache::thumbnailForWidth(int width) -> Thumbnail&
 	// Move back by one to get the nearest larger thumbnail
 	const auto nearest = std::prev(it);
 
-	auto thumbnail = nearest->compress(nearest->width() / width);
+	auto thumbnail = nearest->compress(width);
 	return *m_thumbnails.insert(it, std::move(thumbnail));
 }
 
-auto SampleThumbnailCache::thumbnailForSamplesPerPixel(int samplesPerPixel) -> Thumbnail&
+auto SampleThumbnailCache::Thumbnail::compress(int outputWidth) const -> Thumbnail
 {
-	assert(1 <= samplesPerPixel && samplesPerPixel <= m_sampleCount && "invalid samples per pixel");
-	const auto width = (m_sampleCount + samplesPerPixel - 1) / samplesPerPixel;
-	return thumbnailForWidth(width);
-}
+	assert(outputWidth <= width() && "output width cannot be greater than this thumbnail's width");
 
-auto SampleThumbnailCache::Thumbnail::compress(int factor) const -> Thumbnail
-{
-	assert(factor > 0 && "factor must be greater than 0");
+	const auto factor = static_cast<float>(width()) / outputWidth;
+	auto compressedThumbnail = Thumbnail{outputWidth};
 
-	// A ceiling needs to be applied when dealing with factors that do not cleanly divide the number of peaks
-	// An extra peak is needed for the trailing remainder in this case
-	auto compressedThumbnail = Thumbnail{static_cast<int>((m_peaks.size() + factor - 1) / factor)};
-
-	for (auto in = 0, out = 0; in < m_peaks.size(); in += factor, ++out)
+	for (auto out = 0; out < outputWidth; ++out)
 	{
-		const auto end = std::min(in + factor, static_cast<int>(m_peaks.size()));
-		compressedThumbnail[out] = std::accumulate(m_peaks.begin() + in, m_peaks.begin() + end, Thumbnail::Peak{});
+		const auto start = m_peaks.begin() + static_cast<size_t>(std::floor(out * factor));
+		const auto end = m_peaks.begin() + static_cast<size_t>(std::floor((out + 1) * factor));
+		compressedThumbnail[out] = std::accumulate(start, end, Peak{});
 	}
 
 	return compressedThumbnail;
@@ -109,12 +102,13 @@ void SampleThumbnailCache::visualize(VisualizeParameters parameters, QPainter& p
 	parameters.sampleEnd = std::min(parameters.sampleEnd, m_sampleCount);
 
 	if (parameters.sampleStart >= m_sampleCount || parameters.sampleEnd <= parameters.sampleStart) { return; }
+	if (parameters.rect.width() == 0)  { return; }	
 
 	const auto numSamples = parameters.sampleEnd - parameters.sampleStart;
-	const auto samplesPerPixel = numSamples / parameters.rect.width();
-	const auto& thumbnail = thumbnailForSamplesPerPixel(samplesPerPixel);
+	const auto samplesPerPixel = std::max(numSamples / parameters.rect.width(), f_cnt_t{1});
+	const auto& thumbnail = thumbnailForWidth(m_sampleCount / samplesPerPixel);
 
-	const auto drawStart = std::max(parameters.viewportStart, parameters.rect.x());
+	const auto drawStart = std::min(parameters.viewportStart, parameters.rect.x());
 	const auto drawEnd = std::max(parameters.viewportEnd, parameters.rect.x() + parameters.rect.width());
 
 	const auto yScale = parameters.rect.height() / 2 * parameters.amplification;
@@ -125,8 +119,7 @@ void SampleThumbnailCache::visualize(VisualizeParameters parameters, QPainter& p
 
 	for (auto x = drawStart; x <= drawEnd; ++x)
 	{
-		const auto peakIndex = x - parameters.rect.x();
-
+		const auto peakIndex = x - drawStart;
 		if (0 <= peakIndex && peakIndex < thumbnail.width())
 		{
 			const auto yMin = yCenter - thumbnail[peakIndex].min * yScale;
