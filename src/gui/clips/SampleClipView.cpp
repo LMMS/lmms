@@ -324,7 +324,6 @@ void SampleClipView::paintSample(QPainter& p, const QRect& viewPortRect)
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);
-
 }
 
 void SampleClipView::paintOverlay(QPainter& p, const QColor& c)
