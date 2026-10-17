@@ -48,7 +48,8 @@ add_executable(${EXE_NAME} WIN32
 if(IS_WIN)
 	if(MSVC)
 		target_sources(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.manifest")
-	else()
+	elseif(IS_MINGW)
+		# Wine's compiler also defines _WIN32 but does not use CMake's RC language.
 		enable_language(RC)
 		target_sources(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.rc")
 		target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")

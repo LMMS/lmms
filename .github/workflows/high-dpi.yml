@@ -6,22 +6,28 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
+          # Qt 5.15.2's MSVC headers require the STL shipped with v142.
+          - os: windows-2022
             qt: '5.15.2'
             arch: win64_msvc2019_64
             major: 5
+            cmake_args: -T v142
+            archives: qtbase qtsvg
           - os: windows-latest
             qt: '6.8.3'
             arch: win64_msvc2022_64
             major: 6
+            archives: qtbase qtsvg
           - os: ubuntu-22.04
             qt: '5.15.2'
             arch: gcc_64
             major: 5
+            archives: qtbase qtsvg icu
           - os: macos-14
             qt: '6.8.3'
             arch: clang_64
             major: 6
+            archives: qtbase qtsvg
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -29,10 +35,12 @@ jobs:
         with:
           version: ${{ matrix.qt }}
           arch: ${{ matrix.arch }}
-          archives: qtbase qtsvg
+          archives: ${{ matrix.archives }}
           cache: true
       - name: Configure production-code tests
-        run: cmake -S tests/dpi -B build-dpi -DDPI_QT_MAJOR=${{ matrix.major }}
+        run: >-
+          cmake -S tests/dpi -B build-dpi
+          -DDPI_QT_MAJOR=${{ matrix.major }} ${{ matrix.cmake_args }}
       - name: Build
         run: cmake --build build-dpi --config Release --parallel
       - name: Test fractional scales in separate processes

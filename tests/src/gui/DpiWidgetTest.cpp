@@ -237,7 +237,6 @@ private slots:
 		}
 		QDir::setSearchPaths("artwork", previous);
 	}
-
 };
 #include "DpiTestMain.h"
 LMMS_DPI_TEST_MAIN(DpiWidgetTest)

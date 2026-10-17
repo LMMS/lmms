@@ -897,7 +897,7 @@ void VstPlugin::createUI( QWidget * parent )
 		RemotePlugin::showUI();
 
 	} else
-#endif
+#endif // LMMS_BUILD_WIN32
 
 #if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	if (m_embedMethod == "xembed" )
