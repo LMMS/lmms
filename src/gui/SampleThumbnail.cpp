@@ -57,7 +57,7 @@ SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 	}
 }
 
-auto SampleThumbnailCache::thumbnailForWidth(int width) -> Thumbnail&
+auto SampleThumbnailCache::nearestThumbnailForWidth(int width) -> Thumbnail&
 {
 	assert(1 <= width && width <= m_sampleCount && "invalid width");
 
@@ -74,10 +74,7 @@ auto SampleThumbnailCache::thumbnailForWidth(int width) -> Thumbnail&
 	if (it->width() == width) { return *it; }
 
 	// Move back by one to get the nearest larger thumbnail
-	const auto nearest = std::prev(it);
-
-	auto thumbnail = nearest->compress(width);
-	return *m_thumbnails.insert(it, std::move(thumbnail));
+	return *std::prev(it);
 }
 
 auto SampleThumbnailCache::Thumbnail::compress(int outputWidth) const -> Thumbnail
@@ -106,7 +103,7 @@ void SampleThumbnailCache::visualize(VisualizeParameters parameters, QPainter& p
 
 	const auto numSamples = parameters.sampleEnd - parameters.sampleStart;
 	const auto samplesPerPixel = std::max(numSamples / parameters.rect.width(), f_cnt_t{1});
-	const auto& thumbnail = thumbnailForWidth(m_sampleCount / samplesPerPixel);
+	const auto& thumbnail = nearestThumbnailForWidth(m_sampleCount / samplesPerPixel);
 
 	const auto drawStart = std::min(parameters.viewportStart, parameters.rect.x());
 	const auto drawEnd = std::max(parameters.viewportEnd, parameters.rect.x() + parameters.rect.width());
