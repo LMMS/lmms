@@ -390,10 +390,6 @@ bool Knob::updateAngle()
 
 void Knob::drawKnob( QPainter * _p )
 {
-	bool enabled = this->isEnabled();
-	QColor currentArcColor = enabled ? m_arcActiveColor : m_arcInactiveColor;
-	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
-
 	const qreal currentDpr = Dpi::effectiveDevicePixelRatio(this);
 	if (m_knobPixmap && !qFuzzyCompare(m_knobPixmap->devicePixelRatio(), currentDpr))
 	{
@@ -416,42 +412,52 @@ void Knob::drawKnob( QPainter * _p )
 
 	QPainter p( &m_cache );
 
-	QPoint mid;
-
-	if( m_knobNum == KnobType::Styled )
+	if (m_knobNum == KnobType::Styled)
 	{
-		p.setRenderHint( QPainter::Antialiasing );
+		drawStyledKnob(p, _p->pen().brush().color());
+	}
+	else
+	{
+		drawLegacyKnob(p);
+	}
+	p.end();
+	_p->drawImage(0, 0, m_cache);
+}
 
-		// Perhaps this can move to setOuterRadius()
-		if( m_outerColor.isValid() )
-		{
-			QRadialGradient gradient( centerPoint(), outerRadius() );
-			gradient.setColorAt( 0.4, _p->pen().brush().color() );
-			gradient.setColorAt( 1, m_outerColor );
+void Knob::drawStyledKnob(QPainter& p, const QColor& baseColor)
+{
+	p.setRenderHint( QPainter::Antialiasing );
 
-			p.setPen( QPen( gradient, lineWidth(),
-						Qt::SolidLine, Qt::RoundCap ) );
-		}
-		else {
-			QPen pen = p.pen();
-			pen.setWidth( (int) lineWidth() );
-			pen.setCapStyle( Qt::RoundCap );
+	// Perhaps this can move to setOuterRadius()
+	if( m_outerColor.isValid() )
+	{
+		QRadialGradient gradient( centerPoint(), outerRadius() );
+		gradient.setColorAt( 0.4, baseColor );
+		gradient.setColorAt( 1, m_outerColor );
 
-			p.setPen( pen );
-		}
+		p.setPen( QPen( gradient, lineWidth(),
+					Qt::SolidLine, Qt::RoundCap ) );
+	}
+	else {
+		QPen pen = p.pen();
+		pen.setWidth( (int) lineWidth() );
+		pen.setCapStyle( Qt::RoundCap );
 
-		p.drawLine( calculateLine( centerPoint(), outerRadius(),
-							innerRadius() ) );
-		p.end();
-		_p->drawImage( 0, 0, m_cache );
-		return;
+		p.setPen( pen );
 	}
 
+	p.drawLine( calculateLine( centerPoint(), outerRadius(),
+						innerRadius() ) );
+}
 
+void Knob::drawLegacyKnob(QPainter& p)
+{
+	const QColor currentArcColor = isEnabled() ? m_arcActiveColor : m_arcInactiveColor;
+	const QColor currentLineColor = isEnabled() ? m_lineActiveColor : m_lineInactiveColor;
 	// Old-skool knobs
 	const QSize logicalKnobSize = m_knobPixmap ? m_knobLogicalSize : QSize(0, 0);
 	const float radius = logicalKnobSize.width() / 2.0f - 1;
-	mid = QPoint( width() / 2, logicalKnobSize.height() / 2 );
+	const QPoint mid = QPoint( width() / 2, logicalKnobSize.height() / 2 );
 
 	p.drawPixmap(QRect(QPoint(width() / 2 - logicalKnobSize.width() / 2, 0), logicalKnobSize),
 		*m_knobPixmap, m_knobPixmap->rect());
@@ -499,10 +505,6 @@ void Knob::drawKnob( QPainter * _p )
 	}
 
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, (90-centerAngle)*16, -16*(m_angle-centerAngle) );
-
-	p.end();
-
-	_p->drawImage( 0, 0, m_cache );
 }
 
 void Knob::drawLabel(QPainter& p)

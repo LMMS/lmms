@@ -255,30 +255,7 @@ void DpiContext::checkDpiChange()
 	if (m_geometryCheckPending && m_widget->isVisible() && !m_widget->isMinimized())
 	{
 		m_geometryCheckPending = false;
-		const auto type = m_widget->windowType();
-		if (type != Qt::Popup && type != Qt::ToolTip && !m_widget->isMaximized()
-			&& !m_widget->isFullScreen() && !m_widget->isMinimized())
-		{
-			if (QGuiApplication::platformName() == "wayland")
-			{
-				// Global positioning is controlled by the compositor.
-				if (m_screen)
-				{
-					m_widget->resize(m_widget->size().boundedTo(m_screen->availableGeometry().size())
-						.expandedTo(m_widget->minimumSize()));
-				}
-			}
-			else
-			{
-				QList<QRect> areas;
-				for (const auto* screen : QGuiApplication::screens()) { areas.append(screen->availableGeometry()); }
-				const QMargins margins = m_window ? m_window->frameMargins() : QMargins();
-				const QSize frameSize(margins.left() + margins.right(), margins.top() + margins.bottom());
-				const QRect reachable = Dpi::reachableGeometry(m_widget->frameGeometry(), areas,
-					m_widget->minimumSize() + frameSize).marginsRemoved(margins);
-				if (reachable != m_widget->geometry()) { m_widget->setGeometry(reachable); }
-			}
-		}
+		ensureReachableGeometry();
 	}
 
 	const qreal newDpr = Dpi::effectiveDevicePixelRatio(m_widget);
@@ -289,6 +266,34 @@ void DpiContext::checkDpiChange()
 		qDebug() << "LMMS window DPR:" << m_widget->objectName() << oldDpr << "->" << newDpr;
 		emit dpiChanged(newDpr, oldDpr);
 		m_widget->update();
+	}
+}
+
+void DpiContext::ensureReachableGeometry()
+{
+	const auto type = m_widget->windowType();
+	if (type != Qt::Popup && type != Qt::ToolTip && !m_widget->isMaximized()
+		&& !m_widget->isFullScreen() && !m_widget->isMinimized())
+	{
+		if (QGuiApplication::platformName() == "wayland")
+		{
+			// Global positioning is controlled by the compositor.
+			if (m_screen)
+			{
+				m_widget->resize(m_widget->size().boundedTo(m_screen->availableGeometry().size())
+					.expandedTo(m_widget->minimumSize()));
+			}
+		}
+		else
+		{
+			QList<QRect> areas;
+			for (const auto* screen : QGuiApplication::screens()) { areas.append(screen->availableGeometry()); }
+			const QMargins margins = m_window ? m_window->frameMargins() : QMargins();
+			const QSize frameSize(margins.left() + margins.right(), margins.top() + margins.bottom());
+			const QRect reachable = Dpi::reachableGeometry(m_widget->frameGeometry(), areas,
+				m_widget->minimumSize() + frameSize).marginsRemoved(margins);
+			if (reachable != m_widget->geometry()) { m_widget->setGeometry(reachable); }
+		}
 	}
 }
 

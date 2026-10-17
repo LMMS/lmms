@@ -199,6 +199,8 @@ private:
 						float _innerRadius = 1) const;
 
 	void drawKnob( QPainter * _p );
+	void drawStyledKnob(QPainter& painter, const QColor& baseColor);
+	void drawLegacyKnob(QPainter& painter);
 	void drawLabel(QPainter& p);
 	bool updateAngle();
 

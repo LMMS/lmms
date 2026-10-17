@@ -96,6 +96,7 @@ private:
 	void onScreenChanged(QScreen* newScreen);
 	void scheduleCheck();
 	void scheduleGeometryCheck();
+	void ensureReachableGeometry();
 
 	QPointer<QWidget> m_widget;
 	QPointer<QWindow> m_window;

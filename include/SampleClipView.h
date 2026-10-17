@@ -64,6 +64,10 @@ protected:
 
 
 private:
+	auto paintBackground(QPainter& painter, const QPainter& destination) -> QColor;
+	void paintSample(QPainter& painter, const QRect& viewport);
+	void paintOverlay(QPainter& painter, const QColor& background);
+
 	SampleClip * m_clip;
 	SampleThumbnail m_sampleThumbnail;
 	QPixmap m_paintPixmap;

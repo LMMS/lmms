@@ -242,6 +242,15 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	QPainter p( &m_paintPixmap );
 
+	const QColor background = paintBackground(p, painter);
+	paintSample(p, viewPortRect);
+	paintOverlay(p, background);
+	p.end();
+	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
+}
+
+auto SampleClipView::paintBackground(QPainter& p, const QPainter& painter) -> QColor
+{
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
 
@@ -280,6 +289,11 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		p.setPen(p.pen().brush().color().darker(150));
 	}
 
+	return c;
+}
+
+void SampleClipView::paintSample(QPainter& p, const QRect& viewPortRect)
+{
 	const int spacing = BORDER_WIDTH + 1;
 	const float ppb = fixedClips() ?
 			( parentWidget()->width() - 2 * BORDER_WIDTH )
@@ -311,6 +325,10 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);
 
+}
+
+void SampleClipView::paintOverlay(QPainter& p, const QColor& c)
+{
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
 
@@ -340,25 +358,8 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		p.setPen(markerColor());
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
-	// recording sample tracks is not possible at the moment
-
-	/* if( m_clip->isRecord() )
-	{
-		p.setFont( pointSize<7>( p.font() ) );
-
-		p.setPen( textShadowColor() );
-		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
-		p.setPen( textColor() );
-		p.drawText( 9, p.fontMetrics().height(), "Rec" );
-
-		p.setBrush( QBrush( textColor() ) );
-		p.drawEllipse( 4, 5, 4, 4 );
-	}*/
-
-	p.end();
-
-	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
 }
+
 
 
 

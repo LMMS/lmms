@@ -98,6 +98,93 @@ auto resolveSource(const QString& name) -> QString
 	return {};
 }
 
+auto resolutionVariant(const QString& source, qreal dpr) -> QString
+{
+	if (dpr > 1 && !source.isEmpty() && !source.endsWith(".svg", Qt::CaseInsensitive)
+		&& !QFileInfo(source).completeBaseName().endsWith("@2x"))
+	{
+		const int dot = source.lastIndexOf('.');
+		const QString vectorSource = source.left(dot) + ".svg";
+		const QString highRes = source.left(dot) + "@2x" + source.mid(dot);
+		if (QFile::exists(vectorSource)) { return vectorSource; }
+		else
+		{
+			QImageReader highReader(highRes);
+			if (highReader.canRead()) { return highRes; }
+		}
+	}
+	return source;
+}
+
+struct IconSource
+{
+	QImage image;
+	QSize natural;
+	std::unique_ptr<QSvgRenderer> svg;
+};
+
+auto readIconSource(const QString& source, const QString& selectedSource, const char* const* xpm) -> IconSource
+{
+	IconSource data;
+	if (xpm)
+	{
+		data.image = QImage(xpm);
+		data.natural = data.image.size();
+	}
+	else if (!source.isEmpty())
+	{
+		QImageReader reader(source);
+		if (selectedSource.endsWith(".svg", Qt::CaseInsensitive) || reader.format().toLower() == "svg")
+		{
+			data.svg = std::make_unique<QSvgRenderer>(selectedSource);
+			if (data.svg->isValid()) { data.natural = data.svg->defaultSize(); }
+		}
+		else
+		{
+			data.natural = reader.size();
+			// An explicitly named @2x source also retains its base logical dimensions.
+			if (QFileInfo(source).completeBaseName().endsWith("@2x")) { data.natural /= 2; }
+		}
+	}
+	return data;
+}
+
+auto rasterizeIcon(IconSource& data, const QString& selectedSource, const char* const* xpm,
+	const QSize& raster, qreal dpr) -> QPixmap
+{
+	if (data.svg)
+	{
+		data.image = QImage(raster, QImage::Format_ARGB32_Premultiplied);
+		data.image.setDevicePixelRatio(dpr);
+		data.image.fill(Qt::transparent);
+		QPainter painter(&data.image);
+		// Fill the ceil-rounded raster. Consumers draw it into the separately retained
+		// logical target, so rounding cannot introduce transparent layout margins.
+		data.svg->render(&painter, QRectF(QPointF(), QSizeF(raster) / dpr));
+	}
+	else
+	{
+		if (!xpm) { data.image = QImage(selectedSource); }
+		data.image = data.image.scaled(raster, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		data.image.setDevicePixelRatio(dpr);
+	}
+	return QPixmap::fromImage(data.image);
+}
+
+auto restoreCachedResource(const QString& key, PixmapResource& result) -> bool
+{
+	if (QPixmapCache::find(key, &result.pixmap))
+	{
+		if (const auto* description = resourceDescriptions.object(result.pixmap.cacheKey()))
+		{
+			result.logicalSize = description->logicalSize;
+			result.rasterSource = description->rasterSource;
+			return true;
+		}
+	}
+	return false;
+}
+
 void remember(const PixmapResource& resource)
 {
 	if (resource.pixmap.isNull()) { return; }
@@ -120,20 +207,8 @@ auto getIconResource(std::string_view name, const PixmapRequest& request, const 
 	const qreal dpr = std::isfinite(request.devicePixelRatio) && request.devicePixelRatio > 0
 		? request.devicePixelRatio : 1.0;
 	const QString source = xpm ? QString() : resolveSource(QString::fromUtf8(name.data(), name.size()));
-	QString selectedSource = xpm ? "xpm:" + QString::fromUtf8(name.data(), name.size()) : source;
-	if (dpr > 1 && !source.isEmpty() && !source.endsWith(".svg", Qt::CaseInsensitive)
-		&& !QFileInfo(source).completeBaseName().endsWith("@2x"))
-	{
-		const int dot = source.lastIndexOf('.');
-		const QString vectorSource = source.left(dot) + ".svg";
-		const QString highRes = source.left(dot) + "@2x" + source.mid(dot);
-		if (QFile::exists(vectorSource)) { selectedSource = vectorSource; }
-		else
-		{
-			QImageReader highReader(highRes);
-			if (highReader.canRead()) { selectedSource = highRes; }
-		}
-	}
+	const QString selectedSource = xpm ? "xpm:" + QString::fromUtf8(name.data(), name.size())
+		: resolutionVariant(source, dpr);
 	const auto cacheKeyFor = [&](QSize size) {
 		return QStringLiteral("lmms:%1:%2:%3:%4:%5")
 			.arg(selectedSource).arg(quintptr(xpm), 0, 16)
@@ -141,41 +216,11 @@ auto getIconResource(std::string_view name, const PixmapRequest& request, const 
 			.arg(QString::number(dpr, 'g', std::numeric_limits<qreal>::max_digits10));
 	};
 	const QString key = cacheKeyFor(request.logicalSize);
-	if (QPixmapCache::find(key, &result.pixmap))
-	{
-		if (const auto* description = resourceDescriptions.object(result.pixmap.cacheKey()))
-		{
-			result.logicalSize = description->logicalSize;
-			result.rasterSource = description->rasterSource;
-			return result;
-		}
-	}
-	QImage image;
-	QSize natural;
-	std::unique_ptr<QSvgRenderer> svg;
-	if (xpm)
-	{
-		image = QImage(xpm);
-		result.rasterSource = image;
-		natural = image.size();
-	}
-	else if (!source.isEmpty())
-	{
-		QImageReader reader(source);
-		if (selectedSource.endsWith(".svg", Qt::CaseInsensitive) || reader.format().toLower() == "svg")
-		{
-			svg = std::make_unique<QSvgRenderer>(selectedSource);
-			if (svg->isValid()) { natural = svg->defaultSize(); }
-		}
-		else
-		{
-			natural = reader.size();
-			// An explicitly named @2x source also retains its base logical dimensions.
-			if (QFileInfo(source).completeBaseName().endsWith("@2x")) { natural /= 2; }
-		}
-	}
-	result.logicalSize = targetSize(natural, request.logicalSize);
-	if (natural.isEmpty() || result.logicalSize.isEmpty())
+	if (restoreCachedResource(key, result)) { return result; }
+	auto data = readIconSource(source, selectedSource, xpm);
+	if (xpm) { result.rasterSource = data.image; }
+	result.logicalSize = targetSize(data.natural, request.logicalSize);
+	if (data.natural.isEmpty() || result.logicalSize.isEmpty())
 	{
 		qWarning() << "Cannot load icon resource:" << QString::fromUtf8(name.data(), name.size());
 		result.logicalSize = QSize(1, 1);
@@ -190,23 +235,7 @@ auto getIconResource(std::string_view name, const PixmapRequest& request, const 
 	const QString canonicalKey = cacheKeyFor(result.logicalSize);
 	if (!QPixmapCache::find(canonicalKey, &result.pixmap))
 	{
-		if (svg)
-		{
-			image = QImage(raster, QImage::Format_ARGB32_Premultiplied);
-			image.setDevicePixelRatio(dpr);
-			image.fill(Qt::transparent);
-			QPainter painter(&image);
-			// Fill the ceil-rounded raster. Consumers draw it into the separately retained
-			// logical target, so rounding cannot introduce transparent layout margins.
-			svg->render(&painter, QRectF(QPointF(), QSizeF(raster) / dpr));
-		}
-		else
-		{
-			if (!xpm) { image = QImage(selectedSource); }
-			image = image.scaled(raster, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-			image.setDevicePixelRatio(dpr);
-		}
-		result.pixmap = QPixmap::fromImage(image);
+		result.pixmap = rasterizeIcon(data, selectedSource, xpm, raster, dpr);
 		QPixmapCache::insert(canonicalKey, result.pixmap);
 	}
 	if (key != canonicalKey) { QPixmapCache::insert(key, result.pixmap); }
