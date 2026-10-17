@@ -101,8 +101,9 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 		dot.fill(Qt::transparent);
 		{
 			QPainter painter(&dot);
+			const qreal rowHeight = resource.pixmap.height() / 2.0;
 			painter.drawPixmap(QRect(QPoint(), size), resource.pixmap,
-				QRectF(0, 0, resource.pixmap.width(), resource.pixmap.height() / 2.0));
+				QRectF(0, dotLabel->isEnabled() ? 0 : rowHeight, resource.pixmap.width(), rowHeight));
 		}
 		dotLabel->setFixedSize(size);
 		dotLabel->setPixmap(dot);

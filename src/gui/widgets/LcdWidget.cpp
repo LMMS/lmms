@@ -150,7 +150,9 @@ void LcdWidget::paintEvent( QPaintEvent* )
 
 	QRect cellRect( 0, 0, m_cellWidth, m_cellHeight );
 
-	const qreal scaleX = qreal(m_lcdPixmap.width()) / std::max(1, charsPerPixmap * m_cellWidth);
+	// The sprite has twelve character cells followed by one blank margin cell.
+	// Include that last cell when mapping logical coordinates into the raster.
+	const qreal scaleX = qreal(m_lcdPixmap.width()) / std::max(1, (charsPerPixmap + 1) * m_cellWidth);
 	const qreal scaleY = qreal(m_lcdPixmap.height()) / std::max(1, 2 * m_cellHeight);
 	auto srcRect = [scaleX, scaleY](int x, int y, int w, int h) -> QRectF
 	{
@@ -297,7 +299,7 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 	m_cachedDpr = Dpi::effectiveDevicePixelRatio(this);
 	m_lcdPixmap = embed::getIconPixmap(QString("lcd_" + style).toUtf8().constData(), m_cachedDpr);
 	const QSize logicalLcdSize = embed::logicalSize(m_lcdPixmap);
-	m_cellWidth = logicalLcdSize.width() / LcdWidget::charsPerPixmap;
+	m_cellWidth = logicalLcdSize.width() / (LcdWidget::charsPerPixmap + 1);
 	m_cellHeight = logicalLcdSize.height() / 2;
 
 	m_marginWidth =  m_cellWidth / 2;

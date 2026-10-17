@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QPainter>
 #include <QImage>
+#include <QLabel>
 #include <QtTest>
 #include "DpiContext.h"
 #include "Engine.h"
@@ -33,6 +34,7 @@
 #include "PianoView.h"
 #include "PixmapButton.h"
 #include "LcdWidget.h"
+#include "LcdFloatSpinBox.h"
 #include "Knob.h"
 #include "embed.h"
 
@@ -95,14 +97,30 @@ private slots:
 		QCOMPARE(after.size(), before.size());
 		QVERIFY(after != before);
 	}
+	void lcdSpriteAndLogicalGeometry_data()
+	{
+		QTest::addColumn<int>("cellWidth");
+		QTest::newRow("small") << 6;
+		QTest::newRow("toolbar") << 11;
+		QTest::newRow("wide") << 13;
+	}
 	void lcdSpriteAndLogicalGeometry()
 	{
+		QFETCH(int, cellWidth);
 		QTemporaryDir directory;
-		QImage sprite(36, 10, QImage::Format_ARGB32);
-		sprite.fill(Qt::red);
+		constexpr int cellHeight = 9;
+		// Real themes contain 0..9, a blank, a minus, and a separate margin cell.
+		QImage sprite(13 * cellWidth, 2 * cellHeight, QImage::Format_ARGB32);
+		auto color = [](int cell, bool enabled) {
+			return QColor::fromRgba(QColor::fromHsv(cell * 27, 255, enabled ? 255 : 128).rgba());
+		};
 		{
 			QPainter painter(&sprite);
-			painter.fillRect(0, 5, 36, 5, Qt::blue);
+			for (int cell = 0; cell < 13; ++cell)
+			{
+				painter.fillRect(cell * cellWidth, 0, cellWidth, cellHeight, color(cell, true));
+				painter.fillRect(cell * cellWidth, cellHeight, cellWidth, cellHeight, color(cell, false));
+			}
 		}
 		QVERIFY(sprite.save(directory.filePath("lcd_dpitest.png")));
 		const auto previous = QDir::searchPaths("artwork");
@@ -110,16 +128,73 @@ private slots:
 		{
 			QWidget window;
 			LcdWidget lcd(1, "dpitest", &window);
-			lcd.setValue(5);
+			lcd.setSeamless(true, true);
+			lcd.addTextForValue(10, " ");
+			lcd.addTextForValue(11, "-");
 			window.show();
 			QCoreApplication::processEvents();
-			QCOMPARE(lcd.cellHeight(), 5);
-			const QSize logical = lcd.size();
-			const QImage enabled = lcd.grab().toImage();
+			QCOMPARE(lcd.cellHeight(), cellHeight);
+			QCOMPARE(lcd.size(), QSize(cellWidth, cellHeight + 2));
+			const qreal dpr = Dpi::effectiveDevicePixelRatio(&lcd);
+			for (bool enabled : {true, false})
+			{
+				lcd.setEnabled(enabled);
+				QCoreApplication::processEvents();
+				for (int cell = 0; cell < 12; ++cell)
+				{
+					lcd.setValue(cell);
+					const QImage rendered = lcd.grab().toImage();
+					for (int x : {1, cellWidth - 2})
+					{
+						QCOMPARE(rendered.pixelColor(qFloor((x + 0.5) * dpr), qFloor(5.5 * dpr)), color(cell, enabled));
+					}
+				}
+			}
+			lcd.setSeamless(false, false);
+			lcd.setValue(9);
+			const QImage withMargins = lcd.grab().toImage();
+			QCOMPARE(withMargins.pixelColor(qFloor(2.5 * dpr), qFloor(5.5 * dpr)), color(12, false));
+		}
+		QDir::setSearchPaths("artwork", previous);
+	}
+
+	void lcdDecimalPointEnabledState()
+	{
+		QTemporaryDir directory;
+		QImage sprite(39, 10, QImage::Format_ARGB32);
+		sprite.fill(Qt::green);
+		QVERIFY(sprite.save(directory.filePath("lcd_dpitest.png")));
+		QImage dot(4, 10, QImage::Format_ARGB32);
+		{
+			QPainter painter(&dot);
+			painter.fillRect(0, 0, 4, 5, Qt::red);
+			painter.fillRect(0, 5, 4, 5, Qt::blue);
+		}
+		QVERIFY(dot.save(directory.filePath("lcd_dpitest_dot.png")));
+		const auto previous = QDir::searchPaths("artwork");
+		QDir::setSearchPaths("artwork", {directory.path()});
+		{
+			QWidget window;
+			FloatModel model(129.75f, 0.f, 999.f, 0.01f);
+			LcdFloatSpinBox lcd(3, 2, "dpitest", "", &window);
+			lcd.setModel(&model);
+			window.show();
+			QCoreApplication::processEvents();
+			auto* label = lcd.findChild<QLabel*>();
+			QVERIFY(label);
+			QCOMPARE(label->size(), QSize(4, 5));
+			const qreal dpr = Dpi::effectiveDevicePixelRatio(label);
+			QCOMPARE(label->grab().toImage().pixelColor(qFloor(1.5 * dpr), qFloor(2.5 * dpr)), QColor(Qt::red));
 			lcd.setEnabled(false);
 			QCoreApplication::processEvents();
-			QCOMPARE(lcd.size(), logical);
-			QVERIFY(lcd.grab().toImage() != enabled);
+			// QLabel styles may gray disabled pixmaps; check the selected source row.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+			const QPixmap disabledDot = label->pixmap();
+#else
+			const QPixmap disabledDot = label->pixmap(Qt::ReturnByValue);
+#endif
+			QCOMPARE(disabledDot.toImage().pixelColor(qFloor(1.5 * dpr), qFloor(2.5 * dpr)), QColor(Qt::blue));
+			QCOMPARE(model.value(), 129.75f);
 		}
 		QDir::setSearchPaths("artwork", previous);
 	}
