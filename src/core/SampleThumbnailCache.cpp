@@ -23,16 +23,13 @@
  *
  */
 
-#include "SampleThumbnail.h"
-
-#include <QFileInfo>
-#include <QPainter>
+#include "SampleThumbnailCache.h"
 
 namespace {
 constexpr auto AggregationPerZoomStep = 4;
 } // namespace
 
-namespace lmms::gui {
+namespace lmms {
 
 SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 	: m_sampleCount{buffer.size()}
@@ -90,49 +87,6 @@ auto SampleThumbnailCache::Thumbnail::compress(f_cnt_t outputWidth) const -> Thu
 	}
 
 	return compressedThumbnail;
-}
-
-void SampleThumbnailCache::visualize(VisualizeParameters parameters, QPainter& painter)
-{
-	assert(0 <= parameters.sampleStart && parameters.sampleStart < parameters.sampleEnd && parameters.sampleEnd <= 1
-		&& "invalid sample range");
-
-	if (parameters.rect.width() == 0) { return; }
-
-	// Get the number of samples that will be drawn in this rectangle
-	const auto numSamples = (parameters.sampleEnd - parameters.sampleStart) * m_sampleCount;
-
-	// For our rectangle, how many samples each pixel has
-	const auto samplesPerPixel = numSamples / parameters.rect.width();
-
-	// We want a thumbnail that has the same SPP as our own rectangle
-	// However, it needs to cover the full sample
-	const auto nearestThumbnail = nearestThumbnailForWidth(std::round(m_sampleCount / samplesPerPixel));
-
-	const auto yScale = parameters.rect.height() / 2 * parameters.amplification;
-	const auto yCenter = parameters.rect.center().y();
-
-	// Calculate how far along we should be in the thumbnail based on where we begin and end in the sample
-	const auto nearestThumbnailStart = parameters.sampleStart * nearestThumbnail.width();
-	const auto nearestThumbnailEnd = parameters.sampleEnd * nearestThumbnail.width();
-	const auto nearestThumbnailRange = nearestThumbnailEnd - nearestThumbnailStart;
-
-	painter.save();
-	painter.setRenderHint(QPainter::Antialiasing, true);
-
-	for (auto out = 0; out < parameters.rect.width(); ++out)
-	{
-		const auto peakStart = nearestThumbnailStart + (out / parameters.rect.width()) * nearestThumbnailRange;
-		const auto peakEnd = nearestThumbnailStart + ((out + 1) / parameters.rect.width()) * nearestThumbnailRange;
-		const auto peak = std::accumulate(nearestThumbnail.begin() + peakStart, nearestThumbnail.begin() + peakEnd, Thumbnail::Peak{});
-
-		const auto yMin = yCenter - peak.min * yScale;
-		const auto yMax = yCenter - peak.max * yScale;
-		const auto x = parameters.rect.x() + out;
-		painter.drawLine(x, yMin, x, yMax);
-	}
-
-	painter.restore();
 }
 
 } // namespace lmms::gui

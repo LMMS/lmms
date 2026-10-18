@@ -52,7 +52,7 @@
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "SampleClip.h"
-#include "SampleThumbnail.h"
+#include "SampleThumbnailRenderer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
@@ -1214,7 +1214,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 			const auto& sample = m_ghostSample->sample();
 
-			const auto param = SampleThumbnailCache::VisualizeParameters{
+			const auto param = SampleThumbnailRenderer::VisualizeParameters{
+				.cache = &m_sampleThumbnail,
 				.rect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
 				.sampleStart = static_cast<double>(sample.startFrame()) / sample.sampleSize(),
 				.sampleEnd = static_cast<double>(sample.endFrame()) / sample.sampleSize(),
@@ -1222,7 +1223,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				.reversed = sample.reversed()
 			};
 
-			m_sampleThumbnail.visualize(param, p);
+			SampleThumbnailRenderer::visualize(param, p);
 		}
 
 		// draw ghost notes

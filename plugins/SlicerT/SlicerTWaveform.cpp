@@ -30,7 +30,7 @@
 #include <QPainterPath>
 
 #include "DeprecationHelper.h"
-#include "SampleThumbnail.h"
+#include "SampleThumbnailRenderer.h"
 #include "SlicerT.h"
 #include "SlicerTView.h"
 #include "embed.h"
@@ -121,15 +121,15 @@ void SlicerTWaveform::drawSeekerWaveform()
 
 	m_sampleThumbnail = SampleThumbnailCache{*sample.buffer()};
 
-	const auto param = SampleThumbnailCache::VisualizeParameters{
+	const auto param = SampleThumbnailRenderer::VisualizeParameters{
+		.cache = &m_sampleThumbnail,
 		.sampleStart = static_cast<double>(sample.startFrame()) / sample.sampleSize(),
 		.sampleEnd = static_cast<double>(sample.endFrame()) / sample.sampleSize(),
 		.amplification = sample.amplification(),
 		.reversed = sample.reversed()
 	};
 
-	m_sampleThumbnail.visualize(param, brush);
-
+	SampleThumbnailRenderer::visualize(param, brush);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -188,7 +188,8 @@ void SlicerTWaveform::drawEditorWaveform()
 
 	m_sampleThumbnail = SampleThumbnailCache{*sample.buffer()};
 
-	const auto param = SampleThumbnailCache::VisualizeParameters{
+	const auto param = SampleThumbnailRenderer::VisualizeParameters{
+		.cache = &m_sampleThumbnail,
 		.rect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
 		.sampleStart = static_cast<double>(startFrame) / sample.sampleSize(),
 		.sampleEnd = static_cast<double>(endFrame) / sample.sampleSize(),
@@ -196,7 +197,7 @@ void SlicerTWaveform::drawEditorWaveform()
 		.reversed = sample.reversed(),
 	};
 
-	m_sampleThumbnail.visualize(param, brush);
+	SampleThumbnailRenderer::visualize(param, brush);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);

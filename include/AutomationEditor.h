@@ -33,11 +33,11 @@
 #include "ComboBoxModel.h"
 #include "Editor.h"
 #include "JournallingObject.h"
+#include "LmmsTypes.h"
 #include "MidiClip.h"
 #include "SampleClip.h"
+#include "SampleThumbnailCache.h"
 #include "TimePos.h"
-#include "LmmsTypes.h"
-#include "SampleThumbnail.h"
 
 class QPushButton;
 class QScrollBar;

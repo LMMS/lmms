@@ -23,22 +23,14 @@
  *
  */
 
-#ifndef LMMS_SAMPLE_THUMBNAIL_H
-#define LMMS_SAMPLE_THUMBNAIL_H
-
-#include <QDateTime>
-#include <QRect>
+#ifndef LMMS_SAMPLE_THUMBNAIL_CACHE_H
+#define LMMS_SAMPLE_THUMBNAIL_CACHE_H
 
 #include "SampleBuffer.h"
 #include "lmms_export.h"
 
-class QPainter;
-
 namespace lmms {
 class Sample;
-}
-
-namespace lmms::gui {
 
 /**
    Allows for visualizing sample data.
@@ -54,25 +46,6 @@ namespace lmms::gui {
 class LMMS_EXPORT SampleThumbnailCache
 {
 public:
-	struct VisualizeParameters
-	{
-		//!< A rectangle that covers the entire range of samples from [@a sampleStart, @a sampleEnd)
-		//!< @a rect must share the same coordinate system as that of the painter in which it is drawn with.
-		QRectF rect;
-
-		//!< Where the sample begins for drawing.
-		double sampleStart = 0.f;
-
-		//!< Where the sample ends for drawing.
-		double sampleEnd = 1.f;
-
-		//!< The amount of amplification to apply to the waveform.
-		float amplification = 1.0f;
-
-		//!< Determines if the waveform is drawn in reverse or not.
-		bool reversed = false;
-	};
-
 	class Thumbnail
 	{
 	public:
@@ -125,8 +98,9 @@ public:
 	 * @note This function is not thread safe.
 	 */
 	auto nearestThumbnailForWidth(f_cnt_t width) -> Thumbnail&;
-
-	void visualize(VisualizeParameters parameters, QPainter& painter);
+	
+	//! @returns The number of samples in the original audio buffer.
+	auto sampleCount() -> f_cnt_t { return m_sampleCount; }
 
 private:
 	// Thumbnails are to be in descending order (highest to lowest resolution, or longest to shortest width)
@@ -137,4 +111,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // LMMS_SAMPLE_THUMBNAIL_H
+#endif // LMMS_SAMPLE_THUMBNAIL_CACHE_H

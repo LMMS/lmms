@@ -28,7 +28,7 @@
 #include <QElapsedTimer>
 #include <QWidget>
 
-#include "SampleThumbnail.h"
+#include "SampleThumbnailCache.h"
 
 namespace lmms {
 

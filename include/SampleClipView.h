@@ -27,7 +27,7 @@
 
 #include "ClipView.h"
 
-#include "SampleThumbnail.h"
+#include "SampleThumbnailCache.h"
 
 namespace lmms
 {

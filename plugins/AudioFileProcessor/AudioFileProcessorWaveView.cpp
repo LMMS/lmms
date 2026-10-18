@@ -27,7 +27,7 @@
 #include "Sample.h"
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
-#include "SampleThumbnail.h"
+#include "SampleThumbnailRenderer.h"
 #include "FontHelper.h"
 
 
@@ -347,7 +347,8 @@ void AudioFileProcessorWaveView::updateGraph()
 
 	m_sampleThumbnail = SampleThumbnailCache{*m_sample->buffer()};
 
-	const auto param = SampleThumbnailCache::VisualizeParameters{
+	const auto param = SampleThumbnailRenderer::VisualizeParameters{
+		.cache = &m_sampleThumbnail,
 		.rect = m_graph.rect(),
 		.sampleStart = static_cast<double>(m_from) / m_sample->sampleSize(),
 		.sampleEnd = static_cast<double>(m_to) / m_sample->sampleSize(),
@@ -355,7 +356,7 @@ void AudioFileProcessorWaveView::updateGraph()
 		.reversed = m_sample->reversed(),
 	};
 
-	m_sampleThumbnail.visualize(param, p);
+	SampleThumbnailRenderer::visualize(param, p);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)
