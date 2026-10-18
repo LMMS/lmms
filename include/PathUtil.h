@@ -25,9 +25,12 @@
 #ifndef LMMS_PATHUTIL_H
 #define LMMS_PATHUTIL_H
 
-#include "lmms_export.h"
+#include <filesystem>
+#include <string_view>
 
 #include <QDir>
+
+#include "lmms_export.h"
 
 namespace lmms::PathUtil
 {
@@ -68,6 +71,14 @@ namespace lmms::PathUtil
 	//! Defaults to an absolute path if all bases fail.
 	QString LMMS_EXPORT toShortestRelative(const QString& input, bool allowLocal = false);
 
+	//! Converts a UTF-8 encoded string to std::filesystem::path
+	LMMS_EXPORT auto stringToPath(std::string_view path) -> std::filesystem::path;
+
+	//! Converts QString to std::filesystem::path
+	LMMS_EXPORT auto stringToPath(const QString& path) -> std::filesystem::path;
+
+	//! Converts std::filesystem::path to a UTF-8 encoded std::string
+	LMMS_EXPORT auto pathToString(const std::filesystem::path& path) -> std::string;
 } // namespace lmms::PathUtil
 
 #endif // LMMS_PATHUTIL_H
