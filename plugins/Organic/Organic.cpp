@@ -220,8 +220,7 @@ QString OrganicInstrument::nodeName() const
 
 
 
-void OrganicInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void OrganicInstrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out)
 {
 	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -285,21 +284,21 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 		newOsc->oscRight = oscs_r[0];
 	}
 
+	assert(out.has_value());
 	auto osc = static_cast<oscPtr*>(_n->m_pluginData);
-	osc->oscLeft->update(_working_buffer + offset, frames, 0);
-	osc->oscRight->update(_working_buffer + offset, frames, 1);
+	osc->oscLeft->update(out->buffer(0).subspan(offset, frames));
+	osc->oscRight->update(out->buffer(1).subspan(offset, frames));
 
 	// -- fx section --
 
 	// fxKnob is [0;1]
 	float t =  m_fx1Model.value();
 
+	// FIXME: This should probably operate from offset to frames+offset, not 0 to frames+offset
 	for (auto i = std::size_t{0}; i < frames + offset; i++)
 	{
-		_working_buffer[i][0] = waveshape( _working_buffer[i][0], t ) *
-						m_volModel.value() / 100.0f;
-		_working_buffer[i][1] = waveshape( _working_buffer[i][1], t ) *
-						m_volModel.value() / 100.0f;
+		(*out)[0][i] = waveshape((*out)[0][i], t) * m_volModel.value() / 100.0f;
+		(*out)[1][i] = waveshape((*out)[1][i], t) * m_volModel.value() / 100.0f;
 	}
 
 	// -- --

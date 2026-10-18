@@ -137,7 +137,7 @@ void SlicerTView::clearSlices()
 void SlicerTView::exportMidi()
 {
 	using namespace Clipboard;
-	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
+	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 
 	DataFile dataFile(DataFile::Type::ClipboardData);
 	QDomElement noteList = dataFile.createElement("note-list");
@@ -195,7 +195,10 @@ void SlicerTView::dropEvent(QDropEvent* de)
 	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
 		DataFile dataFile(value.toUtf8());
-		m_slicerTParent->updateFile(dataFile.content().firstChild().toElement().attribute("src"));
+		const auto elem = dataFile.content().firstChild().toElement();
+		const auto file = elem.attribute("src");
+
+		m_slicerTParent->updateFile(file);
 		de->accept();
 		return;
 	}

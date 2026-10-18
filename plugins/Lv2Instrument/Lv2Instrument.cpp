@@ -71,8 +71,8 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 */
 
 
-Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
-	Descriptor::SubPluginFeatures::Key *key) :
+Lv2Instrument::Lv2Instrument(InstrumentTrack* instrumentTrackArg,
+	Descriptor::SubPluginFeatures::Key* key) :
 	Instrument(instrumentTrackArg, &lv2instrument_plugin_descriptor, key,
 #ifdef LV2_INSTRUMENT_USE_MIDI
 		Flag::IsSingleStreamed | Flag::IsMidiBased
@@ -137,7 +137,7 @@ void Lv2Instrument::onSampleRateChanged()
 
 
 
-void Lv2Instrument::saveSettings(QDomDocument &doc, QDomElement &that)
+void Lv2Instrument::saveSettings(QDomDocument& doc, QDomElement& that)
 {
 	Lv2ControlBase::saveSettings(doc, that);
 }
@@ -145,7 +145,7 @@ void Lv2Instrument::saveSettings(QDomDocument &doc, QDomElement &that)
 
 
 
-void Lv2Instrument::loadSettings(const QDomElement &that)
+void Lv2Instrument::loadSettings(const QDomElement& that)
 {
 	Lv2ControlBase::loadSettings(that);
 }
@@ -153,7 +153,7 @@ void Lv2Instrument::loadSettings(const QDomElement &that)
 
 
 
-void Lv2Instrument::loadFile(const QString &file)
+void Lv2Instrument::loadFile(const QString& file)
 {
 	Lv2ControlBase::loadFile(file);
 }
@@ -163,7 +163,7 @@ void Lv2Instrument::loadFile(const QString &file)
 
 #ifdef LV2_INSTRUMENT_USE_MIDI
 bool Lv2Instrument::handleMidiEvent(
-	const MidiEvent &event, const TimePos &time, f_cnt_t offset)
+	const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
 	// this function can be called from GUI threads while the plugin is running
 	// handleMidiInputEvent will use a thread-safe ringbuffer
@@ -177,7 +177,7 @@ bool Lv2Instrument::handleMidiEvent(
 
 // not yet working
 #ifndef LV2_INSTRUMENT_USE_MIDI
-void Lv2Instrument::playNote(NotePlayHandle *nph, SampleFrame*)
+void Lv2Instrument::playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>>)
 {
 }
 #endif
@@ -185,22 +185,20 @@ void Lv2Instrument::playNote(NotePlayHandle *nph, SampleFrame*)
 
 
 
-void Lv2Instrument::play(SampleFrame* buf)
+void Lv2Instrument::play(std::optional<PlanarBufferView<float>> out)
 {
 	copyModelsFromLmms();
 
-	f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
-
-	run(fpp);
+	run(out.value().frames());
 
 	copyModelsToLmms();
-	copyBuffersToLmms(buf, fpp);
+	copyBuffersToLmms(*out);
 }
 
 
 
 
-gui::PluginView* Lv2Instrument::instantiateView(QWidget *parent)
+gui::PluginView* Lv2Instrument::instantiateView(QWidget* parent)
 {
 	return new gui::Lv2InsView(this, parent);
 }
@@ -233,7 +231,7 @@ namespace gui
 */
 
 
-Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
+Lv2InsView::Lv2InsView(Lv2Instrument* _instrument, QWidget* _parent) :
 	InstrumentView(_instrument, _parent),
 	Lv2ViewBase(this, _instrument)
 {
@@ -255,7 +253,7 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 
 
 
-void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
+void Lv2InsView::dragEnterEvent(QDragEnterEvent* _dee)
 {
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
@@ -277,7 +275,7 @@ void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 
 
 
-void Lv2InsView::dropEvent(QDropEvent *_de)
+void Lv2InsView::dropEvent(QDropEvent* _de)
 {
 	const QString type = StringPairDrag::decodeKey(_de);
 	const QString value = StringPairDrag::decodeValue(_de);
@@ -293,7 +291,7 @@ void Lv2InsView::dropEvent(QDropEvent *_de)
 
 
 
-void Lv2InsView::hideEvent(QHideEvent *event)
+void Lv2InsView::hideEvent(QHideEvent* event)
 {
 	closeHelpWindow();
 	QWidget::hideEvent(event);
@@ -316,7 +314,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
+PLUGIN_EXPORT Plugin *lmms_plugin_main(Model* _parent, void* _data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
 	try {

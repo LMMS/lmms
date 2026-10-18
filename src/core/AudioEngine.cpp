@@ -55,8 +55,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-#include "BufferManager.h"
-
 namespace lmms
 {
 
@@ -75,8 +73,8 @@ AudioEngine::AudioEngine(bool renderOnly)
 		std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front()))
 	, m_inputBufferRead(0)
 	, m_inputBufferWrite(1)
-	, m_outputBufferRead(nullptr)
-	, m_outputBufferWrite(nullptr)
+	, m_outputBufferRead(m_framesPerPeriod, 2)
+	, m_outputBufferWrite(m_framesPerPeriod, 2)
 	, m_outputBufferReadIndex(0)
 	, m_workers()
 	, m_numWorkers(QThread::idealThreadCount() - 1)
@@ -89,18 +87,16 @@ AudioEngine::AudioEngine(bool renderOnly)
 	, m_clearSignal(false)
 	, m_sanitizationEnabled(ConfigManager::inst()->value("audioengine", "sanitizemix", "1").toInt())
 {
-	for( int i = 0; i < 2; ++i )
+	for (int i = 0; i < 2; ++i)
 	{
+		constexpr auto initialSamplesPerChannel = DEFAULT_BUFFER_SIZE * 100;
+
 		m_inputBufferFrames[i] = 0;
-		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
-		m_inputBuffer[i] = new SampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
-		zeroSampleFrames(m_inputBuffer[i], m_inputBufferSize[i]);
+		m_inputBufferSource[i].resize(initialSamplesPerChannel * DEFAULT_CHANNELS);
+
+		m_inputBufferChannels[i].push_back(m_inputBufferSource[i].data()); // L
+		m_inputBufferChannels[i].push_back(m_inputBufferSource[i].data() + initialSamplesPerChannel); // R
 	}
-
-	BufferManager::init( m_framesPerPeriod );
-	m_outputBufferRead = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
-	m_outputBufferWrite = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
-
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
@@ -132,12 +128,6 @@ AudioEngine::~AudioEngine()
 
 	delete m_midiClient;
 	delete m_audioDev;
-
-
-	for (const auto& input : m_inputBuffer)
-	{
-		delete[] input;
-	}
 }
 
 
@@ -164,37 +154,40 @@ bool AudioEngine::criticalXRuns() const
 	return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false;
 }
 
-
-
-
-void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
+void AudioEngine::preparePushInputFrames(f_cnt_t framesNeeded)
 {
-	requestChangeInModel();
+	auto& sourceBuffer = m_inputBufferSource[m_inputBufferWrite];
+	auto& channelBuffer = m_inputBufferChannels[m_inputBufferWrite];
+	const auto channels = static_cast<ch_cnt_t>(channelBuffer.size());
+	const auto totalSamplesNeeded = static_cast<std::size_t>(framesNeeded * channels);
 
-	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
-	auto size = m_inputBufferSize[m_inputBufferWrite];
-	SampleFrame* buf = m_inputBuffer[ m_inputBufferWrite ];
-
-	if( frames + _frames > size )
+	// Check if we need to grow the source buffer
+	if (const auto oldSize = sourceBuffer.size(); totalSamplesNeeded > oldSize)
 	{
-		size = std::max(size * 2, frames + _frames);
-		auto ab = new SampleFrame[size];
-		memcpy( ab, buf, frames * sizeof( SampleFrame ) );
-		delete [] buf;
+		const auto newSize = std::max(oldSize * 2, totalSamplesNeeded);
+		const auto newFramesCapacity = static_cast<f_cnt_t>(newSize / channels);
+		const auto oldFramesCapacity = static_cast<f_cnt_t>(oldSize / channels);
+		const auto oldFramesWritten = m_inputBufferFrames[m_inputBufferWrite];
+		assert(oldFramesWritten <= oldFramesCapacity);
 
-		m_inputBufferSize[ m_inputBufferWrite ] = size;
-		m_inputBuffer[ m_inputBufferWrite ] = ab;
+		auto newSourceBuffer = std::vector<float>{};
+		newSourceBuffer.reserve(newSize);
+		for (ch_cnt_t ch = 0; ch < channels; ++ch)
+		{
+			const float* src = sourceBuffer.data() + (ch * oldFramesCapacity);
 
-		buf = ab;
+			// Copy this channel's data from the old buffer
+			const auto it = newSourceBuffer.insert(newSourceBuffer.end(), src, src + oldFramesWritten);
+
+			// Zero the new frames
+			newSourceBuffer.insert(newSourceBuffer.end(), newFramesCapacity - oldFramesWritten, 0.f);
+
+			channelBuffer[ch] = &*it;
+		}
+
+		sourceBuffer = std::move(newSourceBuffer);
 	}
-
-	memcpy( &buf[ frames ], _ab, _frames * sizeof( SampleFrame ) );
-	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
-
-	doneChangeInModel();
 }
-
-
 
 void AudioEngine::renderStageNoteSetup()
 {
@@ -301,11 +294,12 @@ void AudioEngine::renderStageMix()
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Mixing);
 
 	Mixer *mixer = Engine::mixer();
-	mixer->masterMix(m_outputBufferWrite.get());
+	mixer->masterMix(m_outputBufferWrite.allBuffers());
 
-	MixHelpers::multiply(m_outputBufferWrite.get(), m_masterGain, m_framesPerPeriod);
+	MixHelpers::multiply(m_outputBufferWrite.allBuffers(), m_masterGain);
 
-	emit nextAudioBuffer(m_outputBufferRead.get());
+	const auto buffer = m_outputBufferRead.allBuffers();
+	emit nextAudioBuffer(buffer.data(), buffer.channels(), buffer.frames());
 
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
@@ -315,7 +309,7 @@ void AudioEngine::renderStageMix()
 
 
 
-std::span<const SampleFrame> AudioEngine::renderNextPeriod()
+PlanarBufferView<const float> AudioEngine::renderNextPeriod()
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
@@ -331,7 +325,63 @@ std::span<const SampleFrame> AudioEngine::renderNextPeriod()
 	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
 	m_outputBufferReadIndex = 0;
 
-	return {m_outputBufferRead.get(), m_framesPerPeriod};
+	return m_outputBufferRead.allBuffers();
+}
+
+void AudioEngine::renderNextBuffer(InterleavedBufferSpan<float> dst)
+{
+	auto outputBufferRead = m_outputBufferRead.allBuffers();
+	assert(outputBufferRead.channels() == 2); // I don't feel like implementing this for channels != 2
+
+	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
+	{
+		if (m_outputBufferReadIndex == m_framesPerPeriod) { m_outputBufferReadIndex = 0; }
+		if (m_outputBufferReadIndex == 0) { renderNextPeriod(); }
+
+		switch (dst.channels())
+		{
+		case 0:
+			assert(false);
+			break;
+		case 1:
+			dst.sample(0, frame) = (outputBufferRead[0][m_outputBufferReadIndex]
+				+ outputBufferRead[1][m_outputBufferReadIndex]) / 2; // stereo to mono
+			break;
+		case 2:
+			dst.sample(0, frame) = outputBufferRead[0][m_outputBufferReadIndex];
+			dst.sample(1, frame) = outputBufferRead[1][m_outputBufferReadIndex];
+			break;
+		default:
+			dst.sample(0, frame) = outputBufferRead[0][m_outputBufferReadIndex];
+			dst.sample(1, frame) = outputBufferRead[1][m_outputBufferReadIndex];
+			for (auto channel = 2; channel < dst.channels(); ++channel)
+			{
+				dst.sample(channel, frame) = 0.f;
+			}
+			break;
+		}
+
+		++m_outputBufferReadIndex;
+	}
+}
+
+void AudioEngine::renderNextBuffer(PlanarBufferView<float> dst)
+{
+	auto framesCopied = f_cnt_t{0};
+	while (framesCopied < dst.frames())
+	{
+		if (m_outputBufferReadIndex == m_outputBufferRead.frames()) { m_outputBufferReadIndex = 0; }
+		if (m_outputBufferReadIndex == 0) { renderNextPeriod(); }
+
+		const auto framesToCopy = std::min(m_outputBufferRead.frames(), dst.frames() - framesCopied);
+		MixHelpers::copyMixAndZero(
+			PlanarBufferSpan{dst, framesCopied},
+			PlanarBufferSpan{m_outputBufferRead.allBuffers(), m_outputBufferReadIndex, framesToCopy}
+		);
+
+		m_outputBufferReadIndex += framesToCopy;
+		framesCopied += framesToCopy;
+	}
 }
 
 void AudioEngine::swapBuffers()
@@ -341,7 +391,7 @@ void AudioEngine::swapBuffers()
 	m_inputBufferFrames[m_inputBufferWrite] = 0;
 
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
-	zeroSampleFrames(m_outputBufferWrite.get(), m_framesPerPeriod);
+	m_outputBufferWrite.silenceAllChannels();
 }
 
 void AudioEngine::clear()

@@ -269,7 +269,7 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 	if( static_cast<EnvelopeAndLfoParameters::LfoShape>(m_params->m_lfoWaveModel.value()) ==
 				EnvelopeAndLfoParameters::LfoShape::UserDefinedWave )
 	{
-		if (m_params->m_userWave->size() <= 1)
+		if (m_params->m_userWave->frames() <= 1)
 		{
 			TextFloat::displayMessage( tr( "Hint" ),
 				tr( "Drag and drop a sample into this window." ),

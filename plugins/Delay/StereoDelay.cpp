@@ -56,17 +56,17 @@ StereoDelay::~StereoDelay()
 
 
 
-void StereoDelay::tick( SampleFrame& frame )
+void StereoDelay::tick(float& sampleL, float& sampleR)
 {
-	m_writeIndex = ( m_writeIndex + 1 ) % ( int )m_maxLength;
+	m_writeIndex = (m_writeIndex + 1) % m_maxLength;
 	int readIndex = m_writeIndex - static_cast<int>(m_length);
-	if (readIndex < 0 ) { readIndex += m_maxLength; }
-	float lOut = m_buffer[ readIndex ][ 0 ];
-	float rOut = m_buffer[ readIndex ] [1 ];
-	m_buffer[ m_writeIndex ][ 0 ] = frame[ 0 ] + ( lOut * m_feedback );
-	m_buffer[ m_writeIndex ][ 1 ] = frame[ 1 ] + ( rOut * m_feedback );
-	frame[ 0 ] = lOut;
-	frame[ 1 ] = rOut;
+	if (readIndex < 0) { readIndex += m_maxLength; }
+	float lOut = m_buffer[readIndex][0];
+	float rOut = m_buffer[readIndex][1];
+	m_buffer[m_writeIndex][0] = sampleL + (lOut * m_feedback);
+	m_buffer[m_writeIndex][1] = sampleR + (rOut * m_feedback);
+	sampleL = lOut;
+	sampleR = rOut;
 }
 
 

@@ -57,7 +57,7 @@ public:
 	}
 
 private:
-	void writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames) override;
+	void writeBuffer(PlanarBufferView<const float> buffer) override;
 	vorbis_info m_vi;
 	vorbis_dsp_state m_vds;
 	vorbis_comment m_vc;

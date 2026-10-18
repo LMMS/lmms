@@ -29,6 +29,7 @@
 #include <QProcess>
 #include <QRecursiveMutex>
 
+#include "AudioBufferSpan.h"
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
 #include "LmmsTypes.h"
@@ -38,7 +39,6 @@ namespace lmms
 
 class MidiEvent;
 class RemotePlugin;
-class SampleFrame;
 
 class ProcessWatcher : public QThread
 {
@@ -98,7 +98,8 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	bool process( const SampleFrame* _in_buf, SampleFrame* _out_buf );
+	bool process(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out);
+	bool process(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out, float wet, float dry);
 
 	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
 
@@ -142,21 +143,26 @@ public:
 		m_commMutex.unlock();
 	}
 
+	ch_cnt_t inputCount() const
+	{
+		return static_cast<ch_cnt_t>(m_audioBufferAccessIn.size());
+	}
+
+	ch_cnt_t outputCount() const
+	{
+		return static_cast<ch_cnt_t>(m_audioBufferAccessOut.size());
+	}
+
 public slots:
 	virtual void showUI();
 	virtual void hideUI();
 
 protected:
-	inline void setSplittedChannels( bool _on )
-	{
-		m_splitChannels = _on;
-	}
-
-
 	bool m_failed;
-private:
-	void resizeSharedProcessingMemory();
 
+private:
+	bool processImpl(PlanarBufferSpan<const float> in, PlanarBufferSpan<float> out);
+	void resizeSharedProcessingMemory();
 
 	QProcess m_process;
 	ProcessWatcher m_watcher;
@@ -165,13 +171,11 @@ private:
 	QStringList m_args;
 
 	QRecursiveMutex m_commMutex;
-	bool m_splitChannels;
 
-	SharedMemory<float[]> m_audioBuffer;
-	std::size_t m_audioBufferSize;
-
-	int m_inputCount;
-	int m_outputCount;
+	SharedMemory<float[]> m_audioBuffer; // NOLINT
+	std::vector<float*> m_audioBufferAccessIn;  //!< size() is input count
+	std::vector<float*> m_audioBufferAccessOut; //!< size() is output count
+	f_cnt_t m_frames = 0;
 
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;

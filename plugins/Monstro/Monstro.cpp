@@ -107,7 +107,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 }
 
 
-void MonstroSynth::renderOutput( f_cnt_t _frames, SampleFrame* _buf  )
+void MonstroSynth::renderOutput(PlanarBufferSpan<float> out)
 {
 	float modtmp; // temp variable for freq modulation
 // macros for modulating with env/lfos
@@ -340,10 +340,10 @@ void MonstroSynth::renderOutput( f_cnt_t _frames, SampleFrame* _buf  )
 	float sub;
 
 	// render modulators: envelopes, lfos
-	updateModulators( m_env[0].data(), m_env[1].data(), m_lfo[0].data(), m_lfo[1].data(), _frames );
+	updateModulators(m_env[0].data(), m_env[1].data(), m_lfo[0].data(), m_lfo[1].data(), out.frames());
 
 	// begin for loop
-	for( f_cnt_t f = 0; f < _frames; ++f )
+	for (f_cnt_t f = 0; f < out.frames(); ++f)
 	{
 /*	// debug code
 		if( f % 10 == 0 ) {
@@ -662,8 +662,8 @@ void MonstroSynth::renderOutput( f_cnt_t _frames, SampleFrame* _buf  )
 		sample_t L = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		sample_t R = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
 
-		_buf[f][0] = std::lerp(L, m_l_last, m_parent->m_integrator);
-		_buf[f][1] = std::lerp(R, m_r_last, m_parent->m_integrator);
+		out[0][f] = std::lerp(L, m_l_last, m_parent->m_integrator);
+		out[1][f] = std::lerp(R, m_r_last, m_parent->m_integrator);
 
 		m_l_last = L;
 		m_r_last = R;
@@ -1058,8 +1058,7 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-void MonstroInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void MonstroInstrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out)
 {
 	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -1071,9 +1070,9 @@ void MonstroInstrument::playNote( NotePlayHandle * _n,
 
 	auto ms = static_cast<MonstroSynth*>(_n->m_pluginData);
 
-	ms->renderOutput( frames, _working_buffer + offset );
+	ms->renderOutput(PlanarBufferSpan{out.value(), offset, frames});
 
-	//applyRelease( _working_buffer, _n ); // we have our own release
+	//applyRelease(*out, _n); // we have our own release
 }
 
 void MonstroInstrument::deleteNotePluginData( NotePlayHandle * _n )

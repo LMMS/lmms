@@ -52,6 +52,7 @@ AudioSdl::AudioSdl(bool& _success_ful, AudioEngine* _audioEngine)
 		return;
 	}
 
+	m_audioHandle = {};
 	m_audioHandle.freq = sampleRate();
 	m_audioHandle.format = AUDIO_F32SYS;	// we want it in byte-order
 						// of system, so we don't have
@@ -63,7 +64,7 @@ AudioSdl::AudioSdl(bool& _success_ful, AudioEngine* _audioEngine)
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
 
-  	SDL_AudioSpec actual; 
+	SDL_AudioSpec actual;
 
 	const auto playbackDevice = ConfigManager::inst()->value(SectionSDL, PlaybackDeviceSDL).toStdString();
 	const bool isDefaultPlayback = playbackDevice.empty();
@@ -180,11 +181,20 @@ void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
 	_this->sdlInputAudioCallback( _buf, _len );
 }
 
-void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
-	auto samples_buffer = (SampleFrame*)_buf;
-	f_cnt_t frames = _len / sizeof ( SampleFrame );
+void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len)
+{
+	const auto channels = this->channels();
+	assert(channels > 0);
 
-	audioEngine()->pushInputFrames (samples_buffer, frames);
+	const auto frames = static_cast<f_cnt_t>(_len / (sizeof(float) * channels));
+
+	const auto buffer = InterleavedBufferSpan {
+		reinterpret_cast<const float*>(_buf),
+		channels,
+		frames
+	};
+
+	audioEngine()->pushInputFrames(buffer);
 }
 
 QString AudioSdl::setupWidget::s_systemDefaultDevice = AudioDeviceSetupWidget::tr("[System Default]");

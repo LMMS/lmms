@@ -25,9 +25,8 @@
 #ifndef LMMS_SAMPLE_RECORD_HANDLE_H
 #define LMMS_SAMPLE_RECORD_HANDLE_H
 
-#include <QList>
-#include <QPair>
 #include <memory>
+#include <tuple>
 
 #include "PlayHandle.h"
 #include "TimePos.h"
@@ -48,7 +47,7 @@ public:
 	SampleRecordHandle( SampleClip* clip );
 	~SampleRecordHandle() override;
 
-	void play( SampleFrame* _working_buffer ) override;
+	void play(std::optional<PlanarBufferView<float>> buffer) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;
@@ -58,11 +57,12 @@ public:
 
 
 private:
-	virtual void writeBuffer( const SampleFrame* _ab,
-						const f_cnt_t _frames );
+	virtual void writeBuffer(PlanarBufferView<const float> buffer);
 
-	using bufferList = QList<QPair<SampleFrame*, f_cnt_t>>;
-	bufferList m_buffers;
+	//! Planar, with each channel's buffer laid out sequentially
+	using Buffer = std::tuple<std::unique_ptr<float[]>, ch_cnt_t, f_cnt_t>;
+	using BufferList = std::vector<Buffer>;
+	BufferList m_buffers;
 	f_cnt_t m_framesRecorded;
 	TimePos m_minLength;
 

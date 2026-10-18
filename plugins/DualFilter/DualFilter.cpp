@@ -77,7 +77,7 @@ DualFilterEffect::~DualFilterEffect()
 
 
 
-Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus DualFilterEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -128,20 +128,17 @@ Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const f_cn
 	const bool enabled1 = m_dfControls.m_enabled1Model.value();
 	const bool enabled2 = m_dfControls.m_enabled2Model.value();
 
-
-
-
 	// buffer processing loop
-	for( f_cnt_t f = 0; f < frames; ++f )
+	for (f_cnt_t f = 0; f < inOut.frames(); ++f)
 	{
 		// get mix amounts for wet signals of both filters
 		const float mix2 = ( ( *mixPtr + 1.0f ) * 0.5f );
 		const float mix1 = 1.0f - mix2;
 		const float gain1 = *gain1Ptr * 0.01f;
 		const float gain2 = *gain2Ptr * 0.01f;
-		auto s = std::array{0.0f, 0.0f};	// mix
-		auto s1 = std::array{buf[f][0], buf[f][1]};	// filter 1
-		auto s2 = std::array{buf[f][0], buf[f][1]};	// filter 2
+		auto s = std::array{0.0f, 0.0f}; // mix
+		auto s1 = std::array{inOut[0][f], inOut[1][f]}; // filter 1
+		auto s2 = std::array{inOut[0][f], inOut[1][f]}; // filter 2
 
 		// update filter 1
 		if( enabled1 )
@@ -193,8 +190,8 @@ Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const f_cn
 		}
 
 		// do another mix with dry signal
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		inOut[0][f] = d * inOut[0][f] + w * s[0];
+		inOut[1][f] = d * inOut[1][f] + w * s[1];
 
 		//increment pointers
 		cut1Ptr += cut1Inc;

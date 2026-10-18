@@ -93,47 +93,55 @@ PeakControllerEffect::~PeakControllerEffect()
 }
 
 
-Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus PeakControllerEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	PeakControllerEffectControls & c = m_peakControls;
 
-	// RMS:
-	double sum = 0;
-
-	if( c.m_absModel.value() )
+	float curRMS;
+	if (!c.m_muteModel.value())
 	{
-		for (auto i = std::size_t{0}; i < frames; ++i)
+		double sum = 0;
+		const auto channels = inOut.channels();
+		const auto frames = inOut.frames();
+		if (c.m_absModel.value())
 		{
-			// absolute value is achieved because the squares are > 0
-			sum += buf[i][0] * buf[i][0] + buf[i][1] * buf[i][1];
+			for (ch_cnt_t ch = 0; ch < channels; ++ch)
+			{
+				const float* channelBuffer = inOut.bufferPtr(ch);
+				for (f_cnt_t frame = 0; frame < frames; ++frame)
+				{
+					// absolute value is achieved because the squares are >= 0
+					sum += channelBuffer[frame] * channelBuffer[frame];
+				}
+			}
+
+			curRMS = static_cast<float>(std::sqrt(sum / frames));
+		}
+		else
+		{
+			for (ch_cnt_t ch = 0; ch < channels; ++ch)
+			{
+				const float* channelBuffer = inOut.bufferPtr(ch);
+				for (f_cnt_t frame = 0; frame < frames; ++frame)
+				{
+					// the value is absolute because of squaring,
+					// so we need to correct it
+					sum += channelBuffer[frame] * channelBuffer[frame] * sign(channelBuffer[frame]);
+				}
+			}
+
+			curRMS = static_cast<float>(sqrt_neg(sum / frames));
 		}
 	}
 	else
 	{
-		for (auto i = std::size_t{0}; i < frames; ++i)
-		{
-			// the value is absolute because of squaring,
-			// so we need to correct it
-			sum += buf[i][0] * buf[i][0] * sign(buf[i][0])
-				+ buf[i][1] * buf[i][1] * sign(buf[i][1]);
-		}
+		curRMS = 0.f;
 	}
 
-	// TODO: flipping this might cause clipping
-	// this will mute the output after the values were measured
-	if( c.m_muteModel.value() )
-	{
-		for (auto i = std::size_t{0}; i < frames; ++i)
-		{
-			buf[i][0] = buf[i][1] = 0.0f;
-		}
-	}
-
-	float curRMS = sqrt_neg(sum / frames);
 	const float tres = c.m_tresholdModel.value();
 	const float amount = c.m_amountModel.value() * c.m_amountMultModel.value();
-	curRMS = qAbs( curRMS ) < tres ? 0.0f : curRMS;
-	m_lastSample = qBound( 0.0f, c.m_baseModel.value() + amount * curRMS, 1.0f );
+	curRMS = std::abs(curRMS) < tres ? 0.0f : curRMS;
+	m_lastSample = std::clamp(c.m_baseModel.value() + amount * curRMS, 0.0f, 1.0f);
 
 	return ProcessStatus::Continue;
 }

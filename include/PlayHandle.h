@@ -25,11 +25,13 @@
 #ifndef LMMS_PLAY_HANDLE_H
 #define LMMS_PLAY_HANDLE_H
 
+#include <optional>
 #include <QList>
 #include <QMutex>
 
 #include "lmms_export.h"
 
+#include "AudioBuffer.h"
 #include "Flags.h"
 #include "ThreadableJob.h"
 #include "LmmsTypes.h"
@@ -41,7 +43,6 @@ namespace lmms
 
 class Track;
 class AudioBusHandle;
-class SampleFrame;
 
 class LMMS_EXPORT PlayHandle : public ThreadableJob
 {
@@ -69,7 +70,7 @@ public:
 		return *this;
 	}
 
-	virtual ~PlayHandle();
+	virtual ~PlayHandle() = default;
 
 	virtual bool affinityMatters() const
 	{
@@ -106,7 +107,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	virtual void play( SampleFrame* buffer ) = 0;
+	virtual void play(std::optional<PlanarBufferView<float>> buffer) = 0;
 	virtual bool isFinished() const = 0;
 
 	// returns the frameoffset at the start of the playhandle,
@@ -128,32 +129,32 @@ public:
 	{
 		return m_usesBuffer;
 	}
-	
+
 	void setUsesBuffer( const bool b )
 	{
 		m_usesBuffer = b;
 	}
-	
+
 	AudioBusHandle* audioBusHandle()
 	{
 		return m_audioBusHandle;
 	}
-	
+
 	void setAudioBusHandle(AudioBusHandle* busHandle)
 	{
 		m_audioBusHandle = busHandle;
 	}
-	
+
 	void releaseBuffer();
-	
-	SampleFrame* buffer();
+
+	auto buffer() -> std::optional<PlanarBufferView<float>>;
 
 private:
 	Type m_type;
 	f_cnt_t m_offset;
 	QThread* m_affinity;
 	QMutex m_processingLock;
-	SampleFrame* m_playHandleBuffer;
+	AudioBuffer m_playHandleBuffer;
 	bool m_bufferReleased;
 	bool m_usesBuffer;
 	AudioBusHandle* m_audioBusHandle;

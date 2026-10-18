@@ -64,7 +64,7 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 
-Effect::ProcessStatus EqEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus EqEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	const int sampleRate = Engine::audioEngine()->outputSampleRate();
 
@@ -142,128 +142,128 @@ Effect::ProcessStatus EqEffect::processImpl(SampleFrame* buf, const f_cnt_t fram
 	}
 
 	m_eqControls.m_inProgress = true;
-	double outSum = 0.0;
 
+	double outSum = 0.0;
+	const auto frames = inOut.frames();
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
+		outSum += inOut[0][f] * inOut[0][f] + inOut[1][f] * inOut[1][f];
 	}
 
 	const float outGain =  m_outGain;
-	SampleFrame m_inPeak = { 0, 0 };
+	auto inPeak = std::array{0.f, 0.f};
 
 	if(m_eqControls.m_analyseInModel.value( true ) &&  outSum > 0 && m_eqControls.isViewVisible()  )
 	{
-		m_eqControls.m_inFftBands.analyze( buf, frames );
+		m_eqControls.m_inFftBands.analyze(inOut);
 	}
 	else
 	{
 		m_eqControls.m_inFftBands.clear();
 	}
 
-	gain( buf, frames, m_inGain, &m_inPeak );
-	m_eqControls.m_inPeakL = m_eqControls.m_inPeakL < m_inPeak[0] ? m_inPeak[0] : m_eqControls.m_inPeakL;
-	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < m_inPeak[1] ? m_inPeak[1] : m_eqControls.m_inPeakR;
+	gain(inOut, m_inGain, inPeak[0], inPeak[1]);
+	m_eqControls.m_inPeakL = m_eqControls.m_inPeakL < inPeak[0] ? inPeak[0] : m_eqControls.m_inPeakL;
+	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < inPeak[1] ? inPeak[1] : m_eqControls.m_inPeakR;
 
 	float periodProgress = 0.0f; // percentage of period processed
 	for( f_cnt_t f = 0; f < frames; ++f)
 	{
 		periodProgress = (float)f / (float)(frames-1);
 		//wet dry buffer
-		dryS[0] = buf[f][0];
-		dryS[1] = buf[f][1];
+		dryS[0] = inOut[0][f];
+		dryS[1] = inOut[1][f];
 		if( hpActive )
 		{
-			buf[f][0] = m_hp12.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_hp12.update( buf[f][1], 1, periodProgress );
+			inOut[0][f] = m_hp12.update(inOut[0][f], 0, periodProgress);
+			inOut[1][f] = m_hp12.update(inOut[1][f], 1, periodProgress);
 
 			if( hp24Active || hp48Active )
 			{
-				buf[f][0] = m_hp24.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_hp24.update( buf[f][1], 1, periodProgress );
+				inOut[0][f] = m_hp24.update(inOut[0][f], 0, periodProgress);
+				inOut[1][f] = m_hp24.update(inOut[1][f], 1, periodProgress);
 			}
 
 			if( hp48Active )
 			{
-				buf[f][0] = m_hp480.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_hp480.update( buf[f][1], 1, periodProgress );
+				inOut[0][f] = m_hp480.update(inOut[0][f], 0, periodProgress);
+				inOut[1][f] = m_hp480.update(inOut[1][f], 1, periodProgress);
 
-				buf[f][0] = m_hp481.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_hp481.update( buf[f][1], 1, periodProgress );
+				inOut[0][f] = m_hp481.update(inOut[0][f], 0, periodProgress);
+				inOut[1][f] = m_hp481.update(inOut[1][f], 1, periodProgress);
 			}
 		}
 
 		if( lowShelfActive )
 		{
-			buf[f][0] = m_lowShelf.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_lowShelf.update( buf[f][1], 1, periodProgress );
+			inOut[0][f] = m_lowShelf.update(inOut[0][f], 0, periodProgress);
+			inOut[1][f] = m_lowShelf.update(inOut[1][f], 1, periodProgress);
 		}
 
 		if( para1Active )
 		{
-			buf[f][0] = m_para1.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_para1.update( buf[f][1], 1, periodProgress );
+			inOut[0][f] = m_para1.update(inOut[0][f], 0, periodProgress);
+			inOut[1][f] = m_para1.update(inOut[1][f], 1, periodProgress);
 		}
 
 		if( para2Active )
 		{
-			buf[f][0] = m_para2.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_para2.update( buf[f][1], 1, periodProgress );
+			inOut[0][f] = m_para2.update(inOut[0][f], 0, periodProgress);
+			inOut[1][f] = m_para2.update(inOut[1][f], 1, periodProgress);
 		}
 
 		if( para3Active )
 		{
-			buf[f][0] = m_para3.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_para3.update( buf[f][1], 1, periodProgress );
+			inOut[0][f] = m_para3.update(inOut[0][f], 0, periodProgress);
+			inOut[1][f] = m_para3.update(inOut[1][f], 1, periodProgress);
 		}
 
 		if( para4Active )
 		{
-			buf[f][0] = m_para4.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_para4.update( buf[f][1], 1, periodProgress );
+			inOut[0][f] = m_para4.update(inOut[0][f], 0, periodProgress);
+			inOut[1][f] = m_para4.update(inOut[1][f], 1, periodProgress);
 		}
 
 		if( highShelfActive )
 		{
-			buf[f][0] = m_highShelf.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_highShelf.update( buf[f][1], 1, periodProgress );
+			inOut[0][f] = m_highShelf.update(inOut[0][f], 0, periodProgress);
+			inOut[1][f] = m_highShelf.update(inOut[1][f], 1, periodProgress);
 		}
 
-		if( lpActive ){
-			buf[f][0] = m_lp12.update( buf[f][0], 0, periodProgress );
-			buf[f][1] = m_lp12.update( buf[f][1], 1, periodProgress );
+		if (lpActive)
+		{
+			inOut[0][f] = m_lp12.update(inOut[0][f], 0, periodProgress);
+			inOut[1][f] = m_lp12.update(inOut[1][f], 1, periodProgress);
 
 			if( lp24Active || lp48Active )
 			{
-				buf[f][0] = m_lp24.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_lp24.update( buf[f][1], 1, periodProgress );
+				inOut[0][f] = m_lp24.update(inOut[0][f], 0, periodProgress);
+				inOut[1][f] = m_lp24.update(inOut[1][f], 1, periodProgress);
 			}
 
 			if( lp48Active )
 			{
-				buf[f][0] = m_lp480.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_lp480.update( buf[f][1], 1, periodProgress );
+				inOut[0][f] = m_lp480.update(inOut[0][f], 0, periodProgress);
+				inOut[1][f] = m_lp480.update(inOut[1][f], 1, periodProgress);
 
-				buf[f][0] = m_lp481.update( buf[f][0], 0, periodProgress );
-				buf[f][1] = m_lp481.update( buf[f][1], 1, periodProgress );
+				inOut[0][f] = m_lp481.update(inOut[0][f], 0, periodProgress);
+				inOut[1][f] = m_lp481.update(inOut[1][f], 1, periodProgress);
 			}
 		}
 
 		//apply wet / dry levels
-		buf[f][1] = ( dry * dryS[1] ) + ( wet * buf[f][1] );
-		buf[f][0] = ( dry * dryS[0] ) + ( wet * buf[f][0] );
-
-
+		inOut[1][f] = (dry * dryS[1]) + (wet * inOut[1][f]);
+		inOut[0][f] = (dry * dryS[0]) + (wet * inOut[0][f]);
 	}
 
-	SampleFrame outPeak = { 0, 0 };
-	gain( buf, frames, outGain, &outPeak );
+	auto outPeak = std::array{0.f, 0.f};
+	gain(inOut, outGain, outPeak[0], outPeak[1]);
 	m_eqControls.m_outPeakL = m_eqControls.m_outPeakL < outPeak[0] ? outPeak[0] : m_eqControls.m_outPeakL;
 	m_eqControls.m_outPeakR = m_eqControls.m_outPeakR < outPeak[1] ? outPeak[1] : m_eqControls.m_outPeakR;
 
 	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 && m_eqControls.isViewVisible() )
 	{
-		m_eqControls.m_outFftBands.analyze( buf, frames );
+		m_eqControls.m_outFftBands.analyze(inOut);
 		setBandPeaks( &m_eqControls.m_outFftBands , ( int )( sampleRate ) );
 	}
 	else

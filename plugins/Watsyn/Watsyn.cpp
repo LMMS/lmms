@@ -62,20 +62,20 @@ Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 
 
 
-WatsynObject::WatsynObject( float * _A1wave, float * _A2wave,
-					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, f_cnt_t _frames,
-					WatsynInstrument * _w ) :
-				m_amod( _amod ),
-				m_bmod( _bmod ),
-				m_samplerate( _samplerate ),
-				m_nph( _nph ),
-				m_fpp( _frames ),
-				m_parent( _w )
+WatsynObject::WatsynObject(
+	float* a1wave, float* a2wave,
+	float* b1wave, float* b2wave,
+	int amod, int bmod, const sample_rate_t samplerate, NotePlayHandle* nph, f_cnt_t frames,
+	WatsynInstrument* w)
+	: m_amod(amod)
+	, m_bmod(bmod)
+	, m_samplerate(samplerate)
+	, m_nph(nph)
+	, m_fpp(frames)
+	, m_parent(w)
+	, m_abuf(frames, 2)
+	, m_bbuf(frames, 2)
 {
-	m_abuf = new SampleFrame[_frames];
-	m_bbuf = new SampleFrame[_frames];
-
 	m_lphase[A1_OSC] = 0.0f;
 	m_lphase[A2_OSC] = 0.0f;
 	m_lphase[B1_OSC] = 0.0f;
@@ -88,27 +88,20 @@ WatsynObject::WatsynObject( float * _A1wave, float * _A2wave,
 
 	// copy wavegraphs to the synth object to prevent race conditions
 
-	memcpy( &m_A1wave, _A1wave, sizeof( m_A1wave ) );
-	memcpy( &m_A2wave, _A2wave, sizeof( m_A2wave ) );
-	memcpy( &m_B1wave, _B1wave, sizeof( m_B1wave ) );
-	memcpy( &m_B2wave, _B2wave, sizeof( m_B2wave ) );
+	memcpy(&m_A1wave, a1wave, sizeof(m_A1wave));
+	memcpy(&m_A2wave, a2wave, sizeof(m_A2wave));
+	memcpy(&m_B1wave, b1wave, sizeof(m_B1wave));
+	memcpy(&m_B2wave, b2wave, sizeof(m_B2wave));
 }
 
-
-
-WatsynObject::~WatsynObject()
-{
-	delete[] m_abuf;
-	delete[] m_bbuf;
-}
 
 
 void WatsynObject::renderOutput( f_cnt_t _frames )
 {
-	if( m_abuf == nullptr )
-		m_abuf = new SampleFrame[m_fpp];
-	if( m_bbuf == nullptr )
-		m_bbuf = new SampleFrame[m_fpp];
+	assert(!m_abuf.empty());
+	assert(!m_bbuf.empty());
+	const auto abuf = m_abuf.allBuffers();
+	const auto bbuf = m_bbuf.allBuffers();
 
 	for( f_cnt_t frame = 0; frame < _frames; frame++ )
 	{
@@ -211,8 +204,8 @@ void WatsynObject::renderOutput( f_cnt_t _frames )
 				A1_R *= A2_R;
 				break;
 		}
-		m_abuf[frame][0] = A1_L;
-		m_abuf[frame][1] = A1_R;
+		abuf[0][frame] = A1_L;
+		abuf[1][frame] = A1_R;
 
 		// B-series modulation (other than phase mod)
 		switch( m_bmod )
@@ -230,8 +223,8 @@ void WatsynObject::renderOutput( f_cnt_t _frames )
 				B1_R *= B2_R;
 				break;
 		}
-		m_bbuf[frame][0] = B1_L;
-		m_bbuf[frame][1] = B1_R;
+		bbuf[0][frame] = B1_L;
+		bbuf[1][frame] = B1_R;
 
 		// update phases
 		for( int i = 0; i < NUM_OSCS; i++ )
@@ -341,8 +334,7 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-void WatsynInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void WatsynInstrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out)
 {
 	if (!_n->m_pluginData)
 	{
@@ -354,12 +346,12 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 
 	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	SampleFrame* buffer = _working_buffer + offset;
+	const auto buffer = PlanarBufferSpan{out.value(), offset, frames};
 
 	auto w = static_cast<WatsynObject*>(_n->m_pluginData);
 
-	SampleFrame* abuf = w->abuf();
-	SampleFrame* bbuf = w->bbuf();
+	const auto abuf = w->abuf();
+	const auto bbuf = w->bbuf();
 
 	w-> renderOutput( frames );
 
@@ -400,10 +392,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 			const float amix = 1.0 - bmix;
 
 			// mix a/b streams according to mixing knob
-			_working_buffer[f][0] = ( abuf[f][0] * amix ) +
-									( bbuf[f][0] * bmix );
-			_working_buffer[f][1] = ( abuf[f][1] * amix ) +
-									( bbuf[f][1] * bmix );
+			buffer[0][f] = (abuf[0][f] * amix) + (bbuf[0][f] * bmix);
+			buffer[1][f] = (abuf[1][f] * amix) + (bbuf[1][f] * bmix);
 		}
 	}
 	else*/ 
@@ -436,10 +426,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 			const float amix = 1.0 - bmix;
 
 			// mix a/b streams according to mixing knob
-			buffer[f][0] = ( abuf[f][0] * amix ) +
-									( bbuf[f][0] * bmix );
-			buffer[f][1] = ( abuf[f][1] * amix ) +
-									( bbuf[f][1] * bmix );
+			buffer[0][f] = (abuf[0][f] * amix) + (bbuf[0][f] * bmix);
+			buffer[1][f] = (abuf[1][f] * amix) + (bbuf[1][f] * bmix);
 		}
 	}
 
@@ -452,14 +440,12 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 		for( f_cnt_t f=0; f < frames; f++ )
 		{
 			// mix a/b streams according to mixing knob
-			buffer[f][0] = ( abuf[f][0] * amix ) +
-									( bbuf[f][0] * bmix );
-			buffer[f][1] = ( abuf[f][1] * amix ) +
-									( bbuf[f][1] * bmix );
+			buffer[0][f] = (abuf[0][f] * amix) + (bbuf[0][f] * bmix);
+			buffer[1][f] = (abuf[1][f] * amix) + (bbuf[1][f] * bmix);
 		}
 	}
 
-	applyRelease( _working_buffer, _n );
+	applyRelease(*out, _n);
 }
 
 
@@ -643,28 +629,28 @@ void WatsynInstrument::updateFreqB2()
 void WatsynInstrument::updateWaveA1()
 {
 	// do sinc+oversampling on the wavetables to improve quality
-	srccpy( &A1_wave[0], const_cast<float*>( a1_graph.samples() ) );
+	srccpy(&A1_wave[0], a1_graph.samples());
 }
 
 
 void WatsynInstrument::updateWaveA2()
 {
 	// do sinc+oversampling on the wavetables to improve quality
-	srccpy( &A2_wave[0], const_cast<float*>( a2_graph.samples() ) );
+	srccpy(&A2_wave[0], a2_graph.samples());
 }
 
 
 void WatsynInstrument::updateWaveB1()
 {
 	// do sinc+oversampling on the wavetables to improve quality
-	srccpy( &B1_wave[0], const_cast<float*>( b1_graph.samples() ) );
+	srccpy(&B1_wave[0], b1_graph.samples());
 }
 
 
 void WatsynInstrument::updateWaveB2()
 {
 	// do sinc+oversampling on the wavetables to improve quality
-	srccpy( &B2_wave[0], const_cast<float*>( b2_graph.samples() ) );
+	srccpy(&B2_wave[0], b2_graph.samples());
 }
 
 

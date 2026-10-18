@@ -64,6 +64,7 @@ CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPlugin
 	m_hp4( m_sampleRate ),
 	m_needsUpdate( true )
 {
+	// TODO: See if it's more efficient with these converted to planar
 	m_tmp2 = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
 	m_tmp1 = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
 	m_work = new SampleFrame[Engine::audioEngine()->framesPerPeriod()];
@@ -89,7 +90,7 @@ void CrossoverEQEffect::sampleRateChanged()
 }
 
 
-Effect::ProcessStatus CrossoverEQEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus CrossoverEQEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	// filters update
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )
@@ -133,16 +134,17 @@ Effect::ProcessStatus CrossoverEQEffect::processImpl(SampleFrame* buf, const f_c
 	const bool mute4 = m_controls.m_mute4.value();
 	
 	m_needsUpdate = false;
-	
+
+	const auto frames = inOut.frames();
 	zeroSampleFrames(m_work, frames);
-	
+
 	// run temp bands
 	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
-		m_tmp1[f][0] = m_lp2.update( buf[f][0], 0 );
-		m_tmp1[f][1] = m_lp2.update( buf[f][1], 1 );
-		m_tmp2[f][0] = m_hp3.update( buf[f][0], 0 );
-		m_tmp2[f][1] = m_hp3.update( buf[f][1], 1 );
+		m_tmp1[f][0] = m_lp2.update(inOut[0][f], 0);
+		m_tmp1[f][1] = m_lp2.update(inOut[1][f], 1);
+		m_tmp2[f][0] = m_hp3.update(inOut[0][f], 0);
+		m_tmp2[f][1] = m_hp3.update(inOut[1][f], 1);
 	}
 
 	// run band 1
@@ -190,8 +192,8 @@ Effect::ProcessStatus CrossoverEQEffect::processImpl(SampleFrame* buf, const f_c
 
 	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
-		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
-		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
+		inOut[0][f] = d * inOut[0][f] + w * m_work[f][0];
+		inOut[1][f] = d * inOut[1][f] + w * m_work[f][1];
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

@@ -60,7 +60,7 @@ DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFea
 }
 
 
-Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus DispersionEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -98,9 +98,9 @@ Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const f_cn
 		m_feedbackVal[0] = m_feedbackVal[1] = 0;
 	}
 
-	for (f_cnt_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < inOut.frames(); ++f)
 	{
-		std::array<sample_t, 2> s = { buf[f][0] + m_feedbackVal[0], buf[f][1] + m_feedbackVal[1] };
+		auto s = std::array{inOut[0][f] + m_feedbackVal[0], inOut[1][f] + m_feedbackVal[1]};
 		
 		runDispersionAP(m_amountVal, apCoeff1, apCoeff2, s);
 		m_feedbackVal[0] = s[0] * feedback;
@@ -116,8 +116,8 @@ Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const f_cn
 			}
 		}
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		inOut[0][f] = d * inOut[0][f] + w * s[0];
+		inOut[1][f] = d * inOut[1][f] + w * s[1];
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

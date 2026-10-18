@@ -26,8 +26,7 @@
 #ifndef LMMS_EFFECT_H
 #define LMMS_EFFECT_H
 
-#include <span>
-
+#include "AudioBufferSpan.h"
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "Engine.h"
@@ -161,7 +160,7 @@ protected:
 	/**
 	 * The main audio processing method that runs when plugin is awake and running
 	 */
-	virtual ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) = 0;
+	virtual ProcessStatus processImpl(PlanarBufferView<float> inOut) = 0;
 
 	/**
 	 * Optional method that runs instead of `processImpl` when an effect
