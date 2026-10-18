@@ -81,7 +81,7 @@ public:
 			friend auto operator+(const Peak& left, const Peak& right) -> Peak
 			{ return Peak{std::min(left.min, right.min), std::max(left.max, right.max)}; }
 
-			auto operator+=(const Peak& other) -> Peak
+			auto operator+=(const Peak& other) -> Peak&
 			{
 				min = std::min(min, other.min);
 				max = std::max(max, other.max);
