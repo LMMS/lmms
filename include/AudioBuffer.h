@@ -27,6 +27,7 @@
 
 #include <bitset>
 #include <memory_resource>
+#include <vector>
 
 #include "AudioBufferView.h"
 #include "ArrayVector.h"
