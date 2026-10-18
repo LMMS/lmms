@@ -54,7 +54,7 @@ SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 	}
 }
 
-auto SampleThumbnailCache::nearestThumbnailForWidth(f_cnt_t width) -> Thumbnail&
+auto SampleThumbnailCache::nearestThumbnailForWidth(f_cnt_t width) const -> const Thumbnail&
 {
 	assert(1 <= width && width <= m_sampleCount && "invalid width");
 
