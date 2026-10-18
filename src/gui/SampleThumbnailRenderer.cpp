@@ -1,5 +1,5 @@
 /*
- * SampleThumbnail.cpp
+ * SampleThumbnailRenderer.cpp
  *
  * Copyright (c) 2024 Khoi Dau <casboi86@gmail.com>
  * Copyright (c) 2024 Sotonye Atemie <sakertooth@gmail.com>
