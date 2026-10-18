@@ -74,7 +74,7 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 SampleThumbnail::SampleThumbnail(const Sample& sample)
 	: m_buffer(sample.shareBuffer())
 {
-	auto entry = SampleThumbnailEntry{sample.sampleFile(), QFileInfo{sample.sampleFile()}.lastModified()};
+	auto entry = SampleThumbnailEntry{sample.buffer().path(), QFileInfo{sample.buffer().path()}.lastModified()};
 	if (!entry.filePath.isEmpty())
 	{
 		const auto it = s_sampleThumbnailCacheMap.find(entry);
