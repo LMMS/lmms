@@ -38,6 +38,9 @@ class SampleThumbnailCache;
 
 namespace lmms::gui {
 
+/**
+ * @brief A class that can be used to render sample thumbnails.
+ */
 class LMMS_EXPORT SampleThumbnailRenderer
 {
 public:
@@ -63,6 +66,7 @@ public:
 		bool reversed = false;
 	};
 
+	//! Visualize sample thumbnails with the given @a parameters and @a painter object.
 	static void visualize(VisualizeParameters parameters, QPainter& painter);
 };
 
