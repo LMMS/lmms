@@ -58,14 +58,13 @@ public:
 	{
 		//!< A rectangle that covers the entire range of samples from [@a sampleStart, @a sampleEnd)
 		//!< @a rect must share the same coordinate system as that of the painter in which it is drawn with.
-		QRect rect;
+		QRectF rect;
 
 		//!< Where the sample begins for drawing.
-		f_cnt_t sampleStart = 0;
+		double sampleStart = 0.f;
 
 		//!< Where the sample ends for drawing.
-		//!< Clamped to the number of frames in the original buffer during rendering.
-		f_cnt_t sampleEnd = std::numeric_limits<f_cnt_t>::max();
+		double sampleEnd = 1.f;
 
 		//!< The amount of amplification to apply to the waveform.
 		float amplification = 1.0f;
@@ -93,15 +92,15 @@ public:
 			float max = -std::numeric_limits<float>::infinity();
 		};
 
-		explicit Thumbnail(int width)
+		explicit Thumbnail(f_cnt_t width)
 			: m_peaks(width)
 		{
 		}
 
-		auto compress(int outputWidth) const -> Thumbnail;
+		auto compress(f_cnt_t outputWidth) const -> Thumbnail;
 
-		auto operator[](std::size_t index) -> Peak& { return m_peaks[index]; }
-		auto operator[](std::size_t index) const -> const Peak& { return m_peaks[index]; }
+		auto operator[](f_cnt_t index) -> Peak& { return m_peaks[index]; }
+		auto operator[](f_cnt_t index) const -> const Peak& { return m_peaks[index]; }
 
 		auto begin() { return m_peaks.begin(); }
 		auto begin() const { return m_peaks.begin(); }
@@ -109,8 +108,7 @@ public:
 		auto end() { return m_peaks.end(); }
 		auto end() const { return m_peaks.end(); }
 
-		auto width() const -> int { return m_peaks.size(); }
-		auto samplesPerPixel(f_cnt_t samples) const -> f_cnt_t { return samples / width(); }
+		auto width() const -> f_cnt_t { return m_peaks.size(); }
 
 	private:
 		std::vector<Peak> m_peaks;
@@ -126,7 +124,7 @@ public:
 	 * @pre @a width is in the range [1, N] where N is the number of frames in the original buffer.
 	 * @note This function is not thread safe.
 	 */
-	auto nearestThumbnailForWidth(int width) -> Thumbnail&;
+	auto nearestThumbnailForWidth(f_cnt_t width) -> Thumbnail&;
 
 	void visualize(VisualizeParameters parameters, QPainter& painter);
 
