@@ -37,7 +37,7 @@ SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 	if (buffer.empty()) { return; }
 
 	auto highestResolutionThumbnail = Thumbnail{m_sampleCount};
-	for (auto i = 0; i < highestResolutionThumbnail.width(); ++i)
+	for (f_cnt_t i = 0; i < highestResolutionThumbnail.width(); ++i)
 	{
 		const auto value = buffer.data()[i].average();
 		highestResolutionThumbnail[i] = Thumbnail::Peak{value, value};
