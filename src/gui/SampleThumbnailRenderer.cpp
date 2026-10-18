@@ -61,7 +61,7 @@ void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	for (auto out = 0; out < parameters.rect.width(); ++out)
+	for (double out = 0; out < parameters.rect.width(); ++out)
 	{
 		const auto peakStart = nearestThumbnailStart + (out / parameters.rect.width()) * nearestThumbnailRange;
 		const auto peakEnd = nearestThumbnailStart + ((out + 1) / parameters.rect.width()) * nearestThumbnailRange;

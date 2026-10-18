@@ -79,7 +79,7 @@ auto SampleThumbnailCache::Thumbnail::compress(f_cnt_t outputWidth) const -> Thu
 	const auto factor = static_cast<double>(width()) / outputWidth;
 	auto compressedThumbnail = Thumbnail{outputWidth};
 
-	for (auto out = 0; out < outputWidth; ++out)
+	for (f_cnt_t out = 0; out < outputWidth; ++out)
 	{
 		const auto start = m_peaks.begin() + static_cast<f_cnt_t>(std::floor(out * factor));
 		const auto end = m_peaks.begin() + static_cast<f_cnt_t>(std::floor((out + 1) * factor));
