@@ -89,4 +89,4 @@ auto SampleThumbnailCache::Thumbnail::compress(f_cnt_t outputWidth) const -> Thu
 	return compressedThumbnail;
 }
 
-} // namespace lmms::gui
+} // namespace lmms
