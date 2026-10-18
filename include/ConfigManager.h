@@ -46,6 +46,7 @@ const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
 const QString GIG_PATH = "samples/gig/";
 const QString SF2_PATH = "samples/soundfonts/";
+const QString SFZ_PATH = "samples/sfz/";
 const QString LADSPA_PATH ="plugins/ladspa/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
@@ -147,6 +148,11 @@ public:
 	{
 		return m_sf2File;
 	}
+
+	const QString & sfzDir() const
+	{
+		return m_sfzDir;
+	}
 #endif
 
 #ifdef LMMS_HAVE_STK
@@ -175,6 +181,11 @@ public:
 	QString userSf2Dir() const
 	{
 		return workingDir() + SF2_PATH;
+	}
+
+	QString userSfzDir() const
+	{
+		return workingDir() + SFZ_PATH;
 	}
 
 	QString userGigDir() const
@@ -259,6 +270,7 @@ public:
 	void setLADSPADir(const QString & ladspaDir);
 	void setSF2Dir(const QString & sf2Dir);
 	void setSF2File(const QString & sf2File);
+	void setSFZDir(const QString & sfzDir);
 	void setSTKDir(const QString & stkDir);
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
@@ -294,6 +306,7 @@ private:
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString m_sf2File;
 #endif
+	QString m_sfzDir;
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;
 #endif
