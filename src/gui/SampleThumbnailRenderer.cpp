@@ -65,8 +65,12 @@ void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter
 	{
 		const auto peakStart = nearestThumbnailStart + (out / parameters.rect.width()) * nearestThumbnailRange;
 		const auto peakEnd = nearestThumbnailStart + ((out + 1) / parameters.rect.width()) * nearestThumbnailRange;
-		const auto peak = std::accumulate(
-			nearestThumbnail.begin() + peakStart, nearestThumbnail.begin() + peakEnd, SampleThumbnailCache::Thumbnail::Peak{});
+
+		const auto peak = parameters.reversed
+			? std::accumulate(nearestThumbnail.rbegin() + peakStart, nearestThumbnail.rbegin() + peakEnd,
+				  SampleThumbnailCache::Thumbnail::Peak{})
+			: std::accumulate(nearestThumbnail.begin() + peakStart, nearestThumbnail.begin() + peakEnd,
+				  SampleThumbnailCache::Thumbnail::Peak{});
 
 		const auto yMin = yCenter - peak.min * yScale;
 		const auto yMax = yCenter - peak.max * yScale;

@@ -122,6 +122,18 @@ public:
 		//! @returns An iterator to the last peak.
 		auto end() const { return m_peaks.end(); }
 
+		//! @returns A reversed iterator to the first peak.
+		auto rbegin() { return m_peaks.rbegin(); }
+
+		//! @returns A reversed iterator to the first peak.
+		auto rbegin() const { return m_peaks.rbegin(); }
+
+		//! @returns A reversed iterator to the last peak.
+		auto rend() { return m_peaks.rend(); }
+
+		//! @returns A reversed iterator to the last peak.
+		auto rend() const { return m_peaks.rend(); }
+
 		//! @returns The number of peaks stored inside this thumbnail.
 		auto width() const -> f_cnt_t { return m_peaks.size(); }
 
