@@ -217,7 +217,7 @@ void SampleTrackWindow::updateName()
 
 void SampleTrackWindow::textChanged(const QString& new_name)
 {
-	m_track->setName(new_name);
+	m_track->setName(new_name, false);
 	Engine::getSong()->setModified();
 }
 

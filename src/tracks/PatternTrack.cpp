@@ -46,7 +46,7 @@ PatternTrack::PatternTrack(TrackContainer* tc) :
 	int patternNum = s_infoMap.size();
 	s_infoMap[this] = patternNum;
 
-	setName(tr("Pattern %1").arg(patternNum));
+	setName(tr("Pattern"), true);
 	Engine::patternStore()->createClipsForPattern(patternNum);
 	Engine::patternStore()->setCurrentPattern(patternNum);
 	Engine::patternStore()->updateComboBox();
@@ -194,8 +194,6 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 		{
 			Clip::copyStateTo(track->getClip(src), track->getClip(dst));
 		}
-		setName( tr( "Clone of %1" ).arg(
-					_this.parentNode().toElement().attribute( "name" ) ) );
 	}
 	else
 	{

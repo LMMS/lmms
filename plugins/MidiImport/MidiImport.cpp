@@ -153,7 +153,7 @@ public:
 			qApp->processEvents();
 			at = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, tc));
 		}
-		if (tn != "") { at->setName(tn); }
+		if (tn != "") { at->setName(tn, true); }
 		return *this;
 	}
 
@@ -227,7 +227,7 @@ public:
 			it_inst = it->loadInstrument("patman");
 #endif
 			trackName = tn;
-			if (trackName != "") { it->setName(tn); }
+			if (trackName != "") { it->setName(tn, true); }
 			// General MIDI default
 			it->pitchRangeModel()->setInitValue(2);
 			// Create a default pattern
@@ -303,9 +303,9 @@ bool MidiImport::readSMF(TrackContainer* tc)
 
 	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
 	auto nt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
-	nt->setName(tr("MIDI Time Signature Numerator"));
+	nt->setName(tr("MIDI Time Signature Numerator"), true);
 	auto dt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
-	dt->setName(tr("MIDI Time Signature Denominator"));
+	dt->setName(tr("MIDI Time Signature Denominator"), true);
 	auto timeSigNumeratorPat = new AutomationClip(nt);
 	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
 	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
@@ -333,7 +333,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 
 	// Tempo stuff
 	auto tt = dynamic_cast<AutomationTrack*>(Track::create(Track::Type::Automation, Engine::getSong()));
-	tt->setName(tr("Tempo"));
+	tt->setName(tr("Tempo"), true);
 	auto tap = new AutomationClip(tt);
 	tap->setDisplayName(tr("Tempo"));
 	tap->addObject(&Engine::getSong()->tempoModel());
