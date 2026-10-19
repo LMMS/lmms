@@ -101,7 +101,6 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	setModel( _t );
 
 	m_window = new SampleTrackWindow(this);
-	m_window->toggleVisibility(false);
 }
 
 

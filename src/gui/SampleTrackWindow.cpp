@@ -167,6 +167,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
 
 	setWindowIcon(embed::getIconPixmap("sample_track"));
 	subWin->hide();
+	m_track->setHook(this);
 }
 
 

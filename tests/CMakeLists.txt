@@ -10,6 +10,7 @@ set(LMMS_TESTS
 	src/core/MathTest.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
+	src/core/SerializingObjectTest.cpp
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp
 )
