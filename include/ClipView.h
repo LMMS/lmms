@@ -55,6 +55,7 @@ class ClipView : public selectableObject, public ModelView
 // theming qproperties
 	Q_PROPERTY( QColor mutedColor READ mutedColor WRITE setMutedColor )
 	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
+	Q_PROPERTY(QColor selectedBlendColor READ selectedBlendColor WRITE setSelectedBlendColor)
 	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
@@ -92,6 +93,7 @@ public:
 	QColor mutedColor() const { return m_mutedColor; }
 	QColor mutedBackgroundColor() const { return m_mutedBackgroundColor; }
 	QColor selectedColor() const { return m_selectedColor; }
+	QColor selectedBlendColor() const { return m_selectedBlendColor; };
 	QColor textColor() const { return m_textColor; }
 	QColor textBackgroundColor() const { return m_textBackgroundColor; }
 	QColor textShadowColor() const { return m_textShadowColor; }
@@ -101,6 +103,7 @@ public:
 	void setMutedColor(const QColor& c) { m_mutedColor = QColor(c); }
 	void setMutedBackgroundColor(const QColor& c) { m_mutedBackgroundColor = QColor(c); }
 	void setSelectedColor(const QColor& c) { m_selectedColor = QColor(c); }
+	void setSelectedBlendColor(const QColor& c) { m_selectedBlendColor = QColor(c); }
 	void setTextColor(const QColor& c) { m_textColor = QColor(c); }
 	void setTextBackgroundColor(const QColor& c) { m_textBackgroundColor = QColor(c); }
 	void setTextShadowColor(const QColor& c) { m_textShadowColor = QColor(c); }
@@ -127,7 +130,18 @@ public:
 
 	void toggleSelectedAutoResize();
 
-	QColor getColorForDisplay( QColor );
+	//! Blend the selected "color mask" into a specific color.
+	QColor getBlendedSelectedColor(QColor baseColor);
+
+	//! @brief Calculate the "final" version of a specific color.
+	//!
+	//! Is affected by whether the clip is muted, empty and/or selected, but only when their specific flags are not true.
+	QColor getColor(QColor baseColor, bool ignoreMuted = false, bool ignoreEmpty = false, bool ignoreSelected = false);
+
+	//! @brief Calculate the "final" primary color for this clip.
+	//!
+	//! Is affected by the clip's custom color, and whether it is muted, empty and/or selected.
+	QColor getColorForDisplay(QColor defaultColor);
 
 	void inline setMarkerPos(int x) { m_markerPos = x; }
 	void inline setMarkerEnabled(bool e) { m_marker = e; }
@@ -274,6 +288,15 @@ protected slots:
 	//! has changed the track view's length.
 	void updatePosition();
 
+	//! @brief Makes the color lighter by modifying its HSV value.
+	//!
+	//! This is a slightly better implementation of `QColor::lighter` that doesn't malfunction when the value
+	//! is zero.
+	//!
+	//! @param src The source color
+	//! @param factor The factor to multiply, multiplied by 100 (e.g. factor=150 means 50% lighter).
+	QColor lighter(QColor src, int factor);
+
 private:
 	enum class Action
 	{
@@ -308,6 +331,7 @@ private:
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
+	QColor m_selectedBlendColor;
 	QColor m_textColor;
 	QColor m_textBackgroundColor;
 	QColor m_textShadowColor;
@@ -369,8 +393,7 @@ private:
 	//! @brief Chooses the correct cursor to be displayed on the widget
 	//! @param me The QMouseEvent that is triggering the cursor change
 	void updateCursor(QMouseEvent* me);
-} ;
-
+};
 
 } // namespace gui
 
