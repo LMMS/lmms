@@ -37,6 +37,7 @@
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
+#include "ControlSurfaceMCU.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "Mixer.h"
 #include "MixerView.h"
@@ -45,6 +46,7 @@
 #include "InstrumentTrack.h"
 #include "Keymap.h"
 #include "NotePlayHandle.h"
+#include "MidiClient.h"
 #include "MidiClip.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
@@ -179,8 +181,16 @@ void Song::setTempo()
 	emit tempoChanged( tempo );
 }
 
-
-
+void Song::setControlSurfaceMCU()
+{
+	m_mcu_controller.reset();
+	const QString& device = ConfigManager::inst()->value("midi", "midimcudaw");
+	// Check if the device exists
+	if (Engine::audioEngine()->midiClient()->readablePorts().indexOf(device) >= 0)
+	{
+		m_mcu_controller = std::make_shared<ControlSurfaceMCU>(device);
+	}
+}
 
 void Song::setTimeSignature()
 {
@@ -1159,6 +1169,14 @@ void Song::loadProject( const QString & fileName )
 		}
 		node = node.nextSibling();
 	}
+
+	// Set the midi MCU controller and update it when the config is updated.
+	setControlSurfaceMCU();
+	connect(ConfigManager::inst(), &ConfigManager::valueChanged,
+		[this](QString const& cls, QString const& attribute, QString const& value) {
+			if (!(cls == "midi" && attribute == "midimcudaw")) { return; }
+			setControlSurfaceMCU();
+		});
 
 	// quirk for fixing projects with broken positions of Clips inside pattern tracks
 	Engine::patternStore()->fixIncorrectPositions();
