@@ -135,8 +135,8 @@ AutomationEditor::AutomationEditor() :
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
-	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
-						SLOT(horScrolled(int)));
+	connect(m_leftRightScroll, &QScrollBar::valueChanged, this, &AutomationEditor::horScrolled);
+	connect(m_leftRightScroll, &QScrollBar::sliderReleased, this, &AutomationEditor::updatePosition);
 
 	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
 	m_topBottomScroll->setSingleStep( 1 );
@@ -1692,10 +1692,10 @@ void AutomationEditor::play()
 
 void AutomationEditor::stop()
 {
-	if( !validClip() )
-	{
-		return;
-	}
+	if (!validClip()) { return; }
+
+	m_scrollBack = true;
+
 	if (m_clip->getTrack() && inPatternEditor())
 	{
 		Engine::patternStore()->stop();
@@ -1704,7 +1704,6 @@ void AutomationEditor::stop()
 	{
 		Engine::getSong()->stop();
 	}
-	m_scrollBack = true;
 }
 
 
@@ -1785,10 +1784,9 @@ void AutomationEditor::setTension()
 void AutomationEditor::updatePosition()
 {
 	const TimePos& t = m_timeLine->timeline()->pos();
-	if( ( Engine::getSong()->isPlaying() &&
-			Engine::getSong()->playMode() ==
-					Song::PlayMode::AutomationClip ) ||
-							m_scrollBack == true )
+	if (((Engine::getSong()->isPlaying()
+		&& Engine::getSong()->playMode() == Song::PlayMode::AutomationClip) || m_scrollBack)
+		&& !m_leftRightScroll->isSliderDown()) // Manual scrolling overrides autoscroll
 	{
 		const int w = width() - VALUES_WIDTH;
 		if( t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb )
