@@ -135,10 +135,8 @@ void WatsynObject::renderOutput( f_cnt_t _frames )
 		// if phase mod, add to phases
 		if( m_amod == MOD_PM )
 		{
-			A1_lphase = std::fmod(A1_lphase + A2_L * PMOD_AMT, WAVELEN);
-			if( A1_lphase < 0 ) A1_lphase += WAVELEN;
-			A1_rphase = std::fmod(A1_rphase + A2_R * PMOD_AMT, WAVELEN);
-			if( A1_rphase < 0 ) A1_rphase += WAVELEN;
+			A1_lphase = normalizePhase<WAVELEN>(A1_lphase + A2_L * PMOD_AMT);
+			A1_rphase = normalizePhase<WAVELEN>(A1_rphase + A2_R * PMOD_AMT);
 		}
 		// A1
 		sample_t A1_L = m_parent->m_lvol[A1_OSC] * std::lerp(
@@ -177,10 +175,8 @@ void WatsynObject::renderOutput( f_cnt_t _frames )
 		// if phase mod, add to phases
 		if( m_bmod == MOD_PM )
 		{
-			B1_lphase = std::fmod(B1_lphase + B2_L * PMOD_AMT, WAVELEN);
-			if( B1_lphase < 0 ) B1_lphase += WAVELEN;
-			B1_rphase = std::fmod(B1_rphase + B2_R * PMOD_AMT, WAVELEN);
-			if( B1_rphase < 0 ) B1_rphase += WAVELEN;
+			B1_lphase = normalizePhase<WAVELEN>(B1_lphase + B2_L * PMOD_AMT);
+			B1_rphase = normalizePhase<WAVELEN>(B1_rphase + B2_R * PMOD_AMT);
 		}
 		// B1
 		sample_t B1_L = m_parent->m_lvol[B1_OSC] * std::lerp(
@@ -236,10 +232,9 @@ void WatsynObject::renderOutput( f_cnt_t _frames )
 		// update phases
 		for( int i = 0; i < NUM_OSCS; i++ )
 		{
-			m_lphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_parent->m_lfreq[i] ) ) );
-			m_lphase[i] = std::fmod(m_lphase[i], WAVELEN);
-			m_rphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_parent->m_rfreq[i] ) ) );
-			m_rphase[i] = std::fmod(m_rphase[i], WAVELEN);
+			const auto phasePerSample = static_cast<float>(WAVELEN) * m_nph->frequency() / m_samplerate; 
+			m_lphase[i] = normalizePhase<WAVELEN>(m_lphase[i] + phasePerSample * m_parent->m_lfreq[i]);
+			m_rphase[i] = normalizePhase<WAVELEN>(m_rphase[i] + phasePerSample * m_parent->m_rfreq[i]);
 		}
 	}
 
