@@ -42,7 +42,7 @@ public:
 
 	void setAbsolutePosition(double ticks);
 	void setPlaybackState(bool enabled);
-	void setTempo(int newTempo);
+	void setTempo(float newTempo);
 	void setTimeSignature(int num, int denom);
 	void startCycle(int startTick, int endTick);
 	void stopCycle();

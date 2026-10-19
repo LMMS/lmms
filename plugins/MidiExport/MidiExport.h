@@ -124,12 +124,12 @@ public:
 	//! @return If operation was successful
 	bool tryExport(const TrackContainer::TrackList& tracks,
 		const TrackContainer::TrackList& patternStoreTracks,
-		int tempo, int masterPitch, const std::filesystem::path& filePath) override;
+		bpm_t tempo, int masterPitch, const std::filesystem::path& filePath) override;
 
 private:
 	//! Process a given instrument track
 	void processTrack(Track& track, MidiFile::Track& midiTrack,
-		int tempo, int masterPitch, bool isPattern = false);
+		bpm_t tempo, int masterPitch, bool isPattern = false);
 
 	//! Build a repeating clip from a normal one and write to MIDI track
 	void writePatternClip(Clip& clip, const QDomElement& clipElem,

@@ -38,6 +38,7 @@
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
 #include "InstrumentTrackView.h"
+#include "KeyboardShortcuts.h"
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
@@ -164,6 +165,8 @@ void MidiClipView::transposeSelection()
 	// Engine::getSong()->addJournalCheckPoint();
 
 	QSet<Track*> m_changedTracks;
+	// Linked clips share their notes, which must only be transposed once
+	QSet<const NoteVector*> transposedNotes;
 	for (ClipView* clipview: selection)
 	{
 		auto mcv = qobject_cast<MidiClipView*>(clipview);
@@ -171,6 +174,8 @@ void MidiClipView::transposeSelection()
 
 		auto clip = mcv->getMidiClip();
 		if (clip->notes().empty()) { continue; }
+		if (transposedNotes.contains(&clip->notes())) { continue; }
+		transposedNotes.insert(&clip->notes());
 
 		auto track = clipview->getTrackView()->getTrack();
 		if (!m_changedTracks.contains(track))
@@ -186,6 +191,21 @@ void MidiClipView::transposeSelection()
 		emit clip->dataChanged();
 	}
 	// At least one clip must have notes to show the transpose dialog, so something *has* changed
+	Engine::getSong()->setModified();
+}
+
+
+
+
+void MidiClipView::unlinkSelection()
+{
+	for (ClipView* clipview : getClickedClips())
+	{
+		const auto mcv = qobject_cast<MidiClipView*>(clipview);
+		if (!mcv || !mcv->getMidiClip()->isLinked()) { continue; }
+		mcv->getMidiClip()->addJournalCheckPoint();
+		mcv->getMidiClip()->unlink();
+	}
 	Engine::getSong()->setModified();
 }
 
@@ -228,6 +248,25 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 	}
 
 	_cm->addAction(embed::getIconPixmap("clear_notes_out_of_bounds"), tr("Clear notes out of bounds"), [this]() { bulkClearNotesOutOfBounds(getClickedClips()); });
+
+	if (m_clip->supportsLinking())
+	{
+		_cm->addSeparator();
+		_cm->addAction(embed::getIconPixmap("edit_copy_linked"),
+			tr("Copy linked (<%1> + <Shift> and drag)").arg(UI_COPY_KEY),
+			[this]() { copy(getClickedClips(), true); });
+
+		const auto clicked = getClickedClips();
+		const bool anyLinked = std::any_of(clicked.begin(), clicked.end(), [](ClipView* clipv) {
+			const auto mcv = qobject_cast<MidiClipView*>(clipv);
+			return mcv && mcv->getMidiClip()->isLinked();
+		});
+		if (anyLinked)
+		{
+			_cm->addAction(embed::getIconPixmap("edit_unlink"), tr("Unlink"), this, &MidiClipView::unlinkSelection);
+		}
+		_cm->addSeparator(); // Close it off too
+	}
 
 	if (!isBeat)
 	{
@@ -380,7 +419,7 @@ void MidiClipView::clearNotesOutOfBounds()
 	TimePos startBound = -m_clip->startTimeOffset();
 	TimePos endBound = m_clip->length() - m_clip->startTimeOffset();
 
-	for (Note const* note: m_clip->m_notes)
+	for (Note const* note: m_clip->notes())
 	{
 		const TimePos newNoteStart = std::max(note->pos(), startBound) - startBound;
 		const TimePos newNoteEnd = std::min(note->endPos(), endBound) - startBound;
@@ -629,7 +668,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	const int x_base = BORDER_WIDTH;
 
 	bool displayPattern = fixedClips() || (pixelsPerBar >= 96 && m_legacySEPattern);
-	NoteVector const & noteCollection = m_clip->m_notes;
+	NoteVector const & noteCollection = m_clip->notes();
 
 	// Beat clip paint event (on BB Editor)
 	if (beatClip && displayPattern)
@@ -789,33 +828,55 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 		float const noteHeight = 1. / adjustedNoteRange;
 
+		// Where the content is drawn, relative to the clip start, and which section of it.
+		// Without looping, all of it is drawn once.
+		const auto loopStarts = fixedClips() ? std::vector<TimePos>{} : loopIterationStarts();
+		std::vector<int> contentShifts;
+		for (const auto& start : loopStarts) { contentShifts.push_back(start - m_clip->loopStart()); }
+		if (loopStarts.empty()) { contentShifts.push_back(offset); }
+		const bool looping = !loopStarts.empty();
+
 		// scan through all the notes and draw them on the clip
-		for (Note const * currentNote : noteCollection)
+		for (int contentShift : contentShifts)
 		{
-			// Map to 0, 1, 2, ...
-			int mappedNoteKey = currentNote->key() - minKey;
-			int invertedMappedNoteKey = adjustedNoteRange - mappedNoteKey - 1;
-
-			float const noteStartX = (currentNote->pos() + offset) * tickLength;
-			float const noteLength = currentNote->length() * tickLength;
-
-			float const noteStartY = invertedMappedNoteKey * noteHeight;
-
-			QRectF noteRectF( noteStartX, noteStartY, noteLength, noteHeight);
-			if (drawAsLines)
+			for (Note const * currentNote : noteCollection)
 			{
-				p.drawLine(QPointF(noteStartX, noteStartY + 0.5 * noteHeight),
-					   QPointF(noteStartX + noteLength, noteStartY + 0.5 * noteHeight));
+				if (looping && (currentNote->pos() < m_clip->loopStart() || currentNote->pos() >= m_clip->loopEnd()))
+				{
+					continue;
+				}
+
+				// Map to 0, 1, 2, ...
+				int mappedNoteKey = currentNote->key() - minKey;
+				int invertedMappedNoteKey = adjustedNoteRange - mappedNoteKey - 1;
+
+				// Looped notes are cut off where the loop repeats
+				const int noteEnd = looping
+					? std::min<int>(currentNote->endPos(), m_clip->loopEnd())
+					: static_cast<int>(currentNote->endPos());
+				float const noteStartX = (currentNote->pos() + contentShift) * tickLength;
+				float const noteLength = (noteEnd - currentNote->pos()) * tickLength;
+
+				float const noteStartY = invertedMappedNoteKey * noteHeight;
+
+				QRectF noteRectF( noteStartX, noteStartY, noteLength, noteHeight);
+				if (drawAsLines)
+				{
+					p.drawLine(QPointF(noteStartX, noteStartY + 0.5 * noteHeight),
+						   QPointF(noteStartX + noteLength, noteStartY + 0.5 * noteHeight));
+				}
+				else
+				{
+					p.fillRect( noteRectF, noteFillColor );
+					p.drawRect( noteRectF );
+				}
 			}
-			else
-			{
-				p.fillRect( noteRectF, noteFillColor );
-				p.drawRect( noteRectF );
-			}
+
 		}
-
 		p.restore();
 	}
+
+	if (!fixedClips()) { paintLoopBoundaries(p, width() * tickLength, 0); }
 
 	// bar lines
 	const int lineSize = 3;
@@ -838,6 +899,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	{
 		paintTextLabel(m_clip->name(), p);
 	}
+
+	if (m_clip->isLinked() && !fixedClips()) { paintLinkBadge(p); }
 
 	if( !( fixedClips() && beatClip ) )
 	{
@@ -870,6 +933,57 @@ void MidiClipView::paintEvent( QPaintEvent * )
 }
 
 
+void MidiClipView::paintLinkBadge(QPainter& p)
+{
+	// A chain link and the group's label in the top right corner
+	const QString label = m_clip->linkLabel();
+	QFont labelFont = font();
+	labelFont.setHintingPreference(QFont::PreferFullHinting);
+	const QFontMetrics fontMetrics(labelFont);
+
+	constexpr int Padding = 3;
+	constexpr qreal LinkWidth = 7;
+	constexpr qreal LinkHeight = 5;
+	constexpr qreal LinkOverlap = 2;
+	const int chainWidth = static_cast<int>(LinkWidth * 2 - LinkOverlap) + Padding;
+	const int textWidth = fontMetrics.horizontalAdvance(label);
+	const int badgeHeight = fontMetrics.height() + 2 * (BORDER_WIDTH + 1);
+	const int available = width() - 2 * BORDER_WIDTH;
+
+	// Leave out the chain (and possibly the label) on narrow clips
+	const bool showChain = chainWidth + textWidth + 2 * Padding <= available / 2;
+	const int badgeWidth = textWidth + 2 * Padding + (showChain ? chainWidth : 0);
+	if (badgeWidth > available) { return; }
+
+	const QRect badge(width() - BORDER_WIDTH - badgeWidth, 0, badgeWidth + BORDER_WIDTH, badgeHeight);
+	p.save();
+	p.fillRect(badge, textBackgroundColor());
+
+	if (showChain)
+	{
+		p.setRenderHint(QPainter::Antialiasing);
+		p.setBrush(Qt::NoBrush);
+		p.setPen(QPen(textColor(), 1.5));
+		const qreal left = badge.left() + Padding;
+		const qreal top = badge.center().y() - LinkHeight / 2 + 0.5;
+		p.drawRoundedRect(QRectF(left, top, LinkWidth, LinkHeight), 2.5, 2.5);
+		p.drawRoundedRect(QRectF(left + LinkWidth - LinkOverlap, top, LinkWidth, LinkHeight), 2.5, 2.5);
+	}
+	// Also draw in the text showing which clips are linked to each other
+	p.setRenderHint(QPainter::TextAntialiasing);
+	p.setFont(labelFont);
+	const int textLeft = badge.right() - BORDER_WIDTH - Padding - textWidth + 1;
+	const int textTop = BORDER_WIDTH + 1 + fontMetrics.ascent();
+	p.setPen(textShadowColor());
+	p.drawText(textLeft + 1, textTop + 1, label);
+	p.setPen(textColor());
+	p.drawText(textLeft, textTop, label);
+	p.restore();
+}
+
+
+
+
 bool MidiClipView::destructiveSplitClip(const TimePos pos)
 {
 	const TimePos splitPos = m_initialClipPos + pos;
@@ -888,7 +1002,7 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 	auto rightClip =  m_clip->clone();
 	rightClip->clearNotes();
 
-	for (Note const* note : m_clip->m_notes)
+	for (Note const* note : m_clip->notes())
 	{
 		if (note->pos() >= internalSplitPos)
 		{
@@ -905,7 +1019,7 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 		}
 	}
 
-	for (Note const* note : m_clip->m_notes)
+	for (Note const* note : m_clip->notes())
 	{
 		if (note->endPos() <= internalSplitPos)
 		{

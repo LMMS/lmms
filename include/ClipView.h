@@ -26,6 +26,7 @@
 #define LMMS_GUI_CLIP_VIEW_H
 
 #include <optional>
+#include <vector>
 
 #include <QVector>
 
@@ -115,7 +116,8 @@ public:
 	QVector<ClipView *> getClickedClips();
 
 	// Methods to remove, copy, cut, paste and mute a QVector of Clip views
-	void copy( QVector<ClipView *> clipvs );
+	//! @param linked Whether pasting creates clips that share their contents with the copied clips
+	void copy(QVector<ClipView*> clipvs, bool linked = false);
 	void cut( QVector<ClipView *> clipvs );
 	void paste();
 	// remove and toggleMute are static because they don't depend
@@ -126,6 +128,7 @@ public:
 	static void toggleMute( QVector<ClipView *> clipvs );
 
 	void toggleSelectedAutoResize();
+	void toggleSelectedLooping();
 
 	QColor getColorForDisplay( QColor );
 
@@ -255,9 +258,18 @@ protected:
 	//! the Clips.
 	//!
 	//! @param clips The trackContectObjects to save in a DataFile
-	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
+	DataFile createClipDataFiles(const QVector<ClipView *> & clips, bool linked = false) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
+
+	//! @brief Positions relative to the clip start where iterations of the looped content begin
+	//!
+	//! The first iteration may begin before the clip start. Without looping, the content is shown once and
+	//! the result is empty.
+	std::vector<TimePos> loopIterationStarts() const;
+
+	//! @brief Marks where the looped content repeats, with @p xOffset being the x coordinate of the clip start
+	void paintLoopBoundaries(QPainter& painter, float pixelsPerTick, float xOffset) const;
 
 	auto hasCustomColor() const -> bool;
 

@@ -26,6 +26,9 @@
 #ifndef LMMS_MIDI_CLIP_H
 #define LMMS_MIDI_CLIP_H
 
+#include <memory>
+#include <vector>
+
 #include "Clip.h"
 #include "Note.h"
 
@@ -59,6 +62,8 @@ public:
 
 	void updateLength() override;
 
+	bool supportsLooping() const override { return !isInPattern(); }
+
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
@@ -70,10 +75,7 @@ public:
 	void rearrangeAllNotes();
 	void clearNotes();
 
-	inline const NoteVector & notes() const
-	{
-		return m_notes;
-	}
+	const NoteVector& notes() const;
 
 	Note * addStepNote( int step );
 	void setStep( int step, bool enabled );
@@ -117,10 +119,43 @@ public:
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
+	//! @brief Creates a copy of this clip that does not update with the original
 	MidiClip* clone() override
 	{
 		return new MidiClip(*this);
 	}
+
+	// Linked clips share contents, so editing one of them changes all of them
+
+	//! @brief Whether this clip can share its notes with other clips
+	bool supportsLinking() const { return !isInPattern(); }
+
+	//! @brief Whether this clip shares its notes with at least one other clip
+	bool isLinked() const;
+
+	//! @brief All clips sharing notes with this clip, including this clip
+	const std::vector<MidiClip*>& linkedClips() const;
+
+	//! @brief Identifies the notes shared by linked clips. Stored as the "link" attribute in project files.
+	const QString& linkId() const;
+
+	//! @brief The label that tells linked clips of the same group apart from other groups (A, B, ..., Z, A1, B1, ...)
+	//! @return An empty string if the clip isn't linked
+	QString linkLabel() const;
+	static QString linkLabel(int index);
+
+	//! @brief Creates a copy of this clip that updates with the original
+	MidiClip* linkedClone();
+
+	//! @brief Shares the notes of @p other, replacing the notes of this clip
+	void linkTo(MidiClip* other);
+
+	//! @brief Stops sharing notes with other clips while keeping the notes
+	void unlink();
+
+	//! @brief Gives the MIDI clips found in @p element new link IDs, so that clips created from it are linked
+	//! with each other like before, but not with existing clips
+	static void renewLinkIds(QDomElement& element);
 
 
 	using Model::dataChanged;
@@ -151,8 +186,19 @@ private:
 
 	Type m_clipType;
 
+	struct LinkGroup;
+	using LinkGroupPtr = std::shared_ptr<LinkGroup>;
+
+	void setLinkGroup(LinkGroupPtr group);
+	void setLinkId(const QString& id);
+	//! Updates the other clips sharing the notes after the notes changed
+	void updateLinkedClips();
+	//! Locks the tracks of all clips sharing the notes, so that none of them plays while the notes change
+	void lockLinkedTracks();
+	void unlockLinkedTracks();
+
 	// data-stuff
-	NoteVector m_notes;
+	LinkGroupPtr m_links;
 	int m_steps;
 
 	MidiClip * adjacentMidiClipByOffset(int offset) const;
