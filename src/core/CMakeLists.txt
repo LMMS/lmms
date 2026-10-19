@@ -21,6 +21,7 @@ set(LMMS_SRCS
 	core/DataFile.cpp
 	core/DrumSynth.cpp
 	core/Effect.cpp
+	core/EffectCategory.cpp
 	core/EffectChain.cpp
 	core/Engine.cpp
 	core/EnvelopeAndLfoParameters.cpp
