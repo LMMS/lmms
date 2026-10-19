@@ -80,10 +80,10 @@ public:
 		return spinBox;
 	}
 	
-	PixmapButton* createPixmapButton(const QString& text, QWidget* parent, int x, int y, BoolModel* model,
+	PixmapButton* createPixmapButton(QWidget* parent, int x, int y, BoolModel* model,
 		std::string_view activeIcon, std::string_view inactiveIcon, const QString& tooltip)
 	{
-		PixmapButton* button = new PixmapButton(parent, text);
+		PixmapButton* button = new PixmapButton(parent);
 		button->move(x, y);
 		button->setCheckable(true);
 		if (model) { button->setModel(model); }

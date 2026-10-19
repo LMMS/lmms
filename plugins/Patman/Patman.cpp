@@ -440,7 +440,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	setPalette( pal );
 
 
-	m_openFileButton = new PixmapButton( this, nullptr );
+	m_openFileButton = new PixmapButton(this);
 	m_openFileButton->setObjectName( "openFileButton" );
 	m_openFileButton->setCursor(Qt::PointingHandCursor);
 	m_openFileButton->move( 227, 86 );
@@ -452,7 +452,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 				this, SLOT( openFile() ) );
 	m_openFileButton->setToolTip(tr("Open patch"));
 
-	m_loopButton = new PixmapButton( this, tr( "Loop" ) );
+	m_loopButton = new PixmapButton(this);
 	m_loopButton->setObjectName("loopButton");
 	m_loopButton->setCheckable( true );
 	m_loopButton->move( 195, 138 );
@@ -462,7 +462,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 								"loop_off" ) );
 	m_loopButton->setToolTip(tr("Loop mode"));
 
-	m_tuneButton = new PixmapButton( this, tr( "Tune" ) );
+	m_tuneButton = new PixmapButton(this);
 	m_tuneButton->setObjectName("tuneButton");
 	m_tuneButton->setCheckable( true );
 	m_tuneButton->move( 223, 138 );

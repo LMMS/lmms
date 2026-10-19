@@ -34,8 +34,8 @@ namespace lmms::gui
 {
 
 
-PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
-	AutomatableButton( _parent, _name ),
+PixmapButton::PixmapButton(QWidget* parent) :
+	AutomatableButton(parent),
 	m_activePixmap(),
 	m_inactivePixmap(),
 	m_pressed( false )

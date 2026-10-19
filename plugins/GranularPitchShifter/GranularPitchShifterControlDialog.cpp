@@ -81,14 +81,14 @@ GranularPitchShifterControlDialog::GranularPitchShifterControlDialog(GranularPit
 	QPushButton button("Show Help", this);
 	connect(&button, &QPushButton::clicked, this, &GranularPitchShifterControlDialog::showHelpWindow);
 	
-	PixmapButton* m_helpBtn = new PixmapButton(this, nullptr);
+	PixmapButton* m_helpBtn = new PixmapButton(this);
 	m_helpBtn->move(278, 159);
 	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_active"));
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
 	m_helpBtn->setToolTip(tr("Open help window"));
 	connect(m_helpBtn, SIGNAL(clicked()), this, SLOT(showHelpWindow()));
 	
-	PixmapButton* prefilterButton = new PixmapButton(this, tr("Prefilter"));
+	PixmapButton* prefilterButton = new PixmapButton(this);
 	prefilterButton->move(8, 133);
 	prefilterButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("prefilter_active"));
 	prefilterButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("prefilter_inactive"));

@@ -322,10 +322,10 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 	m_distEndKnob->setHintText( tr( "End distortion:" ), "" );
 	m_distEndKnob->move( COL5, ROW2 );
 
-	m_startNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::LedColor::Green );
+	m_startNoteToggle = new LedCheckBox(this, LedCheckBox::LedColor::Green);
 	m_startNoteToggle->move( COL1 + 8, LED_ROW );
 
-	m_endNoteToggle = new LedCheckBox( "", this, "", LedCheckBox::LedColor::Green );
+	m_endNoteToggle = new LedCheckBox(this, LedCheckBox::LedColor::Green);
 	m_endNoteToggle->move( END_COL + 8, LED_ROW );
 
 	setAutoFillBackground( true );

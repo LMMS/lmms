@@ -83,12 +83,12 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	
 	
 	// leds
-	auto rateEnabled = new LedCheckBox("", this, tr("Rate enabled"), LedCheckBox::LedColor::Green);
+	auto rateEnabled = new LedCheckBox(this, LedCheckBox::LedColor::Green);
 	rateEnabled->move( 64, 14 );
 	rateEnabled->setModel( & controls->m_rateEnabled );
 	rateEnabled->setToolTip(tr("Enable sample-rate crushing"));
 
-	auto depthEnabled = new LedCheckBox("", this, tr("Depth enabled"), LedCheckBox::LedColor::Green);
+	auto depthEnabled = new LedCheckBox(this, LedCheckBox::LedColor::Green);
 	depthEnabled->move( 101, 14 );
 	depthEnabled->setModel( & controls->m_depthEnabled );
 	depthEnabled->setToolTip(tr("Enable bit-depth crushing"));
