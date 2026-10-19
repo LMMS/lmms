@@ -42,7 +42,7 @@ public:
 	SimpleTextFloat();
 	~SimpleTextFloat() override = default;
 
-	void setText(const QString & text);
+	void setText(const QString& text);
 
 	void showWithDelay(int msecBeforeDisplay, int msecDisplayTime);
 
@@ -51,10 +51,7 @@ public:
 		showWithDelay(0, msec);
 	}
 
-	void moveGlobal(QWidget * w, const QPoint & offset)
-	{
-		move(w->mapToGlobal(QPoint(0, 0)) + offset);
-	}
+	void moveGlobal(QWidget* w, const QPoint& offset);
 
 	void show();
 	void hide();
@@ -66,9 +63,9 @@ public:
 	void setSource(const QObject* source) { m_source = source; }
 
 private:
-	QLabel * m_textLabel;
-	QTimer * m_showTimer;
-	QTimer * m_hideTimer;
+	QLabel* m_textLabel;
+	QTimer* m_showTimer;
+	QTimer* m_hideTimer;
 
 	//! Which object is currently controlling this text float
 	const QObject* m_source = nullptr;
