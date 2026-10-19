@@ -305,8 +305,9 @@ private:
 	f_cnt_t m_releaseFramesDone;			// number of frames done after
 											// release of note
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
-	volatile bool m_released;				// indicates whether note is released
-	bool m_releaseStarted;
+	volatile bool m_released = false;		// indicates whether note is released
+	bool m_pendingRelease = false;
+	bool m_releaseStarted = false;
 	bool m_hasMidiNote;
 	bool m_hasParent;						// indicates whether note has parent
 	NotePlayHandle * m_parent;			// parent note
