@@ -194,8 +194,8 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	elem.setAttribute("src", m_sample.sampleFile());
-	if (m_sample.sampleFile().isEmpty())
+	elem.setAttribute("src", m_sample.path());
+	if (m_sample.path().isEmpty())
 	{
 		elem.setAttribute("sampledata", m_sample.toBase64());
 	}
@@ -224,7 +224,10 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(SampleBuffer::fromBase64(sampleData));
+		if (const auto buffer = SampleBuffer::fromBase64(sampleData))
+		{
+			m_sample = Sample{std::move(*buffer)};
+		}
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -307,18 +310,24 @@ gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 
 void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
+	auto buffer = SampleBuffer::fromFile(_audio_file);
+
+	// TODO: Return error back to caller
+	if (!buffer) { return; }
+
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
 		( instrumentTrack()->name() ==
-			QFileInfo(m_sample.sampleFile()).fileName() ||
-				m_sample.sampleFile().isEmpty()))
+			QFileInfo(m_sample.path()).fileName() ||
+				m_sample.path().isEmpty()))
 	{
 		// then set it to new one
 		instrumentTrack()->setName( PathUtil::cleanName( _audio_file ) );
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(SampleBuffer::fromFile(_audio_file));
+	m_sample = Sample{std::move(*buffer)};
+
 	loopPointChanged();
 	ampModelChanged();
 	reverseModelChanged();
@@ -417,9 +426,9 @@ void AudioFileProcessor::loopPointChanged()
 
 void AudioFileProcessor::pointChanged()
 {
-	const auto f_start = static_cast<f_cnt_t>(m_startPointModel.value() * m_sample.sampleSize());
-	const auto f_end = static_cast<f_cnt_t>(m_endPointModel.value() * m_sample.sampleSize());
-	const auto f_loop = static_cast<f_cnt_t>(m_loopPointModel.value() * m_sample.sampleSize());
+	const auto f_start = static_cast<f_cnt_t>(m_startPointModel.value() * m_sample.frames());
+	const auto f_end = static_cast<f_cnt_t>(m_endPointModel.value() * m_sample.frames());
+	const auto f_loop = static_cast<f_cnt_t>(m_loopPointModel.value() * m_sample.frames());
 
 	m_nextPlayStartPoint = f_start;
 	m_nextPlayBackwards = false;

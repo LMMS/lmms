@@ -24,10 +24,10 @@
 
 #include "SampleDecoder.h"
 
-#include <QFile>
-#include <QString>
 #include <memory>
 #include <sndfile.h>
+#include "PathUtil.h"
+#include "SampleBuffer.h"
 
 #ifdef LMMS_HAVE_OGGVORBIS
 #include <vorbis/vorbisfile.h>
@@ -42,12 +42,12 @@ namespace lmms {
 
 namespace {
 
-using Decoder = std::optional<SampleDecoder::Result> (*)(const QString&);
+using Decoder = std::optional<SampleBuffer> (*)(const std::filesystem::path&);
 
-auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
-auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleSF(const std::filesystem::path& path) -> std::optional<SampleBuffer>;
+auto decodeSampleDS(const std::filesystem::path& path) -> std::optional<SampleBuffer>;
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleOggVorbis(const std::filesystem::path& path) -> std::optional<SampleBuffer>;
 #endif
 
 static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
@@ -56,131 +56,96 @@ static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
 #endif
 	&decodeSampleDS};
 
-auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>
+auto decodeSampleSF(const std::filesystem::path& path) -> std::optional<SampleBuffer>
 {
-	SNDFILE* sndFile = nullptr;
-	auto sfInfo = SF_INFO{};
+	auto sfinfo = SF_INFO{};
 
-	// TODO: Remove use of QFile
-	auto file = QFile{audioFile};
-	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
+#ifndef LMMS_BUILD_WIN32
+	const auto sndfile = sf_open(path.c_str(), SFM_READ, &sfinfo);
+#else
+	const auto sndfile = sf_wchar_open(path.c_str(), SFM_READ, &sfinfo);
+#endif
 
-	sndFile = sf_open_fd(file.handle(), SFM_READ, &sfInfo, false);
-	if (sf_error(sndFile) != 0) { return std::nullopt; }
+	if (!sndfile || sf_error(sndfile) != 0) { return std::nullopt; }
 
-	auto buf = std::vector<sample_t>(sfInfo.channels * sfInfo.frames);
-	sf_read_float(sndFile, buf.data(), buf.size());
+	auto buffer = SampleBuffer{static_cast<ch_cnt_t>(sfinfo.channels), static_cast<f_cnt_t>(sfinfo.frames),
+		static_cast<sample_rate_t>(sfinfo.samplerate)};
 
-	sf_close(sndFile);
-	file.close();
-
-	auto result = std::vector<SampleFrame>(sfInfo.frames);
-	for (int i = 0; i < static_cast<int>(result.size()); ++i)
-	{
-		if (sfInfo.channels == 1)
-		{
-			// Upmix from mono to stereo
-			result[i] = {buf[i], buf[i]};
-		}
-		else if (sfInfo.channels > 1)
-		{
-			// TODO: Add support for higher number of channels (i.e., 5.1 channel systems)
-			// The current behavior assumes stereo in all cases excluding mono.
-			// This may not be the expected behavior, given some audio files with a higher number of channels.
-			result[i] = {buf[i * sfInfo.channels], buf[i * sfInfo.channels + 1]};
-		}
-	}
-
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sfInfo.samplerate)};
+	sf_readf_float(sndfile, buffer.data(), buffer.frames());
+	sf_close(sndfile);
+	return buffer;
 }
 
-auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>
+auto decodeSampleDS(const std::filesystem::path& path) -> std::optional<SampleBuffer>
 {
 	// Populated by DrumSynth::GetDSFileSamples
 	int_sample_t* dataPtr = nullptr;
 
 	auto ds = DrumSynth{};
+
 	const auto engineRate = Engine::audioEngine()->outputSampleRate();
-	const auto frames = ds.GetDSFileSamples(audioFile, dataPtr, DEFAULT_CHANNELS, engineRate);
+	const auto qPath = QString::fromStdString(PathUtil::pathToString(path));
+	const auto frames = ds.GetDSFileSamples(qPath, dataPtr, DEFAULT_CHANNELS, engineRate);
 	const auto data = std::unique_ptr<int_sample_t[]>{dataPtr}; // NOLINT, we have to use a C-style array here
 
 	if (frames <= 0 || !data) { return std::nullopt; }
 
-	auto result = std::vector<SampleFrame>(frames);
+	auto result = SampleBuffer{2, static_cast<f_cnt_t>(frames), engineRate};
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(engineRate)};
+	return result;
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>
+auto decodeSampleOggVorbis(const std::filesystem::path& path) -> std::optional<SampleBuffer>
 {
-	static auto s_read = [](void* buffer, size_t size, size_t count, void* stream) -> size_t {
-		auto file = static_cast<QFile*>(stream);
-		return file->read(static_cast<char*>(buffer), size * count);
-	};
-
-	static auto s_seek = [](void* stream, ogg_int64_t offset, int whence) -> int {
-		auto file = static_cast<QFile*>(stream);
-		if (whence == SEEK_SET) { file->seek(offset); }
-		else if (whence == SEEK_CUR) { file->seek(file->pos() + offset); }
-		else if (whence == SEEK_END) { file->seek(file->size() + offset); }
-		else { return -1; }
-		return 0;
-	};
-
-	static auto s_close = [](void* stream) -> int {
-		auto file = static_cast<QFile*>(stream);
-		file->close();
-		return 0;
-	};
-
-	static auto s_tell = [](void* stream) -> long {
-		auto file = static_cast<QFile*>(stream);
-		return file->pos();
-	};
-
-	static ov_callbacks s_callbacks = {s_read, s_seek, s_close, s_tell};
-
-	// TODO: Remove use of QFile
-	auto file = QFile{audioFile};
-	if (!file.open(QIODevice::ReadOnly)) { return std::nullopt; }
-
 	auto vorbisFile = OggVorbis_File{};
-	if (ov_open_callbacks(&file, &vorbisFile, nullptr, 0, s_callbacks) < 0) { return std::nullopt; }
+
+#ifndef LMMS_BUILD_WIN32
+	const auto file = fopen(path.c_str(), "rb");
+#else
+	const auto file = _wfopen(path.c_str(), L"rb");
+#endif
+
+	if (!file) { return std::nullopt; }
+	if (ov_open_callbacks(file, &vorbisFile, nullptr, 0, OV_CALLBACKS_DEFAULT) < 0) { return std::nullopt; }
 
 	const auto vorbisInfo = ov_info(&vorbisFile, -1);
 	if (vorbisInfo == nullptr) { return std::nullopt; }
 
 	const auto numChannels = vorbisInfo->channels;
 	const auto sampleRate = vorbisInfo->rate;
-	const auto numSamples = ov_pcm_total(&vorbisFile, -1);
-	if (numSamples < 0) { return std::nullopt; }
+	const auto numFrames = ov_pcm_total(&vorbisFile, 0);
 
-	auto buffer = std::vector<float>(numSamples);
+	auto buffer = SampleBuffer{
+		static_cast<ch_cnt_t>(numChannels), static_cast<f_cnt_t>(numFrames), static_cast<sample_rate_t>(sampleRate)};
 	auto output = static_cast<float**>(nullptr);
 
-	auto totalSamplesRead = 0;
-	while (true)
+	int currentSection = 0;
+	long totalFramesRead = 0;
+	long framesRead = 0;
+
+	while ((framesRead = ov_read_float(&vorbisFile, &output, numFrames - totalFramesRead, &currentSection)) > 0)
 	{
-		auto samplesRead = ov_read_float(&vorbisFile, &output, numSamples, 0);
+		const auto info = ov_info(&vorbisFile, currentSection);
 
-		if (samplesRead < 0) { return std::nullopt; }
-		else if (samplesRead == 0) { break; }
+		// Vorbis files can contain multiple bitstreams of different channels and sample rates
+		// We ignore any bitstreams that differ in channel count and sample rate from the first one seen
+		if (info->channels != numChannels || info->rate != sampleRate) { break; }
 
-		std::copy_n(*output, samplesRead, buffer.begin() + totalSamplesRead);
-		totalSamplesRead += samplesRead;
-	}
+		for (int channel = 0; channel < numChannels; ++channel)
+		{
+			for (long frame = 0; frame < framesRead; ++frame)
+			{
+				buffer[totalFramesRead + frame][channel] = output[channel][frame];
+			}
+		}
 
-	auto result = std::vector<SampleFrame>(totalSamplesRead / numChannels);
-	for (auto i = std::size_t{0}; i < result.size(); ++i)
-	{
-		if (numChannels == 1) { result[i] = {buffer[i], buffer[i]}; }
-		else if (numChannels > 1) { result[i] = {buffer[i * numChannels], buffer[i * numChannels + 1]}; }
+		totalFramesRead += framesRead;
 	}
 
 	ov_clear(&vorbisFile);
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sampleRate)};
+	return buffer;
 }
 #endif // LMMS_HAVE_OGGVORBIS
 } // namespace
@@ -220,12 +185,12 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 	return s_audioTypes;
 }
 
-auto SampleDecoder::decode(const QString& audioFile) -> std::optional<Result>
+auto SampleDecoder::decode(const std::filesystem::path& path) -> std::optional<SampleBuffer>
 {
-	auto result = std::optional<Result>{};
+	auto result = std::optional<SampleBuffer>{};
 	for (const auto& decoder : decoders)
 	{
-		result = decoder(audioFile);
+		result = decoder(path);
 		if (result) { break; }
 	}
 
