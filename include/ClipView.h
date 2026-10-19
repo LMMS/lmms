@@ -57,6 +57,7 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor mutedColor READ mutedColor WRITE setMutedColor )
 	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
 	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
+	Q_PROPERTY( QColor loopedColor READ loopedColor WRITE setLoopedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
@@ -93,6 +94,7 @@ public:
 	QColor mutedColor() const { return m_mutedColor; }
 	QColor mutedBackgroundColor() const { return m_mutedBackgroundColor; }
 	QColor selectedColor() const { return m_selectedColor; }
+	QColor loopedColor() const { return m_loopedColor; }
 	QColor textColor() const { return m_textColor; }
 	QColor textBackgroundColor() const { return m_textBackgroundColor; }
 	QColor textShadowColor() const { return m_textShadowColor; }
@@ -102,6 +104,7 @@ public:
 	void setMutedColor(const QColor& c) { m_mutedColor = QColor(c); }
 	void setMutedBackgroundColor(const QColor& c) { m_mutedBackgroundColor = QColor(c); }
 	void setSelectedColor(const QColor& c) { m_selectedColor = QColor(c); }
+	void setLoopedColor(const QColor& c) { m_loopedColor = QColor(c); }
 	void setTextColor(const QColor& c) { m_textColor = QColor(c); }
 	void setTextBackgroundColor(const QColor& c) { m_textBackgroundColor = QColor(c); }
 	void setTextShadowColor(const QColor& c) { m_textShadowColor = QColor(c); }
@@ -318,6 +321,7 @@ private:
 
 // qproperty fields
 	QColor m_mutedColor;
+	QColor m_loopedColor;
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
 	QColor m_textColor;

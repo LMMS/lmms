@@ -79,6 +79,7 @@ ClipView::ClipView( Clip * clip,
 	m_initialOffsets( QVector<TimePos>() ),
 	m_hint( nullptr ),
 	m_mutedColor( 0, 0, 0 ),
+	m_loopedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
 	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
@@ -1289,7 +1290,7 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	}
 	else
 	{
-		if( muted )
+		if (muted)
 		{
 			c = hasCustomColor()
 				? mutedCustomColor.darker( 250 )

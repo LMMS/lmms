@@ -639,6 +639,30 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.fillRect( rect(), c );
 	}
 
+	// Only the original section of a looped clip has the clip's color
+	// The repetitions use the looped color
+	if (!beatClip && !fixedClips() && !muted && !isSelected())
+	{
+		if (const auto loopStarts = loopIterationStarts(); loopStarts.size() > 1)
+		{
+			const QColor looped = hasCustomColor() ? c.darker(150) : loopedColor();
+			// Find where to start
+			const int x = std::max(0, static_cast<int>(loopStarts[1] * width() / m_clip->length()));
+			const QRect repetitions(x, 0, width() - x, height());
+			if (gradient())
+			{
+				QLinearGradient loopedGradient(0, 0, 0, height());
+				loopedGradient.setColorAt(0, looped);
+				loopedGradient.setColorAt(1, looped.darker(300));
+				p.fillRect(repetitions, loopedGradient);
+			}
+			else
+			{
+				p.fillRect(repetitions, looped);
+			}
+		}
+	}
+
 	// Check whether we will paint a text box and compute its potential height
 	// This is needed so we can paint the notes underneath it.
 	bool const drawTextBox = !m_clip->name().isEmpty();
@@ -871,7 +895,6 @@ void MidiClipView::paintEvent( QPaintEvent * )
 					p.drawRect( noteRectF );
 				}
 			}
-
 		}
 		p.restore();
 	}
@@ -974,8 +997,6 @@ void MidiClipView::paintLinkBadge(QPainter& p)
 	p.setFont(labelFont);
 	const int textLeft = badge.right() - BORDER_WIDTH - Padding - textWidth + 1;
 	const int textTop = BORDER_WIDTH + 1 + fontMetrics.ascent();
-	p.setPen(textShadowColor());
-	p.drawText(textLeft + 1, textTop + 1, label);
 	p.setPen(textColor());
 	p.drawText(textLeft, textTop, label);
 	p.restore();

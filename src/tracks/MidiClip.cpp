@@ -582,46 +582,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		toggleMute();
 	}
 
-	// Linked clips share their notes, so a clip joining existing linked clips keeps their notes
-	bool loadNotes = true;
-	const QString link = supportsLinking() ? _this.attribute("link") : QString{};
-	if (link.isEmpty())
-	{
-		if (isLinked()) { unlink(); }
-	}
-	else if (link != linkId())
-	{
-		if (const auto group = LinkGroup::registry().value(link))
-		{
-			setLinkGroup(group->self.lock());
-			loadNotes = false;
-		}
-		else
-		{
-			if (isLinked()) { unlink(); }
-			setLinkId(link);
-		}
-	}
-
-	if (loadNotes)
-	{
-		clearNotes();
-
-		lockLinkedTracks();
-		QDomNode node = _this.firstChild();
-		while( !node.isNull() )
-		{
-			if( node.isElement() &&
-				!node.toElement().attribute( "metadata" ).toInt() )
-			{
-				auto n = new Note;
-				n->restoreState( node.toElement() );
-				m_links->notes.push_back( n );
-			}
-			node = node.nextSibling();
-		}
-		unlockLinkedTracks();
-	}
+	if (loadLinkSettings(_this)) { loadNotes(_this); }
 
 	m_steps = _this.attribute( "steps" ).toInt();
 	if( m_steps == 0 )
@@ -947,6 +908,46 @@ void MidiClip::setLinkId(const QString& id)
 		return;
 	}
 	m_links->setId(id);
+}
+
+
+
+// "Reduced Complexity"
+bool MidiClip::loadLinkSettings(const QDomElement& element)
+{
+	// Linked clips share their notes, so a clip joining existing linked clips keeps their notes
+	const QString link = supportsLinking() ? element.attribute("link") : QString{};
+	if (link == linkId()) { return true; }
+
+	if (const auto group = link.isEmpty() ? nullptr : LinkGroup::registry().value(link))
+	{
+		setLinkGroup(group->self.lock());
+		return false;
+	}
+
+	if (isLinked()) { unlink(); }
+	if (!link.isEmpty()) { setLinkId(link); }
+	return true;
+}
+
+
+
+
+void MidiClip::loadNotes(const QDomElement& element)
+{
+	clearNotes();
+
+	lockLinkedTracks();
+	for (QDomNode node = element.firstChild(); !node.isNull(); node = node.nextSibling())
+	{
+		if (node.isElement() && !node.toElement().attribute("metadata").toInt())
+		{
+			auto n = new Note;
+			n->restoreState(node.toElement());
+			m_links->notes.push_back(n);
+		}
+	}
+	unlockLinkedTracks();
 }
 
 

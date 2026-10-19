@@ -31,6 +31,7 @@
 #include "FileDialog.h"
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
+#include "TimePos.h"
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
@@ -205,6 +206,33 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
+// "Reduced complexity"
+void SampleClipView::paintSample(QPainter& p, SampleThumbnail::VisualizeParameters param, float pixelsPerTick)
+{
+	const std::vector<TimePos> loopStarts = fixedClips() ? std::vector<TimePos>{} : loopIterationStarts();
+	if (loopStarts.empty())
+	{
+		m_sampleThumbnail.visualize(param, p);
+		return;
+	}
+
+	// Paint the looped section of the sample once per iteration and cut off where the next one starts
+	const float iterationWidth = m_clip->loopLength() * pixelsPerTick;
+	for (const TimePos& start : loopStarts)
+	{
+		const float iterationX = start * pixelsPerTick - m_paintPixmapXPosition;
+		if (iterationX + iterationWidth < 0 || iterationX > param.viewportRect.width()) { continue; }
+
+		p.save();
+		p.setClipRect(QRectF(iterationX, 0, iterationWidth, height()));
+		param.sampleRect.moveLeft(static_cast<int>(iterationX - m_clip->loopStart() * pixelsPerTick));
+		m_sampleThumbnail.visualize(param, p);
+		p.restore();
+	}
+}
+
+
+
 
 void SampleClipView::paintEvent( QPaintEvent * pe )
 {
@@ -289,33 +317,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	if (sample.sampleSize() > 0)
 	{
-		const auto paintSample = [&](int sampleX)
-		{
-			const auto param = SampleThumbnail::VisualizeParameters{
-				.sampleRect = QRect(sampleX, spacing, sampleLength, height() - spacing),
-				.viewportRect = viewPortRect,
-				.amplification = sample.amplification(),
-				.reversed = sample.reversed()
-			};
-
-			m_sampleThumbnail.visualize(param, p);
-		};
-
-		const auto loopStarts = fixedClips() ? std::vector<TimePos>{} : loopIterationStarts();
-		if (loopStarts.empty()) { paintSample(sampleRextX); }
-
-		// Paint the looped section of the sample once per iteration, cut off where the next one starts
-		for (const auto& start : loopStarts)
-		{
-			const float iterationX = start * pixelsPerTick - m_paintPixmapXPosition;
-			const float iterationWidth = m_clip->loopLength() * pixelsPerTick;
-			if (iterationX + iterationWidth < 0 || iterationX > viewPortRect.width()) { continue; }
-
-			p.save();
-			p.setClipRect(QRectF(iterationX, 0, iterationWidth, height()));
-			paintSample(static_cast<int>(iterationX - m_clip->loopStart() * pixelsPerTick));
-			p.restore();
-		}
+		paintSample(p, {
+			.sampleRect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
+			.viewportRect = viewPortRect,
+			.amplification = sample.amplification(),
+			.reversed = sample.reversed()
+		}, pixelsPerTick);
 	}
 
 	if (!fixedClips()) { paintLoopBoundaries(p, pixelsPerTick, -m_paintPixmapXPosition); }

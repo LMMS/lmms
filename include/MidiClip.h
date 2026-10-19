@@ -191,6 +191,10 @@ private:
 
 	void setLinkGroup(LinkGroupPtr group);
 	void setLinkId(const QString& id);
+	//! Joins, leaves or creates the link group given by the "link" attribute of @p element
+	//! @return Whether the clip's notes still have to be loaded from @p element
+	bool loadLinkSettings(const QDomElement& element);
+	void loadNotes(const QDomElement& element);
 	//! Updates the other clips sharing the notes after the notes changed
 	void updateLinkedClips();
 	//! Locks the tracks of all clips sharing the notes, so that none of them plays while the notes change
