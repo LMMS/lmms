@@ -47,7 +47,7 @@ public:
 	struct VisualizeParameters
 	{
 		//!< The sample thumbnail cache to use.
-		SampleThumbnailCache* cache;
+		const SampleThumbnailCache* cache;
 
 		//!< A rectangle that covers the entire range of samples from [@a sampleStart, @a sampleEnd)
 		//!< @a rect must share the same coordinate system as that of the painter in which it is drawn with.
