@@ -43,6 +43,7 @@ Clip::Clip( Track * track ) :
 	m_track( track ),
 	m_startPosition(),
 	m_length(),
+	m_loopLength(m_length),
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate{false}
 {
@@ -64,6 +65,7 @@ Clip::Clip(const Clip& other):
 	m_startPosition(other.m_startPosition),
 	m_length(other.m_length),
 	m_startTimeOffset(other.m_startTimeOffset),
+	m_loopLength(other.m_loopLength),
 	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
 	m_autoResize(other.m_autoResize),
 	m_selectViewOnCreate{other.m_selectViewOnCreate},
@@ -87,6 +89,17 @@ Clip::~Clip()
 }
 
 
+
+
+void Clip::changeLoopLength(TimePos length)
+{
+	m_loopLength = std::max(m_length, length);
+	emit lengthChanged();
+}
+
+
+
+
 void Clip::movePosition( const TimePos & pos )
 {
 	TimePos newPos = std::max(0, pos.getTicks());
@@ -101,11 +114,17 @@ void Clip::movePosition( const TimePos & pos )
 }
 
 
-void Clip::changeLength( const TimePos & length )
+void Clip::changeLength(const TimePos & length)
 {
 	if (m_length == length) { return; }
+	bool noLoop = m_length == m_loopLength;
 
 	m_length = length;
+
+	if (noLoop || m_loopLength < m_length)
+	{
+		m_loopLength = m_length;
+	}
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
 }
@@ -166,7 +185,9 @@ TimePos Clip::startTimeOffset() const
 
 void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
 {
+	m_loopLength += startTimeOffset - m_startTimeOffset;
 	m_startTimeOffset = startTimeOffset;
+	emit lengthChanged();
 }
 
 void Clip::setColor(const std::optional<QColor>& color)
