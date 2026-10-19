@@ -482,15 +482,7 @@ private:
 	double m_currentSamplePos;
 	int m_currentProgram;
 
-	//! Host to plugin synchronisation data structure
-	struct Sync
-	{
-		double lastppqPos = 0;
-		double timestamp = -1;
-		std::int32_t lastFlags = 0;
-	};
-
-	Sync m_sync;
+	std::int32_t m_lastVstSyncFlags = 0;
 };
 
 
@@ -1103,6 +1095,17 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 		memset( m_outputs[i], 0, bufferSize() * sizeof( float ) );
 	}
 
+	const auto syncData = getVstSyncData();
+	if (syncData && syncData->bpm > 0)
+	{
+		m_currentSamplePos = syncData->ppqPos * syncData->sampleRate * 60.0 / syncData->bpm;
+	}
+	else
+	{
+		// Fallback if syncData is unavailable or bpm is invalid
+		m_currentSamplePos += bufferSize();
+	}
+
 #ifdef OLD_VST_SDK
 	if( m_plugin->flags & effFlagsCanReplacing )
 	{
@@ -1119,8 +1122,6 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 #endif
 
 	unlockShm();
-
-	m_currentSamplePos += bufferSize();
 }
 
 
@@ -1879,7 +1880,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			_timeInfo.samplePos = __plugin->m_currentSamplePos;
 			_timeInfo.sampleRate = syncData->sampleRate;
 			_timeInfo.flags = 0;
-			_timeInfo.tempo = syncData->bpm;
+			_timeInfo.tempo = static_cast<double>(syncData->bpm);
 			_timeInfo.timeSigNumerator = syncData->timeSigNumer;
 			_timeInfo.timeSigDenominator = syncData->timeSigDenom;
 			_timeInfo.flags |= kVstTempoValid;
@@ -1893,21 +1894,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 				_timeInfo.flags |= kVstTransportCycleActive;
 			}
 
-			if (syncData->ppqPos != __plugin->m_sync.timestamp)
-			{
-				_timeInfo.ppqPos = syncData->ppqPos;
-				__plugin->m_sync.lastppqPos = syncData->ppqPos;
-				__plugin->m_sync.timestamp = syncData->ppqPos;
-			}
-			else if (syncData->isPlaying)
-			{
-				__plugin->m_sync.lastppqPos +=
-					syncData->bpm / 60.0
-					* syncData->bufferSize
-					/ syncData->sampleRate;
-				_timeInfo.ppqPos = __plugin->m_sync.lastppqPos;
-			}
-//			_timeInfo.ppqPos = syncData->ppqPos;
+			_timeInfo.ppqPos = syncData->ppqPos;
 			_timeInfo.flags |= kVstPpqPosValid;
 
 			if (syncData->isPlaying)
@@ -1921,12 +1908,12 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			_timeInfo.flags |= kVstBarsValid;
 
 			if ((_timeInfo.flags & (kVstTransportPlaying | kVstTransportCycleActive))
-				!= (__plugin->m_sync.lastFlags & (kVstTransportPlaying | kVstTransportCycleActive))
+				!= (__plugin->m_lastVstSyncFlags & (kVstTransportPlaying | kVstTransportCycleActive))
 				|| syncData->playbackJumped)
 			{
 				_timeInfo.flags |= kVstTransportChanged;
 			}
-			__plugin->m_sync.lastFlags = _timeInfo.flags;
+			__plugin->m_lastVstSyncFlags = _timeInfo.flags;
 
 			return (intptr_t) &_timeInfo;
 		}
