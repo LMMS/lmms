@@ -23,93 +23,87 @@
  *
  */
 
-
 #ifndef BIT_INVADER_H
 #define BIT_INVADER_H
 
 #include "AutomatableModel.h"
+#include "ComboBox.h"
+#include "ComboBoxModel.h"
+#include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Graph.h"
+#include "Knob.h"
+#include "LedCheckBox.h"
+#include "PixmapButton.h"
 
 namespace lmms
 {
 
+namespace gui { class BitInvaderView; }
 
-namespace gui
-{
-class BitInvaderView;
-class Knob;
-class LedCheckBox;
-class PixmapButton;
-}
-
-
-class BSynth
-{
-public:
-	BSynth( float * sample, NotePlayHandle * _nph,
-			bool _interpolation, float factor, 
-			const sample_rate_t _sample_rate );
-	virtual ~BSynth();
-	
-	sample_t nextStringSample( float sample_length );
-
-
-private:
-	int sample_index;
-	float sample_realindex;
-	float* sample_shape;
-	NotePlayHandle* nph;
-	const sample_rate_t sample_rate;
-
-	bool interpolation;
-	
-} ;
+//! @brief The phase of a note, represented as an index into a wavetable.
+//! The phase is normalized such that it has a range of [0, n), where n
+//! is the current length of the wavetable. It can therefore be
+//! truncated to obtain a valid index into that wavetable.
+using BitInvaderIndex = float;
 
 class BitInvader : public Instrument
 {
 	Q_OBJECT
+	friend class gui::BitInvaderView;
 public:
-	BitInvader(InstrumentTrack * _instrument_track );
+	BitInvader(InstrumentTrack*);
 	~BitInvader() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
-	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
-
-	void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
-
+	void playNote(NotePlayHandle* nph, SampleFrame* workingBuffer) override;
+	void deleteNotePluginData(NotePlayHandle* nph) override;
+	void saveSettings(QDomDocument& doc, QDomElement& el) override;
+	void loadSettings(const QDomElement& el) override;
 	QString nodeName() const override;
-
-	float desiredReleaseTimeMs() const override
-	{
-		return 1.5f;
-	}
-
-	gui::PluginView * instantiateView( QWidget * _parent ) override;
+	float desiredReleaseTimeMs() const override { return 1.5f; }
+	gui::PluginView* instantiateView(QWidget* parent) override;
 
 protected slots:
 	void lengthChanged();
-	void samplesChanged( int, int );
 
+	//! @brief Normalize the wavetable according to the current normalization mode.
+	//! @see NormalizeMode
+	//! @see m_graph
+	//! @see m_normalizeMode
 	void normalize();
 
-
 private:
-	FloatModel  m_sampleLength;
-	graphModel  m_graph;
-	
+	//! @brief A kind of normalization to apply to BitInvader's wavetable.
+	enum class NormalizeMode
+	{
+		//! No normalization.
+		Off,
+
+		//! Normalization is applied and DC offset removed, such that
+		//! the entire waveform has a range of [-1, 1].
+		Full,
+
+		//! Normalization is applied and DC offset removed, such that
+		//! the waveform within domain [0, L] has a range of [-1, 1],
+		//! with L being the value of @ref m_sampleLength.
+		LengthOnly,
+
+		//! Normalization is applied, such that the absolute value of
+		//! the entire waveform has a range of [0, 1]. DC offset is
+		//! preserved.
+		Legacy
+	};
+
+	FloatModel m_sampleLength;
+	graphModel m_graph;
 	BoolModel m_interpolation;
-	BoolModel m_normalize;
-	
-	float m_normalizeFactor;
-	
-	friend class gui::BitInvaderView;
-} ;
+	ComboBoxModel m_normalizeMode; //!< Which normalization mode to use. @see NormalizeMode
+
+	float m_normalizeFactor; //!< Factor by which to amplify output such that the output is normalized
+	float m_normalizeOffset; //!< Amount by which to offset the output such that no DC offset is produced when normalized
+};
+
+
 
 
 namespace gui
@@ -119,49 +113,40 @@ class BitInvaderView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	BitInvaderView( Instrument * _instrument,
-					QWidget * _parent );
-
+	BitInvaderView(Instrument*, QWidget* parent);
 	~BitInvaderView() override = default;
+	QSize sizeHint() const override { return QSize(250, 280); }
+	QSize minimumSizeHint() const override { return sizeHint(); }
 
 protected slots:
-	//void sampleSizeChanged( float _new_sample_length );
-
-	void interpolationToggled( bool value );
-	void normalizeToggled( bool value );
-
+	void interpolationToggled(bool value);
 	void sinWaveClicked();
 	void triangleWaveClicked();
 	void sqrWaveClicked();
 	void sawWaveClicked();
 	void noiseWaveClicked();
 	void usrWaveClicked();
-	
-	void smoothClicked(  );
+	void smoothClicked();
 
 private:
 	void modelChanged() override;
 
-	Knob * m_sampleLengthKnob;
-	PixmapButton * m_sinWaveBtn;
-	PixmapButton * m_triangleWaveBtn;
-	PixmapButton * m_sqrWaveBtn;
-	PixmapButton * m_sawWaveBtn;
-	PixmapButton * m_whiteNoiseWaveBtn;
-	PixmapButton * m_smoothBtn;
-	PixmapButton * m_usrWaveBtn;
-
-	static QPixmap * s_artwork;
-
-	Graph * m_graph;
-	LedCheckBox * m_interpolationToggle;
-	LedCheckBox * m_normalizeToggle;
-
-} ;
+	Knob* m_sampleLengthKnob;
+	PixmapButton* m_sinWaveBtn;
+	PixmapButton* m_triangleWaveBtn;
+	PixmapButton* m_sqrWaveBtn;
+	PixmapButton* m_sawWaveBtn;
+	PixmapButton* m_whiteNoiseWaveBtn;
+	PixmapButton* m_smoothBtn;
+	PixmapButton* m_usrWaveBtn;
+	Graph* m_graph;
+	LedCheckBox* m_interpolationToggle;
+	ComboBox* m_normalizeMode;
+};
 
 
 } // namespace gui
 
 } // namespace lmms
 
-#endif
+#endif // BIT_INVADER_H
