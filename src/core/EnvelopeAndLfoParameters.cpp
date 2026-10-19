@@ -32,6 +32,7 @@
 #include "Oscillator.h"
 #include "PathUtil.h"
 #include "Song.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -257,10 +258,11 @@ void EnvelopeAndLfoParameters::updateLfoShapeData()
 
 
 
-inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
+void EnvelopeAndLfoParameters::fillLfoLevel(float* _buf,
 							f_cnt_t _frame,
 							const f_cnt_t _frames )
 {
+	ZoneScoped;
 	if( m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames )
 	{
 		for( f_cnt_t offset = 0; offset < _frames; ++offset )
@@ -296,10 +298,12 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 						const f_cnt_t _release_begin,
 						const f_cnt_t _frames )
 {
-	QMutexLocker m(&m_paramMutex);
+	ZoneScoped;
+	QMutexLocker m(&m_paramMutex); // TODO: Use hazard pointer?
 
 	fillLfoLevel( _buf, _frame, _frames );
 
+	const bool controlEnvAmount = m_controlEnvAmountModel.value();
 	for( f_cnt_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
 	{
 		float env_level;
@@ -326,9 +330,9 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 		}
 
 		// at this point, *_buf is LFO level
-		*_buf = m_controlEnvAmountModel.value() ?
-			env_level * ( 0.5f + *_buf ) :
-			env_level + *_buf;
+		*_buf = controlEnvAmount
+			? env_level * (0.5f + *_buf)
+			: env_level + *_buf;
 	}
 }
 

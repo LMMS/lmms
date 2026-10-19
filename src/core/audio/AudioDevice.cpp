@@ -26,6 +26,7 @@
 
 #include "AudioDevice.h"
 #include "AudioEngine.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -47,12 +48,14 @@ AudioDevice::~AudioDevice()
 
 void AudioDevice::startProcessing()
 {
+	ZoneScoped;
 	m_running.test_and_set(std::memory_order_acquire);
 	startProcessingImpl();
 }
 
 void AudioDevice::stopProcessing()
 {
+	ZoneScoped;
 	m_running.clear(std::memory_order_release);
 	stopProcessingImpl();
 }
@@ -95,6 +98,7 @@ int AudioDevice::convertToS16(const SampleFrame* _ab,
 								int_sample_t * _output_buffer,
 								const bool _convert_endian )
 {
+	ZoneScoped;
 	if( _convert_endian )
 	{
 		for( f_cnt_t frame = 0; frame < _frames; ++frame )

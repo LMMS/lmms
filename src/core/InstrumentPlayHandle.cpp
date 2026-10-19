@@ -22,12 +22,12 @@
  *
  */
 
-
 #include "InstrumentPlayHandle.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Engine.h"
 #include "AudioEngine.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -42,7 +42,10 @@ InstrumentPlayHandle::InstrumentPlayHandle(Instrument * instrument, InstrumentTr
 
 void InstrumentPlayHandle::play(SampleFrame* working_buffer)
 {
-	InstrumentTrack * instrumentTrack = m_instrument->instrumentTrack();
+	InstrumentTrack* instrumentTrack = m_instrument->instrumentTrack();
+
+	ZoneScopedC(0xff7f50); // #ff7f50 (tracy::Color::Coral)
+	ZoneNameF("InstrumentPlayHandle::play [%s]", instrumentTrack->displayNameUtf8().c_str());
 
 	// ensure that all our nph's have been processed first
 	auto nphv = NotePlayHandle::nphsOfInstrumentTrack(instrumentTrack, true);
@@ -50,6 +53,7 @@ void InstrumentPlayHandle::play(SampleFrame* working_buffer)
 	bool nphsLeft;
 	do
 	{
+		ZoneScopedN("Process PlayHandles");
 		nphsLeft = false;
 		for (const auto& handle : nphv)
 		{
@@ -62,7 +66,10 @@ void InstrumentPlayHandle::play(SampleFrame* working_buffer)
 	}
 	while (nphsLeft);
 
-	m_instrument->play(working_buffer);
+	{
+		ZoneScopedN("Instrument::play");
+		m_instrument->play(working_buffer);
+	}
 
 	// Process the audio buffer that the instrument has just worked on...
 	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();

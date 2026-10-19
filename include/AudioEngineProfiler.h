@@ -29,6 +29,7 @@
 #include <atomic>
 #include <QFile>
 
+#include "lmmsconfig.h"
 #include "LmmsTypes.h"
 #include "MicroTimer.h"
 
@@ -38,13 +39,10 @@ namespace lmms
 class AudioEngineProfiler
 {
 public:
-	AudioEngineProfiler();
+	AudioEngineProfiler() = default;
 	~AudioEngineProfiler() = default;
 
-	void startPeriod()
-	{
-		m_periodTimer.reset();
-	}
+	void startPeriod();
 
 	void finishPeriod( sample_rate_t sampleRate, f_cnt_t framesPerPeriod );
 
@@ -73,20 +71,22 @@ public:
 	class Probe
 	{
 	public:
-		Probe(AudioEngineProfiler& profiler, AudioEngineProfiler::DetailType type)
-			: m_profiler(profiler)
-			, m_type(type)
-		{
-			profiler.startDetail(type);
-		}
-		~Probe() { m_profiler.finishDetail(m_type); }
-		Probe& operator=(const Probe&) = delete;
+		Probe(AudioEngineProfiler& profiler, AudioEngineProfiler::DetailType type);
+		~Probe();
+
 		Probe(const Probe&) = delete;
 		Probe(Probe&&) = delete;
+		Probe& operator=(const Probe&) = delete;
+		Probe& operator=(Probe&&) = delete;
 
 	private:
-		AudioEngineProfiler &m_profiler;
+		AudioEngineProfiler& m_profiler;
 		const AudioEngineProfiler::DetailType m_type;
+
+#ifdef LMMS_DEBUG_TRACY
+		struct TracyZoneContext { std::uint32_t id; std::int32_t active; };
+		[[maybe_unused]] TracyZoneContext m_context{};
+#endif
 	};
 
 private:
@@ -97,7 +97,7 @@ private:
 	}
 
 	MicroTimer m_periodTimer;
-	std::atomic<float> m_cpuLoad;
+	std::atomic<float> m_cpuLoad = 0;
 	QFile m_outputFile;
 
 	// Use arrays to avoid dynamic allocations in realtime code

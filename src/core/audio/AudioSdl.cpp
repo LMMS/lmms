@@ -33,6 +33,7 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -164,6 +165,7 @@ void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 
 void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 {
+	ZoneScoped;
 	if (!isRunning())
 	{
 		memset( _buf, 0, _len );
@@ -180,7 +182,9 @@ void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
 	_this->sdlInputAudioCallback( _buf, _len );
 }
 
-void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
+void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len)
+{
+	ZoneScoped;
 	auto samples_buffer = (SampleFrame*)_buf;
 	f_cnt_t frames = _len / sizeof ( SampleFrame );
 

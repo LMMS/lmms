@@ -30,6 +30,7 @@
 #include "InstrumentTrack.h"
 #include "lmms_math.h"
 #include "PresetPreviewPlayHandle.h"
+#include "TracyProfiling.h"
 
 #include <vector>
 #include <algorithm>
@@ -230,6 +231,8 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 
 void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 {
+	ZoneScopedN("Process note stacking");
+
 	const int base_note_key = _n->key();
 	const ChordTable & chord_table = ChordTable::getInstance();
 	// we add chord-subnotes to note if either note is a base-note and
@@ -338,6 +341,8 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 
 void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 {
+	ZoneScopedN("Process arpeggio");
+
 	const int base_note_key = _n->key();
 	if( _n->origin() == NotePlayHandle::Origin::Arpeggio ||
 		_n->origin() == NotePlayHandle::Origin::NoteStacking ||

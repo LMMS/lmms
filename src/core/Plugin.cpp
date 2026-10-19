@@ -104,6 +104,15 @@ QString Plugin::displayName() const
 
 
 
+const std::string& Plugin::displayNameUtf8() const
+{
+	m_displayName = displayName().toStdString();
+	return m_displayName;
+}
+
+
+
+
 const PixmapLoader* Plugin::logo() const
 {
 	return (m_descriptor->subPluginFeatures && m_key.isValid())

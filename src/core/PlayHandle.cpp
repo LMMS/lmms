@@ -26,6 +26,7 @@
 #include "AudioEngine.h"
 #include "BufferManager.h"
 #include "Engine.h"
+#include "TracyProfiling.h"
 
 #include <QThread>
 
@@ -52,6 +53,8 @@ PlayHandle::~PlayHandle()
 
 void PlayHandle::doProcessing()
 {
+	ZoneScopedN("PlayHandle::doProcessing");
+
 	if( m_usesBuffer )
 	{
 		m_bufferReleased = false;
