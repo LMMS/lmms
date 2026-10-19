@@ -140,6 +140,7 @@ public:
 			static ChordTable inst;
 			return inst;
 		}
+		static Chord s_alternativeOctave;
 
 		const Chord & getByName( const QString & name, bool is_scale = false ) const;
 
