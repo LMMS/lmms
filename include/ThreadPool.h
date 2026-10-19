@@ -26,15 +26,15 @@
 #define LMMS_THREAD_POOL_H
 
 #include <atomic>
+#include <condition_variable>
+#include <functional>
+#include <future>
+#include <mutex>
 #include <queue>
+#include <thread>
 #include <tuple>
 #include <type_traits>
 #include <vector>
-
-#include <condition_variable>
-#include <future>
-#include <mutex>
-#include <thread>
 
 namespace lmms {
 //! A thread pool that can be used for asynchronous processing.
