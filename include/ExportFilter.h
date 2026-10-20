@@ -51,7 +51,7 @@ public:
 	//! @return If operation was successful
 	virtual bool tryExport(const TrackContainer::TrackList& tracks,
 		const TrackContainer::TrackList& patternTracks,
-		int tempo, int masterPitch, const std::filesystem::path& filePath) = 0;
+		bpm_t tempo, int masterPitch, const std::filesystem::path& filePath) = 0;
 
 protected:
 

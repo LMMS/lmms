@@ -80,6 +80,7 @@ private:
 	PatternTrack* m_patternTrack = nullptr;
 	bool m_doneMayReturnTrue = true;
 	bool m_ownAudioBusHandle = false;
+	bool m_ownSample = false;
 } ;
 
 

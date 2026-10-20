@@ -23,6 +23,9 @@
  */
 
 #include "MidiAlsaSeq.h"
+
+#include <cmath>
+
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "Song.h"
@@ -620,7 +623,7 @@ void MidiAlsaSeq::changeQueueTempo( bpm_t _bpm )
 	m_seqMutex.lock();
 
 	snd_seq_change_queue_tempo( m_seqHandle, m_queueID,
-					60000000 / (int) _bpm, nullptr );
+					static_cast<int>(std::round(60000000 / _bpm)), nullptr );
 	snd_seq_drain_output( m_seqHandle );
 
 	m_seqMutex.unlock();

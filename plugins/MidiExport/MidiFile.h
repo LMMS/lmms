@@ -157,7 +157,7 @@ private:
 			note;
 
 			//! Tempo of event (in BPM)
-			std::uint32_t tempo = 0;
+			float tempo = 0;
 
 			//! Bank select and program change
 			MidiPatch patch;
@@ -192,7 +192,7 @@ public:
 			double realTime, double duration);
 
 		//! Add a tempo mark
-		void addTempo(std::uint32_t tempo, tick_t time);
+		void addTempo(float tempo, tick_t time);
 
 		//! Add bank select and program change events
 		void addPatch(MidiPatch patch, tick_t time);
