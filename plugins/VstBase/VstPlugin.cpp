@@ -278,7 +278,10 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		if( pluginWidget() != nullptr )
 		{
-			_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
+			// Default embedded VST UIs to visible
+			// A closed VST UI window should not save as "hidden",
+			// since that makes the plugin reopen with an unreachable UI after loading.
+			_this.setAttribute( "guivisible", 1 );
 		}
 	}
 	else
