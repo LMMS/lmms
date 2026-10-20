@@ -136,7 +136,7 @@ SongEditor::SongEditor( Song * song ) :
 
 	// Integer part of tempo is changed by dragging the left digits while 
 	// fractional part is changed by dragging the numbers after the decimal point
-	m_tempoSpinBox = new LcdFloatSpinBox(4, 3, tr("Tempo"), tb);
+	m_tempoSpinBox = new LcdFloatSpinBox(3, 3, tr("Tempo"), tb);
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
 	m_tempoSpinBox->setLabel( tr( "TEMPO" ) );
 	m_tempoSpinBox->setToolTip(tr("Tempo in BPM"));

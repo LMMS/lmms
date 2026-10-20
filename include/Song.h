@@ -57,10 +57,9 @@ class ControllerRackView;
 }
 
 
-const bpm_t MinTempo = 1;
-const bpm_t DefaultTempo = 120;
-const bpm_t MaxTempo = 9999; // Finally bumping this (999 to 9999)
-// Who is actually going to set their song to 9999 bpm??
+const bpm_t MinTempo = 10;
+const bpm_t DefaultTempo = 140;
+const bpm_t MaxTempo = 999;
 const bpm_t TempoStep = 0.001f; // Tempo can be set to the thousandth
 const tick_t MaxSongLength = 9999 * DefaultTicksPerBar;
 
