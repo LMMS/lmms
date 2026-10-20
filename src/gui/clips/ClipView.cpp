@@ -700,6 +700,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
 		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerBar()) );
+		TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 
 		if( m_action == Action::Resize )
 		{
@@ -721,18 +722,27 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				// The end position has to be after the clip's start
 				TimePos min = m_initialClipPos.quantize( snapSize );
 				if ( min <= m_initialClipPos ) min += snapLength;
-				m_clip->changeLength( qMax<int>(min - m_initialClipPos, end - m_initialClipPos) );
-				m_clip->setAutoResize(false);
+
+				int newLength = qMax<int>(min - m_initialClipPos, end - m_initialClipPos);
+				if (newLength != initialLength)
+				{
+					m_clip->changeLength(newLength);
+					m_clip->setAutoResize(false);
+				}
 			}
 			else
 			{	// Otherwise, resize in fixed increments
-				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
 				// Don't resize to less than 1 tick
 				auto min = TimePos(initialLength % snapLength);
 				if (min < 1) min += snapLength;
-				m_clip->changeLength( qMax<int>( min, initialLength + offset) );
-				m_clip->setAutoResize(false);
+
+				int newLength = qMax<int>(min, initialLength + offset);
+				if (newLength != initialLength)
+				{
+					m_clip->changeLength(newLength);
+					m_clip->setAutoResize(false);
+				}
 			}
 		}
 		else
@@ -767,7 +777,6 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			else
 			{	// Otherwise, resize in fixed increments
 				// Don't resize to less than 1 tick
-				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 				auto minLength = TimePos(initialLength % snapLength);
 				if (minLength < 1) minLength += snapLength;
 				TimePos offset = TimePos(t - m_initialClipPos).quantize( snapSize );
@@ -775,10 +784,11 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			}
 
 			TimePos positionOffset = m_clip->startPosition() - t;
-			if (m_clip->length() + positionOffset >= 1)
+			int newLength = m_clip->length() + positionOffset;
+			if (newLength >= 1 && positionOffset != 0)
 			{
 				m_clip->movePosition(t);
-				m_clip->changeLength(m_clip->length() + positionOffset);
+				m_clip->changeLength(newLength);
 				if (pClip)
 				{
 					// Modulus the start time offset as we need it only for offsets
