@@ -292,6 +292,11 @@ private:
 
 	void changePreset();
 
+    void onProgramChangeEvent(MidiPort::PresetSelectPolicy policy, int16_t key);
+    bool onControlChangeEvent(MidiPort::PresetSelectPolicy policy, uint8_t ctrlNumber, uint8_t ctrlValue);
+    bool onControllerBankSelectMSB(MidiPort::PresetSelectPolicy policy, uint8_t ctrlValue);
+    bool onControllerBankSelectLSB(MidiPort::PresetSelectPolicy policy, uint8_t ctrlValue);
+
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
@@ -346,7 +351,6 @@ private:
 	friend class NotePlayHandle;
 	friend class gui::InstrumentTuningView;
 	friend class gui::MidiCCRackView;
-
 } ;
 
 

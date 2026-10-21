@@ -901,7 +901,7 @@ bool GigInstrument::presetChangeSupported()
 	return true;
 }
 
-void GigInstrument::changePreset(int bank, unsigned int preset)
+void GigInstrument::changePreset(int bank, int preset)
 {
 	bool presetChanged = false;
 	// The "empty" bank indicates that we do not want to switch

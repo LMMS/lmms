@@ -911,7 +911,7 @@ bool Sf2Instrument::presetChangeSupported()
 	return true;
 }
 
-void Sf2Instrument::changePreset(int bank, unsigned int preset)
+void Sf2Instrument::changePreset(int bank, int preset)
 {
 	bool presetChanged = false;
 	if (bank != InstrumentTrack::BANK_NONE)

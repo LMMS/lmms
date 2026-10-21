@@ -72,7 +72,7 @@ public:
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 	bool presetChangeSupported() override;
-	void changePreset(int bank, unsigned int preset) override;
+	void changePreset(int bank, int preset) override;
 
 	virtual gui::PluginView* instantiateView( QWidget * _parent );
 

@@ -30,6 +30,7 @@
 #include "DataFile.h"
 #include "GuiApplication.h"
 #include "Midi.h"
+#include "MidiPort.h"
 #include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
@@ -1008,72 +1009,103 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	unlock();
 }
 
-bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
+
+
+void InstrumentTrack::onProgramChangeEvent(MidiPort::PresetSelectPolicy policy, int16_t key)
 {
-	if (m_midiPort.m_captureProgramChangeModel.value() == 0)
+	m_programNumber = key;
+
+	if (policy == MidiPort::BankSelectIgnore)
 	{
+		m_programBankMSB = BANK_NONE;
+		m_programBankLSB = BANK_NONE;
+	}
+}
+
+
+
+bool InstrumentTrack::onControllerBankSelectMSB(MidiPort::PresetSelectPolicy policy, uint8_t ctrlValue)
+{
+	switch (policy)
+	{
+	case MidiPort::BankSelectMSB:
+		/* Only MSB is meaningful and is the only bank select
+		 * message, so it should be actually treated as LSB.
+		 * MSB should be set to zero. */
+		m_programBankMSB = 0;
+		m_programBankLSB = ctrlValue;
+		return true;
+	case MidiPort::BankSelectBoth:
+		/* Both MSB and LSB are meaningful, so don't touch
+		 * LSB here unless it is set to None (-1) - in this case reset it to 0. */
+		m_programBankMSB = ctrlValue;
+		if (m_programBankLSB == BANK_NONE) {
+			m_programBankLSB = 0;
+		}
+		return true;
+	case MidiPort::BankSelectIgnore:
+	default:
 		return false;
 	}
+}
+
+
+
+bool InstrumentTrack::onControllerBankSelectLSB(MidiPort::PresetSelectPolicy policy, uint8_t ctrlValue)
+{
+	switch (policy)
+	{
+	case MidiPort::BankSelectBoth:
+		m_programBankLSB = ctrlValue;
+		if (m_programBankMSB == BANK_NONE) {
+			m_programBankMSB = 0;
+		}
+		return true;
+	case MidiPort::BankSelectIgnore:
+	case MidiPort::BankSelectMSB:
+	default:
+		return false;
+	}
+}
+
+
+
+bool InstrumentTrack::onControlChangeEvent(MidiPort::PresetSelectPolicy policy, uint8_t ctrlNumber, uint8_t ctrlValue)
+{
+	switch (ctrlNumber)
+	{
+	case MidiControllerBankSelectMSB:
+		return onControllerBankSelectMSB(policy, ctrlValue);
+	case MidiControllerBankSelectLSB:
+		return onControllerBankSelectLSB(policy, ctrlValue);
+	default:
+		return false;
+	}
+}
+
+
+
+bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
+{
+	if (m_midiPort.m_captureProgramChangeModel.value() == 0) { return false; }
 
 	auto policy = static_cast<MidiPort::PresetSelectPolicy>(
 			m_midiPort.m_presetSelectPolicyModel.value());
 
-	if (event.type() == MidiProgramChange)
+	switch (event.type())
 	{
-		m_programNumber = event.key();
-
-		if (policy == MidiPort::BankSelectIgnore)
-		{
-			m_programBankMSB = BANK_NONE;
-			m_programBankLSB = BANK_NONE;
-		}
+	case MidiProgramChange:
+		onProgramChangeEvent(policy, event.key());
 		return true;
-	}
 
-	else if (event.type() == MidiControlChange &&
-			event.controllerNumber() == MidiControllerBankSelectMSB)
-	{
-		switch (policy)
-		{
-		case MidiPort::BankSelectIgnore:
-			return false;
-		case MidiPort::BankSelectMSB:
-			/* Only MSB is meaningful and is the only bank select
-			 * message, so it should be actually treated as LSB.
-			 * MSB should be set to zero. */
-			m_programBankMSB = 0;
-			m_programBankLSB = event.controllerValue();
-			return true;
-		case MidiPort::BankSelectBoth:
-			/* Both MSB and LSB are meaningful, so don't touch
-			 * LSB here unless it is set to None (-1) - in this case reset it to 0. */
-			m_programBankMSB = event.controllerValue();
-			if (m_programBankLSB == BANK_NONE) {
-				m_programBankLSB = 0;
-			}
-			return true;
-		}
-	}
+	case MidiControlChange:
+		return onControlChangeEvent(policy, event.controllerNumber(), event.controllerValue());
 
-	else if (event.type() == MidiControlChange &&
-			event.controllerNumber() == MidiControllerBankSelectLSB)
-	{
-		switch (policy)
-		{
-		case MidiPort::BankSelectIgnore:
-		case MidiPort::BankSelectMSB:
-			return false;
-		case MidiPort::BankSelectBoth:
-			m_programBankLSB = event.controllerValue();
-			if (m_programBankMSB == BANK_NONE) {
-				m_programBankMSB = 0;
-			}
-			return true;
-		}
+	default:
+		return false;
 	}
-
-	return false;
 }
+
 
 
 void InstrumentTrack::changePreset()

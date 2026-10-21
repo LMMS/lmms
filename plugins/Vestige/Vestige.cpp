@@ -428,7 +428,7 @@ bool VestigeInstrument::presetChangeSupported()
 	return true;
 }
 
-void VestigeInstrument::changePreset(int bank, unsigned int preset)
+void VestigeInstrument::changePreset(int bank, int preset)
 {
 	if (m_plugin == nullptr) { return; }
 

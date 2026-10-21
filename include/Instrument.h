@@ -167,7 +167,7 @@ public:
 	// The preset number is always an integer between 0 and 127
 	// The bank number can be equal to -1, meaning that bank selection
 	// is ignored. The plugin should decide what to do in such situation.
-	inline virtual void changePreset(int bank, unsigned int preset) {}
+	inline virtual void changePreset(int bank, int preset) {}
 
 	// --------------------------------------------------------------------
 	// provided functions:
