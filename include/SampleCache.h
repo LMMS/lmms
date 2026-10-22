@@ -11,9 +11,9 @@ namespace lmms {
 class SampleCache
 {
 public:
-	auto fetchBuffer(const std::filesystem::path& path) -> std::shared_ptr<const SampleBuffer>
+	static auto fetchBuffer(const std::filesystem::path& path) -> std::shared_ptr<const SampleBuffer>
 	{
-		auto [it, inserted] = m_buffers.try_emplace(path, SampleBufferEntry{});
+		auto [it, inserted] = s_buffers.try_emplace(path, SampleBufferEntry{});
 		auto& entry = it->second;
 		const auto lastWriteTime = std::filesystem::last_write_time(path);
 
@@ -31,9 +31,9 @@ public:
 		return resource;
 	}
 
-	auto fetchThumbnail(const std::filesystem::path& path) -> std::shared_ptr<const SampleThumbnailCache>
+	static auto fetchThumbnail(const std::filesystem::path& path) -> std::shared_ptr<const SampleThumbnailCache>
 	{
-		auto [it, inserted] = m_thumbnailCaches.try_emplace(path, SampleThumbnailCacheEntry{});
+		auto [it, inserted] = s_thumbnailCaches.try_emplace(path, SampleThumbnailCacheEntry{});
 		auto& entry = it->second;
 		const auto lastWriteTime = std::filesystem::last_write_time(path);
 
@@ -52,12 +52,6 @@ public:
 		return resource;
 	}
 
-	static auto instance() -> SampleCache&
-	{
-		static auto s_instance = SampleCache{};
-		return s_instance;
-	}
-
 private:
 	struct SampleBufferEntry
 	{
@@ -71,8 +65,8 @@ private:
 		std::filesystem::file_time_type lastWriteTime;
 	};
 
-	std::unordered_map<std::filesystem::path, SampleBufferEntry> m_buffers;
-	std::unordered_map<std::filesystem::path, SampleThumbnailCacheEntry> m_thumbnailCaches;
+	inline static std::unordered_map<std::filesystem::path, SampleBufferEntry> s_buffers;
+	inline static std::unordered_map<std::filesystem::path, SampleThumbnailCacheEntry> s_thumbnailCaches;
 };
 } // namespace lmms
 
