@@ -23,7 +23,6 @@
  */
 
 
-#include <QDebug>
 #include "EqControlsDialog.h"
 
 #include <QWidget>
