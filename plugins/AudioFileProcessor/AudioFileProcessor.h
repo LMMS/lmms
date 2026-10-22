@@ -38,6 +38,8 @@
 namespace lmms
 {
 
+class SampleThumbnailCache;
+
 class AudioFileProcessor : public Instrument
 {
 	Q_OBJECT
@@ -65,6 +67,7 @@ public:
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 	Sample const & sample() const { return m_sample; }
+	const SampleThumbnailCache* sampleThumbnailCache() const { return m_sampleThumbnailCache.get(); }
 
 	FloatModel & ampModel() { return m_ampModel; }
 	FloatModel & startPointModel() { return m_startPointModel; }
@@ -95,6 +98,7 @@ signals:
 
 private:
 	Sample m_sample;
+	std::shared_ptr<const SampleThumbnailCache> m_sampleThumbnailCache;
 
 	FloatModel m_ampModel;
 	FloatModel m_startPointModel;

@@ -76,6 +76,7 @@ private:
 	AutomatableButtonGroup* m_loopGroup;
 	PixmapButton* m_stutterButton;
 	ComboBox* m_interpBox;
+	friend class AudioFileProcessorWaveView;
 } ;
 
 } // namespace gui

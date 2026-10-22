@@ -27,6 +27,8 @@
 
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
+#include "SampleCache.h"
+#include "SampleThumbnailCache.h"
 #include "Song.h"
 
 #include "LmmsTypes.h"
@@ -224,7 +226,8 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(SampleBuffer::fromBase64(sampleData));
+		m_sample = Sample{SampleBuffer::fromBase64(sampleData)};
+		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(*m_sample.buffer());
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -318,7 +321,10 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(SampleBuffer::fromFile(_audio_file));
+	const auto path = PathUtil::stringToPath(_audio_file);
+	m_sample = Sample{SampleCache::fetchBuffer(path)};
+	m_sampleThumbnailCache = SampleCache::fetchThumbnail(path);
+
 	loopPointChanged();
 	ampModelChanged();
 	reverseModelChanged();

@@ -28,7 +28,7 @@
 #include <QElapsedTimer>
 #include <QWidget>
 
-#include "SampleThumbnail.h"
+#include "SampleThumbnailCache.h"
 
 namespace lmms {
 
@@ -106,8 +106,6 @@ private:
 	QPixmap m_editorWaveform;
 	QPixmap m_sliceEditor;
 	QPixmap m_emptySampleIcon;
-	
-	SampleThumbnail m_sampleThumbnail;
 
 	SlicerT* m_slicerTParent;
 
