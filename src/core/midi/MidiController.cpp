@@ -115,6 +115,10 @@ void MidiController::onNoteOn(MidiPortEventModel::Values linkEventType)
 		{
 			emit valueChanged();
 		}
+        break;
+
+    default:
+        break;
 	}
 }
 
