@@ -923,10 +923,7 @@ void GigInstrument::changePreset(int bank, int preset)
 		presetChanged = true;
 	}
 
-	if (presetChanged)
-	{
-		emit patchChanged();
-	}
+	if (presetChanged) { emit patchChanged(); }
 }
 
 namespace gui

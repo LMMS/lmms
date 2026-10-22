@@ -422,20 +422,15 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 			{
 				silenceAllNotes();
 			}
-			if(event.controllerNumber() == MidiControllerBankSelectMSB
+			if (event.controllerNumber() == MidiControllerBankSelectMSB
 				|| event.controllerNumber() == MidiControllerBankSelectLSB)
 			{
-				if (processPresetSelectEvents(event))
-				{
-					changePreset();
-				}
+				if (processPresetSelectEvents(event)) { changePreset(); }
 			}
 			break;
 
 		case MidiProgramChange:
-			if (processPresetSelectEvents(event)) {
-				changePreset();
-			}
+			if (processPresetSelectEvents(event)) { changePreset(); }
 			break;
 
 		case MidiMetaEvent:
@@ -1039,9 +1034,7 @@ bool InstrumentTrack::onControllerBankSelectMSB(MidiPort::PresetSelectPolicy pol
 		/* Both MSB and LSB are meaningful, so don't touch
 		 * LSB here unless it is set to None (-1) - in this case reset it to 0. */
 		m_programBankMSB = ctrlValue;
-		if (m_programBankLSB == BANK_NONE) {
-			m_programBankLSB = 0;
-		}
+		if (m_programBankLSB == BANK_NONE) { m_programBankLSB = 0; }
 		return true;
 	case MidiPort::BankSelectIgnore:
 	default:
@@ -1057,9 +1050,7 @@ bool InstrumentTrack::onControllerBankSelectLSB(MidiPort::PresetSelectPolicy pol
 	{
 	case MidiPort::BankSelectBoth:
 		m_programBankLSB = ctrlValue;
-		if (m_programBankMSB == BANK_NONE) {
-			m_programBankMSB = 0;
-		}
+		if (m_programBankMSB == BANK_NONE) { m_programBankMSB = 0; }
 		return true;
 	case MidiPort::BankSelectIgnore:
 	case MidiPort::BankSelectMSB:
@@ -1097,10 +1088,8 @@ bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 	case MidiProgramChange:
 		onProgramChangeEvent(policy, event.key());
 		return true;
-
 	case MidiControlChange:
 		return onControlChangeEvent(policy, event.controllerNumber(), event.controllerValue());
-
 	default:
 		return false;
 	}
