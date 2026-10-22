@@ -24,6 +24,8 @@
 
 #include "AudioFileProcessorWaveView.h"
 
+#include "AudioFileProcessor.h"
+#include "AudioFileProcessorView.h"
 #include "Sample.h"
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
@@ -345,10 +347,9 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 
-	m_sampleThumbnail = SampleThumbnailCache{*m_sample->buffer()};
-
 	const auto param = SampleThumbnailRenderer::VisualizeParameters{
-		.cache = &m_sampleThumbnail,
+		.cache
+		= static_cast<AudioFileProcessorView*>(parent())->castModel<AudioFileProcessor>()->sampleThumbnailCache(),
 		.rect = m_graph.rect(),
 		.sampleStart = static_cast<double>(m_from) / m_sample->sampleSize(),
 		.sampleEnd = static_cast<double>(m_to) / m_sample->sampleSize(),

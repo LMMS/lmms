@@ -119,10 +119,8 @@ void SlicerTWaveform::drawSeekerWaveform()
 
 	const auto& sample = m_slicerTParent->m_originalSample;
 
-	m_sampleThumbnail = SampleThumbnailCache{*sample.buffer()};
-
 	const auto param = SampleThumbnailRenderer::VisualizeParameters{
-		.cache = &m_sampleThumbnail,
+		.cache = m_slicerTParent->m_sampleThumbnailCache.get(),
 		.sampleStart = static_cast<double>(sample.startFrame()) / sample.sampleSize(),
 		.sampleEnd = static_cast<double>(sample.endFrame()) / sample.sampleSize(),
 		.amplification = sample.amplification(),
@@ -186,10 +184,8 @@ void SlicerTWaveform::drawEditorWaveform()
 
 	const auto& sample = m_slicerTParent->m_originalSample;
 
-	m_sampleThumbnail = SampleThumbnailCache{*sample.buffer()};
-
 	const auto param = SampleThumbnailRenderer::VisualizeParameters{
-		.cache = &m_sampleThumbnail,
+		.cache = m_slicerTParent->m_sampleThumbnailCache.get(),
 		.rect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
 		.sampleStart = static_cast<double>(startFrame) / sample.sampleSize(),
 		.sampleEnd = static_cast<double>(endFrame) / sample.sampleSize(),

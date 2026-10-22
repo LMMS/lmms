@@ -106,8 +106,6 @@ private:
 	QPixmap m_editorWaveform;
 	QPixmap m_sliceEditor;
 	QPixmap m_emptySampleIcon;
-	
-	SampleThumbnailCache m_sampleThumbnail;
 
 	SlicerT* m_slicerTParent;
 

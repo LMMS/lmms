@@ -65,8 +65,6 @@ void SampleClipView::updateSample()
 {
 	update();
 
-	m_sampleThumbnail = SampleThumbnailCache{*m_clip->m_sample.buffer()};
-
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
@@ -289,7 +287,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	if (sample.sampleSize() > 0)
 	{
 		const auto param = SampleThumbnailRenderer::VisualizeParameters{
-			.cache = &m_sampleThumbnail,
+			.cache = m_clip->sampleThumbnailCache(),
 			.rect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
 			.amplification = sample.amplification(),
 			.reversed = sample.reversed()
