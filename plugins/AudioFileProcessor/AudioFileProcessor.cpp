@@ -226,14 +226,8 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		auto buffer = SampleBuffer::fromBase64(sampleData);
-		auto thumbnail = std::make_shared<const SampleThumbnailCache>(*buffer);
-
-		if (buffer && thumbnail)
-		{
-			m_sample = Sample{std::move(buffer)};
-			m_sampleThumbnailCache = std::move(thumbnail);
-		}
+		m_sample = Sample{SampleBuffer::fromBase64(sampleData)};
+		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(*m_sample.buffer());
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -328,13 +322,8 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	// else we don't touch the track-name, because the user named it self
 
 	const auto path = PathUtil::stringToPath(_audio_file);
-	auto buffer = SampleCache::fetchBuffer(path);
-	auto thumbnail = SampleCache::fetchThumbnail(path);
-
-	if (!buffer || !thumbnail) { return; }
-
-	m_sample = Sample{std::move(buffer)};
-	m_sampleThumbnailCache = std::move(thumbnail);
+	m_sample = Sample{SampleCache::fetchBuffer(path)};
+	m_sampleThumbnailCache = SampleCache::fetchThumbnail(path);
 
 	loopPointChanged();
 	ampModelChanged();
