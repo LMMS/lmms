@@ -596,7 +596,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
-	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
+	m_selPresetButton->setIcon(embed::getIconPixmap("stepper-down"));
 
 	m_selPresetButton->setMenu(menu);
 

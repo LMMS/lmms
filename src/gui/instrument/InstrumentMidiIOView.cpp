@@ -44,7 +44,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( nullptr, this ),
 	m_rpBtn( nullptr ),
-	m_wpBtn( nullptr ),
+	m_wpBtn(nullptr),
 	m_presetSelectPolicyComboBox(new ComboBox())
 {
 	auto layout = new QVBoxLayout(this);

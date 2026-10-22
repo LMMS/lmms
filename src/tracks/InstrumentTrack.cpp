@@ -422,8 +422,8 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 			{
 				silenceAllNotes();
 			}
-			if( event.controllerNumber() == MidiControllerBankSelectMSB ||
-				event.controllerNumber() == MidiControllerBankSelectLSB )
+			if(event.controllerNumber() == MidiControllerBankSelectMSB
+				|| event.controllerNumber() == MidiControllerBankSelectLSB)
 			{
 				if (processPresetSelectEvents(event))
 				{

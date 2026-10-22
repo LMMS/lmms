@@ -69,8 +69,8 @@ private:
 	LcdSpinBox * m_fixedOutputNoteSpinBox;
 	QToolButton * m_wpBtn;
 
-	ComboBox * m_presetSelectPolicyComboBox;
-	GroupBox * m_presetSelectGroupBox;
+	ComboBox* m_presetSelectPolicyComboBox;
+	GroupBox* m_presetSelectGroupBox;
 
 	LcdSpinBox* m_baseVelocitySpinBox;
 

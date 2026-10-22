@@ -65,8 +65,8 @@ MidiPort::MidiPort( const QString& name,
 	m_fixedOutputNoteModel( -1, -1, MidiMaxKey, this, tr( "Fixed output note" ) ),
 	m_outputProgramModel( 1, 1, MidiProgramCount, this, tr( "Output MIDI program" ) ),
 	m_baseVelocityModel( MidiMaxVelocity/2, 1, MidiMaxVelocity, this, tr( "Base velocity" ) ),
-	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
-	m_writableModel( false, this, tr( "Send MIDI-events" ) ),
+	m_readableModel(false, this, tr("Receive MIDI-events")),
+	m_writableModel(false, this, tr("Send MIDI-events")),
 	m_captureProgramChangeModel(false, this, tr("Capture Program Change events")),
 	m_presetSelectPolicyModel(this, tr("Preset select policy"))
 {
