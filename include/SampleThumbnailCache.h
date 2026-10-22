@@ -30,7 +30,6 @@
 #include "lmms_export.h"
 
 namespace lmms {
-class Sample;
 
 /**
  * @class SampleThumbnailCache
