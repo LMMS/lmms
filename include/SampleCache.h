@@ -46,8 +46,8 @@ public:
 		auto buffer = fetchBuffer(path);
 		if (!buffer) { return nullptr; }
 
-		const auto resource = std::make_shared<const SampleThumbnailCache>(std::move(*buffer));
-		entry.resource = std::make_shared<const SampleThumbnailCache>(std::move(*resource));
+		const auto resource = std::make_shared<const SampleThumbnailCache>(*buffer);
+		entry.resource = resource;
 		entry.lastWriteTime = lastWriteTime;
 		return resource;
 	}
