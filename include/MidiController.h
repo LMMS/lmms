@@ -88,6 +88,10 @@ protected:
 	friend class gui::ControllerConnectionDialog;
 	friend class AutoDetectMidiController;
 
+private:
+	void onControlChange(MidiPortEventModel::Values linkEventType, unsigned char val);
+	void onNoteOn(MidiPortEventModel::Values linkEventType);
+	void onNoteOff(MidiPortEventModel::Values linkEventType);
 } ;
 
 
