@@ -342,6 +342,13 @@ void TrackView::paintEvent( QPaintEvent * pe )
 
 void TrackView::createClipView( Clip * clip )
 {
+	//createClipView races with Track's m_clips state, so when this calls,
+	// it is possible for m_clips to no longer have clip. This indicates that
+	// clip was freed.
+	if (std::find(m_track->m_clips.begin(), m_track->m_clips.end(), clip) == m_track->m_clips.end())
+	{
+		return;
+	}
 	ClipView * tv = clip->createView( this );
 	if( clip->getSelectViewOnCreate() == true )
 	{
