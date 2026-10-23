@@ -351,6 +351,11 @@ void Song::processNextBuffer()
 	m_vstSyncController.setPlaybackJumped(false);
 }
 
+void Song::removeOldAutomatedValue(AutomatableModel * am)
+{
+	//Get rid of object inside Song.m_oldAutomatedValues #8571
+	m_oldAutomatedValues.remove(am);
+}
 
 void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_cnt_t)
 {
