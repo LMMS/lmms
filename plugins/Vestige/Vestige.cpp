@@ -451,8 +451,6 @@ void VestigeInstrument::closePlugin( void )
 
 	if( m_subWindow != nullptr )
 	{
-		m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
-		m_subWindow->close();
 
 		if( m_subWindow != nullptr )
 		{
@@ -1099,8 +1097,6 @@ ManageVestigeInstrumentView::~ManageVestigeInstrumentView()
 	}
 
 	if ( m_vi->m_subWindow != nullptr ) {
-		m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
-		m_vi->m_subWindow->close();
 
 		if ( m_vi->m_subWindow != nullptr )
 			delete m_vi->m_subWindow;
@@ -1180,13 +1176,11 @@ void ManageVestigeInstrumentView::paintEvent( QPaintEvent * )
 
 extern "C"
 {
-
 // necessary for getting instance out of shared lib
 Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
 	return new VestigeInstrument( static_cast<InstrumentTrack *>( m ) );
 }
-
 
 }
 
