@@ -1176,13 +1176,11 @@ void ManageVestigeInstrumentView::paintEvent( QPaintEvent * )
 
 extern "C"
 {
-
 // necessary for getting instance out of shared lib
 Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
 	return new VestigeInstrument( static_cast<InstrumentTrack *>( m ) );
 }
-
 
 }
 
