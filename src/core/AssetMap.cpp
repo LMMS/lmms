@@ -6,8 +6,10 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QFile>
+#include <QString>
 
 #include "ConfigManager.h" // To init with common userdirs
+#include "PathUtil.h" // Conversion to absolute fs::string in convenience wrappers
 
 namespace fs = std::filesystem;
 
@@ -44,7 +46,7 @@ QString AssetMap::QStringFromHash(AssetMap::Sha256Hash hash)
 	return QByteArray::fromRawData(reinterpret_cast<char*>(&hash), sizeof hash).toBase64();
 }
 
-// TODO possible endianness problems
+// TODO possible endianness problems; can corrupt if length is wrong
 AssetMap::Sha256Hash AssetMap::hashFromQString(QString b64)
 {
 	return *reinterpret_cast<AssetMap::Sha256Hash*>(QByteArray::fromBase64(b64.toUtf8()).data());
@@ -79,5 +81,25 @@ fs::path AssetMap::get(AssetMap::Sha256Hash hash) const
 {
 	return map.at(hash);
 }
+
+fs::path AssetMap::fallback(fs::path file, AssetMap::Sha256Hash hash)
+{
+	if (fs::exists(file)) { return file; }
+	try
+	{
+		const fs::path alt = inst()->get(hash);
+		if (fs::exists(alt)) { return alt; }
+	}
+	catch (std::out_of_range const&) {}
+	return "";
+}
+
+fs::path AssetMap::fallback(QString file, QString b64hash)
+{
+	const fs::path stdfile = PathUtil::toAbsolute(file).toStdString();
+	if (b64hash.isEmpty()) { return std::filesystem::exists(stdfile) ? stdfile : ""; }
+	return fallback(file.toStdString(), hashFromQString(b64hash));
+}
+
 
 }

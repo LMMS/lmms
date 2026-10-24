@@ -220,16 +220,12 @@ void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 
 void AudioFileProcessor::loadSettings(const QDomElement& elem)
 {
-	if (auto srcFile = elem.attribute("src"); !srcFile.isEmpty())
+	if (const QString srcFile = elem.attribute("src"); !srcFile.isEmpty())
 	{
-		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
+		const QString resolvedFile = QString::fromStdString(AssetMap::fallback(srcFile, elem.attribute("srcHash")).string());
+		if (!resolvedFile.isEmpty())
 		{
-			setAudioFile(srcFile, false);
-		}
-		else if (auto fallbackSrcFile = AssetMap::inst()->get(elem.attribute("srcHash"));
-				 std::filesystem::exists(fallbackSrcFile))
-		{
-			setAudioFile(QString::fromStdString(fallbackSrcFile), false);
+			setAudioFile(resolvedFile, false);
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
 	}
