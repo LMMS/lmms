@@ -42,6 +42,6 @@ private:
 	std::unordered_map<Sha256Hash, std::filesystem::path> map = {};
 };
 
-}
+} // namespace lmms
 
 #endif

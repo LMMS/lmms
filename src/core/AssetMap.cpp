@@ -102,4 +102,4 @@ QString AssetMap::fallback(QString file, QString b64hash)
 }
 
 
-}
+} // namespace lmms
