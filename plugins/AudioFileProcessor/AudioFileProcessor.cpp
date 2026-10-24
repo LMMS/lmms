@@ -25,6 +25,7 @@
 #include "AudioFileProcessor.h"
 #include "AudioFileProcessorView.h"
 
+#include "AssetMap.h"
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
 #include "Song.h"
@@ -199,6 +200,11 @@ void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 	{
 		elem.setAttribute("sampledata", m_sample.toBase64());
 	}
+	else
+	{
+		const auto filename = PathUtil::toAbsolute(m_sample.sampleFile()).toStdString();
+		elem.setAttribute("srcHash", AssetMap::QStringFromHash(AssetMap::getHash(filename)));
+	}
 	m_reverseModel.saveSettings(doc, elem, "reversed");
 	m_loopModel.saveSettings(doc, elem, "looped");
 	m_ampModel.saveSettings(doc, elem, "amp");
@@ -219,6 +225,11 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
 			setAudioFile(srcFile, false);
+		}
+		else if (auto fallbackSrcFile = AssetMap::inst()->get(elem.attribute("srcHash"));
+				 std::filesystem::exists(fallbackSrcFile))
+		{
+			setAudioFile(QString::fromStdString(fallbackSrcFile), false);
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
 	}
