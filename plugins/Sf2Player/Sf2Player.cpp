@@ -245,7 +245,7 @@ Sf2Instrument::~Sf2Instrument()
 void Sf2Instrument::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
 	elem.setAttribute("src", m_filename);
-	elem.setAttribute("srcHash", AssetMap::getHash(PathUtil::stringToPath(m_filename)));
+	elem.setAttribute("srcHash", AssetMap::stringFromHash(AssetMap::getHash(PathUtil::stringToPath(m_filename))));
 	m_patchNum.saveSettings(doc, elem, "patch");
 	m_bankNum.saveSettings(doc, elem, "bank");
 
