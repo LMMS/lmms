@@ -203,7 +203,7 @@ void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 	else
 	{
 		const auto filename = PathUtil::toAbsolute(m_sample.sampleFile()).toStdString();
-		elem.setAttribute("srcHash", AssetMap::QStringFromHash(AssetMap::getHash(filename)));
+		elem.setAttribute("srcHash", AssetMap::stringFromHash(AssetMap::getHash(filename)));
 	}
 	m_reverseModel.saveSettings(doc, elem, "reversed");
 	m_loopModel.saveSettings(doc, elem, "looped");
@@ -222,7 +222,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 {
 	if (const QString srcFile = elem.attribute("src"); !srcFile.isEmpty())
 	{
-		const QString resolvedFile = QString::fromStdString(AssetMap::fallback(srcFile, elem.attribute("srcHash")).string());
+		const QString resolvedFile = AssetMap::fallback(srcFile, elem.attribute("srcHash"));
 		if (!resolvedFile.isEmpty())
 		{
 			setAudioFile(resolvedFile, false);

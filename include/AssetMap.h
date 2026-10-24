@@ -23,19 +23,19 @@ public:
 
 	using Sha256Hash = std::bitset<256>;
 	static Sha256Hash getHash(std::filesystem::path file);
-	static Sha256Hash hashFromQString(QString b64);
-	static QString QStringFromHash(Sha256Hash hash);
+	static Sha256Hash hashFromString(QString b64);
+	static QString stringFromHash(Sha256Hash hash);
 
 	void add(std::filesystem::path entry);
 	std::filesystem::path get(Sha256Hash hash) const;
 	std::filesystem::path get(QString b64hash) const
 	{
-		return b64hash.isEmpty() ? "" : get(hashFromQString(b64hash));
+		return b64hash.isEmpty() ? "" : get(hashFromString(b64hash));
 	}
 
 	// This is static so that the scan is "lazy" - performed only when source file is missing.
 	static std::filesystem::path fallback(std::filesystem::path file, Sha256Hash hash);
-	static std::filesystem::path fallback(QString file, QString b64hash);
+	static QString fallback(QString file, QString b64hash);
 
 private:
 	static AssetMap* s_inst;

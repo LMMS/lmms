@@ -269,7 +269,7 @@ void Sf2Instrument::loadSettings(const QDomElement& elem)
 	QString src = elem.attribute("src");
 	if (!src.isEmpty())
 	{
-		QString srcF = PathUtil::pathToString(AssetMap::fallback(src, elem.attribute("srcHash")));
+		QString srcF = AssetMap::fallback(src, elem.attribute("srcHash"));
 		if (!srcF.isEmpty())
 		{
 			openFile(srcF, false);

@@ -41,13 +41,13 @@ AssetMap::Sha256Hash AssetMap::getHash(fs::path filePath) {
 	return out;
 };
 
-QString AssetMap::QStringFromHash(AssetMap::Sha256Hash hash)
+QString AssetMap::stringFromHash(AssetMap::Sha256Hash hash)
 {
 	return QByteArray::fromRawData(reinterpret_cast<char*>(&hash), sizeof hash).toBase64();
 }
 
 // TODO possible endianness problems; can corrupt if length is wrong
-AssetMap::Sha256Hash AssetMap::hashFromQString(QString b64)
+AssetMap::Sha256Hash AssetMap::hashFromString(QString b64)
 {
 	return *reinterpret_cast<AssetMap::Sha256Hash*>(QByteArray::fromBase64(b64.toUtf8()).data());
 }
@@ -94,11 +94,11 @@ fs::path AssetMap::fallback(fs::path file, AssetMap::Sha256Hash hash)
 	return "";
 }
 
-fs::path AssetMap::fallback(QString file, QString b64hash)
+QString AssetMap::fallback(QString file, QString b64hash)
 {
-	const fs::path stdfile = PathUtil::toAbsolute(file).toStdString();
-	if (b64hash.isEmpty()) { return std::filesystem::exists(stdfile) ? stdfile : ""; }
-	return fallback(file.toStdString(), hashFromQString(b64hash));
+	const fs::path stdfile = PathUtil::stringToPath(file);
+	if (b64hash.isEmpty()) { return std::filesystem::exists(stdfile) ? file : ""; }
+	return QString::fromStdString(fallback(stdfile, hashFromString(b64hash)).string()); // TODO: where's PathUtil::pathToQString?
 }
 
 
