@@ -328,6 +328,8 @@ public:
 
 	Metronome& metronome() { return m_metronome; }
 
+	void removeOldAutomatedValue(AutomatableModel * am);
+
 public slots:
 	void playSong();
 	void record();
