@@ -40,7 +40,7 @@ std::set<LV2_URID> Lv2Options::s_supportedOptions;
 
 bool Lv2Options::isOptionSupported(LV2_URID key)
 {
-	return s_supportedOptions.find(key) != s_supportedOptions.end();
+	return s_supportedOptions.contains(key);
 }
 
 

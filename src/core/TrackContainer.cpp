@@ -29,6 +29,8 @@
 #include <QDomElement>
 #include <QWriteLocker>
 
+#include <algorithm>
+
 #include "AutomationClip.h"
 #include "embed.h"
 #include "TrackContainer.h"
@@ -196,7 +198,7 @@ void TrackContainer::removeTrack( Track * _track )
 	//   After checking that index != -1, we need to upgrade the lock to a write locker before changing m_tracks.
 	//   But since Qt offers no function to promote a read lock to a write lock, we must start with the write locker.
 	QWriteLocker lockTracksAccess(&m_tracksMutex);
-	auto it = std::find(m_tracks.begin(), m_tracks.end(), _track);
+	auto it = std::ranges::find(m_tracks, _track);
 	if (it != m_tracks.end())
 	{
 		// If the track is solo, all other tracks are muted. Change this before removing the solo track:
@@ -216,7 +218,7 @@ void TrackContainer::removeTrack( Track * _track )
 
 void TrackContainer::moveTrack(Track* track, int indexTo)
 {
-	m_tracks.erase(std::find(m_tracks.begin(), m_tracks.end(), track));
+	m_tracks.erase(std::ranges::find(m_tracks, track));
 	m_tracks.insert(m_tracks.begin() + indexTo, track);
 
 	emit trackMoved();
