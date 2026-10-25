@@ -120,6 +120,8 @@ public:
 	void showTextFloat(const QString &text, const QPoint &pos, int timeout=-1);
 	void showVolTextFloat(volume_t vol, const QPoint &pos, int timeout=-1);
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
+	void showChanceTextFloat(noterand_t c, const QPoint &pos, int timeout=-1);
+
 
 	void setCurrentMidiClip( MidiClip* newMidiClip );
 	void setGhostMidiClip( MidiClip* newMidiClip );
@@ -274,6 +276,7 @@ private:
 	{
 		Volume,
 		Panning,
+		Chance,
 		Count // make sure this one is always last
 	};
 
