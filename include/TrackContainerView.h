@@ -140,7 +140,9 @@ public:
 	void removeTrackView( TrackView * _tv );
 	// -------------------------------------------------------
 
-	int getTrackHeadWidth() const { return m_trackHeadWidth; }
+	//! Returns the width of the track settings/label/channel/volume/panning area to the left of the track content
+	//! This is essentially a sum of both the TrackOperationsWidget width and the Track settings widget width.
+	int trackHeadWidth() const { return m_trackHeadWidth; }
 	void setTrackHeadWidth(int width);
 
 	//! This function only exists because the pattern editor cannot yet handle scrolling, so the track head cannot
