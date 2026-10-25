@@ -700,7 +700,6 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
 		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerBar()) );
-		TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 
 		if( m_action == Action::Resize )
 		{
@@ -724,7 +723,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				if ( min <= m_initialClipPos ) min += snapLength;
 
 				int newLength = qMax<int>(min - m_initialClipPos, end - m_initialClipPos);
-				if (newLength != initialLength)
+				if (newLength != m_clip->length())
 				{
 					m_clip->changeLength(newLength);
 					m_clip->setAutoResize(false);
@@ -732,13 +731,14 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			}
 			else
 			{	// Otherwise, resize in fixed increments
+				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
 				// Don't resize to less than 1 tick
 				auto min = TimePos(initialLength % snapLength);
 				if (min < 1) min += snapLength;
 
 				int newLength = qMax<int>(min, initialLength + offset);
-				if (newLength != initialLength)
+				if (newLength != m_clip->length())
 				{
 					m_clip->changeLength(newLength);
 					m_clip->setAutoResize(false);
@@ -777,6 +777,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			else
 			{	// Otherwise, resize in fixed increments
 				// Don't resize to less than 1 tick
+				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 				auto minLength = TimePos(initialLength % snapLength);
 				if (minLength < 1) minLength += snapLength;
 				TimePos offset = TimePos(t - m_initialClipPos).quantize( snapSize );
