@@ -66,7 +66,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_tlb->show();
 
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
-	if (trackContainerView()->getTrackHeadWidth() < COMPACT_TRACK_WIDTH) { m_mixerChannelNumber->hide(); }
+	if (trackContainerView()->trackHeadWidth() < COMPACT_TRACK_WIDTH) { m_mixerChannelNumber->hide(); }
 	else { m_mixerChannelNumber->show(); }
 
 	connect(trackContainerView(), &TrackContainerView::trackHeadWidthChanged, this, [this](int width){
@@ -208,7 +208,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 
 	if (type == "samplefile")
 	{
-		int trackHeadWidth = trackContainerView()->getTrackHeadWidth();
+		int trackHeadWidth = trackContainerView()->trackHeadWidth();
 
 		const int deX = position(de).x();
 		int xPos = deX < trackHeadWidth

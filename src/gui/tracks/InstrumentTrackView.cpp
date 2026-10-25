@@ -84,7 +84,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect(_it, &InstrumentTrack::instrumentChanged, this, &InstrumentTrackView::onInstrumentChanged);
 
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
-	if (trackContainerView()->getTrackHeadWidth() < COMPACT_TRACK_WIDTH) { m_mixerChannelNumber->hide(); }
+	if (trackContainerView()->trackHeadWidth() < COMPACT_TRACK_WIDTH) { m_mixerChannelNumber->hide(); }
 	else { m_mixerChannelNumber->show(); }
 
 	connect(trackContainerView(), &TrackContainerView::trackHeadWidthChanged, this, [this](int width){

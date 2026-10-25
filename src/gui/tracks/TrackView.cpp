@@ -118,7 +118,7 @@ TrackView::TrackView(Track* track, TrackContainerView* tcv)
 void TrackView::resizeEvent( QResizeEvent * re )
 {
 	m_trackOperationsWidget.setFixedSize(TRACK_OP_WIDTH, height() - 1);
-	m_trackSettingsWidget.setFixedSize(m_trackContainerView->getTrackHeadWidth() - m_trackOperationsWidget.width(), height() - 1);
+	m_trackSettingsWidget.setFixedSize(m_trackContainerView->trackHeadWidth() - m_trackOperationsWidget.width(), height() - 1);
 
 	m_trackContentWidget.setFixedHeight(height());
 }
@@ -214,7 +214,7 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 	}
 
 
-	int widgetTotal = m_trackContainerView->getTrackHeadWidth();
+	int widgetTotal = m_trackContainerView->trackHeadWidth();
 
 	if (m_trackContainerView->allowRubberband() == true  && pos.x() > widgetTotal)
 	{
@@ -249,7 +249,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 
 	const auto pos = position(me);
 
-	int widgetTotal = m_trackContainerView->getTrackHeadWidth();
+	int widgetTotal = m_trackContainerView->trackHeadWidth();
 	if (m_trackContainerView->allowRubberband() == true && pos.x() > widgetTotal)
 	{
 		QWidget::mouseMoveEvent( me );

@@ -54,7 +54,7 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 {
 	setModel(ps);
 
-	m_timeLine = new TimeLineWidget(getTrackHeadWidth(), 32, pixelsPerBar(),
+	m_timeLine = new TimeLineWidget(trackHeadWidth(), 32, pixelsPerBar(),
 		Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
 		m_currentPosition, this
 	);
@@ -135,13 +135,13 @@ void PatternEditor::removeViewsForPattern(int pattern)
 void PatternEditor::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState( parentWidget(), element );
-	element.setAttribute("trackheadwidth", getTrackHeadWidth());
+	element.setAttribute("trackheadwidth", trackHeadWidth());
 }
 
 void PatternEditor::loadSettings(const QDomElement& element)
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
-	setTrackHeadWidth(element.attribute("trackheadwidth", QString::number(getTrackHeadWidth())).toInt());
+	setTrackHeadWidth(element.attribute("trackheadwidth", QString::number(trackHeadWidth())).toInt());
 	updateMaxSteps();
 }
 
@@ -209,8 +209,8 @@ void PatternEditor::updatePosition()
 void PatternEditor::updatePixelsPerBar()
 {
 	setPixelsPerBar(m_maxClipLength != 0
-		? (width() - getTrackHeadWidth()) * TimePos::ticksPerBar() / m_maxClipLength
-		: (width() - getTrackHeadWidth()));
+		? (width() - trackHeadWidth()) * TimePos::ticksPerBar() / m_maxClipLength
+		: (width() - trackHeadWidth()));
 	m_timeLine->setPixelsPerBar(pixelsPerBar());
 }
 
@@ -353,7 +353,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 
 QSize PatternEditorWindow::sizeHint() const
 {
-	return {m_editor->getTrackHeadWidth() + 2 * ClipView::BORDER_WIDTH + PatternEditor::MinPatternWidthPixels, 300};
+	return {m_editor->trackHeadWidth() + 2 * ClipView::BORDER_WIDTH + PatternEditor::MinPatternWidthPixels, 300};
 }
 
 
