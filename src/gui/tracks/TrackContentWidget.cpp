@@ -69,6 +69,7 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	m_embossOffset(0)
 {
 	setAcceptDrops( true );
+	setMouseTracking(true);
 
 	// Update background if snap size changes
 	connect(getGUI()->songEditor()->m_editor->snappingModel(), &Model::dataChanged,
