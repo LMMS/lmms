@@ -206,7 +206,7 @@ private:
 
 	int m_trackHeadWidth;
 
-	//! This variable can be removed once the Pattern Editor supports scrolling.
+	// TODO: This variable can be removed once the Pattern Editor supports scrolling.
 	int m_maxTrackHeadWidth = -1;
 
 	RubberBand * m_rubberBand;
