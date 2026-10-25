@@ -20,7 +20,6 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- *
  */
 
 #ifndef LMMS_GUI_EFFECT_SELECT_DIALOG_H
@@ -32,6 +31,9 @@
 #include <QRegularExpression>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <QHBoxLayout>
+#include <qlist.h>
+#include <qobject.h>
 
 class QScrollArea;
 class QTableView;
@@ -40,11 +42,11 @@ class QLineEdit;
 namespace lmms::gui
 {
 
-class DualColumnFilterProxyModel : public QSortFilterProxyModel
+class MultipleColumnFilterProxyModel : public QSortFilterProxyModel
 {
 	Q_OBJECT
 public:
-	DualColumnFilterProxyModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent)
+	MultipleColumnFilterProxyModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent)
 	{
 	}
 
@@ -54,27 +56,46 @@ public:
 		invalidateFilter();
 	}
 
+	void setEffectCategoryFilter(const QString& filter)
+	{
+		m_effectCategoryFilter = filter;
+		invalidateFilter();
+	}
+
+	void setFavoriteOnlyFilter(const bool filter)
+	{
+		m_effectFavoriteOnlyFilter = filter;
+		invalidateFilter();
+	}
+
 protected:
 	bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
 	{
 		QModelIndex nameIndex = sourceModel()->index(source_row, 0, source_parent);
-		QModelIndex typeIndex = sourceModel()->index(source_row, 1, source_parent);
+		QModelIndex categoryIndex = sourceModel()->index(source_row, 1, source_parent);
+		QModelIndex typeIndex = sourceModel()->index(source_row, 2, source_parent);
+		QModelIndex favoriteIndex = sourceModel()->index(source_row, 3, source_parent);
 
 		QString name = sourceModel()->data(nameIndex, Qt::DisplayRole).toString();
+		QString category = sourceModel()->data(categoryIndex, Qt::DisplayRole).toString();
 		QString type = sourceModel()->data(typeIndex, Qt::DisplayRole).toString();
+		bool isFavorite = !sourceModel()->data(favoriteIndex, Qt::DecorationRole).isNull();
 
 		QRegularExpression nameRegularExpression(filterRegularExpression());
 		nameRegularExpression.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 		
 		bool nameFilterPassed = nameRegularExpression.match(name).capturedStart() != -1;
-
 		bool typeFilterPassed = type.contains(m_effectTypeFilter, Qt::CaseInsensitive);
+		bool categoryFilterPassed = category.contains(m_effectCategoryFilter, Qt::CaseInsensitive);
+		bool favoriteOnlyFilterPassed = !m_effectFavoriteOnlyFilter || (isFavorite == m_effectFavoriteOnlyFilter);
 
-		return nameFilterPassed && typeFilterPassed;
+		return nameFilterPassed && typeFilterPassed && categoryFilterPassed && favoriteOnlyFilterPassed;
 	}
 
 private:
 	QString m_effectTypeFilter;
+	QString m_effectCategoryFilter;
+	bool m_effectFavoriteOnlyFilter;
 };
 
 
@@ -82,9 +103,11 @@ class EffectSelectDialog : public QDialog
 {
 	Q_OBJECT
 public:
+	Effect* instantiateSelectedPlugin(EffectChain* parent);
 	EffectSelectDialog(QWidget* parent);
 
-	Effect* instantiateSelectedPlugin(EffectChain* parent);
+signals:
+	void refreshData(QString effectName);
 
 protected slots:
 	void acceptSelection();
@@ -98,11 +121,18 @@ private:
 	EffectKey m_currentSelection;
 
 	QStandardItemModel m_sourceModel;
-	DualColumnFilterProxyModel m_model;
+	MultipleColumnFilterProxyModel m_model;
 	QWidget* m_descriptionWidget;
 	QTableView* m_pluginList;
 	QScrollArea* m_scrollArea;
 	QLineEdit* m_filterEdit;
+	QHBoxLayout* buildFiltersLayout();
+	QHBoxLayout* buildTypeFilterLayout();
+	QStringList getEffectCategoryLabels();
+	QHBoxLayout* buildCategoryFilterLayout();
+	QHBoxLayout* buildFavoriteOnlyFilterLayout();
+	void showContextMenu(const QPoint &);
+	void showEffectCategoryEditDialog(QString effectName, QString currentCategory);
 };
 
 } // namespace lmms::gui
