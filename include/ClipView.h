@@ -26,6 +26,7 @@
 #define LMMS_GUI_CLIP_VIEW_H
 
 #include <optional>
+#include <vector>
 
 #include <QVector>
 
@@ -56,6 +57,7 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor mutedColor READ mutedColor WRITE setMutedColor )
 	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
 	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
+	Q_PROPERTY( QColor loopedColor READ loopedColor WRITE setLoopedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
@@ -92,6 +94,7 @@ public:
 	QColor mutedColor() const { return m_mutedColor; }
 	QColor mutedBackgroundColor() const { return m_mutedBackgroundColor; }
 	QColor selectedColor() const { return m_selectedColor; }
+	QColor loopedColor() const { return m_loopedColor; }
 	QColor textColor() const { return m_textColor; }
 	QColor textBackgroundColor() const { return m_textBackgroundColor; }
 	QColor textShadowColor() const { return m_textShadowColor; }
@@ -101,6 +104,7 @@ public:
 	void setMutedColor(const QColor& c) { m_mutedColor = QColor(c); }
 	void setMutedBackgroundColor(const QColor& c) { m_mutedBackgroundColor = QColor(c); }
 	void setSelectedColor(const QColor& c) { m_selectedColor = QColor(c); }
+	void setLoopedColor(const QColor& c) { m_loopedColor = QColor(c); }
 	void setTextColor(const QColor& c) { m_textColor = QColor(c); }
 	void setTextBackgroundColor(const QColor& c) { m_textBackgroundColor = QColor(c); }
 	void setTextShadowColor(const QColor& c) { m_textShadowColor = QColor(c); }
@@ -115,7 +119,8 @@ public:
 	QVector<ClipView *> getClickedClips();
 
 	// Methods to remove, copy, cut, paste and mute a QVector of Clip views
-	void copy( QVector<ClipView *> clipvs );
+	//! @param linked Whether pasting creates clips that share their contents with the copied clips
+	void copy(QVector<ClipView*> clipvs, bool linked = false);
 	void cut( QVector<ClipView *> clipvs );
 	void paste();
 	// remove and toggleMute are static because they don't depend
@@ -126,6 +131,7 @@ public:
 	static void toggleMute( QVector<ClipView *> clipvs );
 
 	void toggleSelectedAutoResize();
+	void toggleSelectedLooping();
 
 	QColor getColorForDisplay( QColor );
 
@@ -255,9 +261,18 @@ protected:
 	//! the Clips.
 	//!
 	//! @param clips The trackContectObjects to save in a DataFile
-	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
+	DataFile createClipDataFiles(const QVector<ClipView *> & clips, bool linked = false) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
+
+	//! @brief Positions relative to the clip start where iterations of the looped content begin
+	//!
+	//! The first iteration may begin before the clip start. Without looping, the content is shown once and
+	//! the result is empty.
+	std::vector<TimePos> loopIterationStarts() const;
+
+	//! @brief Marks where the looped content repeats, with @p xOffset being the x coordinate of the clip start
+	void paintLoopBoundaries(QPainter& painter, float pixelsPerTick, float xOffset) const;
 
 	auto hasCustomColor() const -> bool;
 
@@ -306,6 +321,7 @@ private:
 
 // qproperty fields
 	QColor m_mutedColor;
+	QColor m_loopedColor;
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
 	QColor m_textColor;

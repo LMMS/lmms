@@ -3856,8 +3856,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 
 		// draw clip bounds
+		// Notes placed outside of loop for looping clips are never heard,
+		// so they are grayed out too.
+		const int contentStart = m_midiClip->isLooping()
+			? static_cast<int>(m_midiClip->loopStart())
+			: -m_midiClip->startTimeOffset();
+		const int contentEnd = m_midiClip->isLooping()
+			? static_cast<int>(m_midiClip->loopEnd())
+			: m_midiClip->length() - m_midiClip->startTimeOffset();
 		p.fillRect(
-			xCoordOfTick(m_midiClip->length() - m_midiClip->startTimeOffset()),
+			xCoordOfTick(contentEnd),
 			PR_TOP_MARGIN,
 			width() - 10,
 			noteEditBottom(),
@@ -3866,7 +3874,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		p.fillRect(
 			0,
 			PR_TOP_MARGIN,
-			xCoordOfTick(-m_midiClip->startTimeOffset()),
+			xCoordOfTick(contentStart),
 			noteEditBottom(),
 			m_outOfBoundsShade
 		);

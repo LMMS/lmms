@@ -111,11 +111,22 @@ bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 
 			if( _start >= sClip->startPosition() && _start < sClip->endPosition() )
 			{
-				if( sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset()) )
+				const TimePos clipPos = _start - sClip->startPosition();
+				// The current position on the timeline of the sample
+				const TimePos contentPos = sClip->contentPosition(clipPos);
+				const bool looping = sClip->isLooping();
+				// When looping, the sample restarts once per loop iteration, at the first position
+				// of the looped section that is within the sample
+				const bool loopRestart = looping && contentPos == std::max(sClip->loopStart(), TimePos{0});
+				if ((!sClip->isPlaying() || loopRestart) && contentPos >= 0)
 				{
 					auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
-					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() );
-					f_cnt_t clipFrameLength = bufferFramesPerTick * ( sClip->endPosition() - sClip->startPosition() - sClip->startTimeOffset() );
+					f_cnt_t sampleStart = bufferFramesPerTick * contentPos;
+					// Play until the end of the clip, or the end of the current loop iteration
+					const TimePos contentEnd = looping
+						? std::min<tick_t>(sClip->loopEnd(), contentPos + sClip->length() - clipPos)
+						: sClip->length() - sClip->startTimeOffset();
+					f_cnt_t clipFrameLength = bufferFramesPerTick * contentEnd;
 					f_cnt_t sampleBufferLength = sClip->sample().sampleSize();
 					//if the Clip smaller than the sample length we play only until Clip end
 					//else we play the sample to the end but nothing more

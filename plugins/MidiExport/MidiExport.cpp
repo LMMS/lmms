@@ -159,7 +159,7 @@ MidiExport::MidiExport()
 
 bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 	const TrackContainer::TrackList& patternStoreTracks,
-	int tempo, int masterPitch, const std::filesystem::path& filePath)
+	bpm_t tempo, int masterPitch, const std::filesystem::path& filePath)
 {
 	// Count number of instrument (and PatternStore) tracks
 	const auto numTracks = std::ranges::count_if(tracks, [](const Track* t) {
@@ -200,7 +200,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 }
 
 void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
-	int tempo, int masterPitch, bool isPattern)
+	bpm_t tempo, int masterPitch, bool isPattern)
 {
 	// Cast track as a instrument one and save info from it to element
 	auto& instTrack = dynamic_cast<InstrumentTrack&>(track);

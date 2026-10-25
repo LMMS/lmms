@@ -26,7 +26,10 @@
 #include "MidiClip.h"
 
 #include <algorithm>
+#include <set>
 #include <QDomElement>
+#include <QHash>
+#include <QUuid>
 
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
@@ -39,12 +42,82 @@
 namespace lmms
 {
 
+//! The notes of a clip, shared by all clips linked to it
+struct MidiClip::LinkGroup
+{
+	LinkGroup() :
+		// Each one needs an ID
+		id(QUuid::createUuid().toString(QUuid::WithoutBraces))
+	{
+		registry()[id] = this;
+	}
+
+	~LinkGroup()
+	{
+		if (registry().value(id) == this) { registry().remove(id); }
+		for (const auto& note : notes)
+		{
+			delete note;
+		}
+	}
+
+	void setId(const QString& newId)
+	{
+		if (registry().value(id) == this) { registry().remove(id); }
+		id = newId;
+		registry()[id] = this;
+	}
+
+	static LinkGroupPtr create()
+	{
+		auto group = std::make_shared<LinkGroup>();
+		group->self = group;
+		return group;
+	}
+
+	//! All link groups that currently exist, by ID
+	static QHash<QString, LinkGroup*>& registry()
+	{
+		static QHash<QString, LinkGroup*> groups;
+		return groups;
+	}
+
+	//! Gives linked groups the first free label and takes it back from groups that are no longer linked
+	void updateLabel()
+	{
+		if (clips.size() < 2) { labelIndex = -1; }
+		else if (labelIndex < 0)
+		{
+			std::set<int> used;
+			for (const auto& group : registry())
+			{
+				if (group != this && group->labelIndex >= 0) { used.insert(group->labelIndex); }
+			}
+			labelIndex = 0;
+			while (used.count(labelIndex)) { ++labelIndex; }
+		}
+	}
+
+	QString id;
+	NoteVector notes;
+	std::vector<MidiClip*> clips;
+	std::weak_ptr<LinkGroup> self;
+	//! Index of the label shown on linked clips, or -1 when not linked
+	int labelIndex = -1;
+	bool updating = false;
+};
+
+
+
+
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_clipType( Type::BeatClip ),
+	m_links( LinkGroup::create() ),
 	m_steps( TimePos::stepsPerBar() )
 {
+	m_links->clips.push_back(this);
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();
@@ -59,11 +132,13 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	Clip(other),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_clipType( other.m_clipType ),
+	m_links( LinkGroup::create() ),
 	m_steps( other.m_steps )
 {
-	for (const auto& note : other.m_notes)
+	m_links->clips.push_back(this);
+	for (const auto& note : other.notes())
 	{
-		m_notes.push_back(note->clone());
+		m_links->notes.push_back(note->clone());
 	}
 
 	init();
@@ -74,12 +149,19 @@ MidiClip::~MidiClip()
 {
 	emit destroyedMidiClip( this );
 
-	for (const auto& note : m_notes)
-	{
-		delete note;
-	}
+	// The notes are deleted together with the last clip using them
+	auto& clips = m_links->clips;
+	clips.erase(std::remove(clips.begin(), clips.end(), this), clips.end());
 
-	m_notes.clear();
+	// A clip left on its own is no longer linked, so it stops showing the label
+	const bool wasLinked = m_links->labelIndex >= 0;
+	m_links->updateLabel();
+	if (wasLinked && clips.size() == 1)
+	{
+		m_links->updating = true;
+		emit clips.front()->dataChanged();
+		m_links->updating = false;
+	}
 }
 
 
@@ -113,6 +195,8 @@ void MidiClip::resizeToFirstTrack()
 void MidiClip::init()
 {
 	connect(Engine::getSong(), &Song::timeSignatureChanged, this, &MidiClip::changeTimeSignature);
+	// Notes are often edited directly (e.g. by the piano roll), followed by dataChanged()
+	connect(this, &MidiClip::dataChanged, this, &MidiClip::updateLinkedClips);
 	if (getTrack()->trackContainer() != Engine::patternStore())
 	{
 		saveJournallingState(false);
@@ -137,7 +221,7 @@ void MidiClip::updateLength()
 		}
 		tick_t max_length = TimePos::ticksPerBar();
 
-		for (const auto& note : m_notes)
+		for (const auto& note : notes())
 		{
 			if (note->length() > 0)
 			{
@@ -158,7 +242,7 @@ TimePos MidiClip::beatClipLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for (const auto& note : m_notes)
+	for (const auto& note : notes())
 	{
 		if (note->type() == Note::Type::Step)
 		{
@@ -185,9 +269,9 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 		new_note->quantizePos(gui::getGUI()->pianoRoll()->quantization());
 	}
 
-	instrumentTrack()->lock();
-	m_notes.insert(std::upper_bound(m_notes.begin(), m_notes.end(), new_note, Note::lessThan), new_note);
-	instrumentTrack()->unlock();
+	lockLinkedTracks();
+	m_links->notes.insert(std::upper_bound(m_links->notes.begin(), m_links->notes.end(), new_note, Note::lessThan), new_note);
+	unlockLinkedTracks();
 
 	checkType();
 	updateLength();
@@ -202,10 +286,10 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 
 NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator it)
 {
-	instrumentTrack()->lock();
+	lockLinkedTracks();
 	delete *it;
-	auto new_it = m_notes.erase(it);
-	instrumentTrack()->unlock();
+	auto new_it = m_links->notes.erase(it);
+	unlockLinkedTracks();
 
 	checkType();
 	updateLength();
@@ -216,16 +300,17 @@ NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator it)
 
 NoteVector::const_iterator MidiClip::removeNote(Note* note)
 {
-	instrumentTrack()->lock();
+	lockLinkedTracks();
 
-	auto it = std::find(m_notes.begin(), m_notes.end(), note);
-	if (it != m_notes.end())
+	auto& notes = m_links->notes;
+	auto it = std::find(notes.begin(), notes.end(), note);
+	if (it != notes.end())
 	{
 		delete *it;
-		it = m_notes.erase(it);
+		it = notes.erase(it);
 	}
 
-	instrumentTrack()->unlock();
+	unlockLinkedTracks();
 
 	checkType();
 	updateLength();
@@ -238,7 +323,7 @@ NoteVector::const_iterator MidiClip::removeNote(Note* note)
 // Returns a pointer to the note at specified step, or nullptr if note doesn't exist
 Note * MidiClip::noteAtStep(int step)
 {
-	for (const auto& note : m_notes)
+	for (const auto& note : notes())
 	{
 		if (note->pos() == TimePos::stepPosition(step)
 			&& note->type() == Note::Type::Step)
@@ -254,20 +339,22 @@ Note * MidiClip::noteAtStep(int step)
 void MidiClip::rearrangeAllNotes()
 {
 	// sort notes by start time
-	std::sort(m_notes.begin(), m_notes.end(), Note::lessThan);
+	lockLinkedTracks();
+	std::sort(m_links->notes.begin(), m_links->notes.end(), Note::lessThan);
+	unlockLinkedTracks();
 }
 
 
 
 void MidiClip::clearNotes()
 {
-	instrumentTrack()->lock();
-	for (const auto& note : m_notes)
+	lockLinkedTracks();
+	for (const auto& note : m_links->notes)
 	{
 		delete note;
 	}
-	m_notes.clear();
-	instrumentTrack()->unlock();
+	m_links->notes.clear();
+	unlockLinkedTracks();
 
 	checkType();
 	updateLength();
@@ -418,7 +505,7 @@ void MidiClip::setType( Type _new_clip_type )
 void MidiClip::checkType()
 {
 	// If all notes are StepNotes, we have a BeatClip
-	const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
+	const auto beatClip = std::all_of(notes().begin(), notes().end(), [](auto note) { return note->type() == Note::Type::Step; });
 
 	setType(beatClip ? Type::BeatClip : Type::MelodyClip);
 }
@@ -430,6 +517,11 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 	midiClipElement.setAttribute("name", name());
 	midiClipElement.setAttribute("autoresize", QString::number(getAutoResize()));
 	midiClipElement.setAttribute("off", startTimeOffset());
+	saveLoopSettings(midiClipElement);
+	if (isLinked())
+	{
+		midiClipElement.setAttribute("link", linkId());
+	}
 	
 	if (const auto& c = color())
 	{
@@ -452,7 +544,7 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 	midiClipElement.setAttribute("len", length());
 
 	// now save settings of all notes
-	for (auto& note : m_notes)
+	for (auto& note : notes())
 	{
 		if (!onlySelectedNotes || note->selected())
 		{
@@ -490,20 +582,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		toggleMute();
 	}
 
-	clearNotes();
-
-	QDomNode node = _this.firstChild();
-	while( !node.isNull() )
-	{
-		if( node.isElement() &&
-			!node.toElement().attribute( "metadata" ).toInt() )
-		{
-			auto n = new Note;
-			n->restoreState( node.toElement() );
-			m_notes.push_back( n );
-		}
-		node = node.nextSibling();
-        }
+	if (loadLinkSettings(_this)) { loadNotes(_this); }
 
 	m_steps = _this.attribute( "steps" ).toInt();
 	if( m_steps == 0 )
@@ -526,6 +605,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
 	setStartTimeOffset(_this.attribute("off").toInt());
+	loadLoopSettings(_this);
 
 	emit dataChanged();
 }
@@ -646,7 +726,7 @@ void MidiClip::updatePatternTrack()
 
 bool MidiClip::empty()
 {
-	for (const auto& note : m_notes)
+	for (const auto& note : notes())
 	{
 		if (note->length() != 0)
 		{
@@ -662,7 +742,7 @@ bool MidiClip::empty()
 void MidiClip::changeTimeSignature()
 {
 	TimePos last_pos = TimePos::ticksPerBar() - 1;
-	for (const auto& note : m_notes)
+	for (const auto& note : notes())
 	{
 		if (note->length() < 0 && note->pos() > last_pos)
 		{
@@ -673,6 +753,241 @@ void MidiClip::changeTimeSignature()
 	m_steps = std::max<tick_t>(TimePos::stepsPerBar(),
 				last_pos.getBar() * TimePos::stepsPerBar());
 	updateLength();
+}
+
+
+
+
+const NoteVector& MidiClip::notes() const
+{
+	return m_links->notes;
+}
+
+
+
+
+bool MidiClip::isLinked() const
+{
+	return m_links->clips.size() > 1;
+}
+
+
+
+
+const std::vector<MidiClip*>& MidiClip::linkedClips() const
+{
+	return m_links->clips;
+}
+
+
+
+
+const QString& MidiClip::linkId() const
+{
+	return m_links->id;
+}
+
+
+
+
+QString MidiClip::linkLabel() const
+{
+	return isLinked() ? linkLabel(m_links->labelIndex) : QString{};
+}
+
+
+
+
+QString MidiClip::linkLabel(int index)
+{
+	if (index < 0) { return {}; }
+
+	// A to Z, then A1 to Z1, A2 to Z2, ...
+	const auto letter = QChar('A' + index % 26);
+	const int round = index / 26;
+	return round == 0 ? QString{letter} : letter + QString::number(round);
+}
+
+
+
+
+MidiClip* MidiClip::linkedClone()
+{
+	auto clip = new MidiClip(*this);
+	clip->setLinkGroup(m_links);
+	return clip;
+}
+
+
+
+
+void MidiClip::linkTo(MidiClip* other)
+{
+	if (other == this || other->m_links == m_links) { return; }
+	setLinkGroup(other->m_links);
+	checkType();
+	updateLength();
+	emit dataChanged();
+}
+
+
+
+
+void MidiClip::unlink()
+{
+	if (!isLinked()) { return; }
+
+	auto group = LinkGroup::create();
+	for (const auto& note : notes())
+	{
+		group->notes.push_back(note->clone());
+	}
+	setLinkGroup(group);
+	emit dataChanged();
+}
+
+
+
+
+void MidiClip::renewLinkIds(QDomElement& element)
+{
+	QHash<QString, QString> newIds;
+	const QDomNodeList clips = element.elementsByTagName("midiclip");
+	for (int i = 0; i < clips.length(); ++i)
+	{
+		QDomElement clip = clips.item(i).toElement();
+		const QString id = clip.attribute("link");
+		if (id.isEmpty()) { continue; }
+
+		if (!newIds.contains(id))
+		{
+			newIds[id] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+		}
+		clip.setAttribute("link", newIds[id]);
+	}
+}
+
+
+
+
+void MidiClip::setLinkGroup(LinkGroupPtr group)
+{
+	if (group == m_links) { return; }
+
+	// The audio thread may be playing this clip's notes
+	instrumentTrack()->lock();
+	auto& clips = m_links->clips;
+	clips.erase(std::remove(clips.begin(), clips.end(), this), clips.end());
+	// Keep the old notes alive until the track is unlocked since this may have been their last clip
+	const auto oldGroup = std::exchange(m_links, std::move(group));
+	m_links->clips.push_back(this);
+	instrumentTrack()->unlock();
+
+	// Free the old group's label first so that it can be reused right away
+	oldGroup->updateLabel();
+	m_links->updateLabel();
+
+	// Let the views of both groups show whether their clip is still linked
+	for (const auto& affected : {oldGroup.get(), m_links.get()})
+	{
+		affected->updating = true;
+		for (const auto& clip : affected->clips) { emit clip->dataChanged(); }
+		affected->updating = false;
+	}
+}
+
+
+
+
+void MidiClip::setLinkId(const QString& id)
+{
+	if (const auto other = LinkGroup::registry().value(id); other && other != m_links.get())
+	{
+		// IDs are unique, so this only happens when joining the group was intended
+		setLinkGroup(other->self.lock());
+		return;
+	}
+	m_links->setId(id);
+}
+
+
+
+// "Reduced Complexity"
+bool MidiClip::loadLinkSettings(const QDomElement& element)
+{
+	// Linked clips share their notes, so a clip joining existing linked clips keeps their notes
+	const QString link = supportsLinking() ? element.attribute("link") : QString{};
+	if (link == linkId()) { return true; }
+
+	if (const auto group = link.isEmpty() ? nullptr : LinkGroup::registry().value(link))
+	{
+		setLinkGroup(group->self.lock());
+		return false;
+	}
+
+	if (isLinked()) { unlink(); }
+	if (!link.isEmpty()) { setLinkId(link); }
+	return true;
+}
+
+
+
+
+void MidiClip::loadNotes(const QDomElement& element)
+{
+	clearNotes();
+
+	lockLinkedTracks();
+	for (QDomNode node = element.firstChild(); !node.isNull(); node = node.nextSibling())
+	{
+		if (node.isElement() && !node.toElement().attribute("metadata").toInt())
+		{
+			auto n = new Note;
+			n->restoreState(node.toElement());
+			m_links->notes.push_back(n);
+		}
+	}
+	unlockLinkedTracks();
+}
+
+
+
+
+void MidiClip::updateLinkedClips()
+{
+	if (m_links->updating || !isLinked()) { return; }
+
+	m_links->updating = true;
+	const auto clips = m_links->clips;
+	for (const auto& clip : clips)
+	{
+		if (clip == this) { continue; }
+		clip->checkType();
+		clip->updateLength();
+		emit clip->dataChanged();
+	}
+	m_links->updating = false;
+}
+
+
+
+
+void MidiClip::lockLinkedTracks()
+{
+	// Lock each track once, in a consistent order
+	std::set<Track*> tracks;
+	for (const auto& clip : m_links->clips) { tracks.insert(clip->getTrack()); }
+	for (const auto& track : tracks) { track->lock(); }
+}
+
+
+
+
+void MidiClip::unlockLinkedTracks()
+{
+	std::set<Track*> tracks;
+	for (const auto& clip : m_links->clips) { tracks.insert(clip->getTrack()); }
+	for (auto it = tracks.rbegin(); it != tracks.rend(); ++it) { (*it)->unlock(); }
 }
 
 

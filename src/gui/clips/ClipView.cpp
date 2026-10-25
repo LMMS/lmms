@@ -41,6 +41,7 @@
 #include "GuiApplication.h"
 #include "KeyboardShortcuts.h"
 #include "lmms_math.h"
+#include "MidiClip.h"
 #include "MidiClipView.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
@@ -78,6 +79,7 @@ ClipView::ClipView( Clip * clip,
 	m_initialOffsets( QVector<TimePos>() ),
 	m_hint( nullptr ),
 	m_mutedColor( 0, 0, 0 ),
+	m_loopedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
 	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
@@ -332,6 +334,10 @@ void ClipView::dropEvent( QDropEvent * de )
 	DataFile dataFile( value.toUtf8() );
 	TimePos pos = m_clip->startPosition();
 	QDomElement clips = dataFile.content().firstChildElement("clips");
+	if (dataFile.content().firstChildElement("copyMetadata").attribute("linked") != "1")
+	{
+		MidiClip::renewLinkIds(clips);
+	}
 	m_clip->restoreState( clips.firstChildElement().firstChildElement() );
 	m_clip->movePosition( pos );
 	AutomationClip::resolveAllIDs();
@@ -363,8 +369,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 
 
 
-DataFile ClipView::createClipDataFiles(
-    				const QVector<ClipView *> & clipViews) const
+DataFile ClipView::createClipDataFiles(const QVector<ClipView *> & clipViews, bool linked) const
 {
 	Track * t = m_trackView->getTrack();
 	TrackContainer * tc = t->trackContainer();
@@ -383,6 +388,12 @@ DataFile ClipView::createClipDataFiles(
 		clipElement.setAttribute( "trackType", static_cast<int>(clipTrack->type()) );
 		clipElement.setAttribute( "trackName", clipTrack->name() );
 		clipView->m_clip->saveState(dataFile, clipElement);
+		const auto midiClip = dynamic_cast<MidiClip*>(clipView->m_clip);
+		if (linked && midiClip && midiClip->supportsLinking())
+		{
+			// Clips that aren't linked yet don't store a link ID
+			clipElement.firstChildElement().setAttribute("link", midiClip->linkId());
+		}
 		clipParent.appendChild( clipElement );
 	}
 
@@ -404,6 +415,8 @@ DataFile ClipView::createClipDataFiles(
 	metadata.setAttribute( "trackContainerId", tc->id() );
 	// grabbedClipPos is the pos of the bar containing the Clip we grabbed
 	metadata.setAttribute( "grabbedClipPos", m_clip->startPosition() );
+	// Unless this is set, pasted clips don't stay linked to the copied clips
+	if (linked) { metadata.setAttribute("linked", 1); }
 
 	dataFile.content().appendChild( metadata );
 
@@ -550,7 +563,11 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 
 			delete m_hint;
 			QString hint;
-			if (m_action == Action::Move || m_action == Action::MoveSelection)
+			if ((m_action == Action::Move || m_action == Action::MoveSelection) && dynamic_cast<MidiClipView*>(this))
+			{
+				hint = tr("Press <%1> and drag to make a copy.\nPress <%1> + <Shift> and drag to make a linked copy.");
+			}
+			else if (m_action == Action::Move || m_action == Action::MoveSelection)
 			{
 				hint = tr("Press <%1> and drag to make a copy.");
 			}
@@ -631,8 +648,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			// triggered once we go into drag.
 			m_action = Action::None;
 
-			// Write the Clips to the DataFile for copying
-			DataFile dataFile = createClipDataFiles( clipViews );
+			// Write the Clips to the DataFile for copying. Holding shift too makes linked copies.
+			DataFile dataFile = createClipDataFiles(clipViews, me->modifiers() & Qt::ShiftModifier);
 
 			// TODO -- thumbnail for all selected
 			QPixmap thumbnail = grab().scaled(
@@ -755,7 +772,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 								m_trackView->trackContainerView()->currentPosition() +
 								static_cast<int>( x * TimePos::ticksPerBar() / ppb ) );
 
-			if (!isResizableBeforeStart())
+			// Looped content repeats before its start too
+			if (!isResizableBeforeStart() && !m_clip->isLooping())
 			{
 				t = std::max(t, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
 			}
@@ -854,7 +872,8 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = position(me).x() * TimePos::ticksPerBar() / ppb;
-		if (me->modifiers() & Qt::ShiftModifier)
+		// Moving content between the clips makes no sense when they repeat the same looped section
+		if (me->modifiers() & Qt::ShiftModifier && !m_clip->isLooping())
 		{
 			destructiveSplitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
 		}
@@ -952,6 +971,15 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		this, &ClipView::toggleSelectedAutoResize
 	);
 
+	if (m_clip->supportsLooping())
+	{
+		contextMenu.addAction(
+			embed::getIconPixmap(m_clip->isLooping() ? "loop_points_off" : "loop_points_on"),
+			m_clip->isLooping() ? tr("Stop looping contents") : tr("Loop contents"),
+			this, &ClipView::toggleSelectedLooping
+		);
+	}
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -1015,13 +1043,13 @@ void ClipView::remove( QVector<ClipView *> clipvs )
 	}
 }
 
-void ClipView::copy( QVector<ClipView *> clipvs )
+void ClipView::copy(QVector<ClipView*> clipvs, bool linked)
 {
 	// For copyStringPair()
 	using namespace Clipboard;
 
 	// Write the Clips to a DataFile for copying
-	DataFile dataFile = createClipDataFiles( clipvs );
+	DataFile dataFile = createClipDataFiles(clipvs, linked);
 
 	// Copy the Clip type as a key and the Clip data file to the clipboard
 	copyStringPair( QString( "clip_%1" ).arg( static_cast<int>(m_clip->getTrack()->type()) ),
@@ -1075,6 +1103,61 @@ void ClipView::toggleSelectedAutoResize()
 		clip->updateLength();
 	}
 }
+
+void ClipView::toggleSelectedLooping()
+{
+	const bool newState = !m_clip->isLooping();
+	std::set<Track*> journaledTracks;
+	for (auto clipv: getClickedClips())
+	{
+		Clip* clip = clipv->getClip();
+		if (!clip->supportsLooping()) { continue; }
+		if (journaledTracks.insert(clip->getTrack()).second) { clip->getTrack()->addJournalCheckPoint(); }
+		if (newState)
+		{
+			// Repeat what is currently visible when the clip gets longer, instead of growing to fit the content
+			clip->loopVisibleContent();
+			clip->setAutoResize(false);
+		}
+		else
+		{
+			clip->setLoop(0, 0);
+		}
+		clipv->update();
+	}
+}
+
+std::vector<TimePos> ClipView::loopIterationStarts() const
+{
+	std::vector<TimePos> starts;
+	if (!m_clip->isLooping()) { return starts; }
+
+	const tick_t loopLength = m_clip->loopLength();
+	// Painting a huge number of tiny repetitions is pointless and slow
+	constexpr tick_t MaxIterations = 4096;
+	const tick_t first = m_clip->loopStart() - m_clip->contentPosition(0);
+	for (tick_t pos = first; pos < m_clip->length() && static_cast<tick_t>(starts.size()) < MaxIterations; pos += loopLength)
+	{
+		starts.push_back(pos);
+	}
+	return starts;
+}
+
+
+void ClipView::paintLoopBoundaries(QPainter& painter, float pixelsPerTick, float xOffset) const
+{
+	painter.save();
+	auto pen = QPen{QColor{255, 255, 255, 110}, 0, Qt::DashLine};
+	painter.setPen(pen);
+	for (const auto& start : loopIterationStarts())
+	{
+		if (start <= 0) { continue; }
+		const int x = static_cast<int>(xOffset + start * pixelsPerTick);
+		painter.drawLine(x, 0, x, height());
+	}
+	painter.restore();
+}
+
 
 float ClipView::pixelsPerBar() const
 {
@@ -1218,7 +1301,7 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	}
 	else
 	{
-		if( muted )
+		if (muted)
 		{
 			c = hasCustomColor()
 				? mutedCustomColor.darker( 250 )
@@ -1251,7 +1334,9 @@ bool ClipView::splitClip(const TimePos pos)
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
 
-	auto rightClip = m_clip->clone();
+	// Both halves of a linked clip stay linked
+	const auto midiClip = dynamic_cast<MidiClip*>(m_clip);
+	Clip* rightClip = midiClip && midiClip->isLinked() ? midiClip->linkedClone() : m_clip->clone();
 
 	m_clip->changeLength(splitPos - m_initialClipPos);
 	m_clip->setAutoResize(false);
