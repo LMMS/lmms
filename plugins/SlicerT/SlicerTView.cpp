@@ -137,7 +137,7 @@ void SlicerTView::clearSlices()
 void SlicerTView::exportMidi()
 {
 	using namespace Clipboard;
-	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
+	if (m_slicerTParent->m_originalSample.frames() <= 1) { return; }
 
 	DataFile dataFile(DataFile::Type::ClipboardData);
 	QDomElement noteList = dataFile.createElement("note-list");

@@ -25,30 +25,24 @@
 #ifndef LMMS_SAMPLE_DECODER_H
 #define LMMS_SAMPLE_DECODER_H
 
-#include <QString>
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <vector>
 
-#include "SampleFrame.h"
-
 namespace lmms {
+class SampleBuffer;
+
 class SampleDecoder
 {
 public:
-	struct Result
-	{
-		std::vector<SampleFrame> data;
-		int sampleRate;
-	};
-
 	struct AudioType
 	{
 		std::string name;
 		std::string extension;
 	};
 
-	static auto decode(const QString& audioFile) -> std::optional<Result>;
+	static auto decode(const std::filesystem::path& path) -> std::optional<SampleBuffer>;
 	static auto supportedAudioTypes() -> const std::vector<AudioType>&;
 };
 } // namespace lmms

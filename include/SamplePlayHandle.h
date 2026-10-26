@@ -41,9 +41,9 @@ class Track;
 class LMMS_EXPORT SamplePlayHandle : public PlayHandle
 {
 public:
-	SamplePlayHandle(Sample* sample, bool ownAudioBusHandle = true);
-	SamplePlayHandle( const QString& sampleFile );
-	SamplePlayHandle( SampleClip* clip );
+	SamplePlayHandle(SampleBuffer buffer);
+	SamplePlayHandle(Sample* sample);
+	SamplePlayHandle(SampleClip* clip);
 	~SamplePlayHandle() override;
 
 	inline bool affinityMatters() const override
@@ -73,13 +73,13 @@ public:
 	}
 
 private:
+	std::unique_ptr<Sample> m_ownedSample;
+	Sample* m_sample = nullptr;
 	Sample::PlaybackState m_state;
 	f_cnt_t m_frame = 0;
-	Sample* m_sample = nullptr;
 	Track* m_track = nullptr;
 	PatternTrack* m_patternTrack = nullptr;
 	bool m_doneMayReturnTrue = true;
-	bool m_ownAudioBusHandle = false;
 } ;
 
 

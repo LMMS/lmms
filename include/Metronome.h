@@ -26,16 +26,25 @@
 #define LMMS_METRONOME_H
 
 #include <cstddef>
+#include <mutex>
+
+#include "Sample.h"
 
 namespace lmms {
-class Metronome
+class LMMS_EXPORT Metronome
 {
 public:
 	bool active() const { return m_active; }
 	void setActive(bool active) { m_active = active; }
 	void processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset);
+	void processBeat(int currentBeat, int numBeats);
 
 private:
+	// We have to lazily initialize the buffers because QString cannot be used before the QApplication is created
+	void init();
+	inline static Sample s_strong;
+	inline static Sample s_weak;
+	inline static std::once_flag s_initFlag;
 	bool m_active = false;
 };
 } // namespace lmms
