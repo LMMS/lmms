@@ -67,7 +67,7 @@ public:
 			if (resource) { return resource; }
 		}
 
-		auto buffer = fetchBuffer(path);
+		const auto buffer = fetchBuffer(path);
 		if (!buffer) { return nullptr; }
 
 		const auto resource = std::make_shared<const SampleThumbnailCache>(*buffer);
