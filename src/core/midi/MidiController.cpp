@@ -25,6 +25,7 @@
 
 
 #include "AudioEngine.h"
+#include "MidiPort.h"
 #include "MidiController.h"
 
 namespace lmms
@@ -71,27 +72,104 @@ void MidiController::updateName()
 
 
 
+void MidiController::onControlChange(MidiPortEventModel::Values linkEventType, unsigned char val)
+{
+	if (linkEventType == MidiPortEventModel::EventControlChange)
+	{
+		m_previousValue = m_lastValue;
+		m_lastValue = static_cast<float>(val) / 127.0f;
+		if (m_previousValue != m_lastValue)
+		{
+			emit valueChanged();
+		}
+	}
+}
+
+
+
+
+void MidiController::onNoteOn(MidiPortEventModel::Values linkEventType)
+{
+	switch (linkEventType)
+	{
+	case MidiPortEventModel::EventNoteOn:
+		m_previousValue = m_lastValue;
+		if (m_lastValue == 0)
+		{
+			m_lastValue = 1.0;
+		}
+		else
+		{
+			m_lastValue = 0.0;
+		}
+		if (m_previousValue != m_lastValue)
+		{
+			emit valueChanged();
+		}
+		break;
+
+	case MidiPortEventModel::EventNoteOnOff:
+		m_previousValue = m_lastValue;
+		m_lastValue = 1.0;
+		if (m_previousValue != m_lastValue)
+		{
+			emit valueChanged();
+		}
+        break;
+
+    default:
+        break;
+	}
+}
+
+
+
+
+void MidiController::onNoteOff(MidiPortEventModel::Values linkEventType)
+{
+	if (linkEventType == MidiPortEventModel::EventNoteOnOff)
+	{
+		m_previousValue = m_lastValue;
+		m_lastValue = 0.0;
+		if (m_previousValue != m_lastValue)
+		{
+			emit valueChanged();
+		}
+	}
+}
+
+
+
+
 void MidiController::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
+	int expectedChannel = m_midiPort.inputChannel();
+	MidiPortEventModel::Values linkEventType
+			= m_midiPort.inputControllerEventType();
+	if (expectedChannel != event.channel() + 1  && expectedChannel != 0)
+	{
+		return;
+	}
 	switch(event.type())
 	{
-		case MidiControlChange:
+	case MidiControlChange:
+		if (m_midiPort.inputController() == event.controllerNumber() + 1)
 		{
-			unsigned char controllerNum = event.controllerNumber();
-
-			if (m_midiPort.inputController() == controllerNum &&
-				(m_midiPort.inputChannel() == event.channel() + 1 || m_midiPort.inputChannel() == 0))
-			{
-				unsigned char val = event.controllerValue();
-				m_previousValue = m_lastValue;
-				m_lastValue = static_cast<float>(val) / 127.0f;
-				emit valueChanged();
-			}
-			break;
+			onControlChange(linkEventType, event.controllerValue());
 		}
-		default:
-			// Don't care - maybe add special cases for pitch and mod later
-			break;
+	break;
+
+	case MidiNoteOn:
+		if (m_midiPort.inputController() == event.key() + 1) { onNoteOn(linkEventType); }
+		break;
+
+	case MidiNoteOff:
+		if (m_midiPort.inputController() == event.key() + 1) { onNoteOff(linkEventType); }
+		break;
+
+	default:
+		// Don't care - maybe add special cases for pitch and mod later
+		break;
 	}
 }
 
@@ -114,7 +192,6 @@ void MidiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	Controller::saveSettings( _doc, _this );
 	m_midiPort.saveSettings( _doc, _this );
-
 }
 
 
