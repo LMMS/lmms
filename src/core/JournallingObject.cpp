@@ -22,9 +22,10 @@
  *
  */
 
-#include <QDomElement>
-
 #include "JournallingObject.h"
+
+#include <qqueue.h>
+
 #include "AutomatableModel.h"
 #include "ProjectJournal.h"
 #include "Engine.h"
@@ -81,6 +82,34 @@ QDomElement JournallingObject::saveState( QDomDocument & _doc,
 		return _this;
 	} else {
 		return QDomElement();
+	}
+}
+
+void JournallingObject::cloneState( QDomDocument & _doc, QDomElement & _parent )
+{
+	saveState(_doc,_parent);
+	auto projectJournal = Engine::projectJournal();
+	//Walk the tree and replace all ids with a fresh one via a BFS.
+	// No visited list needed, as XML is not cyclic
+	QQueue< QDomElement > bfsQueue;
+
+	bfsQueue.enqueue(_parent);
+
+	while (!bfsQueue.isEmpty())
+	{
+		auto current = bfsQueue.dequeue();
+		if (current.hasAttribute("id"))
+		{
+			current.setAttribute("id", ProjectJournal::idToSave(projectJournal->generateId()));
+		}
+
+		for (int i=0;i<current.childNodes().count();i++) {
+			auto child = current.childNodes().at(i);
+			if (!child.isElement()) {
+				continue;
+			}
+			bfsQueue.enqueue(child.toElement());
+		}
 	}
 }
 

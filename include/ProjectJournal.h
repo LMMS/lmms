@@ -69,6 +69,9 @@ public:
 	// alloc new ID and register object _obj to it
 	jo_id_t allocID( JournallingObject * _obj );
 
+	//Create a new id without registering any object
+	jo_id_t generateId() const;
+
 	// if there's already something known about ID _id, but it is currently
 	// unused (e.g. after jouralling object was deleted), register object
 	// _obj to this id
