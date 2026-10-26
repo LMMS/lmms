@@ -33,11 +33,11 @@
 #include "ComboBoxModel.h"
 #include "Editor.h"
 #include "JournallingObject.h"
+#include "LmmsTypes.h"
 #include "MidiClip.h"
 #include "SampleClip.h"
+#include "SampleThumbnailCache.h"
 #include "TimePos.h"
-#include "LmmsTypes.h"
-#include "SampleThumbnail.h"
 
 class QPushButton;
 class QScrollBar;
@@ -241,6 +241,7 @@ private:
 	// QPointers to set to nullptr on deletion
 	QPointer<MidiClip> m_ghostNotes = nullptr; 
 	QPointer<SampleClip> m_ghostSample = nullptr;
+	const SampleThumbnailCache* m_ghostSampleThumbnailCache;
 	bool m_renderSample = false;
 
 	void centerTopBottomScroll();
@@ -300,8 +301,7 @@ private:
 	QColor m_detuningNoteColor;
 	QColor m_ghostSampleColor;
 	QColor m_outOfBoundsShade;
-	
-	SampleThumbnail m_sampleThumbnail;
+
 
 	friend class AutomationEditorWindow;
 

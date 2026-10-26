@@ -51,8 +51,9 @@
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
+#include "SampleCache.h"
 #include "SampleClip.h"
-#include "SampleThumbnail.h"
+#include "SampleThumbnailRenderer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
@@ -1021,7 +1022,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
-	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
+	m_ghostSampleThumbnailCache = newGhostSample->sampleThumbnailCache();
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1214,16 +1215,16 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 			const auto& sample = m_ghostSample->sample();
 
-			const auto param = SampleThumbnail::VisualizeParameters{
-				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
-				.viewportRect = rect(),
+			const auto param = SampleThumbnailRenderer::VisualizeParameters{
+				.cache = m_ghostSampleThumbnailCache,
+				.rect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+				.sampleStart = static_cast<double>(sample.startFrame()) / sample.sampleSize(),
+				.sampleEnd = static_cast<double>(sample.endFrame()) / sample.sampleSize(),
 				.amplification = sample.amplification(),
-				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
-				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
 				.reversed = sample.reversed()
 			};
 
-			m_sampleThumbnail.visualize(param, p);
+			SampleThumbnailRenderer::visualize(param, p);
 		}
 
 		// draw ghost notes
