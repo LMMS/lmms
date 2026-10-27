@@ -50,7 +50,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 500, 500 );
+	setFixedSize( EQCONTROL_ARTWORK_WIDTH, EQCONTROL_ARTWORK_FULLHEIGHT );
 
 	auto inSpec = new EqSpectrumView(&controls->m_inFftBands, this);
 	inSpec->move( 26, 17 );
@@ -209,13 +209,18 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	hpBtnGrp->setModel(&m_controls->m_hpTypeModel);
 }
 
-
-
-
 void EqControlsDialog::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	m_originalHeight = parentWidget()->height() == 283 ? m_originalHeight : parentWidget()->height() ;
-	parentWidget()->setFixedHeight( parentWidget()->height() == m_originalHeight ? 283 : m_originalHeight  );
+	if (this->height() == EQCONTROL_ARTWORK_FULLHEIGHT)
+	{
+		//Collapse expanded area
+		this->setFixedHeight( EQCONTROL_ARTWORK_COLLAPSEDHEIGHT );
+	}
+	else
+	{
+		//Expand area to original height
+		this->setFixedHeight( EQCONTROL_ARTWORK_FULLHEIGHT );
+	}
 	update();
 }
 
