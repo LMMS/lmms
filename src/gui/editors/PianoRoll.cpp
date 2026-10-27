@@ -513,6 +513,7 @@ void PianoRoll::changeNoteEditMode( int i )
 
 void PianoRoll::markSemiTone(SemiToneMarkerAction i, bool fromMenu)
 {
+	Engine::getSong()->setModified();
 	const int key = fromMenu
 		? m_pianoKeySelected
 		: m_keyModel.value() - 1;
@@ -617,6 +618,7 @@ void PianoRoll::markSemiTone(SemiToneMarkerAction i, bool fromMenu)
 
 void PianoRoll::setGhostMidiClip( MidiClip* newMidiClip )
 {
+	Engine::getSong()->setModified();
 	// Expects a pointer to a MIDI clip or nullptr.
 	m_ghostNotes.clear();
 	if( newMidiClip != nullptr )
@@ -5048,6 +5050,7 @@ void PianoRoll::quantizeNotes(QuantizeAction mode)
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
+	Engine::getSong()->setModified();
 	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
 			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const InstrumentFunctionNoteStacking::Chord& scale =
@@ -5173,6 +5176,7 @@ void PianoRoll::changeSnapMode()
 	//	GridMode::Free - to be implemented
 
 	m_gridMode = static_cast<GridMode>(m_snapModel.value());
+	Engine::getSong()->setModified();
 }
 
 PianoRollWindow::PianoRollWindow() :
