@@ -618,6 +618,7 @@ void PianoRoll::markSemiTone(SemiToneMarkerAction i, bool fromMenu)
 
 void PianoRoll::setGhostMidiClip( MidiClip* newMidiClip )
 {
+	Engine::getSong()->setModified();
 	// Expects a pointer to a MIDI clip or nullptr.
 	m_ghostNotes.clear();
 	if( newMidiClip != nullptr )
