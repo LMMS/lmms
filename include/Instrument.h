@@ -165,9 +165,15 @@ public:
 
 	// An instruction to change the preset.
 	// The preset number is always an integer between 0 and 127
-	// The bank number can be equal to -1, meaning that bank selection
+	// The bank number may be not set, meaning that bank selection
 	// is ignored. The plugin should decide what to do in such situation.
-	inline virtual void changePreset(int bank, int preset) {}
+	//! @param bank Bank number
+	//! @param program Program number
+	//! @returns true if the patch was successfully changed
+	inline virtual bool setMidiPatch(std::optional<uint16_t> bank, uint8_t program)
+	{
+		return false;
+	}
 
 	// --------------------------------------------------------------------
 	// provided functions:

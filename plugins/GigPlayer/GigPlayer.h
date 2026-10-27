@@ -267,7 +267,7 @@ public:
 
 	void setParameter( const QString & _param, const QString & _value );
 	bool presetChangeSupported() override;
-	void changePreset(int bank, int preset) override;
+	bool setMidiPatch(std::optional<uint16_t> bank, uint8_t preset) override;
 
 public slots:
 	void openFile( const QString & _gigFile, bool updateTrackName = true );

@@ -47,9 +47,6 @@
 namespace lmms
 {
 
-	static const int BANK_NONE = -1;
-
-
 InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	Track(Track::Type::Instrument, tc),
 	MidiEventProcessor(),
@@ -76,8 +73,8 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_piano(this),
 	m_microtuner(),
 	m_programNumber(0),
-	m_programBankMSB(BANK_NONE),
-	m_programBankLSB(BANK_NONE)
+	m_programBankMSB(),
+	m_programBankLSB()
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_pitchModel.setStrictStepSize(true);
@@ -1012,8 +1009,8 @@ void InstrumentTrack::onProgramChangeEvent(MidiPort::PresetSelectPolicy policy, 
 
 	if (policy == MidiPort::BankSelectIgnore)
 	{
-		m_programBankMSB = BANK_NONE;
-		m_programBankLSB = BANK_NONE;
+		m_programBankMSB.reset();
+		m_programBankLSB.reset();
 	}
 }
 
@@ -1023,22 +1020,22 @@ bool InstrumentTrack::onControllerBankSelectMSB(MidiPort::PresetSelectPolicy pol
 {
 	switch (policy)
 	{
-	case MidiPort::BankSelectMSB:
-		/* Only MSB is meaningful and is the only bank select
-		 * message, so it should be actually treated as LSB.
-		 * MSB should be set to zero. */
-		m_programBankMSB = 0;
-		m_programBankLSB = ctrlValue;
-		return true;
-	case MidiPort::BankSelectBoth:
-		/* Both MSB and LSB are meaningful, so don't touch
-		 * LSB here unless it is set to None (-1) - in this case reset it to 0. */
-		m_programBankMSB = ctrlValue;
-		if (m_programBankLSB == BANK_NONE) { m_programBankLSB = 0; }
-		return true;
-	case MidiPort::BankSelectIgnore:
-	default:
-		return false;
+		case MidiPort::BankSelectMSB:
+			/* Only MSB is meaningful and is the only bank select
+			 * message, so it should be actually treated as LSB.
+			 * MSB should be set to zero. */
+			m_programBankMSB = 0;
+			m_programBankLSB = ctrlValue;
+			return true;
+		case MidiPort::BankSelectBoth:
+			/* Both MSB and LSB are meaningful, so don't touch
+			 * LSB here unless it is set to None (-1) - in this case reset it to 0. */
+			m_programBankMSB = ctrlValue;
+			if (!m_programBankLSB.has_value()) { m_programBankLSB = 0; }
+			return true;
+		case MidiPort::BankSelectIgnore:
+		default:
+			return false;
 	}
 }
 
@@ -1048,14 +1045,14 @@ bool InstrumentTrack::onControllerBankSelectLSB(MidiPort::PresetSelectPolicy pol
 {
 	switch (policy)
 	{
-	case MidiPort::BankSelectBoth:
-		m_programBankLSB = ctrlValue;
-		if (m_programBankMSB == BANK_NONE) { m_programBankMSB = 0; }
-		return true;
-	case MidiPort::BankSelectIgnore:
-	case MidiPort::BankSelectMSB:
-	default:
-		return false;
+		case MidiPort::BankSelectBoth:
+			m_programBankLSB = ctrlValue;
+			if (!m_programBankMSB.has_value()) { m_programBankMSB = 0; }
+			return true;
+		case MidiPort::BankSelectIgnore:
+		case MidiPort::BankSelectMSB:
+		default:
+			return false;
 	}
 }
 
@@ -1065,12 +1062,12 @@ bool InstrumentTrack::onControlChangeEvent(MidiPort::PresetSelectPolicy policy, 
 {
 	switch (ctrlNumber)
 	{
-	case MidiControllerBankSelectMSB:
-		return onControllerBankSelectMSB(policy, ctrlValue);
-	case MidiControllerBankSelectLSB:
-		return onControllerBankSelectLSB(policy, ctrlValue);
-	default:
-		return false;
+		case MidiControllerBankSelectMSB:
+			return onControllerBankSelectMSB(policy, ctrlValue);
+		case MidiControllerBankSelectLSB:
+			return onControllerBankSelectLSB(policy, ctrlValue);
+		default:
+			return false;
 	}
 }
 
@@ -1085,13 +1082,13 @@ bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 
 	switch (event.type())
 	{
-	case MidiProgramChange:
-		onProgramChangeEvent(policy, event.key());
-		return true;
-	case MidiControlChange:
-		return onControlChangeEvent(policy, event.controllerNumber(), event.controllerValue());
-	default:
-		return false;
+		case MidiProgramChange:
+			onProgramChangeEvent(policy, event.key());
+			return true;
+		case MidiControlChange:
+			return onControlChangeEvent(policy, event.controllerNumber(), event.controllerValue());
+		default:
+			return false;
 	}
 }
 
@@ -1100,12 +1097,15 @@ bool InstrumentTrack::processPresetSelectEvents(const MidiEvent& event)
 void InstrumentTrack::changePreset()
 {
 	if (m_instrument == nullptr) { return; }
-	int bankNo = BANK_NONE;
-	if (m_programBankMSB != BANK_NONE && m_programBankLSB != BANK_NONE)
+	if (m_programBankMSB.has_value() && m_programBankLSB.has_value())
 	{
-		bankNo = (m_programBankMSB << 7) | m_programBankLSB;
+		uint16_t bankNo = (static_cast<uint16_t>(*m_programBankMSB) << 7) | *m_programBankLSB;
+		m_instrument->setMidiPatch(bankNo, m_programNumber);
 	}
-	m_instrument->changePreset(bankNo, m_programNumber);
+	else
+	{
+		m_instrument->setMidiPatch(std::nullopt, m_programNumber);
+	}
 }
 
 

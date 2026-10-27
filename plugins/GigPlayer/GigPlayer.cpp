@@ -901,29 +901,27 @@ bool GigInstrument::presetChangeSupported()
 	return true;
 }
 
-void GigInstrument::changePreset(int bank, int preset)
+bool GigInstrument::setMidiPatch(std::optional<uint16_t> bank, uint8_t preset)
 {
 	bool presetChanged = false;
 	// The "empty" bank indicates that we do not want to switch
 	// banks. If we configure the preset change feature to ignore
 	// bank switching, we can set it manually and be sure
 	// that it will not reset.
-	if (bank != InstrumentTrack::BANK_NONE)
+	if (bank.has_value() && m_bankNum.value() != static_cast<int>(*bank))
 	{
-		if (m_bankNum.value() != bank)
-		{
-			m_bankNum.setValue(bank);
-			presetChanged = true;
-		}
+		m_bankNum.setValue(*bank);
+		presetChanged = true;
 	}
 
-	if (m_patchNum.value() != preset)
+	if (m_patchNum.value() != static_cast<int>(preset))
 	{
 		m_patchNum.setValue(preset);
 		presetChanged = true;
 	}
 
 	if (presetChanged) { emit patchChanged(); }
+	return presetChanged;
 }
 
 namespace gui

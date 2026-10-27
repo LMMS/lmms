@@ -64,8 +64,6 @@ class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
 
-	static const int BANK_NONE = -1;
-
 	InstrumentTrack( TrackContainer* tc );
 	~InstrumentTrack() override;
 
@@ -340,8 +338,8 @@ private:
 	Microtuner m_microtuner;
 
 	int m_programNumber;
-	int m_programBankMSB;
-	int m_programBankLSB;
+	std::optional<uint8_t> m_programBankMSB;
+	std::optional<uint8_t> m_programBankLSB;
 
 	std::unique_ptr<BoolModel> m_midiCCEnable;
 	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];

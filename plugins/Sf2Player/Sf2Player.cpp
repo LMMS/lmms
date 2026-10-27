@@ -911,24 +911,22 @@ bool Sf2Instrument::presetChangeSupported()
 	return true;
 }
 
-void Sf2Instrument::changePreset(int bank, int preset)
+bool Sf2Instrument::setMidiPatch(std::optional<uint16_t> bank, uint8_t preset)
 {
 	bool presetChanged = false;
-	if (bank != InstrumentTrack::BANK_NONE)
+	if (bank.has_value() && m_bankNum.value() != static_cast<int>(*bank))
 	{
-		if (m_bankNum.value() != bank)
-		{
-			m_bankNum.setValue(bank);
-			presetChanged = true;
-		}
+		m_bankNum.setValue(*bank);
+		presetChanged = true;
 	}
-	if (m_patchNum.value() != preset)
+	if (m_patchNum.value() != static_cast<int>(preset))
 	{
 		m_patchNum.setValue(preset);
 		presetChanged = true;
 	}
 
 	if (presetChanged) { emit patchChanged(); }
+	return presetChanged;
 }
 
 
