@@ -5175,6 +5175,7 @@ void PianoRoll::changeSnapMode()
 	//	GridMode::Free - to be implemented
 
 	m_gridMode = static_cast<GridMode>(m_snapModel.value());
+	Engine::getSong()->setModified();
 }
 
 PianoRollWindow::PianoRollWindow() :
