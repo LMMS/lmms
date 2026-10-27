@@ -1,9 +1,6 @@
-#include <BarModelEditor.h>
+#include "BarModelEditor.h"
 
 #include <QPainter>
-
-#include "DeprecationHelper.h"
-
 
 namespace lmms::gui
 {

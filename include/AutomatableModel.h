@@ -214,13 +214,14 @@ public:
 	float scaledValue( float value ) const;
 	//! @brief Returns value applied with the inverse of this model's scale type
 	float inverseScaledValue( float value ) const;
+	//! @brief Returns value inverse-scaled and normalized into the range of 0..1
+	float normValue(float value) const;
+	//! @brief Returns value transformed from normalized to direct representation
+	float inverseNormValue(float value) const;
 
 	void setInitValue( const float value );
 
 	void setValue(const float value, const bool isAutomated = false);
-
-	float normValue(const float value) const;
-	float inverseNormValue(const float value) const;
 
 	void incValue( int steps )
 	{
