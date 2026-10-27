@@ -513,6 +513,7 @@ void PianoRoll::changeNoteEditMode( int i )
 
 void PianoRoll::markSemiTone(SemiToneMarkerAction i, bool fromMenu)
 {
+	Engine::getSong()->setModified();
 	const int key = fromMenu
 		? m_pianoKeySelected
 		: m_keyModel.value() - 1;
@@ -5048,6 +5049,7 @@ void PianoRoll::quantizeNotes(QuantizeAction mode)
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
+	Engine::getSong()->setModified();
 	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
 			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const InstrumentFunctionNoteStacking::Chord& scale =
