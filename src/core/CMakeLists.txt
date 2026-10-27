@@ -25,6 +25,7 @@ set(LMMS_SRCS
 	core/Engine.cpp
 	core/EnvelopeAndLfoParameters.cpp
 	core/fft_helpers.cpp
+	core/GridModel.cpp
 	core/Mixer.cpp
 	core/ImportFilter.cpp
 	core/InlineAutomation.cpp
@@ -88,6 +89,7 @@ set(LMMS_SRCS
 	core/UpgradeExtendedNoteRange.cpp
 	core/Clip.cpp
 	core/ValueBuffer.cpp
+	core/VectorGraphModel.cpp
 	core/VstSyncController.cpp
 	core/StepRecorder.cpp
 
