@@ -77,7 +77,7 @@ Analyzer::~Analyzer()
 }
 
 // Take audio data and pass them to the spectrum processor.
-Effect::ProcessStatus Analyzer::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus Analyzer::processImpl(PlanarBufferView<float> inOut)
 {
 	// Measure time spent in audio thread; both average and peak should be well under 1 ms.
 	#ifdef SA_DEBUG
@@ -94,9 +94,23 @@ Effect::ProcessStatus Analyzer::processImpl(SampleFrame* buf, const f_cnt_t fram
 	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 	if (m_controls.isViewVisible())
 	{
+		// Planar-to-interleaved ringbuffer copier
+		class Copier
+		{
+		public:
+			explicit Copier(PlanarBufferView<const float> src) : m_src(src) {}
+
+			void operator()(std::size_t srcOffset, std::size_t amount, SampleFrame* dest) const
+			{
+				MixHelpers::copy(InterleavedBufferSpan{dest, amount}, m_src.subspan(srcOffset, amount));
+			}
+		private:
+			PlanarBufferSpan<const float> m_src;
+		} copier{inOut};
+
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		m_inputBuffer.write(buf, frames, true);
+		m_inputBuffer.writeFunc(copier, inOut.frames(), true);
 	}
 	#ifdef SA_DEBUG
 		audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;

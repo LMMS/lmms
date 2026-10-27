@@ -125,7 +125,7 @@ void LadspaEffect::changeSampleRate()
 
 
 
-Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus LadspaEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	m_pluginMutex.lock();
 	if (!isProcessingAudio())
@@ -136,6 +136,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const f_cnt_t 
 
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
 	// the control ports.
+	const auto frames = inOut.frames();
 	ch_cnt_t channel = 0;
 	for( ch_cnt_t proc = 0; proc < processorCount(); ++proc )
 	{
@@ -147,7 +148,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const f_cnt_t 
 				case BufferRate::ChannelIn:
 					for (f_cnt_t frame = 0; frame < frames; ++frame)
 					{
-						pp->buffer[frame] = buf[frame][channel];
+						pp->buffer[frame] = inOut[channel][frame];
 					}
 					++channel;
 					break;
@@ -217,7 +218,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const f_cnt_t 
 				case BufferRate::ChannelOut:
 					for (f_cnt_t frame = 0; frame < frames; ++frame)
 					{
-						buf[frame][channel] = d * buf[frame][channel] + w * pp->buffer[frame];
+						inOut[channel][frame] = d * inOut[channel][frame] + w * pp->buffer[frame];
 					}
 					++channel;
 					break;

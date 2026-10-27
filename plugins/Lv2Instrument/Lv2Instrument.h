@@ -57,8 +57,8 @@ public:
 	/*
 		initialization
 	*/
-	Lv2Instrument(InstrumentTrack *instrumentTrackArg,
-		 Descriptor::SubPluginFeatures::Key* key);
+	Lv2Instrument(InstrumentTrack* instrumentTrackArg,
+		Descriptor::SubPluginFeatures::Key* key);
 	~Lv2Instrument() override;
 	void reload();
 	void onSampleRateChanged();
@@ -66,26 +66,26 @@ public:
 	/*
 		load/save
 	*/
-	void saveSettings(QDomDocument &doc, QDomElement &that) override;
-	void loadSettings(const QDomElement &that) override;
-	void loadFile(const QString &file) override;
+	void saveSettings(QDomDocument& doc, QDomElement& that) override;
+	void loadSettings(const QDomElement& that) override;
+	void loadFile(const QString& file) override;
 
 	/*
 		realtime funcs
 	*/
 	bool hasNoteInput() const override { return Lv2ControlBase::hasNoteInput(); }
 #ifdef LV2_INSTRUMENT_USE_MIDI
-	bool handleMidiEvent(const MidiEvent &event,
-		const TimePos &time = TimePos(), f_cnt_t offset = 0) override;
+	bool handleMidiEvent(const MidiEvent& event,
+		const TimePos& time = TimePos(), f_cnt_t offset = 0) override;
 #else
-	void playNote(NotePlayHandle *nph, SampleFrame*) override;
+	void playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>>) override;
 #endif
-	void play(SampleFrame* buf) override;
+	void play(std::optional<PlanarBufferView<float>> out) override;
 
 	/*
 		misc
 	*/
-	gui::PluginView* instantiateView(QWidget *parent) override;
+	gui::PluginView* instantiateView(QWidget* parent) override;
 
 private slots:
 	void updatePitchRange();
@@ -110,11 +110,11 @@ class Lv2InsView : public InstrumentView, public Lv2ViewBase
 {
 Q_OBJECT
 public:
-	Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent);
+	Lv2InsView(Lv2Instrument* _instrument, QWidget* _parent);
 
 protected:
-	void dragEnterEvent(QDragEnterEvent *_dee) override;
-	void dropEvent(QDropEvent *_de) override;
+	void dragEnterEvent(QDragEnterEvent* _dee) override;
+	void dropEvent(QDropEvent* _de) override;
 	void hideEvent(QHideEvent* event) override;
 
 private:

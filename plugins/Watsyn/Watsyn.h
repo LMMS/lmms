@@ -26,6 +26,7 @@
 #ifndef WATSYN_H
 #define WATSYN_H
 
+#include "AudioBuffer.h"
 #include "AudioResampler.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -74,22 +75,18 @@ class WatsynView;
 class WatsynObject
 {
 public:
-	WatsynObject( 	float * _A1wave, float * _A2wave,
-					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, f_cnt_t _frames,
-					WatsynInstrument * _w );
-	virtual ~WatsynObject();
+	WatsynObject(
+		float* a1wave, float* a2wave,
+		float* b1wave, float* b2wave,
+		int amod, int bmod, const sample_rate_t samplerate, NotePlayHandle* nph, f_cnt_t frames,
+		WatsynInstrument* w);
+	~WatsynObject() = default;
 
 	void renderOutput( f_cnt_t _frames );
 
-	inline SampleFrame* abuf() const
-	{
-		return m_abuf;
-	}
-	inline SampleFrame* bbuf() const
-	{
-		return m_bbuf;
-	}
+	PlanarBufferView<const float> abuf() const { return m_abuf.allBuffers(); }
+	PlanarBufferView<const float> bbuf() const { return m_bbuf.allBuffers(); }
+
 	inline sample_rate_t samplerate() const
 	{
 		return m_samplerate;
@@ -106,8 +103,8 @@ private:
 
 	WatsynInstrument * m_parent;
 
-	SampleFrame* m_abuf;
-	SampleFrame* m_bbuf;
+	AudioBuffer m_abuf;
+	AudioBuffer m_bbuf;
 
 	float m_lphase [NUM_OSCS];
 	float m_rphase [NUM_OSCS];
@@ -125,8 +122,7 @@ public:
 	WatsynInstrument( InstrumentTrack * _instrument_track );
 	~WatsynInstrument() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
+	void playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -173,7 +169,7 @@ private:
 	}
 
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
-	inline void srccpy(float* _dst, float* _src)
+	inline void srccpy(float* dst, const float* src)
 	{
 		auto srcIndex = f_cnt_t{0};
 		auto dstIndex = f_cnt_t{0};
@@ -183,8 +179,8 @@ private:
 
 		while (dstIndex < WAVELEN)
 		{
-			const auto input = InterleavedBufferView<const float, 1>{_src + srcIndex, GRAPHLEN - srcIndex};
-			const auto output = InterleavedBufferView<float, 1>{_dst + dstIndex, WAVELEN - dstIndex};
+			const auto input = InterleavedBufferSpan<const float, 1>{src + srcIndex, GRAPHLEN - srcIndex};
+			const auto output = InterleavedBufferSpan<float, 1>{dst + dstIndex, WAVELEN - dstIndex};
 			const auto result = m_resampler.process(input, output);
 
 			srcIndex = (srcIndex + result.inputFramesUsed) % GRAPHLEN;
@@ -223,7 +219,7 @@ private:
 		}
 	}*/
 
-	AudioResampler m_resampler = AudioResampler{AudioResampler::Mode::SincFastest, 1};
+	AudioResampler m_resampler = AudioResampler{AudioResampler::Mode::SincFastest, 1, true};
 
 	FloatModel a1_vol;
 	FloatModel a2_vol;

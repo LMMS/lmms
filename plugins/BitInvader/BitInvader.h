@@ -74,8 +74,7 @@ public:
 	BitInvader(InstrumentTrack * _instrument_track );
 	~BitInvader() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
+	void playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 

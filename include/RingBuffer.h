@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2014 Vesa Kivimäki
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -27,35 +28,34 @@
 #define LMMS_RING_BUFFER_H
 
 #include <cmath>
+#include <concepts>
 #include <QObject>
+
+#include "AudioBuffer.h"
 #include "LmmsTypes.h"
 #include "lmms_export.h"
-
 
 namespace lmms
 {
 
-class SampleFrame;
-
-/** \brief A basic LMMS ring buffer for single-thread use. For thread and realtime safe alternative see LocklessRingBuffer.
-*/
+//! @brief A basic LMMS ring buffer for single-thread use.
+//!
+//! For thread and realtime safe alternative see LocklessRingBuffer.
 class LMMS_EXPORT RingBuffer : public QObject
 {
 	Q_OBJECT
 public:
-/** \brief Constructs a ringbuffer of specified size, will not care about samplerate changes
- * 	\param size The size of the buffer in frames. The actual size will be size + period size
- */
-	RingBuffer( f_cnt_t size );
+	//! @brief Constructs a ringbuffer of specified size, will not care about samplerate changes
+	//! @param frames The size of the buffer in frames. The actual size will be frames + period size
+	//! @param channels The number of planar channels in the buffer
+	explicit RingBuffer(f_cnt_t frames, ch_cnt_t channels = DEFAULT_CHANNELS);
 
-/** \brief Constructs a ringbuffer of specified samplerate-dependent size, which will be updated when samplerate changes
- * 	\param size The size of the buffer in milliseconds. The actual size will be size + period size
- */
-	RingBuffer( float size );
-	~RingBuffer() override;
+	//! @brief Constructs a ringbuffer of specified samplerate-dependent size, which will be updated when samplerate changes
+	//! @param milliseconds The size of the buffer in milliseconds. The actual size will be size + period size
+	//! @param channels The number of planar channels in the buffer
+	explicit RingBuffer(float milliseconds, ch_cnt_t channels = DEFAULT_CHANNELS);
 
-
-
+	~RingBuffer() override = default;
 
 ////////////////////////////////////
 //       Provided functions       //
@@ -63,162 +63,117 @@ public:
 
 // utility functions
 
-/** \brief Clears the ringbuffer of any data and resets the position to 0
- */
+	//! @brief Clears the ringbuffer of any data and resets the position to 0
 	void reset();
 
-/** \brief Changes the size of the ringbuffer. Clears all data.
- * 	\param size New size in frames
- */
-	void changeSize( f_cnt_t size );
+	//! @brief Changes the size of the ringbuffer. Clears all data.
+	//! @param frames New size in frames
+	void changeSize(f_cnt_t frames);
 
-/** \brief Changes the size of the ringbuffer. Clears all data.
- * 	\param size New size in milliseconds
- */
-	void changeSize( float size );
+	//! @brief Changes the size of the ringbuffer. Clears all data.
+	//! @param milliseconds New size in milliseconds
+	void changeSize(float milliseconds);
 
-/** \brief Sets whether the ringbuffer size is adjusted for samplerate when samplerate changes
- *	\param b True if samplerate should affect buffer size
- */
-	void setSamplerateAware( bool b );
-
+	//! @brief Sets whether the ringbuffer size is adjusted for samplerate when samplerate changes
+	//! @param b True if samplerate should affect buffer size
+	void setSamplerateAware(bool b);
 
 // position adjustment functions
 
-/** \brief Advances the position by one period
- */
+	//! @brief Advances the position by one period
 	void advance();
 
-/** \brief Moves position forwards/backwards by an amount of frames
- * 	\param amount Number of frames to move, may be negative
- */
-	void movePosition( f_cnt_t amount );
+	//! @brief Moves position forwards/backwards by an amount of frames
+	//! @param frames Number of frames to move, may be negative
+	void movePosition(int frames);
 
-/** \brief Moves position forwards/backwards by an amount of milliseconds
- * 	\param amount Number of milliseconds to move, may be negative
- */
-	void movePosition( float amount );
-
+	//! @brief Moves position forwards/backwards by an amount of milliseconds
+	//! @param milliseconds Number of milliseconds to move, may be negative
+	void movePosition(float milliseconds);
 
 // read functions
 
-/** \brief Destructively reads a period-sized buffer from the current position, writes it
- * 	to a specified destination, and advances the position by one period
- * 	\param dst Destination pointer
- */
-	void pop( SampleFrame* dst );
+	//! @brief Destructively reads from the current position, writes it
+	//! to a specified destination, and advances the position by one period
+	//! @param dst Destination span and read size
+	void pop(PlanarBufferSpan<float> dst);
 
-// note: ringbuffer position is unaffected by all other read functions beside pop()
+	//! @brief Reads from the ringbuffer and writes it to a specified destination
+	//! @param dst Destination span and read size
+	//! @param frames Offset in frames against current position
+	void read(PlanarBufferSpan<float> dst, f_cnt_t frames = 0) const;
 
-/** \brief Reads a period-sized buffer from the ringbuffer and writes it to a specified destination
- * 	\param dst Destination pointer
- * 	\param offset Offset in frames against current position, may be negative
- */
-	void read( SampleFrame* dst, f_cnt_t offset = 0 );
-
-/** \brief Reads a period-sized buffer from the ringbuffer and writes it to a specified destination
- * 	\param dst Destination pointer
- * 	\param offset Offset in milliseconds against current position, may be negative
- */
-	void read( SampleFrame* dst, float offset );
-
-/** \brief Reads a buffer of specified size from the ringbuffer and writes it to a specified destination
- * 	\param dst Destination pointer
- * 	\param offset Offset in frames against current position, may be negative
- * 	\param length Length in frames of the buffer to read - must not be higher than the size of the ringbuffer!
- */
-	void read( SampleFrame* dst, f_cnt_t offset, f_cnt_t length );
-
-/** \brief Reads a buffer of specified size from the ringbuffer and writes it to a specified destination
- * 	\param dst Destination pointer
- * 	\param offset Offset in milliseconds against current position, may be negative
- * 	\param length Length in frames of the buffer to read - must not be higher than the size of the ringbuffer!
- */
-	void read( SampleFrame* dst, float offset, f_cnt_t length );
+	//! @brief Reads a period-sized buffer from the ringbuffer and writes it to a specified destination
+	//! @param dst Destination pointer and read size
+	//! @param milliseconds Offset in milliseconds against current position
+	void read(PlanarBufferSpan<float> dst, float milliseconds = 0) const;
 
 
 // write functions
 
-/** \brief Writes a buffer of sampleframes to the ringbuffer at specified position
- * 	\param src Pointer to the source buffer
- * 	\param offset Offset in frames against current position, may *NOT* be negative
- * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
- */
-	void write( SampleFrame* src, f_cnt_t offset=0, f_cnt_t length=0 );
+	//! @brief Reads from @p src and writes to the ringbuffer using the function @p func
+	//! @param src Source buffer; also specifies the write amount
+	//! @param dstOffset The write offset in frames
+	//! @param func A function accepting the parameters
+	//!             (PlanarBufferSpan<float> d, PlanarBufferSpan<const float> s)
+	//!             which writes the @a s buffer to @a d in whatever way desired.
+	template<std::invocable<PlanarBufferSpan<float>, PlanarBufferSpan<const float>> Func>
+	void write(PlanarBufferSpan<const float> src, f_cnt_t dstOffset, Func&& func)
+	{
+		const auto writePosition = (m_position + dstOffset) % m_buf.frames();
+		const auto writeAmount = src.frames();
 
-/** \brief Writes a buffer of sampleframes to the ringbuffer at specified position
- * 	\param src Pointer to the source buffer
- * 	\param offset Offset in milliseconds against current position, may *NOT* be negative
- * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
- */
-	void write( SampleFrame* src, float offset, f_cnt_t length=0 );
+		if (writePosition + writeAmount <= m_buf.frames())
+		{
+			func(PlanarBufferSpan{m_buf.allBuffers(), writePosition}, src.first(writeAmount));
+		}
+		else
+		{
+			const auto first = m_buf.frames() - writePosition;
+			const auto second = writeAmount - first;
 
-/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position
- * 	\param src Pointer to the source buffer
- * 	\param offset Offset in frames against current position, may *NOT* be negative
- * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
- */
-	void writeAdding( SampleFrame* src, f_cnt_t offset=0, f_cnt_t length=0 );
+			func(PlanarBufferSpan{m_buf.allBuffers(), writePosition}, src.first(first));
+			func(PlanarBufferSpan{m_buf.allBuffers()}, src.subspan(first, second));
+		}
+	}
 
-/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position
- * 	\param src Pointer to the source buffer
- * 	\param offset Offset in milliseconds against current position, may *NOT* be negative
- * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
- */
-	void writeAdding( SampleFrame* src, float offset, f_cnt_t length=0 );
+	//! @brief Reads from @p src and writes to the ringbuffer using the function @p func
+	//! @param src Source buffer; also specifies the write amount
+	//! @param dstOffsetMs The write offset in milliseconds
+	//! @param func A function accepting the parameters
+	//!             (PlanarBufferSpan<float> d, PlanarBufferSpan<const float> s)
+	//!             which writes the @a s buffer to @a d in whatever way desired.
+	template<std::invocable<PlanarBufferSpan<float>, PlanarBufferSpan<const float>> Func>
+	void write(PlanarBufferSpan<const float> src, float dstOffsetMs, Func&& func)
+	{
+		write(src, static_cast<f_cnt_t>(msToFrames(dstOffsetMs)), std::forward<Func>(func));
+	}
 
-/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position, with
- * 	a specified multiplier applied to the frames
- * 	\param	src Pointer to the source buffer
- * 	\param offset Offset in frames against current position, may *NOT* be negative
- * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
- * 	\param level Multiplier applied to the frames before they're written to the ringbuffer
- */
-	void writeAddingMultiplied( SampleFrame* src, f_cnt_t offset, f_cnt_t length, float level );
-
-/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position, with
- * 	a specified multiplier applied to the frames
- * 	\param	src Pointer to the source buffer
- * 	\param offset Offset in milliseconds against current position, may *NOT* be negative
- * 	\param length Length of the source buffer, if zero, period size is used
- * 	\param level Multiplier applied to the frames before they're written to the ringbuffer
- */
-	void writeAddingMultiplied( SampleFrame* src, float offset, f_cnt_t length, float level );
-
-/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position, with
- * 	a specified multiplier applied to the frames, with swapped channels
- * 	\param	src Pointer to the source buffer
- * 	\param offset Offset in frames against current position, may *NOT* be negative
- * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
- * 	\param level Multiplier applied to the frames before they're written to the ringbuffer
- */
-	void writeSwappedAddingMultiplied( SampleFrame* src, f_cnt_t offset, f_cnt_t length, float level );
-
-/** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position, with
- * 	a specified multiplier applied to the frames, with swapped channels
- * 	\param	src Pointer to the source buffer
- * 	\param offset Offset in milliseconds against current position, may *NOT* be negative
- * 	\param length Length of the source buffer, if zero, period size is used
- * 	\param level Multiplier applied to the frames before they're written to the ringbuffer
- */
-	void writeSwappedAddingMultiplied( SampleFrame* src, float offset, f_cnt_t length, float level );
-
+	//! @brief Reads from @p src and writes to the ringbuffer using the function @p func
+	//! @param src Source buffer; also specifies the write amount
+	//! @param func A function accepting the parameters
+	//!             (PlanarBufferSpan<float> d, PlanarBufferSpan<const float> s)
+	//!             which writes the @a s buffer to @a d in whatever way desired.
+	template<std::invocable<PlanarBufferSpan<float>, PlanarBufferSpan<const float>> Func>
+	void write(PlanarBufferSpan<const float> src, Func&& func)
+	{
+		write(src, static_cast<f_cnt_t>(0), std::forward<Func>(func));
+	}
 
 protected slots:
 	void updateSamplerate();
 
 private:
-	inline f_cnt_t msToFrames( float ms )
+	int msToFrames(float ms) const
 	{
-		return static_cast<f_cnt_t>( ceilf( ms * (float)m_samplerate * 0.001f ) );
+		return static_cast<int>(std::ceil(ms * m_samplerate * 0.001f));
 	}
 
 	const f_cnt_t m_fpp;
 	sample_rate_t m_samplerate;
-	size_t m_size;
-	SampleFrame* m_buffer;
-	volatile unsigned int m_position;
+	AudioBuffer m_buf;
 
+	volatile unsigned int m_position;
 };
 
 

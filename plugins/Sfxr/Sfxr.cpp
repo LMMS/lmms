@@ -434,19 +434,21 @@ QString SfxrInstrument::nodeName() const
 
 
 
-void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
+void SfxrInstrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out)
 {
 	float currentSampleRate = Engine::audioEngine()->outputSampleRate();
 
 	f_cnt_t frameNum = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
+	auto buffer = PlanarBufferSpan{out.value(), offset, frameNum};
+
 	if (!_n->m_pluginData)
 	{
 		_n->m_pluginData = new SfxrSynth( this );
 	}
 	else if( static_cast<SfxrSynth*>(_n->m_pluginData)->isPlaying() == false )
 	{
-		zeroSampleFrames(_working_buffer + offset, frameNum);
+		MixHelpers::zero(buffer);
 		_n->noteOff();
 		return;
 	}
@@ -459,19 +461,20 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer
 // debug code
 //	qDebug( "pFN %d", pitchedFrameNum );
 
-	auto pitchedBuffer = new SampleFrame[pitchedFrameNum];
+	auto pitchedBuffer = new SampleFrame[pitchedFrameNum]; // FIXME: Remove dynamic allocation from processing method
 	static_cast<SfxrSynth*>(_n->m_pluginData)->update( pitchedBuffer, pitchedFrameNum );
-	for( f_cnt_t i=0; i<frameNum; i++ )
+	for (f_cnt_t f = 0; f < frameNum; ++f)
 	{
-		for( ch_cnt_t j=0; j<DEFAULT_CHANNELS; j++ )
+		const auto pitchedBufferIdx = f * pitchedFrameNum / frameNum;
+		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 		{
-			_working_buffer[i+offset][j] = pitchedBuffer[i*pitchedFrameNum/frameNum][j];
+			buffer[ch][f] = pitchedBuffer[pitchedBufferIdx][ch];
 		}
 	}
 
 	delete[] pitchedBuffer;
 
-	applyRelease( _working_buffer, _n );
+	applyRelease(*out, _n);
 }
 
 

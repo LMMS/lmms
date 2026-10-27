@@ -142,8 +142,8 @@ class Lb302Synth : public Instrument
 
 public:
 	Lb302Synth(InstrumentTrack*);
-	void play(SampleFrame* working_buffer) override;
-	void playNote(NotePlayHandle* nph, SampleFrame* working_buffer) override;
+	void play(std::optional<PlanarBufferView<float>> out) override;
+	void playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData(NotePlayHandle* nph) override;
 	void saveSettings(QDomDocument& doc, QDomElement& el) override;
 	void loadSettings(const QDomElement& el) override;
@@ -160,7 +160,7 @@ public slots:
 
 private:
 	void processNote(NotePlayHandle* nph);
-	void process(SampleFrame* outbuf, const f_cnt_t size);
+	void process(PlanarBufferView<float> out);
 	void recalcFilter();
 
 	enum class VcoShape { Sawtooth, Triangle, Square, RoundSquare, Moog, Sine, Exponential, WhiteNoise,

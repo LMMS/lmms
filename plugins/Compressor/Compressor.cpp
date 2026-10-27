@@ -236,7 +236,7 @@ void CompressorEffect::calcMix()
 
 
 
-Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus CompressorEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	m_cleanedBuffers = false;
 
@@ -261,9 +261,10 @@ Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const f_cn
 	const bool feedback = m_compressorControls.m_feedbackModel.value();
 	const bool lookahead = m_compressorControls.m_lookaheadModel.value();
 
-	for(f_cnt_t f = 0; f < frames; ++f)
+	const auto frames = inOut.frames();
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		auto drySignal = std::array{buf[f][0], buf[f][1]};
+		auto drySignal = std::array{inOut[0][f], inOut[1][f]};
 		auto s = std::array{drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
 
 		// Calculate tilt filters, to bias the sidechain to the low or high frequencies
@@ -493,10 +494,10 @@ Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const f_cn
 		// Calculate wet/dry value results
 		const float temp1 = delayedDrySignal[0];
 		const float temp2 = delayedDrySignal[1];
-		buf[f][0] = d * temp1 + w * s[0];
-		buf[f][1] = d * temp2 + w * s[1];
-		buf[f][0] = (1 - m_mixVal) * temp1 + m_mixVal * buf[f][0];
-		buf[f][1] = (1 - m_mixVal) * temp2 + m_mixVal * buf[f][1];
+		inOut[0][f] = d * temp1 + w * s[0];
+		inOut[1][f] = d * temp2 + w * s[1];
+		inOut[0][f] = (1 - m_mixVal) * temp1 + m_mixVal * inOut[0][f];
+		inOut[1][f] = (1 - m_mixVal) * temp2 + m_mixVal * inOut[1][f];
 
 		if (--m_lookWrite < 0) { m_lookWrite = m_lookBufLength - 1; }
 

@@ -117,10 +117,7 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 		return false;
 	}
 
-	const auto status = processImpl(inOut.interleavedBuffer().asSampleFrames().data(), inOut.frames());
-
-	// Copy interleaved plugin output to planar
-	toPlanar(inOut.interleavedBuffer(), inOut.groupBuffers(0));
+	const auto status = processImpl(inOut.allBuffers());
 
 	const auto sanitized = Engine::audioEngine()->sanitizationEnabled() ? inOut.sanitize(0b11) : false;
 	m_corrupted.store(sanitized, std::memory_order_relaxed);

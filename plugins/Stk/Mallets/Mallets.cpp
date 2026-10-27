@@ -279,8 +279,7 @@ QString MalletsInstrument::nodeName() const
 
 
 
-void MalletsInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void MalletsInstrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out)
 {
 	if( m_filesMissing )
 	{
@@ -401,12 +400,10 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		add_scale = static_cast<sample_t>( m_strikeModel.value() ) * freq * 2.5f;
 	}
 
-	for( f_cnt_t frame = offset; frame < frames + offset; ++frame )
+	for (f_cnt_t frame = offset; frame < frames + offset; ++frame)
 	{
-		_working_buffer[frame][0] = ps->nextSampleLeft() *
-				( m_scalers[p] + add_scale );
-		_working_buffer[frame][1] = ps->nextSampleRight() *
-				( m_scalers[p] + add_scale );
+		(*out)[0][frame] = ps->nextSampleLeft() * (m_scalers[p] + add_scale);
+		(*out)[1][frame] = ps->nextSampleRight() * (m_scalers[p] + add_scale);
 	}
 }
 

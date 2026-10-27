@@ -58,38 +58,30 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 
 
 
-Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *key) :
+Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&lv2effect_plugin_descriptor, parent, key),
-	m_controls(this, key->attributes["uri"]),
-	m_tmpOutputSmps(Engine::audioEngine()->framesPerPeriod())
+	m_controls(this, key->attributes["uri"])
 {
 }
 
 
 
 
-Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus Lv2Effect::processImpl(PlanarBufferView<float> inOut)
 {
-	Q_ASSERT(frames <= static_cast<f_cnt_t>(m_tmpOutputSmps.size()));
-
-	m_controls.copyBuffersFromLmms(buf, frames);
+	m_controls.copyBuffersFromLmms(inOut);
 	m_controls.copyModelsFromLmms();
 
 //	m_pluginMutex.lock();
-	m_controls.run(frames);
+	m_controls.run(inOut.frames());
 //	m_pluginMutex.unlock();
 
-	m_controls.copyModelsToLmms();
-	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), frames);
-
 	bool corrupt = wetLevel() < 0; // #3261 - if w < 0, bash w := 0, d := 1
-	const float d = corrupt ? 1 : dryLevel();
-	const float w = corrupt ? 0 : wetLevel();
-	for(f_cnt_t f = 0; f < frames; ++f)
-	{
-		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
-		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
-	}
+	const float wet = corrupt ? 0 : wetLevel();
+	const float dry = corrupt ? 1 : dryLevel();
+
+	m_controls.copyModelsToLmms();
+	m_controls.copyBuffersToLmms(inOut, wet, dry);
 
 	return ProcessStatus::ContinueIfNotQuiet;
 }
@@ -101,7 +93,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
 	try {

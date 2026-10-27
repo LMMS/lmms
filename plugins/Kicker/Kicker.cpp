@@ -155,9 +155,10 @@ QString KickerInstrument::nodeName() const
 using DistFX = DspEffectLibrary::Distortion;
 using SweepOsc = KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX>>;
 
-void KickerInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void KickerInstrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out)
 {
+	assert(out.has_value());
+	assert(out->channels() == 2);
 	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 	const float decfr = m_decayModel.value() * Engine::audioEngine()->outputSampleRate() / 1000.0f;
@@ -184,7 +185,7 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	auto so = static_cast<SweepOsc*>(_n->m_pluginData);
-	so->update( _working_buffer + offset, frames, Engine::audioEngine()->outputSampleRate() );
+	so->update({*out, offset, frames}, Engine::audioEngine()->outputSampleRate());
 
 	if( _n->isReleased() )
 	{
@@ -202,8 +203,8 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 			const bool releaseStillActive = currentReleaseFrame < desired;
 			const float attenuation = releaseStillActive ? (1.0f - (currentReleaseFrame / desired)) : 0.f;
 
-			_working_buffer[f + offset][0] *= attenuation;
-			_working_buffer[f + offset][1] *= attenuation;
+			(*out)[0][f + offset] *= attenuation;
+			(*out)[1][f + offset] *= attenuation;
 		}
 	}
 }

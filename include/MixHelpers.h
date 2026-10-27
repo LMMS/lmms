@@ -2,6 +2,7 @@
  * MixHelpers.h - helper functions for mixing buffers
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,54 +26,167 @@
 #ifndef LMMS_MIX_HELPERS_H
 #define LMMS_MIX_HELPERS_H
 
-#include "AudioBufferView.h"
+#include "AudioBufferSpan.h"
 
-namespace lmms
-{
+#include "lmms_export.h"
+
+namespace lmms {
 
 class ValueBuffer;
-class SampleFrame;
 
-namespace MixHelpers
-{
+namespace MixHelpers {
 
-bool isSilent(const SampleFrame* src, int frames);
+//! @returns true if all samples within @p buffer fall below a silence threshold
+//! @note NaN is considered non-silent
+LMMS_EXPORT bool isSilent(std::span<const float> buffer);
 
-bool isSilent(std::span<const sample_t> buffer);
+//! @returns true if all samples within @p buffer fall below a silence threshold
+//! @note NaN is considered non-silent
+LMMS_EXPORT bool isSilent(PlanarBufferSpan<const float> buffer);
 
-/*! \brief Add samples from src to dst */
-void add( SampleFrame* dst, const SampleFrame* src, int frames );
+//! Fills the entire span with 0.f
+LMMS_EXPORT void zero(PlanarBufferSpan<float> dst);
 
-/*! \brief Add samples from src to dst */
-void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src);
+//! @brief Copies data from @a src to @a dst, upmixing from mono to stereo
+//! @note If @a dst has more frames than @a src, the additional
+//!       frames are left unmodified.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @pre dst.channels() == 2
+//! @pre src.channels() == 1
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void monoUpmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
-/*! \brief Multiply samples from `dst` by `coeff` */
-void multiply(SampleFrame* dst, float coeff, int frames);
+//! @brief Copies data from @a src to @a dst, upmixing from mono to stereo and performing
+//!        wet/dry mixing
+//! @note If @a dst has more frames than @a src, the additional
+//!       frames are left unmodified.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @param wet the wet level, applied to @p src
+//! @param dry the dry level, applied to @p dst
+//! @pre dst.channels() == 2
+//! @pre src.channels() == 1
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void monoUpmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src,
+	float wet, float dry);
 
-/*! \brief Add samples from src multiplied by coeffSrc to dst */
-void addMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
+//! @brief Copies data from @a src to @a dst, downmixing from stereo to mono
+//! @note If @a dst has more frames than @a src, the additional
+//!       frames are left unmodified.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @pre dst.channels() == 1
+//! @pre src.channels() == 2
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void stereoDownmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
-/*! \brief Add samples from src multiplied by coeffSrc to dst, swap inputs */
-void addSwappedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
+//! @brief Copies data from @a src to @a dst, downmixing from stereo to mono and performing
+//!        wet/dry mixing
+//! @note If @a dst has more frames than @a src, the additional
+//!       frames are left unmodified.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @param wet the wet level, applied to @p src
+//! @param dry the dry level, applied to @p dst
+//! @pre dst.channels() == 1
+//! @pre src.channels() == 2
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void stereoDownmix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src,
+	float wet, float dry);
 
-/*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst */
-void addMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames );
+//! @brief Copies data from @a src to @a dst
+//! @note If @a dst has more channels or frames than @a src, the additional channels or frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copy(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
-/*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst */
-void addMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
+//! @brief Copies data from @a src to @a dst, performing wet/dry mixing
+//! @note If @a dst has more channels or frames than @a src, the additional channels or frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @param wet the wet level, applied to @p src
+//! @param dry the dry level, applied to @p dst
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copy(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float wet, float dry);
 
-/*! \brief Add samples from src multiplied by coeffSrcLeft/coeffSrcRight to dst */
-void addMultipliedStereo( SampleFrame* dst, const SampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames );
+//! @brief Copies data from @a src to @a dst, performing interleaved to planar conversion
+//! @note If @a dst  has more channels or frames than @a src,
+//!       the additional channels or frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copy(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src);
 
-/*! \brief Multiply dst by coeffDst and add samples from src multiplied by coeffSrc */
-void multiplyAndAddMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffDst, float coeffSrc, int frames );
+//! @brief Copies data from @a src to @a dst, performing planar to interleaved conversion
+//! @note If @a dst  has more channels or frames than @a src,
+//!       the additional channels or frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copy(InterleavedBufferSpan<float> dst, PlanarBufferSpan<const float> src);
 
-/*! \brief Multiply dst by coeffDst and add samples from srcLeft/srcRight multiplied by coeffSrc */
-void multiplyAndAddMultipliedJoined( SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames );
+//! @brief Copies data from @a src to @a dst
+//! @note If @a dst has more channels than @a src, the additional channels are zeroed,
+//!       but only the first `src.frames()` frames.
+//! @note If @a dst has more frames than @a src, the additional frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copyAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
+
+//! @brief Copies data from @a src to @a dst, performing wet/dry mixing
+//! @note If @a dst has more channels than @a src, the additional channels are zeroed,
+//!       but only the first `src.frames()` frames.
+//! @note If @a dst has more frames than @a src, the additional frames are left unmodified.
+//! @note If @a dst has fewer channels than @a src, only the first `dst.channels()` channels are copied.
+//! @param dst the output buffer
+//! @param src the input buffer
+//! @param wet the wet level, applied to @p src
+//! @param dry the dry level, applied to @p dst
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copyAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float wet, float dry);
+
+//! Same as @ref copy(PlanarBufferSpan<float>, PlanarBufferSpan<const float>) but
+//! applies @ref monoUpmix or @ref stereoDownmix if possible.
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copyMix(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
+
+//! Same as @ref copyAndZero(PlanarBufferSpan<float>, PlanarBufferSpan<const float>) but
+//! applies @ref monoUpmix or @ref stereoDownmix if possible.
+//! @pre dst.frames() >= src.frames()
+LMMS_EXPORT void copyMixAndZero(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src);
+
+//! @brief Add samples from src to dst
+LMMS_EXPORT void add(PlanarBufferView<float> dst, PlanarBufferView<const float> src);
+
+//! @brief Add samples from src to dst
+LMMS_EXPORT void add(PlanarBufferSpan<float> dst, InterleavedBufferSpan<const float> src);
+
+//! @brief Multiply samples from `dst` by `coeff`
+LMMS_EXPORT void multiply(PlanarBufferSpan<float> dst, float coeff);
+
+//! @brief Add samples from src multiplied by coeffSrc to dst
+LMMS_EXPORT void addMultiplied(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float coeffSrc);
+
+//! @brief Add samples from src multiplied by coeffSrc to dst, swap inputs
+LMMS_EXPORT void addSwappedMultiplied(PlanarBufferSpan<float> dst, PlanarBufferSpan<const float> src, float coeffSrc);
+
+//! @brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst
+LMMS_EXPORT void addMultipliedByBuffer(PlanarBufferView<float> dst, PlanarBufferView<const float> src,
+	float coeffSrc, const ValueBuffer* coeffSrcBuf);
+
+//! @brief Add samples from src multiplied by coeffSrcBuf1 and coeffSrcBuf2 to dst
+LMMS_EXPORT void addMultipliedByBuffers(PlanarBufferView<float> dst, PlanarBufferView<const float> src,
+	const ValueBuffer* coeffSrcBuf1, const ValueBuffer* coeffSrcBuf2);
 
 } // namespace MixHelpers
-
-
 } // namespace lmms
 
 #endif // LMMS_MIX_HELPERS_H

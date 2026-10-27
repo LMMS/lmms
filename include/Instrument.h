@@ -28,6 +28,7 @@
 
 #include <QString>
 
+#include "AudioBufferSpan.h"
 #include "Flags.h"
 #include "lmms_export.h"
 #include "LmmsTypes.h"
@@ -47,7 +48,6 @@ class InstrumentTrack;
 class MidiEvent;
 class NotePlayHandle;
 class Track;
-class SampleFrame;
 
 
 class LMMS_EXPORT Instrument : public Plugin
@@ -78,13 +78,18 @@ public:
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its
 	// output buffer only once per audio engine period
-	virtual void play( SampleFrame* _working_buffer );
+	virtual void play(std::optional<PlanarBufferView<float>> out);
 
-	// to be implemented by actual plugin
-	virtual void playNote( NotePlayHandle * /* _note_to_play */,
-					SampleFrame* /* _working_buf */ )
-	{
-	}
+	//! @brief For capturing (and possibly rendering) note-play events which are needed
+	//!        for arpeggio, filter, etc.
+	//!
+	//! For multi-streamed instruments, @a out has a value and the instrument is expected
+	//!     to render audio into the @a out buffer.
+	//!
+	//! For single-streamed instruments, @a out is always std::nullopt, and this method
+	//!     is analogous to @ref handleMidiEvent but for @a NotePlayHandle -based instruments,
+	//!     informing the instrument of note events but not rendering audio.
+	virtual void playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>> out) {}
 
 	// needed for deleting plugin-specific-data of a note - plugin has to
 	// cast void-ptr so that the plugin-data is deleted properly
@@ -176,12 +181,12 @@ public:
 
 protected:
 	// fade in to prevent clicks
-	void applyFadeIn(SampleFrame* buf, NotePlayHandle * n);
+	void applyFadeIn(PlanarBufferView<float> inOut, NotePlayHandle* nph);
 
 	// instruments may use this to apply a soft fade out at the end of
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left
-	void applyRelease( SampleFrame* buf, const NotePlayHandle * _n );
+	void applyRelease(PlanarBufferView<float> out, const NotePlayHandle* nph);
 
 	float computeReleaseTimeMsByFrameCount(f_cnt_t frames) const;
 

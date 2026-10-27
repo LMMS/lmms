@@ -151,7 +151,7 @@ public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth() = default;
 
-	void renderOutput( f_cnt_t _frames, SampleFrame* _buf );
+	void renderOutput(PlanarBufferSpan<float> out);
 
 private:
 
@@ -330,8 +330,7 @@ public:
 	MonstroInstrument( InstrumentTrack * _instrument_track );
 	~MonstroInstrument() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
+	void playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings( QDomDocument & _doc,

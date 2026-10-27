@@ -53,10 +53,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
 	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
-	m_buffer = new SampleFrame[frames];
-
-	zeroSampleFrames(m_buffer, frames);
-
+	m_buffer = std::make_unique<float[]>(frames * DEFAULT_CHANNELS);
 
 	setToolTip(tr("Oscilloscope"));
 }
@@ -66,19 +63,27 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 
 Oscilloscope::~Oscilloscope()
 {
-	delete[] m_buffer;
 	delete[] m_points;
 }
 
 
 
 
-void Oscilloscope::updateAudioBuffer(const SampleFrame* buffer)
+void Oscilloscope::updateAudioBuffer(const float* const* buffer, unsigned short channels, unsigned long frames)
 {
-	if( !Engine::getSong()->isExporting() )
+	if (Engine::getSong()->isExporting()) { return; }
+
+	const auto buf = PlanarBufferView{buffer, channels, frames};
+	assert(buf.channels() > 0);
+	if (buf.channels() == 1)
 	{
-		const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
-		memcpy(m_buffer, buffer, sizeof(SampleFrame) * frames);
+		std::ranges::copy(buf.buffer(0), m_buffer.get()); // L
+		std::fill_n(m_buffer.get() + buf.frames(), buf.frames(), 0.f); // R
+	}
+	else
+	{
+		std::ranges::copy(buf.buffer(0), m_buffer.get()); // L
+		std::ranges::copy(buf.buffer(1), m_buffer.get() + buf.frames()); // R
 	}
 }
 
@@ -93,18 +98,15 @@ void Oscilloscope::setActive( bool _active )
 		connect( getGUI()->mainWindow(),
 					SIGNAL(periodicUpdate()),
 					this, SLOT(update()));
-		connect( Engine::audioEngine(),
-			SIGNAL(nextAudioBuffer(const lmms::SampleFrame*)),
-			this, SLOT(updateAudioBuffer(const lmms::SampleFrame*)));
+		connect(Engine::audioEngine(), &AudioEngine::nextAudioBuffer, this, &Oscilloscope::updateAudioBuffer);
 	}
 	else
 	{
 		disconnect( getGUI()->mainWindow(),
 					SIGNAL(periodicUpdate()),
 					this, SLOT(update()));
-		disconnect( Engine::audioEngine(),
-			SIGNAL(nextAudioBuffer(const lmms::SampleFrame*)),
-			this, SLOT(updateAudioBuffer(const lmms::SampleFrame*)));
+		disconnect(Engine::audioEngine(), &AudioEngine::nextAudioBuffer, this, &Oscilloscope::updateAudioBuffer);
+
 		// we have to update (remove last waves),
 		// because timer doesn't do that anymore
 		update();
@@ -166,7 +168,14 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 		float masterOutput = audioEngine->masterGain();
 
 		const f_cnt_t frames = audioEngine->framesPerPeriod();
-		SampleFrame peakValues = getAbsPeakValues(m_buffer, frames);
+
+		auto getAbsPeakValue = [](std::span<const float> buffer) -> float {
+			return std::abs(std::ranges::max(buffer, {}, static_cast<float(&)(float)>(std::abs)));
+		};
+		const auto peakValues = SampleFrame {
+			getAbsPeakValue({m_buffer.get(), frames}),
+			getAbsPeakValue({m_buffer.get() + frames, frames})
+		};
 
 		auto const leftChannelClips = clips(peakValues.left() * masterOutput);
 		auto const rightChannelClips = clips(peakValues.right() * masterOutput);
@@ -188,9 +197,10 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 				otherChannelsColor(); // Any other channel
 			p.setPen(QPen(color, width));
 
+			const float* channelBuffer = m_buffer.get() + ch * frames;
 			for (auto frame = std::size_t{0}; frame < frames; ++frame)
 			{
-				sample_t const clippedSample = AudioEngine::clip(m_buffer[frame][ch]);
+				sample_t const clippedSample = AudioEngine::clip(channelBuffer[frame]);
 				m_points[frame] = QPointF(
 					x_base + static_cast<qreal>(frame) * xd,
 					y_base + ( static_cast<qreal>(clippedSample) * half_h ) );

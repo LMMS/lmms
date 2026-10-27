@@ -50,8 +50,6 @@ AudioBusHandle::AudioBusHandle(const QString& name, bool hasEffectChain,
 	m_panningModel(panningModel),
 	m_mutedModel(mutedModel)
 {
-	m_buffer.allocateInterleavedBuffer();
-
 	Engine::audioEngine()->addAudioBusHandle(this);
 	setExtOutputEnabled(true);
 }
@@ -122,16 +120,16 @@ void AudioBusHandle::doProcessing()
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	for (PlayHandle* ph : m_playHandles) // now we mix all playhandle buffers into our internal buffer
 	{
-		if (ph->buffer())
+		if (auto buffer = ph->buffer())
 		{
 			if (ph->usesBuffer()
 				&& (ph->type() == PlayHandle::Type::NotePlayHandle
-					|| !MixHelpers::isSilent(ph->buffer(), fpp)))
+					|| !MixHelpers::isSilent(*buffer)))
 			{
 				m_bufferUsage = true;
 
-				// Writing to temporary interleaved buffer until PlayHandle and MixHelpers switch to planar
-				MixHelpers::add(m_buffer.interleavedBuffer().asSampleFrames().data(), ph->buffer(), fpp);
+				assert(buffer->channels() == 2); // Current restriction
+				MixHelpers::add(m_buffer.allBuffers(), *buffer);
 			}
 			ph->releaseBuffer(); 	// gets rid of playhandle's buffer and sets
 									// pointer to null, so if it doesn't get re-acquired we know to skip it next time
@@ -140,8 +138,9 @@ void AudioBusHandle::doProcessing()
 
 	if (m_bufferUsage)
 	{
-		// PlayHandle buffers were written to the temporary interleaved buffer
-		auto buffer = m_buffer.interleavedBuffer();
+		// The first buffer group always contains the main L/R pair
+		auto buffer = m_buffer.groupBuffers(0);
+		assert(buffer.channels() == 2);
 
 		// handle volume and panning
 		// has both vol and pan models
@@ -157,8 +156,8 @@ void AudioBusHandle::doProcessing()
 				{
 					float v = volBuf->values()[f] * 0.01f;
 					float p = panBuf->values()[f] * 0.01f;
-					buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
-					buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
+					buffer[0][f] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
+					buffer[1][f] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
 				}
 			}
 
@@ -171,8 +170,8 @@ void AudioBusHandle::doProcessing()
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
-					buffer[f][0] *= v * l;
-					buffer[f][1] *= v * r;
+					buffer[0][f] *= v * l;
+					buffer[1][f] *= v * r;
 				}
 			}
 
@@ -183,8 +182,8 @@ void AudioBusHandle::doProcessing()
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float p = panBuf->values()[f] * 0.01f;
-					buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
-					buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
+					buffer[0][f] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
+					buffer[1][f] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
 				}
 			}
 
@@ -195,8 +194,8 @@ void AudioBusHandle::doProcessing()
 				float v = m_volumeModel->value() * 0.01f;
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
-					buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
-					buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
+					buffer[0][f] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
+					buffer[1][f] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
 				}
 			}
 		}
@@ -211,8 +210,8 @@ void AudioBusHandle::doProcessing()
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
-					buffer[f][0] *= v;
-					buffer[f][1] *= v;
+					buffer[0][f] *= v;
+					buffer[1][f] *= v;
 				}
 			}
 			else
@@ -220,15 +219,11 @@ void AudioBusHandle::doProcessing()
 				float v = m_volumeModel->value() * 0.01f;
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
-					buffer[f][0] *= v;
-					buffer[f][1] *= v;
+					buffer[0][f] *= v;
+					buffer[1][f] *= v;
 				}
 			}
 		}
-
-		// Copy from temporary interleaved buffer to the main planar buffer
-		// so they stay in sync
-		toPlanar(buffer, m_buffer.groupBuffers(0));
 
 		const auto sanitized = Engine::audioEngine()->sanitizationEnabled() ? m_buffer.sanitizeAll() : false;
 		m_corrupted.store(sanitized, std::memory_order_relaxed);

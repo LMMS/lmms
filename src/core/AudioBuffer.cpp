@@ -62,7 +62,6 @@ AudioBuffer::AudioBuffer(f_cnt_t frames, ch_cnt_t channels,
 	std::pmr::memory_resource* bufferResource)
 	: m_sourceBuffer{bufferResource}
 	, m_accessBuffer{bufferResource}
-	, m_interleavedBuffer{bufferResource}
 	, m_frames{frames}
 	, m_silenceTrackingEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
 {
@@ -78,22 +77,21 @@ AudioBuffer::AudioBuffer(f_cnt_t frames, ch_cnt_t channels,
 	}
 }
 
-void AudioBuffer::allocateInterleavedBuffer()
+void swap(AudioBuffer& lhs, AudioBuffer& rhs) noexcept
 {
-	m_interleavedBuffer.resize(2 * m_frames);
+	using std::swap;
+	swap(lhs.m_sourceBuffer, rhs.m_sourceBuffer);
+	swap(lhs.m_accessBuffer, rhs.m_accessBuffer);
+	swap(lhs.m_groups, rhs.m_groups);
+	swap(lhs.m_frames, rhs.m_frames);
+	swap(lhs.m_silenceFlags, rhs.m_silenceFlags);
+	swap(lhs.m_silenceTrackingEnabled, rhs.m_silenceTrackingEnabled);
 }
 
-auto AudioBuffer::allocationSize(f_cnt_t frames, ch_cnt_t channels, bool withInterleavedBuffer) -> std::size_t
+auto AudioBuffer::allocationSize(f_cnt_t frames, ch_cnt_t channels) -> std::size_t
 {
-	auto bytes = frames * channels * sizeof(float) // for m_sourceBuffer
+	return frames * channels * sizeof(float) // for m_sourceBuffer
 		+ channels * sizeof(float*); // for m_accessBuffer
-
-	if (withInterleavedBuffer)
-	{
-		bytes += frames * 2 * sizeof(float); // for m_interleavedBuffer
-	}
-
-	return bytes;
 }
 
 auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
@@ -123,15 +121,12 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	const auto usesSharedMemory = dynamic_cast<SharedMemoryResource*>(
 		m_accessBuffer.get_allocator().resource()) != nullptr;
 
-	const auto usesInterleavedBuffer = hasInterleavedBuffer();
-
 	if (usesSharedMemory)
 	{
 		// Shared memory must be reallocated without any over-allocations,
 		// since it only has a fixed amount of space
 		m_accessBuffer.clear();
 		m_sourceBuffer.clear();
-		m_interleavedBuffer.clear();
 	}
 
 	// Next, resize the buffers. The order here is important so no padding bytes
@@ -140,10 +135,6 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	static_assert(alignof(float*) >= alignof(float));
 	m_accessBuffer.resize(newTotalChannels);
 	m_sourceBuffer.resize(newTotalChannels * m_frames);
-	if (usesInterleavedBuffer)
-	{
-		m_interleavedBuffer.resize(2 * m_frames);
-	}
 
 	// Fix channel buffers
 	float* ptr = m_sourceBuffer.data();
@@ -221,12 +212,6 @@ auto AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound) ->
 		}
 	}
 
-	if (changesMade && hasInterleavedBuffer() && (channels[0] || channels[1]))
-	{
-		// Keep the temporary interleaved buffer in sync
-		toInterleaved(groupBuffers(0), interleavedBuffer());
-	}
-
 	return changesMade;
 }
 
@@ -242,12 +227,6 @@ auto AudioBuffer::sanitizeAll() -> bool
 			m_silenceFlags[ch] = true;
 			changesMade = true;
 		}
-	}
-
-	if (changesMade && hasInterleavedBuffer())
-	{
-		// Keep the temporary interleaved buffer in sync
-		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
 
 	return changesMade;
@@ -331,20 +310,12 @@ void AudioBuffer::silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBo
 		}
 	}
 
-	if (hasInterleavedBuffer() && (needSilenced[0] || needSilenced[1]))
-	{
-		// Keep the temporary interleaved buffer in sync
-		toInterleaved(groupBuffers(0), interleavedBuffer());
-	}
-
 	m_silenceFlags |= channels;
 }
 
 void AudioBuffer::silenceAllChannels()
 {
 	std::ranges::fill(m_sourceBuffer, 0);
-	std::ranges::fill(m_interleavedBuffer, 0);
-
 	m_silenceFlags.set();
 }
 

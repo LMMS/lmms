@@ -24,7 +24,6 @@
  
 #include "PlayHandle.h"
 #include "AudioEngine.h"
-#include "BufferManager.h"
 #include "Engine.h"
 
 #include <QThread>
@@ -37,42 +36,36 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_type(type),
 		m_offset(offset),
 		m_affinity(QThread::currentThread()),
-		m_playHandleBuffer(BufferManager::acquire()),
+		m_playHandleBuffer(Engine::audioEngine()->framesPerPeriod()),
 		m_bufferReleased(true),
 		m_usesBuffer(true)
 {
 }
-
-
-PlayHandle::~PlayHandle()
-{
-	BufferManager::release(m_playHandleBuffer);
-}
-
 
 void PlayHandle::doProcessing()
 {
 	if( m_usesBuffer )
 	{
 		m_bufferReleased = false;
-		zeroSampleFrames(m_playHandleBuffer, Engine::audioEngine()->framesPerPeriod());
+		m_playHandleBuffer.silenceAllChannels();
 		play( buffer() );
 	}
 	else
 	{
-		play( nullptr );
+		play(std::nullopt);
 	}
 }
-
 
 void PlayHandle::releaseBuffer()
 {
 	m_bufferReleased = true;
 }
 
-SampleFrame* PlayHandle::buffer()
+auto PlayHandle::buffer() -> std::optional<PlanarBufferView<float>>
 {
-	return m_bufferReleased ? nullptr : m_playHandleBuffer;
+	return m_bufferReleased
+		? std::nullopt
+		: std::optional{m_playHandleBuffer.allBuffers()};
 };
 
 } // namespace lmms

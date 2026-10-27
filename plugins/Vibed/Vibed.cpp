@@ -201,7 +201,7 @@ QString Vibed::nodeName() const
 	return vibedstrings_plugin_descriptor.name;
 }
 
-void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
+void Vibed::playNote(NotePlayHandle* n, std::optional<PlanarBufferView<float>> out)
 {
 	if (!n->m_pluginData)
 	{
@@ -233,10 +233,11 @@ void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
 	const f_cnt_t offset = n->noteOffset();
 	auto ps = static_cast<StringContainer*>(n->m_pluginData);
 
-	for (f_cnt_t i = offset; i < frames + offset; ++i)
+	const auto buffer = PlanarBufferSpan{out.value(), offset, frames};
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		workingBuffer[i][0] = 0.0f;
-		workingBuffer[i][1] = 0.0f;
+		buffer[0][f] = 0.0f;
+		buffer[1][f] = 0.0f;
 		for (int str = 0; str < s_stringCount; ++str)
 		{
 			if (ps->exists(str))
@@ -244,8 +245,8 @@ void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
 				// pan: 0 -> left, 1 -> right
 				const float pan = (m_panModels[str]->value() + 1) / 2.0f;
 				const sample_t sample = ps->getStringSample(str) * m_volumeModels[str]->value() / 100.0f;
-				workingBuffer[i][0] += (1.0f - pan) * sample;
-				workingBuffer[i][1] += pan * sample;
+				buffer[0][f] += (1.0f - pan) * sample;
+				buffer[1][f] += pan * sample;
 			}
 		}
 	}

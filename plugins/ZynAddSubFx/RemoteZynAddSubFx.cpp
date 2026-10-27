@@ -58,7 +58,7 @@ public:
 	{
 		Nio::start();
 
-		setInputCount( 0 );
+		setInputOutputCount(0, 2);
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
 
@@ -141,9 +141,9 @@ public:
 	}
 
 
-	void process( const SampleFrame* _in, SampleFrame* _out ) override
+	void process(PlanarBufferView<const float>, PlanarBufferView<float> out) override
 	{
-		LocalZynAddSubFx::processAudio( _out );
+		LocalZynAddSubFx::processAudio(out);
 	}
 
 	void guiLoop();

@@ -168,7 +168,7 @@ void ProjectRenderer::run()
 	while (!Engine::getSong()->isExportDone() && !m_abort)
 	{
 		const auto buffer = Engine::audioEngine()->renderNextPeriod();
-		m_fileDev->writeBuffer(buffer.data(), buffer.size());
+		m_fileDev->writeBuffer(buffer);
 
 		const int nprog = Engine::getSong()->getExportProgress();
 		if (m_progress != nprog)

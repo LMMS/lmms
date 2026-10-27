@@ -81,13 +81,14 @@ DelayEffect::~DelayEffect()
 
 
 
-Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus DelayEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	const float sr = Engine::audioEngine()->outputSampleRate();
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	SampleFrame peak;
+	float peakL = 0;
+	float peakR = 0;
 	float length = m_delayControls.m_delayTimeModel.value();
 	float amplitude = m_delayControls.m_lfoAmountModel.value() * sr;
 	float lfoTime = 1.0 / m_delayControls.m_lfoTimeModel.value();
@@ -110,10 +111,13 @@ Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const f_cnt_t f
 		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
 
-	for (f_cnt_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < inOut.frames(); ++f)
 	{
-		auto& currentFrame = buf[f];
-		const auto dryS = currentFrame;
+		float& inOutL = inOut[0][f];
+		float& inOutR = inOut[1][f];
+
+		const auto dryL = inOutL;
+		const auto dryR = inOutR;
 
 		// Prepare delay for current sample
 		m_delay->setFeedback( *feedbackPtr );
@@ -122,14 +126,17 @@ Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const f_cnt_t f
 		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
 
 		// Process the wet signal
-		m_delay->tick( currentFrame );
-		currentFrame *= m_outGain;
+		m_delay->tick(inOutL, inOutR);
+		inOutL *= m_outGain;
+		inOutR *= m_outGain;
 
 		// Calculate peak of wet signal
-		peak = peak.absMax(currentFrame);
+		peakL = std::max(peakL, std::abs(inOutL));
+		peakR = std::max(peakR, std::abs(inOutR));
 
 		// Dry/wet mix
-		currentFrame = dryS * d + currentFrame * w;
+		inOutL = dryL * d + inOutL * w;
+		inOutR = dryR * d + inOutR * w;
 
 		lengthPtr += lengthInc;
 		amplitudePtr += amplitudeInc;
@@ -137,8 +144,8 @@ Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const f_cnt_t f
 		feedbackPtr += feedbackInc;
 	}
 
-	m_delayControls.m_outPeakL = peak.left();
-	m_delayControls.m_outPeakR = peak.right();
+	m_delayControls.m_outPeakL = peakL;
+	m_delayControls.m_outPeakR = peakR;
 
 	return ProcessStatus::ContinueIfNotQuiet;
 }
