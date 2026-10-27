@@ -16,7 +16,7 @@ BarModelEditor::BarModelEditor(QString text, FloatModel * floatModel, QWidget * 
 	m_textColor(palette().text().color())
 {
 	setModel(floatModel);
-	connect(this, &BarModelEditor::sliderPressed, this, [this]{setPositionAbsolute(m_lastMousePos);});
+	connect(this, &BarModelEditor::sliderPressed, this, [this]{setPosition(m_lastMousePos);});
 }
 
 QSizePolicy BarModelEditor::sizePolicy() const
@@ -66,24 +66,7 @@ void BarModelEditor::setTextColor(QColor const & textColor)
 }
 
 
-void BarModelEditor::mouseMoveEvent(QMouseEvent * me)
-{
-	updateInteractionState(me);
-	const auto pos = position(me);
-	if (currentInteraction() == InteractionType::MouseDrag && pos != m_lastMousePos)
-	{
-		// knob position is changed depending on last mouse position
-		setPositionAbsolute(pos);
-		emit sliderMoved(model()->value());
-		// original position for next time is current position
-		m_lastMousePos = pos;
-	}
-
-	showTextFloat();
-}
-
-
-void BarModelEditor::setPositionAbsolute(const QPoint& p)
+void BarModelEditor::setPosition(const QPoint& p)
 {
 	FloatModel* mod = model();
 	if (mod->range() == 0) { return; }
@@ -115,7 +98,6 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	painter.setPen(backgroundBrush.color());
 	painter.setBrush(backgroundBrush);
 	painter.drawRect(r);
-
 
 	// Paint the bar
 	// Compute the percentage as:

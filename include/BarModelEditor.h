@@ -44,7 +44,7 @@ public:
 
 	BarModelEditor(QString text, FloatModel * floatModel, QWidget * parent = nullptr);
 
-	void setPositionAbsolute(const QPoint& p);
+	void setPosition(const QPoint& p) override;
 
 	// Define how the widget will behave in a layout
 	QSizePolicy sizePolicy() const;
@@ -66,7 +66,6 @@ public:
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
-	void mouseMoveEvent(QMouseEvent* me) override;
 
 private:
 	QString const m_text;
@@ -74,7 +73,7 @@ private:
 	QBrush m_backgroundBrush;
 	QBrush m_barBrush;
 	QColor m_textColor;
-	QMargins m_valueRectMargins = {3, 3, 3, 3};
+	const QMargins m_valueRectMargins = {3, 3, 3, 3};
 };
 
 } // namespace lmms::gui
