@@ -22,7 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleTrack.h"
 
 #include <QDomElement>
@@ -80,18 +80,24 @@ bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 	class PatternTrack * pattern_track = nullptr;
 	if( _clip_num >= 0 )
 	{
-		if (_start > getClip(_clip_num)->length())
+		auto sClip = dynamic_cast<SampleClip*>(getClip(_clip_num));
+
+		if (_start > sClip->length())
 		{
 			setPlaying(false);
 		}
-		if( _start != 0 )
+		if (sClip->isPlaying())
 		{
 			return false;
 		}
-		clips.push_back( getClip( _clip_num ) );
+		clips.push_back(sClip);
 		if (trackContainer() == Engine::patternStore())
 		{
+			auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
+			f_cnt_t sampleStart = bufferFramesPerTick * _start;
 			pattern_track = PatternTrack::findPatternTrack(_clip_num);
+			sClip->setSampleStartFrame(sampleStart);
+			sClip->setIsPlaying(true);
 			setPlaying(true);
 		}
 	}

@@ -122,7 +122,8 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 	// Copy interleaved plugin output to planar
 	toPlanar(inOut.interleavedBuffer(), inOut.groupBuffers(0));
 
-	inOut.sanitize(0b11);
+	const auto sanitized = Engine::audioEngine()->sanitizationEnabled() ? inOut.sanitize(0b11) : false;
+	m_corrupted.store(sanitized, std::memory_order_relaxed);
 
 	// Update silence status for track channels the processor wrote to
 	const bool silentOutput = inOut.updateSilenceFlags(0b11);

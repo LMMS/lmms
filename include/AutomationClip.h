@@ -88,15 +88,31 @@ public:
 	TimePos timeMapLength() const;
 	void updateLength() override;
 
+	//! @brief Puts an automation node on the timeMap with the given value.
+	//!
+	//! The inValue and outValue of the created node will be the same.
+	//!
+	//! @param time Time to add the node to
+	//! @param value inValue and outValue of the node
+	//! @param quantPos True to quantize the position (defaults to true)
+	//! @param ignoreSurroundingPoints True to ignore unquantized surrounding nodes (defaults to true)
+	//! @return TimePos of the recently added automation node
 	TimePos putValue(
-		const TimePos & time,
+		const TimePos& time,
 		const float value,
 		const bool quantPos = true,
 		const bool ignoreSurroundingPoints = true
 	);
 
+	//! @brief Puts an automation node on the timeMap with the given inValue and outValue.
+	//! @param time Time to add the node to
+	//! @param inValue inValue of the node
+	//! @param outValue outValue of the node
+	//! @param quantPos True to quantize the position (defaults to true)
+	//! @param ignoreSurroundingPoints True to ignore unquantized surrounding nodes (defaults to true)
+	//! @return TimePos of the recently added automation node
 	TimePos putValues(
-		const TimePos & time,
+		const TimePos& time,
 		const float inValue,
 		const float outValue,
 		const bool quantPos = true,
@@ -104,24 +120,42 @@ public:
 	);
 
 	void removeNode(const TimePos & time);
+
+	//! @brief Removes all automation nodes between the given ticks
+	//! @param tick0 first tick of the range
+	//! @param tick1 second tick of the range
 	void removeNodes(const int tick0, const int tick1);
 
+	//! @brief Resets the outValues of all automation nodes between the given ticks
+	//! @param tick0 first tick of the range
+	//! @param tick1 second tick of the range
 	void resetNodes(const int tick0, const int tick1);
 
-	/**
-	 * @brief Resets the tangents from the nodes between the given ticks
-	 * @param Int first tick of the range
-	 * @param Int second tick of the range
-	 */
+	//! @brief Resets the tangents from the nodes between the given ticks
+	//! @param tick0 first tick of the range
+	//! @param tick1 second tick of the range
 	void resetTangents(const int tick0, const int tick1);
 
 	void recordValue(TimePos time, float value);
 
-	TimePos setDragValue( const TimePos & time,
-				const float value,
-				const bool quantPos = true,
-				const bool controlKey = false );
+	//! @brief Set the position of the point that is being dragged.
+	//!
+	//! Calling this function will also automatically set m_dragging to true.
+	//! When applyDragValue() is called, m_dragging is set back to false.
+	//!
+	//! @param time TimePos of the node being dragged
+	//! @param value with the value to assign to the point being dragged
+	//! @param quantPos True to snip x position
+	//! @param controlKey True to ignore unquantized surrounding nodes
+	//! @return TimePos with current time of the dragged value
+	TimePos setDragValue(
+		const TimePos& time,
+		const float value,
+		const bool quantPos = true,
+		const bool controlKey = false
+	);
 
+	//! @brief After the point is dragged, this function is called to apply the change.
 	void applyDragValue();
 
 
@@ -182,7 +216,11 @@ public:
 
 
 	static bool isAutomated( const AutomatableModel * _m );
+
+	//! @brief Returns a list of all the automation clips that are connected to a specific model
+	//! @param _m The model we want to look for
 	static std::vector<AutomationClip*> clipsForModel(const AutomatableModel* _m);
+
 	static AutomationClip * globalAutomationClip( AutomatableModel * _m );
 	static void resolveAllIDs();
 

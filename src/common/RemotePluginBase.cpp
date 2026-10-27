@@ -44,11 +44,9 @@ RemotePluginBase::RemotePluginBase() :
 	m_invalid(false)
 #endif
 {
-#ifdef LMMS_HAVE_LOCALE_H
 	// make sure, we're using common ways to print/scan
 	// floats to/from strings (',' vs. '.' for decimal point etc.)
 	setlocale(LC_NUMERIC, "C");
-#endif
 #ifndef SYNC_WITH_SHM_FIFO
 	pthread_mutex_init(&m_receiveMutex, nullptr);
 	pthread_mutex_init(&m_sendMutex, nullptr);
