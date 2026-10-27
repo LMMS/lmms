@@ -349,6 +349,16 @@ float AutomatableModel::inverseScaledValue( float value ) const
 }
 
 
+float AutomatableModel::normValue(float value) const
+{
+	return (range() == 0) ? 1 : (inverseScaledValue(value) - minValue<float>()) / range();
+}
+
+float AutomatableModel::inverseNormValue(float value) const
+{
+	return scaledValue(value * range() + minValue<float>());
+}
+
 
 
 template<class T>

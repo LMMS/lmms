@@ -16,6 +16,7 @@ BarModelEditor::BarModelEditor(QString text, FloatModel * floatModel, QWidget * 
 	m_textColor(palette().text().color())
 {
 	setModel(floatModel);
+	connect(this, &BarModelEditor::sliderPressed, this, [this]{setPositionAbsolute(m_lastMousePos);});
 }
 
 QSizePolicy BarModelEditor::sizePolicy() const
@@ -64,33 +65,12 @@ void BarModelEditor::setTextColor(QColor const & textColor)
 	m_textColor = textColor;
 }
 
-void BarModelEditor::setPositionAbsolute(const QPoint& p)
-{
-	auto* mod = model();
-	const auto minValue = mod->minValue();
-	const auto maxValue = mod->maxValue();
-	const auto range = maxValue - minValue;
-	if (range == 0) { return; }
-
-	QRect const r = rect();
-
-	const int margin = 3;
-	const QMargins margins(margin, margin, margin, margin);
-	const QRect valueRect = r.marginsRemoved(margins);
-
-	const float percentage = static_cast<float>(p.x() - valueRect.left()) / valueRect.width();
-	const float scaledValue = mod->scaledValue(percentage * range + minValue);
-	const auto step = mod->step<float>();
-	const float roundedValue = std::round(scaledValue / step) * step;
-	mod->setValue(roundedValue);
-}
-
 
 void BarModelEditor::mouseMoveEvent(QMouseEvent * me)
 {
+	updateInteractionState(me);
 	const auto pos = position(me);
-
-	if (m_buttonPressed && pos != m_lastMousePos)
+	if (currentInteraction() == InteractionType::MouseDrag && pos != m_lastMousePos)
 	{
 		// knob position is changed depending on last mouse position
 		setPositionAbsolute(pos);
@@ -101,16 +81,30 @@ void BarModelEditor::mouseMoveEvent(QMouseEvent * me)
 
 	showTextFloat();
 }
-	
+
+
+void BarModelEditor::setPositionAbsolute(const QPoint& p)
+{
+	FloatModel* mod = model();
+	if (mod->range() == 0) { return; }
+
+	const float percentage = static_cast<float>(p.x() - valueRect().left()) / valueRect().width();
+	const float scaledValue = mod->inverseNormValue(percentage);
+	const auto step = mod->step<float>();
+	const float roundedValue = std::round(scaledValue / step) * step;
+	mod->setValue(roundedValue);
+}
+
+
+QRect BarModelEditor::valueRect() const
+{
+	return rect().marginsRemoved(m_valueRectMargins);
+}
+
 
 void BarModelEditor::paintEvent(QPaintEvent *event)
 {
 	QWidget::paintEvent(event);
-
-	auto const * mod = model();
-	auto const minValue = mod->minValue();
-	auto const maxValue = mod->maxValue();
-	auto const range = maxValue - minValue;
 
 	QRect const r = rect();
 
@@ -126,24 +120,21 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	// Paint the bar
 	// Compute the percentage as:
 	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
-	auto const percentage = range == 0 ? 1. : (model()->inverseScaledValue(model()->value()) - minValue) / range;
-
-	int const margin = 3;
-	QMargins const margins(margin, margin, margin, margin);
-	QRect const valueRect = r.marginsRemoved(margins);
+	auto const * mod = model();
+	auto const percentage = mod->normValue(mod->value());
 
 	QBrush const & barBrush = getBarBrush();
 	painter.setPen(barBrush.color());
 	painter.setBrush(barBrush);
-	QPoint const startPoint = valueRect.topLeft();
-	QPoint endPoint = valueRect.bottomRight();
+	QPoint const startPoint = valueRect().topLeft();
+	QPoint endPoint = valueRect().bottomRight();
 	endPoint.setX(startPoint.x() + percentage * (endPoint.x() - startPoint.x()));
 
 	painter.drawRect(QRect(startPoint, endPoint));
 
 
 	// Draw the text into the value rectangle but move it slightly to the right
-	QRect const textRect = valueRect.marginsRemoved(QMargins(3, 0, 0, 0));
+	QRect const textRect = valueRect().marginsRemoved(QMargins(3, 0, 0, 0));
 
 	// Elide the text if needed
 	auto const fm = fontMetrics();

@@ -62,6 +62,8 @@ public:
 	QColor const & getTextColor() const;
 	void setTextColor(QColor const & textColor);
 
+	QRect valueRect() const;
+
 protected:
 	void paintEvent(QPaintEvent *event) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
@@ -72,6 +74,7 @@ private:
 	QBrush m_backgroundBrush;
 	QBrush m_barBrush;
 	QColor m_textColor;
+	QMargins m_valueRectMargins = {3, 3, 3, 3};
 };
 
 } // namespace lmms::gui

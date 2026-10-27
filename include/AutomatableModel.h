@@ -219,6 +219,9 @@ public:
 
 	void setValue(const float value, const bool isAutomated = false);
 
+	float normValue(const float value) const;
+	float inverseNormValue(const float value) const;
+
 	void incValue( int steps )
 	{
 		setValue( m_value + steps * m_step );
