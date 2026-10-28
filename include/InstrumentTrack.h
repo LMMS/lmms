@@ -337,7 +337,7 @@ private:
 
 	Microtuner m_microtuner;
 
-	int m_programNumber;
+    std::optional<uint8_t> m_programNumber;
 	std::optional<uint8_t> m_programBankMSB;
 	std::optional<uint8_t> m_programBankLSB;
 

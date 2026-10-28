@@ -428,18 +428,18 @@ bool VestigeInstrument::presetChangeSupported()
 	return true;
 }
 
-bool VestigeInstrument::setMidiPatch(std::optional<uint16_t> bank, uint8_t preset)
+bool VestigeInstrument::setMidiPatch(std::optional<uint16_t> bank, std::optional<uint8_t> preset)
 {
 	if (m_plugin == nullptr) { return false; }
 
-	int currentProgramNumber = m_plugin->currentProgram();
-	// The "empty" bank indicates that we need to handle it
-	// anyway. Since the list of VST plugins is continuous
-	// (excluding exceptions such as SQ8L), splitting it into
-	// artifically-made banks could be confusing to the user.
-	// Therefore we treat "empty" bank as 0th one, meaning
-	// that we can access only first 128 patches.
-	int newProgramNumber = (static_cast<uint16_t>(bank.value_or(0)) << 7) | preset;
+	uint32_t currentProgramNumber = m_plugin->currentProgram();
+	uint16_t targetBank = currentProgramNumber >> 7;
+	uint8_t targetPreset = currentProgramNumber & 0x7F;
+
+	if (bank.has_value()) { targetBank = *bank; }
+	if (preset.has_value()) { targetPreset = *preset; }
+
+	uint32_t newProgramNumber = (targetBank << 7) | targetPreset;
 	if (newProgramNumber != currentProgramNumber)
 	{
 		m_plugin->setProgram(newProgramNumber);

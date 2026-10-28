@@ -170,7 +170,7 @@ public:
 	//! @param bank Bank number
 	//! @param program Program number
 	//! @returns true if the patch was successfully changed
-	inline virtual bool setMidiPatch(std::optional<uint16_t> bank, uint8_t program)
+	inline virtual bool setMidiPatch(std::optional<uint16_t> bank, std::optional<uint8_t> program)
 	{
 		return false;
 	}

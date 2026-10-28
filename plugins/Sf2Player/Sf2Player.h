@@ -91,7 +91,7 @@ public:
 
 	void setParameter( const QString & _param, const QString & _value );
 	bool presetChangeSupported() override;
-	bool setMidiPatch(std::optional<uint16_t> bank, uint8_t preset) override;
+	bool setMidiPatch(std::optional<uint16_t> bank, std::optional<uint8_t> preset) override;
 
 public slots:
 	void openFile( const QString & _sf2File, bool updateTrackName = true );

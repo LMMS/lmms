@@ -72,7 +72,7 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_noteStacking(this),
 	m_piano(this),
 	m_microtuner(),
-	m_programNumber(0),
+	m_programNumber(),
 	m_programBankMSB(),
 	m_programBankLSB()
 {
@@ -1018,6 +1018,7 @@ void InstrumentTrack::onProgramChangeEvent(MidiPort::PresetSelectPolicy policy, 
 
 bool InstrumentTrack::onControllerBankSelectMSB(MidiPort::PresetSelectPolicy policy, uint8_t ctrlValue)
 {
+    m_programNumber.reset();
 	switch (policy)
 	{
 		case MidiPort::BankSelectMSB:
@@ -1043,6 +1044,7 @@ bool InstrumentTrack::onControllerBankSelectMSB(MidiPort::PresetSelectPolicy pol
 
 bool InstrumentTrack::onControllerBankSelectLSB(MidiPort::PresetSelectPolicy policy, uint8_t ctrlValue)
 {
+    m_programNumber.reset();
 	switch (policy)
 	{
 		case MidiPort::BankSelectBoth:

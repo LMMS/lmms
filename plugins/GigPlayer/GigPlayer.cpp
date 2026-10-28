@@ -901,7 +901,7 @@ bool GigInstrument::presetChangeSupported()
 	return true;
 }
 
-bool GigInstrument::setMidiPatch(std::optional<uint16_t> bank, uint8_t preset)
+bool GigInstrument::setMidiPatch(std::optional<uint16_t> bank, std::optional<uint8_t> preset)
 {
 	bool presetChanged = false;
 	// The "empty" bank indicates that we do not want to switch
@@ -914,9 +914,9 @@ bool GigInstrument::setMidiPatch(std::optional<uint16_t> bank, uint8_t preset)
 		presetChanged = true;
 	}
 
-	if (m_patchNum.value() != static_cast<int>(preset))
+	if (preset.has_value() && m_patchNum.value() != static_cast<int>(*preset))
 	{
-		m_patchNum.setValue(preset);
+		m_patchNum.setValue(*preset);
 		presetChanged = true;
 	}
 

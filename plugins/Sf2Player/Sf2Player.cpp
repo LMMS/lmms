@@ -911,7 +911,7 @@ bool Sf2Instrument::presetChangeSupported()
 	return true;
 }
 
-bool Sf2Instrument::setMidiPatch(std::optional<uint16_t> bank, uint8_t preset)
+bool Sf2Instrument::setMidiPatch(std::optional<uint16_t> bank, std::optional<uint8_t> preset)
 {
 	bool presetChanged = false;
 	if (bank.has_value() && m_bankNum.value() != static_cast<int>(*bank))
@@ -919,9 +919,9 @@ bool Sf2Instrument::setMidiPatch(std::optional<uint16_t> bank, uint8_t preset)
 		m_bankNum.setValue(*bank);
 		presetChanged = true;
 	}
-	if (m_patchNum.value() != static_cast<int>(preset))
+	if (preset.has_value() && m_patchNum.value() != static_cast<int>(*preset))
 	{
-		m_patchNum.setValue(preset);
+		m_patchNum.setValue(*preset);
 		presetChanged = true;
 	}
 
