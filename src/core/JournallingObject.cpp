@@ -24,7 +24,7 @@
 
 #include "JournallingObject.h"
 
-#include <qqueue.h>
+#include <queue>
 
 #include "AutomatableModel.h"
 #include "ProjectJournal.h"
@@ -91,16 +91,17 @@ void JournallingObject::cloneState( QDomDocument & _doc, QDomElement & _parent )
 	auto projectJournal = Engine::projectJournal();
 	//Walk the tree and replace all ids with a fresh one via a BFS.
 	// No visited list needed, as XML is not cyclic
-	QQueue< QDomElement > bfsQueue;
+	std::queue<QDomElement> bfsQueue;
 
-	bfsQueue.enqueue(_parent);
+	bfsQueue.push(_parent);
 
-	while (!bfsQueue.isEmpty())
+	while (!bfsQueue.empty())
 	{
-		auto current = bfsQueue.dequeue();
+		auto current = bfsQueue.front();
+		bfsQueue.pop();
 		if (current.hasAttribute("id"))
 		{
-			current.setAttribute("id", ProjectJournal::idToSave(projectJournal->generateId()));
+			current.setAttribute("id", projectJournal->generateId());
 		}
 
 		for (int i=0;i<current.childNodes().count();i++) {
@@ -108,7 +109,7 @@ void JournallingObject::cloneState( QDomDocument & _doc, QDomElement & _parent )
 			if (!child.isElement()) {
 				continue;
 			}
-			bfsQueue.enqueue(child.toElement());
+			bfsQueue.push(child.toElement());
 		}
 	}
 }
