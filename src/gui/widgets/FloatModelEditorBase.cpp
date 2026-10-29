@@ -328,7 +328,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 
 	we->accept();
 	const int deltaY = we->angleDelta().y();
-	float direction = deltaY > 0 ? 1 : -1;
+	float vector = static_cast<float>(deltaY) / 120;
 
 	auto * m = model();
 	const float step = m->step<float>();
@@ -364,23 +364,29 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 			const int deltaX = we->angleDelta().x();
 			if (deltaX != 0)
 			{
-				direction = deltaX > 0 ? 1 : -1;
+				vector = deltaX > 0 ? 1 : -1;
 			}
 		}
 	}
 
 	// Handle "natural" scrolling, which is common on trackpads and touch devices
 	if (we->inverted()) {
-		direction = -direction;
+		vector = -vector;
 	}
 
 	// Compute the number of steps but make sure that we always do at least one step
 	const float currentValue = model()->value();
-	const float valueOffset = range / numberOfStepsForFullSweep;
-	const float scaledValueOffset = model()->scaledValue(model()->inverseScaledValue(currentValue) + valueOffset) - currentValue;
-	const float stepMult = std::max(scaledValueOffset / step, 1.f);
-	const int inc = direction * stepMult;
-	model()->incValue(inc);
+	const float wantStep = range / numberOfStepsForFullSweep;
+	// Ensure that the increment is a whole number of model-defined steps,
+	// this is so that traditional mice always increment by the same amount.
+	const float scrollStep = std::max(1.f, std::round(wantStep / step)) * step;
+	const float valueOffset = vector * scrollStep;
+	const float newValue = model()->scaledValue(model()->inverseScaledValue(currentValue + m_leftOver) + valueOffset);
+	// Round the final value despite having already rounded the scroll step.
+	// This is because on precision scrolling devices vector can be non-whole.
+	const float newValueRounded = std::round(newValue / step) * step;
+	m_leftOver = newValue - newValueRounded;
+	model()->setValue(newValueRounded);
 
 	// Only force a text update for the 1st wheel event
 	showTextFloat(0, 1000, m_interaction != oldInteraction);
