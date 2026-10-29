@@ -327,8 +327,12 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	updateInteractionState(we);
 
 	we->accept();
-	const int deltaY = we->angleDelta().y();
-	float vector = static_cast<float>(deltaY) / 120;
+	const QPoint delta = we->angleDelta();
+	const float distance = std::hypotf(delta.x(), delta.y()) / 120;
+	const bool sign = std::signbit(delta.y() - delta.x()) // Up or right should increase the value
+		^ we->modifiers().testFlag(Qt::AltModifier)       // Alt swaps X and Y, to undo we invert the sign
+		^ we->inverted();                                 // Undo natural scroll
+	const float vector = distance * (sign ? -1.f : 1.f);
 
 	auto * m = model();
 	const float step = m->step<float>();
@@ -355,23 +359,6 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	{
 		// The alt key enables even finer adjustments
 		numberOfStepsForFullSweep = 2000;
-
-		// It seems that on some systems pressing Alt with mess with the directions,
-		// i.e. scrolling the mouse wheel is interpreted as pressing the mouse wheel
-		// left and right. Account for this quirk.
-		if (deltaY == 0)
-		{
-			const int deltaX = we->angleDelta().x();
-			if (deltaX != 0)
-			{
-				vector = deltaX > 0 ? 1 : -1;
-			}
-		}
-	}
-
-	// Handle "natural" scrolling, which is common on trackpads and touch devices
-	if (we->inverted()) {
-		vector = -vector;
 	}
 
 	// Compute the number of steps but make sure that we always do at least one step
