@@ -269,9 +269,13 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 
 void Fader::wheelEvent (QWheelEvent* ev)
 {
-	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
+	const float referenceDelta = 120; // delta of a single stndard scroll wheel tick,
+	                                  // see https://doc.qt.io/qt-6/qwheelevent.html#angleDelta
+	const float vector = static_cast<float>(ev->angleDelta().y()) / referenceDelta
+		* (ev->inverted() ? -1 : 1)
+		* (ev->modifiers().testFlag(Qt::AltModifier) ? -1 : 1);
 
-	const float increment = determineAdjustmentDelta(ev->modifiers()) * direction;
+	const float increment = determineAdjustmentDelta(ev->modifiers()) * vector;
 
 	adjustByDecibelDelta(increment);
 
