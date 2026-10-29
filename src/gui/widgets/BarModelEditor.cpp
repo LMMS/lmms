@@ -13,7 +13,7 @@ BarModelEditor::BarModelEditor(QString text, FloatModel * floatModel, QWidget * 
 	m_textColor(palette().text().color())
 {
 	setModel(floatModel);
-	connect(this, &BarModelEditor::sliderPressed, this, [this]{setPosition(m_lastMousePos);});
+	connect(this, &BarModelEditor::sliderPressed, this, [this] { setPosition(m_lastMousePos); });
 }
 
 QSizePolicy BarModelEditor::sizePolicy() const
@@ -72,7 +72,7 @@ void BarModelEditor::setPosition(const QPoint& p)
 	const float scaledValue = mod->inverseNormValue(percentage);
 	const auto step = mod->step<float>();
 	const float roundedValue = std::round(scaledValue / step) * step;
-	mod->setValue(roundedValue);
+	mod->setValue(roundedValue); // percentage could have been outside 0..1, but it gets clamped in here
 }
 
 
@@ -97,9 +97,7 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	painter.drawRect(r);
 
 	// Paint the bar
-	// Compute the percentage as:
-	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
-	auto const * mod = model();
+	auto const* mod = model();
 	auto const percentage = mod->normValue(mod->value());
 
 	QBrush const & barBrush = getBarBrush();
