@@ -327,8 +327,12 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	updateInteractionState(we);
 
 	we->accept();
+
 	const QPoint delta = we->angleDelta();
-	const float distance = std::hypotf(delta.x(), delta.y()) / 120;
+	// Delta of a single standard scroll wheel tick,
+	// see https://doc.qt.io/qt-6/qwheelevent.html#angleDelta
+	const float referenceDelta = 120;
+	const float distance = std::hypotf(delta.x(), delta.y()) / referenceDelta;
 	const bool sign = std::signbit(delta.y() - delta.x()) // Up or right should increase the value
 		^ we->modifiers().testFlag(Qt::AltModifier)       // Alt swaps X and Y, to undo we invert the sign
 		^ we->inverted();                                 // Undo natural scroll
