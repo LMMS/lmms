@@ -1,7 +1,7 @@
 /*
- * CustomTextKnob.h
+ * MidiPatch.h
  *
- * Copyright (c) 2020 Ibuki Sugiyama <main/at/fuwa.dev>
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,37 +22,36 @@
  *
  */
 
-#ifndef LMMS_GUI_CUSTOM_TEXT_KNOB_H
-#define LMMS_GUI_CUSTOM_TEXT_KNOB_H
+#ifndef LMMS_MIDI_PATCH_H
+#define LMMS_MIDI_PATCH_H
 
-#include "Knob.h"
+#include <cstdint>
 
-namespace lmms::gui
+namespace lmms
 {
 
-
-class LMMS_EXPORT CustomTextKnob : public Knob
+struct MidiPatch
 {
-protected:
-	inline void setHintText( const QString & _txt_before, const QString & _txt_after ) {} // inaccessible
-public:
-	CustomTextKnob( KnobType _knob_num, const QString& label, QWidget * _parent = nullptr, const QString & _name = QString(), const QString & _value_text = QString() );
+	//! 14-bit bank
+	std::uint16_t bank = 0;
 
-	CustomTextKnob( const Knob& other ) = delete;
+	//! 7-bit program
+	std::uint8_t program = 0;
 
-	inline void setValueText(const QString & _value_text)
+	constexpr auto bankMSB() const noexcept -> std::uint8_t { return (bank >> 7) & 0x7F; }
+	constexpr auto bankLSB() const noexcept -> std::uint8_t { return bank & 0x7F; }
+
+	constexpr void setBankMSB(std::uint8_t value) noexcept
 	{
-		m_value_text = _value_text;
+		bank = ((static_cast<std::uint16_t>(value) & 0x7F) << 7) | (bank & 0x7F);
 	}
 
-private:
-	QString displayValue() const override;
+	constexpr void setBankLSB(std::uint8_t value) noexcept
+	{
+		bank = (bank & 0x3F80) | (value & 0x7F);
+	}
+};
 
-protected:
-	QString m_value_text;
-} ;
+} // namespace lmms
 
-
-} // namespace lmms::gui
-
-#endif // LMMS_GUI_CUSTOM_TEXT_KNOB_H
+#endif // LMMS_MIDI_PATCH_H

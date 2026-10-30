@@ -39,6 +39,7 @@
 #include "AutomationClip.h"
 #include "ConfigManager.h"
 #include "MidiClip.h"
+#include "MidiPatch.h"
 #include "Instrument.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -65,7 +66,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"MIDI Import",
-	QT_TRANSLATE_NOOP("PluginBrowser", "Filter for importing MIDI-files into LMMS"),
+	QT_TRANSLATE_NOOP("PluginBrowser", "Filter for importing MIDI files into LMMS"),
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
 	Plugin::Type::ImportFilter,
@@ -194,6 +195,7 @@ public:
 	bool isSF2 = false;
 	bool hasNotes = false;
 	QString trackName;
+	MidiPatch currentPatch;
 
 	smfMidiChannel* create(TrackContainer* tc, QString tn)
 	{
@@ -209,8 +211,16 @@ public:
 			{
 				isSF2 = true;
 				it_inst->loadFile(ConfigManager::inst()->sf2File());
-				it_inst->childModel("bank")->setValue(0);
-				it_inst->childModel("patch")->setValue(0);
+
+				auto bank = it_inst->childModel("bank");
+				assert(bank != nullptr);
+				bank->setValue(0);
+				currentPatch.bank = 0;
+
+				auto patch = it_inst->childModel("patch");
+				assert(patch != nullptr);
+				patch->setValue(0);
+				currentPatch.program = 0;
 			}
 			else { it_inst = it->loadInstrument("patman"); }
 #else
@@ -334,13 +344,13 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		Alg_beats& beats = timeMap->beats;
 		for (int i = 0; i < beats.len - 1; ++i)
 		{
-			Alg_beat_ptr b = &(beats[i]);
+			Alg_beat* b = &(beats[i]);
 			double tempo = (beats[i + 1].beat - b->beat) / (beats[i + 1].time - beats[i].time);
 			tap->putValue(b->beat * ticksPerBeat, tempo * 60.0);
 		}
 		if (timeMap->last_tempo_flag)
 		{
-			Alg_beat_ptr b = &beats[beats.len - 1];
+			Alg_beat* b = &beats[beats.len - 1];
 			tap->putValue(b->beat * ticksPerBeat, timeMap->last_tempo * 60.0);
 		}
 	}
@@ -352,7 +362,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	// Song events
 	for (int e = 0; e < seq->length(); ++e)
 	{
-		Alg_event_ptr evt = (*seq)[e];
+		Alg_event* evt = (*seq)[e];
 
 		if (evt->is_update())
 		{
@@ -365,7 +375,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	for (int t = 0; t < seq->tracks(); ++t)
 	{
 		QString trackName = QString(tr("Track") + " %1").arg(t);
-		Alg_track_ptr trk = seq->track(t);
+		Alg_track* trk = seq->track(t);
 		pd.setValue(t + preTrackSteps);
 
 		for (auto& cc : ccs) { cc.clear(); }
@@ -373,7 +383,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		// Now look at events
 		for (int e = 0; e < trk->length(); ++e)
 		{
-			Alg_event_ptr evt = (*trk)[e];
+			Alg_event* evt = (*trk)[e];
 
 			if (evt->chan == -1)
 			{
@@ -405,8 +415,10 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			}
 			else if (evt->is_note())
 			{
-				smfMidiChannel* ch = chs[evt->chan].create(tc, trackName);
-				auto noteEvt = dynamic_cast<Alg_note_ptr>(evt);
+				// LMMS does not currently support specifying the channel of a single note
+				// To be safe, put the notes from different channels on separate tracks so that no information is lost
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
+				auto noteEvt = static_cast<Alg_note*>(evt);
 				tick_t ticks = noteEvt->get_duration() * ticksPerBeat;
 				Note n(
 					ticks < 1 ? 1 : ticks,
@@ -419,7 +431,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			}
 			else if (evt->is_update())
 			{
-				smfMidiChannel* ch = chs[evt->chan].create(tc, trackName);
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
 
 				double time = evt->time*ticksPerBeat;
 				QString update(evt->get_attribute());
@@ -431,10 +443,19 @@ bool MidiImport::readSMF(TrackContainer* tc)
 					{
 						auto& pc = pcs[evt->chan];
 						AutomatableModel* objModel = ch->it_inst->childModel("patch");
-						if (pc.at == nullptr) {
-							pc.create(tc, trackName + " > " + objModel->displayName());
+						assert(objModel != nullptr);
+						if (time == 0)
+						{
+							objModel->setInitValue(prog);
 						}
-						pc.putValue(time, objModel, prog);
+						else
+						{
+							if (!pc.at)
+							{
+								pc.create(tc, trackName + " > " + objModel->displayName());
+							}
+							pc.putValue(time, objModel, prog);
+						}
 					}
 					else
 					{
@@ -457,55 +478,70 @@ bool MidiImport::readSMF(TrackContainer* tc)
 					if (ccid <= 128)
 					{
 						double cc = evt->get_real_value();
-						AutomatableModel* objModel = nullptr;
-
+						AutomatableModel* modelObject = nullptr;
+						// Some CC knobs correspond to specific things like pitch and volume, so in that case, set the lmms pitch/volume/etc knobs.
+						// Otherwise, set the knob in the instrument track CC rack
 						switch (ccid)
 						{
 							case 0:
 								if (ch->isSF2 && ch->it_inst)
 								{
-									objModel = ch->it_inst->childModel("bank");
-									printf("BANK SELECT %f %d\n", cc, static_cast<int>(cc * 127));
-									cc *= 127.0f;
+									modelObject = ch->it_inst->childModel("bank");
+									assert(modelObject != nullptr);
+									printf("BANK SELECT (MSB) %f %d\n", cc, static_cast<int>(cc * 127));
+									ch->currentPatch.setBankMSB(static_cast<std::uint8_t>(cc * 127));
+									cc = static_cast<double>(ch->currentPatch.bank);
 								}
 								break;
 
 							case 7:
-								objModel = ch->it->volumeModel();
+								modelObject = ch->it->volumeModel();
 								cc *= 100.0f;
 								break;
 
 							case 10:
-								objModel = ch->it->panningModel();
+								modelObject = ch->it->panningModel();
 								cc = cc * 200.f - 100.0f;
 								break;
 
+							case 32:
+								if (ch->isSF2 && ch->it_inst)
+								{
+									modelObject = ch->it_inst->childModel("bank");
+									assert(modelObject != nullptr);
+									printf("BANK SELECT (LSB) %f %d\n", cc, static_cast<int>(cc * 127));
+									ch->currentPatch.setBankLSB(static_cast<std::uint8_t>(cc * 127));
+									cc = static_cast<double>(ch->currentPatch.bank);
+								}
+								break;
+
 							case 128:
-								objModel = ch->it->pitchModel();
+								modelObject = ch->it->pitchModel();
 								cc = cc * 100.0f;
 								break;
 
 							default:
-								//TODO: something useful for other CCs
+								if (ccid >= 0 && ccid < 128)
+								{
+									modelObject = ch->it->midiCCModel(ccid);
+									cc = cc * 127.0f;
+								}
 								break;
 						}
 
-						if (objModel)
+						if (modelObject)
 						{
-							if (time == 0 && objModel)
+							if (time == 0)
 							{
-								objModel->setInitValue(cc);
+								modelObject->setInitValue(cc);
 							}
 							else
 							{
-								if (ccs[ccid].at == nullptr) {
-									ccs[ccid].create(tc, trackName + " > " +
-										// This is inside if (objModel), so objModel should never be nullptr
-										// (objModel != nullptr ? objModel->displayName() : QString("CC %1").arg(ccid))
-										objModel->displayName()
-									);
+								if (ccs[ccid].at == nullptr)
+								{
+									ccs[ccid].create(tc, trackName + " > " + modelObject->displayName());
 								}
-								ccs[ccid].putValue(time, objModel, cc);
+								ccs[ccid].putValue(time, modelObject, cc);
 							}
 						}
 					}
@@ -537,8 +573,15 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		if (c.first % 16l == 9 /* channel 10 */
 			&& c.second.hasNotes && c.second.it_inst && c.second.isSF2)
 		{
-			c.second.it_inst->childModel("bank")->setValue(128);
-			c.second.it_inst->childModel("patch")->setValue(0);
+			auto bank = c.second.it_inst->childModel("bank");
+			assert(bank != nullptr);
+			bank->setValue(128);
+			c.second.currentPatch.bank = 128;
+
+			auto patch = c.second.it_inst->childModel("patch");
+			assert(patch != nullptr);
+			patch->setValue(0);
+			c.second.currentPatch.program = 0;
 		}
 	}
 

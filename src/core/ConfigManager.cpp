@@ -532,7 +532,6 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			cfgSetInt(app, disablebackup);
 			cfgSetStr(app, language);
 			cfgSetStr(app, loopmarkermode);
-			cfgSetInt(app, nanhandler);
 			cfgSetInt(app, nommpz);
 			cfgSetInt(app, openlastproject);
 			cfgSetInt(app, sololegacybehavior);
@@ -553,6 +552,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			cfgSetStr(audioengine, mididev);
 			cfgSetInt(audioengine, framesperaudiobuffer);
 			cfgSetInt(audioengine, samplerate);
+			cfgSetInt(audioengine, sanitizemix);
 
 			cfgSetInt(audioalsa, channels);
 			cfgSetStr(audioalsa, device);

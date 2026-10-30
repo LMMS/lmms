@@ -44,9 +44,9 @@ class BoolModel;
 	@brief Job between @ref PlayHandle and @ref MixerChannel
 
 	A @ref ThreadableJob class located at the exit point of each @ref PlayHandle into a @ref MixerChannel
-	(or into an audio device, in case of @ref AudioJack, but this is not supported in AudioBusHandle yet).
+	(or into an audio device, in case of AudioJack, but this is not supported in AudioBusHandle yet).
 	It contains an optional @ref EffectChain which is e.g. visualized in the
-	@ref InstrumentTrackWindow or @ref SampleTrackWindow.
+	@ref gui::InstrumentTrackWindow or @ref gui::SampleTrackWindow.
 	For processing, it adds all input play handles into an internal buffer,
 	processes the @ref EffectChain (if existing) on that buffer
 	and finally merges the buffer into its @ref MixerChannel.
@@ -81,6 +81,9 @@ public:
 	void addPlayHandle(PlayHandle* handle);
 	void removePlayHandle(PlayHandle* handle);
 
+	//! @returns true if the processing outputted corrupted audio (infs/nans).
+	bool isCorrupted() const { return m_corrupted.load(std::memory_order_relaxed); }
+
 private:
 	volatile bool m_bufferUsage;
 
@@ -99,6 +102,8 @@ private:
 	FloatModel* m_volumeModel;
 	FloatModel* m_panningModel;
 	BoolModel* m_mutedModel;
+	
+	std::atomic<bool> m_corrupted = false;
 
 	friend class AudioEngine;
 	friend class AudioEngineWorkerThread;

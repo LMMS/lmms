@@ -100,7 +100,6 @@ public:
 			bool disablebackup = false; // -> enable?
 			std::string language = "en"; // TODO enum?
 			std::string loopmarkermode = "dual"; // TODO enum
-			bool nanhandler = true;
 			bool nommpz = false; // -> compressmmp?
 			bool openlastproject = false;
 			bool sololegacybehavior = false;
@@ -127,6 +126,7 @@ public:
 			std::string mididev;
 			uint32_t framesperaudiobuffer = 256;
 			uint32_t samplerate = 44100;
+			bool sanitizemix = true;
 		} audioengine;
 
 		struct AudioAlsa // TODO make these a union?

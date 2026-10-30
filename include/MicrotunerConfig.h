@@ -54,22 +54,52 @@ public:
 	QSize sizeHint() const override {return QSize(300, 400);}
 
 public slots:
+	//! @brief Update list of available scales.
+	//! @param index Index of the scale to update; update all scales if -1 or out of range.
 	void updateScaleList(int index);
+
+	//! @brief Update list of available keymaps.
+	//! @param index Index of the keymap to update; update all keymaps if -1 or out of range.
 	void updateKeymapList(int index);
+
+	//! @brief Fill all the scale-related values based on currently selected scale
 	void updateScaleForm();
+
+	//! @brief Fill all the keymap-related values based on currently selected keymap
 	void updateKeymapForm();
 
 private slots:
+	//! @brief Parse an .scl file and apply the loaded scale if it is valid
+	//! @return true if input is valid, false if problems were detected
 	bool loadScaleFromFile();
+
+	//! @brief Parse a .kbm file and apply the loaded keymap if it is valid
+	//! @return true if input is valid, false if problems were detected
 	bool loadKeymapFromFile();
+
+	//! @brief Save currently entered scale definition as .scl file
+	//! @return true if input is valid, false if problems were detected
 	bool saveScaleToFile();
+
+	//! @brief Save currently entered keymap definition as .kbm file
+	//! @return true if input is valid, false if problems were detected
 	bool saveKeymapToFile();
 
 private:
+	//! @brief Validate the scale name and entered interval definitions
+	//! @return true if input is valid, false if problems were detected
 	bool validateScaleForm();
+
+	//! @brief Validate the entered key mapping and other values
+	//! @return true if input is valid, false if problems were detected
 	bool validateKeymapForm();
 
+	//! @brief Parse and apply the entered scale definition
+	//! @return true if input is valid, false if problems were detected
 	bool applyScale();
+
+	//! @brief Parse and apply the entered keymap definition
+	//! @return true if input is valid, false if problems were detected
 	bool applyKeymap();
 
 	ComboBoxModel m_scaleComboModel;        //!< ID of scale currently selected for editing

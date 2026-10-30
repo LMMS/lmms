@@ -51,12 +51,10 @@
 #include "AudioAlsaSetupWidget.h"
 #include "AudioDummy.h"
 #include "AudioJack.h"
-#include "AudioOss.h"
 #include "AudioPortAudio.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioSndio.h"
-#include "AudioSoundIo.h"
 
 // Platform-specific midi-interface classes.
 #include "MidiAlsaRaw.h"
@@ -64,7 +62,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 #include "MidiJack.h"
-#include "MidiOss.h"
 #include "MidiSndio.h"
 #include "MidiWinMM.h"
 
@@ -124,8 +121,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_vstEmbedMethod{ConfigManager::inst()->vstEmbedMethod()},
 	m_vstAlwaysOnTop{ConfigManager::inst()->config.ui.vstalwaysontop},
 	m_disableAutoQuit{ConfigManager::inst()->config.ui.disableautoquit},
-	m_NaNHandler{ConfigManager::inst()->config.app.nanhandler},
 	m_bufferSize{static_cast<int>(ConfigManager::inst()->config.audioengine.framesperaudiobuffer)},
+	m_mixSanitization(ConfigManager::inst()->config.audioengine.sanitizemix),
 	m_sampleRate{static_cast<int>(ConfigManager::inst()->config.audioengine.samplerate)},
 	m_midiAutoQuantize{ConfigManager::inst()->config.midi.autoquantize},
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
@@ -505,19 +502,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			new AudioPortAudioSetupWidget(as_w);
 #endif
 
-#ifdef LMMS_HAVE_SOUNDIO
-	m_audioIfaceSetupWidgets[AudioSoundIo::name()] =
-			new AudioSoundIo::setupWidget(as_w);
-#endif
-
 #ifdef LMMS_HAVE_SDL
 	m_audioIfaceSetupWidgets[AudioSdl::name()] =
 			new AudioSdl::setupWidget(as_w);
-#endif
-
-#ifdef LMMS_HAVE_OSS
-	m_audioIfaceSetupWidgets[AudioOss::name()] =
-			new AudioOss::setupWidget(as_w);
 #endif
 
 #ifdef LMMS_HAVE_SNDIO
@@ -556,12 +543,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_audioIfaceSetupWidgets[audioDevName]->show();
 
 	connect(m_audioInterfaces, &QComboBox::textActivated, this, &SetupDialog::audioInterfaceChanged);
-
-	// Advanced setting, hidden for now
-	// // TODO Handle or remove.
-	// auto useNaNHandler = new LedCheckBox(tr("Use built-in NaN handler"), audio_w);
-	// audio_layout->addWidget(useNaNHandler);
-	// useNaNHandler->setChecked(m_NaNHandler);
 
 	auto sampleRateBox = new QGroupBox{tr("Sample rate"), audio_w};
 
@@ -638,12 +619,20 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	setBufferSize(m_bufferSizeSlider->value());
 
+	const auto otherBox = new QGroupBox(tr("Other"), audio_w);
+	const auto otherBoxLayout = new QVBoxLayout{otherBox};
+
+	const auto enableMixSanitizationCheckbox = addCheckBox(tr("Enable mix sanitization"), otherBox, otherBoxLayout,
+		m_mixSanitization, SLOT(toggleMixSanitization(bool)), false);
+	enableMixSanitizationCheckbox->setToolTip(tr("Provides protection from any plugins or tracks that generate "
+												 "corrupted audio, but may negatively impact performance."));
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
 	audio_layout->addWidget(as_w);
 	audio_layout->addWidget(sampleRateBox);
 	audio_layout->addWidget(bufferSizeBox);
+	audio_layout->addWidget(otherBox);
 	audio_layout->addStretch();
 
 
@@ -681,17 +670,12 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			MidiSetupWidget::create<MidiJack>(ms_w);
 #endif
 
-#ifdef LMMS_HAVE_OSS
-	m_midiIfaceSetupWidgets[MidiOss::name()] =
-			MidiSetupWidget::create<MidiOss>(ms_w);
-#endif
-
 #ifdef LMMS_HAVE_SNDIO
 	m_midiIfaceSetupWidgets[MidiSndio::name()] =
 			MidiSetupWidget::create<MidiSndio>(ms_w);
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#ifdef LMMS_HAVE_WINMM
 	m_midiIfaceSetupWidgets[MidiWinMM::name()] =
 			MidiSetupWidget::create<MidiWinMM>(ms_w);
 #endif
@@ -1005,8 +989,8 @@ void SetupDialog::accept()
 					QString::number(m_disableAutoQuit));
 	ConfigManager::inst()->setValue("audioengine", "audiodev",
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
-	ConfigManager::inst()->setValue("app", "nanhandler",
-					QString::number(m_NaNHandler));
+	ConfigManager::inst()->setValue("audioengine", "sanitizemix",
+					QString::number(m_mixSanitization));
 	ConfigManager::inst()->setValue("audioengine", "samplerate",
 					QString::number(m_sampleRate));
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
@@ -1044,7 +1028,7 @@ void SetupDialog::accept()
 	ConfigManager::inst()->config.ui.vstalwaysontop = m_vstAlwaysOnTop;
 	ConfigManager::inst()->config.ui.disableautoquit = m_disableAutoQuit;
 	ConfigManager::inst()->config.audioengine.audiodev = m_audioIfaceNames[m_audioInterfaces->currentText()].toStdString();
-	ConfigManager::inst()->config.app.nanhandler = m_NaNHandler;
+	ConfigManager::inst()->config.audioengine.sanitizemix = m_mixSanitization;
 	ConfigManager::inst()->config.audioengine.samplerate = m_sampleRate;
 	ConfigManager::inst()->config.audioengine.framesperaudiobuffer = m_bufferSize;
 	ConfigManager::inst()->config.audioengine.mididev = m_midiIfaceNames[m_midiInterfaces->currentText()].toStdString();
@@ -1246,6 +1230,12 @@ void SetupDialog::toggleVSTAlwaysOnTop(bool enabled)
 void SetupDialog::toggleDisableAutoQuit(bool enabled)
 {
 	m_disableAutoQuit = enabled;
+}
+
+void SetupDialog::toggleMixSanitization(bool enabled)
+{
+	m_mixSanitization = enabled;
+	Engine::audioEngine()->setSanitizationEnabled(m_mixSanitization);
 }
 
 void SetupDialog::audioInterfaceChanged(const QString & iface)

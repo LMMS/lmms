@@ -26,7 +26,7 @@
 #ifndef LMMS_EXPORT_FILTER_H
 #define LMMS_EXPORT_FILTER_H
 
-#include <QFile>
+#include <filesystem>
 
 #include "TrackContainer.h"
 #include "Plugin.h"
@@ -42,10 +42,17 @@ public:
 	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, nullptr ) {}
 	~ExportFilter() override = default;
 
+	//! @brief Exports the project to a file
+	//! @param tracks Song tracks
+	//! @param patternStoreTracks PatternStore tracks
+	//! @param tempo Song global tempo
+	//! @param masterPitch Song master pitch
+	//! @param filePath The path of the exported file
+	//! @return If operation was successful
+	virtual bool tryExport(const TrackContainer::TrackList& tracks,
+		const TrackContainer::TrackList& patternTracks,
+		int tempo, int masterPitch, const std::filesystem::path& filePath) = 0;
 
-	virtual bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &patternTracks,
-				int tempo, int masterPitch, const QString &filename ) = 0;
 protected:
 
 	void saveSettings( QDomDocument &, QDomElement & ) override

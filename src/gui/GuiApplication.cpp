@@ -256,13 +256,6 @@ void GuiApplication::childDestroyed(QObject *obj)
 	}
 }
 
-/** \brief Called from main when SIGINT is fired
- *
- * Unix signal handlers can only call async-signal-safe functions:
- *  write(fd) --> QSocketNotifier --> SLOT sigintOccurred()
- *
- * See https://doc.qt.io/qt-6/unix-signals.html
- */
 void GuiApplication::sigintHandler(int)
 {
 #ifdef LMMS_BUILD_WIN32
@@ -303,9 +296,6 @@ void GuiApplication::sigintOccurred()
 }
 
 #ifdef LMMS_BUILD_WIN32
-/*!
- * @brief Returns the Windows System font.
- */
 QFont GuiApplication::getWin32SystemFont()
 {
 	auto metrics = NONCLIENTMETRICSW{ .cbSize = sizeof(NONCLIENTMETRICSW) };

@@ -37,8 +37,10 @@
 class QPainter;
 
 namespace lmms {
-
 class Sample;
+}
+
+namespace lmms::gui {
 
 /**
    Allows for visualizing sample data.
@@ -58,16 +60,15 @@ public:
 	{
 		QRect sampleRect; //!< A rectangle that covers the entire range of samples.
 
-		QRect viewportRect; //!< Specifies the location in `sampleRect` where the waveform will be drawn. Equals
-							//!< `sampleRect` when null.
+		//! @brief Specifies the location in `sampleRect` where the waveform will be drawn.
+		//!
+		//! Equals `sampleRect` when null.
+		QRect viewportRect;
 
 		float amplification = 1.0f; //!< The amount of amplification to apply to the waveform.
-
-		float sampleStart = 0.0f; //!< Where the sample begins for drawing.
-
-		float sampleEnd = 1.0f; //!< Where the sample ends for drawing.
-
-		bool reversed = false; //!< Determines if the waveform is drawn in reverse or not.
+		float sampleStart = 0.0f;   //!< Where the sample begins for drawing.
+		float sampleEnd = 1.0f;     //!< Where the sample ends for drawing.
+		bool reversed = false;      //!< Determines if the waveform is drawn in reverse or not.
 	};
 
 	SampleThumbnail() = default;
@@ -141,6 +142,6 @@ private:
 	inline static std::unordered_map<SampleThumbnailEntry, std::shared_ptr<ThumbnailCache>, Hash> s_sampleThumbnailCacheMap;
 };
 
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif // LMMS_SAMPLE_THUMBNAIL_H

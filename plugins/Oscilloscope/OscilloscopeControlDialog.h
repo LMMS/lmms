@@ -1,7 +1,7 @@
 /*
- * CustomTextKnob.cpp
+ * OscilloscopeControlDialog.h - Oscilloscope effect gui window
  *
- * Copyright (c) 2020 Ibuki Sugiyama <main/at/fuwa.dev>
+ * Copyright (c) 2025-2026 Keratin
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -19,28 +19,34 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- *
  */
 
-#include "CustomTextKnob.h"
-#include "FontHelper.h"
+#ifndef LMMS_GUI_OSCILLOSCOPE_CONTROL_DIALOG_H
+#define LMMS_GUI_OSCILLOSCOPE_CONTROL_DIALOG_H
 
-namespace lmms::gui
+#include "EffectControlDialog.h"
+
+namespace lmms
 {
 
+class OscilloscopeControls;
+class FloatModel;
 
-CustomTextKnob::CustomTextKnob( KnobType _knob_num, const QString& label, QWidget * _parent, const QString & _name, const QString & _value_text ) :
-	Knob( _knob_num, _parent, _name ),
-	m_value_text( _value_text )
+namespace gui
 {
-	setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
-	setLabel(label);
-}
 
-QString CustomTextKnob::displayValue() const
+class Knob;
+
+class OscilloscopeControlDialog : public EffectControlDialog
 {
-	return m_description.trimmed() + m_value_text;
-}
+	Q_OBJECT
+public:
+	OscilloscopeControlDialog(OscilloscopeControls* controls);
+	~OscilloscopeControlDialog() override = default;
+};
 
+} // namespace gui
 
-} // namespace lmms::gui
+} // namespace lmms
+
+#endif // LMMS_GUI_OSCILLOSCOPE_CONTROL_DIALOG_H
