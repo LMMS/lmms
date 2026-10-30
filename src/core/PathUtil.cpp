@@ -266,10 +266,10 @@ namespace lmms::PathUtil
 	{
 #if defined(LMMS_BUILD_WIN32)
 		// Cast QString's UTF-16 encoded unsigned short* to wchar_t*
-		return reinterpret_cast<const wchar_t*>(path.utf16());
+		return reinterpret_cast<const wchar_t*>(PathUtil::toAbsolute(path).utf16());
 #else
 		// Convert to UTF-8, which we assume is the narrow encoding on non-Windows
-		return path.toStdString();
+		return PathUtil::toAbsolute(path).toStdString();
 #endif
 	}
 
