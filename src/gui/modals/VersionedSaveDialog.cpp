@@ -163,9 +163,7 @@ bool VersionedSaveDialog::confirmOverwrite(const QString& fileName, const QStrin
 
 	QMessageBox mb;
 	mb.setWindowTitle(windowTitle);
-	mb.setText(FileName
-		+ tr(" already exists. "
-			 "Do you want to replace it?"));
+	mb.setText(tr("%1 already exists. Do you want to replace it?").arg(fileName));
 	mb.setIcon(QMessageBox::Warning);
 	mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
