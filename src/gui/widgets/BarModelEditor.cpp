@@ -1,7 +1,6 @@
-#include <BarModelEditor.h>
+#include "BarModelEditor.h"
 
 #include <QPainter>
-
 
 namespace lmms::gui
 {
@@ -14,6 +13,7 @@ BarModelEditor::BarModelEditor(QString text, FloatModel * floatModel, QWidget * 
 	m_textColor(palette().text().color())
 {
 	setModel(floatModel);
+	connect(this, &BarModelEditor::sliderPressed, this, [this] { setPosition(m_lastMousePos); });
 }
 
 QSizePolicy BarModelEditor::sizePolicy() const
@@ -62,14 +62,29 @@ void BarModelEditor::setTextColor(QColor const & textColor)
 	m_textColor = textColor;
 }
 
+
+void BarModelEditor::setPosition(const QPoint& p)
+{
+	FloatModel* mod = model();
+	if (mod->range() == 0) { return; }
+
+	const float percentage = static_cast<float>(p.x() - valueRect().left()) / valueRect().width();
+	const float scaledValue = mod->inverseNormValue(percentage);
+	const auto step = mod->step<float>();
+	const float roundedValue = std::round(scaledValue / step) * step;
+	mod->setValue(roundedValue); // percentage could have been outside 0..1, but it gets clamped in here
+}
+
+
+QRect BarModelEditor::valueRect() const
+{
+	return rect().marginsRemoved(m_valueRectMargins);
+}
+
+
 void BarModelEditor::paintEvent(QPaintEvent *event)
 {
 	QWidget::paintEvent(event);
-
-	auto const * mod = model();
-	auto const minValue = mod->minValue();
-	auto const maxValue = mod->maxValue();
-	auto const range = maxValue - minValue;
 
 	QRect const r = rect();
 
@@ -81,28 +96,22 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	painter.setBrush(backgroundBrush);
 	painter.drawRect(r);
 
-
 	// Paint the bar
-	// Compute the percentage as:
-	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
-	auto const percentage = range == 0 ? 1. : (model()->inverseScaledValue(model()->value()) - minValue) / range;
-
-	int const margin = 3;
-	QMargins const margins(margin, margin, margin, margin);
-	QRect const valueRect = r.marginsRemoved(margins);
+	auto const* mod = model();
+	auto const percentage = mod->normValue(mod->value());
 
 	QBrush const & barBrush = getBarBrush();
 	painter.setPen(barBrush.color());
 	painter.setBrush(barBrush);
-	QPoint const startPoint = valueRect.topLeft();
-	QPoint endPoint = valueRect.bottomRight();
+	QPoint const startPoint = valueRect().topLeft();
+	QPoint endPoint = valueRect().bottomRight();
 	endPoint.setX(startPoint.x() + percentage * (endPoint.x() - startPoint.x()));
 
 	painter.drawRect(QRect(startPoint, endPoint));
 
 
 	// Draw the text into the value rectangle but move it slightly to the right
-	QRect const textRect = valueRect.marginsRemoved(QMargins(3, 0, 0, 0));
+	QRect const textRect = valueRect().marginsRemoved(QMargins(3, 0, 0, 0));
 
 	// Elide the text if needed
 	auto const fm = fontMetrics();
