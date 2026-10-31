@@ -149,6 +149,8 @@ public:
 
 public slots:
 	void updateSampleVars();
+	void dataChangeTriggerEnvelope();
+	void dataChangeTriggerLfo();
 
 
 protected:
