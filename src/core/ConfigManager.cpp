@@ -24,6 +24,8 @@
 
 #include "ConfigManager.h"
 
+#include <format>
+
 #include <QApplication>
 #include <QDir>
 #include <QDomElement>
