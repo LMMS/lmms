@@ -530,12 +530,12 @@ void AudioJack::setupWidget::saveSettings()
 	audioJackConfig.output.resize(m_outputDevices.size());
 	audioJackConfig.input.resize(m_inputDevices.size());
 	
-	for (int i = 0; i < m_outputDevices.size(); i++)
+	for (size_t i = 0; i < m_outputDevices.size(); i++)
 	{
 		audioJackConfig.output[i] = m_outputDevices[i]->text().toStdString();
 	}
 
-	for (int i = 0; i < m_inputDevices.size(); i++)
+	for (size_t i = 0; i < m_inputDevices.size(); i++)
 	{
 		audioJackConfig.input[i] = m_inputDevices[i]->text().toStdString();
 	}
