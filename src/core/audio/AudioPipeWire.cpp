@@ -195,13 +195,40 @@ static void on_capture_process(void *userdata)
 	data->processCapture();
 }
 
+static void notifyFormat(void* userdata, bool capture, uint32_t id, const spa_pod* param)
+{
+	if (id != SPA_PARAM_Format || param == nullptr) { return; }
+
+	uint32_t mediaType = 0;
+	uint32_t mediaSubtype = 0;
+	if (spa_format_parse(param, &mediaType, &mediaSubtype) < 0) { return; }
+	if (mediaType != SPA_MEDIA_TYPE_audio || mediaSubtype != SPA_MEDIA_SUBTYPE_raw) { return; }
+
+	spa_audio_info_raw info{};
+	if (spa_format_audio_raw_parse(param, &info) < 0) { return; }
+
+	static_cast<AudioPipeWire*>(userdata)->onFormatNegotiated(capture, info.rate);
+}
+
+static void on_param_changed(void* userdata, uint32_t id, const spa_pod* param)
+{
+	notifyFormat(userdata, false, id, param);
+}
+
+static void on_capture_param_changed(void* userdata, uint32_t id, const spa_pod* param)
+{
+	notifyFormat(userdata, true, id, param);
+}
+
 static const struct pw_stream_events stream_events = {
         .version = PW_VERSION_STREAM_EVENTS,
+        .param_changed = on_param_changed,
         .process = on_process,
 };
 
 static const struct pw_stream_events capture_stream_events = {
         .version = PW_VERSION_STREAM_EVENTS,
+        .param_changed = on_capture_param_changed,
         .process = on_capture_process,
 };
 
@@ -227,24 +254,6 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
  
 	m_core = pw_context_connect(m_context, NULL /* properties */, 0 /* user_data size */);
 
-	// Update the sample rate used by LMMS to the one from PipeWire if possible
-	if (m_core)
-	{
-		struct pw_properties const *props = pw_core_get_properties(m_core);
-
-		// Note: there does not seem to be a define for "default.clock.rate"
-		const char* sampleRateStr = pw_properties_get(props, "default.clock.rate");
-		if (sampleRateStr)
-		{
-			const auto sampleRatePipeWire = static_cast<lmms::sample_rate_t>(pw_properties_parse_int(sampleRateStr));
-		
-			if (sampleRatePipeWire != sampleRate())
-			{
-				setSampleRate(sampleRatePipeWire);
-			}
-		}
-	}
-
 	const auto cm = ConfigManager::inst();
 	const auto outputNode = cm->value(audioPipeWireClass, outputKey).toUtf8();
 	const auto inputNode = cm->value(audioPipeWireClass, inputKey).toUtf8();
@@ -254,6 +263,8 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 					PW_KEY_MEDIA_CATEGORY, "Playback",
 					PW_KEY_MEDIA_ROLE, "Music",
 					NULL);
+	const auto nodeRate = QString{"1/%1"}.arg(sampleRate()).toUtf8();
+	pw_properties_set(playbackProps, PW_KEY_NODE_RATE, nodeRate.constData());
 	if (!outputNode.isEmpty())
 	{
 		pw_properties_set(playbackProps, PW_KEY_TARGET_OBJECT, outputNode.constData());
@@ -305,19 +316,39 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 							params, 1);
 	}
 
-	// TODO Negotiate preferred buffer sizes
-	// const auto framesPerPeriod = this->audioEngine()->framesPerPeriod();
-	// const auto bufferSize = framesPerPeriod * DEFAULT_CHANNELS * sizeof(float);
+	// Wait for the negotiated rates and adopt the playback rate; the loop is stopped again
+	// afterwards so that startProcessingImpl() can start it.
+	successful = false;
+	if (m_core)
+	{
+		pw_thread_loop_start(m_loop);
+		pw_thread_loop_lock(m_loop);
 
-	// // TODO Rather use a new buffer? It should be copied though I guess.
-    // params[0] = static_cast<spa_pod*>(spa_pod_builder_add_object(&b,
-    //     SPA_TYPE_OBJECT_ParamBuffers, SPA_PARAM_Buffers,
-    //     SPA_PARAM_BUFFERS_size,    SPA_POD_Int(bufferSize)));
-    
-    // // Update stream params
-    // pw_stream_update_params(m_stream, params, 1);
+		timespec deadline{};
+		// Deadline is 2 seconds from the current time
+		pw_thread_loop_get_time(m_loop, &deadline, 2'000'000'000LL);
+		auto negotiated = [this] { return m_playbackRate != 0 && (!m_captureStream || m_captureRate != 0); };
+		while (!negotiated())
+		{
+			if (pw_thread_loop_timed_wait_full(m_loop, &deadline) != 0) { break; }
+		}
 
-	successful = true;
+		// Without a negotiated rate LMMS cannot know what PipeWire runs at.
+		// In case the rate was not negotiated, the "successful" flag remains false
+		// and lets the engine try another device.
+		if (m_playbackRate != 0)
+		{
+			successful = true;
+			if (m_playbackRate != sampleRate()) { setSampleRate(static_cast<sample_rate_t>(m_playbackRate.load())); }
+		}
+		if (m_captureRate != 0 && m_captureRate != sampleRate())
+		{
+			pw_log_warn("capture rate %u differs from playback rate %u", m_captureRate.load(), sampleRate());
+		}
+
+		pw_thread_loop_unlock(m_loop);
+		pw_thread_loop_stop(m_loop);
+	}
 }
 
 AudioPipeWire::~AudioPipeWire()
@@ -325,10 +356,10 @@ AudioPipeWire::~AudioPipeWire()
 	stopProcessing();
 
 	if (m_captureStream) { pw_stream_destroy(m_captureStream); }
-	pw_stream_destroy(m_stream);
-	pw_core_disconnect(m_core);
-	pw_context_destroy(m_context);
-	pw_thread_loop_destroy(m_loop);
+	if (m_stream) { pw_stream_destroy(m_stream); }
+	if (m_core) { pw_core_disconnect(m_core); }
+	if (m_context) { pw_context_destroy(m_context); }
+	if (m_loop) { pw_thread_loop_destroy(m_loop); }
 }
 
 void AudioPipeWire::processStreams()
@@ -403,6 +434,12 @@ void AudioPipeWire::processCapture()
 	pw_stream_queue_buffer(m_captureStream, b);
 }
 
+void AudioPipeWire::onFormatNegotiated(bool capture, uint32_t rate)
+{
+	(capture ? m_captureRate : m_playbackRate) = rate;
+	pw_thread_loop_signal(m_loop, false);
+}
+
 void AudioPipeWire::startProcessingImpl()
 {
 	pw_thread_loop_start(m_loop);
@@ -410,7 +447,10 @@ void AudioPipeWire::startProcessingImpl()
 
 void AudioPipeWire::stopProcessingImpl()
 {
-	pw_thread_loop_stop(m_loop);
+	if (m_loop)
+	{
+		pw_thread_loop_stop(m_loop);
+	}
 }
 
 AudioPipeWire::setupWidget::setupWidget( QWidget * _parent ) :

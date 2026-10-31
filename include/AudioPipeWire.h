@@ -36,6 +36,8 @@
 
 #include <QObject>
 
+#include <atomic>
+#include <cstdint>
 #include <vector>
 
 class QToolButton;
@@ -57,6 +59,9 @@ public:
 
 	void processStreams();
 	void processCapture();
+
+	// Called on the PipeWire thread when a stream's format has been negotiated.
+	void onFormatNegotiated(bool capture, uint32_t rate);
 
 	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
@@ -83,6 +88,10 @@ private:
 	pw_stream* m_captureStream = nullptr;
 
 	std::vector<SampleFrame> m_captureBuffer;
+
+	// 0 until the respective stream has negotiated its format
+	std::atomic<uint32_t> m_playbackRate = 0;
+	std::atomic<uint32_t> m_captureRate = 0;
 
 	// This is a scratch space like buffer that is used by PipeWire to create POD (plain old data) objects on the stack.
 	uint8_t m_podBuilderBuffer[1024];
