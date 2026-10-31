@@ -43,9 +43,7 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 }
 
 AudioPulseAudio::AudioPulseAudio(bool& _success_ful, AudioEngine* _audioEngine)
-	: AudioDevice(std::clamp<ch_cnt_t>(
-					  ConfigManager::inst()->value("audiopa", "channels").toInt(), DEFAULT_CHANNELS, DEFAULT_CHANNELS),
-		  _audioEngine)
+	: AudioDevice(DEFAULT_CHANNELS,  _audioEngine)
 	, m_s(nullptr)
 	, m_latency(static_cast<double>(_audioEngine->framesPerAudioBuffer()) / sampleRate())
 {
