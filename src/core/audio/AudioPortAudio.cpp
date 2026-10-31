@@ -29,6 +29,8 @@
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
+#include <utility>
+
 #include "AudioEngine.h"
 #include "AudioPortAudio.h"
 #include "ConfigManager.h"
@@ -55,6 +57,7 @@ inline auto& cfgDeviceName(Direction direction)
 	case Direction::Output:
 		return cfg().outputdevice;
 	}
+	std::unreachable();
 }
 
 inline auto& cfgChannels(Direction direction)
@@ -66,6 +69,7 @@ inline auto& cfgChannels(Direction direction)
 	case Direction::Output:
 		return cfg().outputchannels;
 	}
+	std::unreachable();
 }
 
 int maxChannels(const PaDeviceInfo* info, Direction direction)
@@ -97,11 +101,11 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 
 	const auto backend = cfg().backend;
 	
-	const auto inputDeviceName = cfgDeviceName(Direction::Input);
-	const auto inputDeviceChannels = cfgChannels(Direction::Input);
+	const auto inputDeviceName = QString::fromStdString(cfgDeviceName(Direction::Input));
+	const auto inputDeviceChannels = static_cast<int>(cfgChannels(Direction::Input));
 
-	const auto outputDeviceName = cfgDeviceName(Direction::Output);
-	const auto outputDeviceChannels = cfgChannels(Direction::Output);
+	const auto outputDeviceName = QString::fromStdString(cfgDeviceName(Direction::Output));
+	const auto outputDeviceChannels = static_cast<int>(cfgChannels(Direction::Output));
 
 	auto inputDeviceIndex = paNoDevice;
 	auto outputDeviceIndex = paNoDevice;
@@ -237,7 +241,7 @@ public:
 			}
 		}
 
-		const auto selectedDeviceName = cfgDeviceName(m_direction);
+		const auto selectedDeviceName = QString::fromStdString(cfgDeviceName(m_direction));
 		const auto selectedDeviceIndex = std::max(0, m_deviceComboBox->findText(selectedDeviceName));
 		m_deviceComboBox->setCurrentIndex(selectedDeviceIndex);
 	}
@@ -253,7 +257,7 @@ public:
 
 	void saveToConfig()
 	{
-		cfgDeviceName(m_direction) =  m_deviceComboBox->currentText().toStdString();
+		cfgDeviceName(m_direction) = m_deviceComboBox->currentText().toStdString();
 		cfgChannels(m_direction) = m_channelModel.value();
 		ConfigManager::inst()->configUpdated();
 	}
@@ -298,7 +302,7 @@ void AudioPortAudioSetupWidget::show()
 			m_backendComboBox->addItem(Pa_GetHostApiInfo(i)->name, i);
 		}
 
-		const auto selectedBackendName = cfg().backend;
+		const auto selectedBackendName = QString::fromStdString(cfg().backend);
 		const auto selectedBackendIndex = std::max(0, m_backendComboBox->findText(selectedBackendName));
 		m_backendComboBox->setCurrentIndex(selectedBackendIndex);
 	}
@@ -308,7 +312,7 @@ void AudioPortAudioSetupWidget::show()
 
 void AudioPortAudioSetupWidget::saveSettings()
 {
-	cfg().backend = m_backendComboBox->currentText()
+	cfg().backend = m_backendComboBox->currentText().toStdString();
 	m_inputDevice->saveToConfig();
 	m_outputDevice->saveToConfig();
 }
