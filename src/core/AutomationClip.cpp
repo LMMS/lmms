@@ -1063,7 +1063,7 @@ void AutomationClip::objectDestroyed( jo_id_t _id )
 	{
 		auto objPtr = *objIt;
 		Q_ASSERT(!objPtr.isNull());
-		if( objPtr->id() == _id )
+		if (objPtr->id() == _id)
 		{
 			//Assign to objIt so that this loop work even break; is removed.
 			objIt = m_objects.erase( objIt );
