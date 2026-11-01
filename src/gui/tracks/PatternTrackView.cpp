@@ -24,6 +24,8 @@
  
 #include "PatternTrackView.h"
 
+#include <QLayout>
+
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -45,8 +47,17 @@ PatternTrackView::PatternTrackView(PatternTrack* pt, TrackContainerView* tcv) :
 
 	m_trackLabel = new TrackLabelButton( this, getTrackSettingsWidget() );
 	m_trackLabel->setIcon( embed::getIconPixmap("pattern_track"));
-	m_trackLabel->move( 3, 1 );
 	m_trackLabel->show();
+
+	auto masterLayout = new QVBoxLayout(getTrackSettingsWidget());
+	masterLayout->setContentsMargins(0, 1, 0, 0);
+	auto layout = new QHBoxLayout();
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->addWidget(m_trackLabel);
+	layout->addSpacing(4);
+	masterLayout->addLayout(layout);
+	masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
 	connect( m_trackLabel, SIGNAL(clicked(bool)),
 			this, SLOT(clickedTrackLabel()));
 	setModel(pt);
