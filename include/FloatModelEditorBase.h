@@ -155,7 +155,7 @@ protected:
 
 	const SimpleTextFloat& textFloat() const { return *s_textFloat; }
 
-	void setPosition(const QPoint & p);
+	virtual void setPosition(const QPoint & p);
 
 	inline float pageSize() const
 	{
