@@ -626,6 +626,12 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			{
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				clipViews.push_back( this );
+
+				if (me->modifiers() & Qt::ShiftModifier)
+				{
+					// With Ctrl+Shift, we initiate a linked copy
+					m_clip->prepareContentLink();
+				}
 			}
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
@@ -906,11 +912,29 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 			: tr("Copy selection"),
 		[this](){ contextMenuAction( ContextMenuAction::Copy ); } );
 
+	if (individualClip && m_clip->hasContent())
+	{
+		contextMenu.addAction(
+			embed::getIconPixmap("edit_copy"),
+			tr("Copy linked"),
+			[this](){ contextMenuAction(ContextMenuAction::CopyLinked); }
+		);
+	}
+
 	auto pasteAction = contextMenu.addAction(
 		embed::getIconPixmap("edit_paste"),
 		tr("Paste"),
 		[this](){ contextMenuAction(ContextMenuAction::Paste); }
 	);
+
+	if (individualClip && !m_clip->contentLink().isEmpty())
+	{
+		contextMenu.addAction(
+			embed::getIconPixmap("edit_unlink"),
+			tr("Break link"),
+			[this](){ m_clip->breakContentLink(); }
+		);
+	}
 
 	pasteAction->setEnabled(
 		Clipboard::hasFormat(Clipboard::MimeType::StringPair) && getTrackView()->getTrackContentWidget()
@@ -961,7 +985,10 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 			cut( active );
 			break;
 		case ContextMenuAction::Copy:
-			copy( active );
+			copy(active, false);
+			break;
+		case ContextMenuAction::CopyLinked:
+			copy(active, true);
 			break;
 		case ContextMenuAction::Paste:
 			paste();
@@ -1004,10 +1031,15 @@ void ClipView::remove( QVector<ClipView *> clipvs )
 	}
 }
 
-void ClipView::copy( QVector<ClipView *> clipvs )
+void ClipView::copy(QVector<ClipView *> clipvs, bool linkContent)
 {
 	// For copyStringPair()
 	using namespace Clipboard;
+
+	if (linkContent)
+	{
+		for (auto clip : clipvs) { clip->m_clip->prepareContentLink(); }
+	}
 
 	// Write the Clips to a DataFile for copying
 	DataFile dataFile = createClipDataFiles( clipvs );

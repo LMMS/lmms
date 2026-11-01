@@ -25,11 +25,15 @@
 #ifndef LMMS_CLIP_H
 #define LMMS_CLIP_H
 
+#include <memory>
 #include <optional>
 
 #include <QColor>
+#include <qobject.h>
+#include <qobjectdefs.h>
 
 #include "AutomatableModel.h"
+#include "ClipContent.h"
 
 
 namespace lmms
@@ -40,6 +44,7 @@ class Track;
 namespace gui
 {
 
+class ClipContent;
 class ClipView;
 class TrackView;
 
@@ -65,6 +70,14 @@ public:
 	inline const QString & name() const
 	{
 		return m_name;
+	}
+
+	inline bool hasContent() const {return m_content != nullptr;}
+
+	inline QString contentLink() const
+	{
+		if (!m_content || m_content.unique()) { QString(); }
+		return m_content->linkName();
 	}
 
 	inline void setName( const QString & name )
@@ -155,6 +168,9 @@ public:
 	//! @return Pointer to the new clip object
 	virtual Clip* clone() = 0;
 
+	void prepareContentLink();
+	virtual void breakContentLink() {}
+
 public slots:
 	void toggleMute(); //!< Mutes this Clip
 
@@ -163,12 +179,24 @@ signals:
 	void positionChanged();
 	void destroyedClip();
 	void colorChanged();
+	void contentChanged();
 
 protected:
 
 	//! @brief Creates a duplicate clip of the one provided.
 	//! @param other The clip object which will be copied.
 	Clip(const Clip& other);
+
+	//!
+	std::shared_ptr<ClipContent> m_content;
+
+	void replaceContent(std::shared_ptr<ClipContent>&& content);
+
+protected slots:
+	void contentChange()
+	{
+		if (m_content != nullptr) {emit m_content.get()->contentChanged();}
+	}
 
 private:
 	Track * m_track;
