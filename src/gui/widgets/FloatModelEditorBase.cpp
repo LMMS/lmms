@@ -236,8 +236,7 @@ void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 	const auto pos = position(me);
 	if (m_interaction == InteractionType::MouseDrag && pos != m_lastMousePos)
 	{
-		// knob position is changed depending on last mouse position
-		setPosition(pos - m_lastMousePos);
+		setPosition(pos);
 		emit sliderMoved(model()->value());
 		// original position for next time is current position
 		m_lastMousePos = pos;
@@ -391,7 +390,8 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 
 void FloatModelEditorBase::setPosition(const QPoint & p)
 {
-	const float valueOffset = getValue(p) + m_leftOver;
+	// knob position is changed depending on last mouse position
+	const float valueOffset = getValue(p - m_lastMousePos) + m_leftOver;
 	const float currentValue = model()->value();
 	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
 	const auto step = model()->step<float>();
