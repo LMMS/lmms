@@ -24,6 +24,8 @@
 
 #include "ClipView.h"
 
+#include <qnamespace.h>
+#include <qobject.h>
 #include <set>
 #include <cassert>
 
