@@ -445,6 +445,43 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
+void ClipView::paintLinkLabel(QPainter& p)
+{
+	QString text = m_clip->contentLink();
+	if (text.isEmpty()) { return; }
+
+	p.setRenderHint(QPainter::TextAntialiasing);
+
+	QFont labelFont = this->font();
+	labelFont.setHintingPreference(QFont::PreferFullHinting);
+	p.setFont(labelFont);
+	QFontMetrics fontMetrics(labelFont);
+
+	const int textBottom = BORDER_WIDTH + 1;
+	const int textRight = BORDER_WIDTH + 3;
+
+	p.fillRect(QRect(
+		width() - (fontMetrics.horizontalAdvance(text) + (1 + 2 * textRight)),
+		height() - (fontMetrics.height() + 2 * textBottom),
+		fontMetrics.horizontalAdvance(text) + (1 + 2 * textRight),
+		fontMetrics.height() + 2 * textBottom),
+		textBackgroundColor()
+	);
+
+	p.setPen(textShadowColor());
+	p.drawText(
+		width() - (fontMetrics.horizontalAdvance(text) + 2 * textRight) + 1,
+		height() - (2 * textBottom) + 1,
+		text
+	);
+	p.setPen(textColor());
+	p.drawText(
+		width() - (fontMetrics.horizontalAdvance(text) + 2 * textRight),
+		height() - 2 * textBottom,
+		text
+	);
+}
+
 void ClipView::mousePressEvent( QMouseEvent * me )
 {
 	const auto pos = position(me);

@@ -261,6 +261,8 @@ protected:
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
+	void paintLinkLabel(QPainter& p);
+
 	auto hasCustomColor() const -> bool;
 
 protected slots:

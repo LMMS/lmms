@@ -841,6 +841,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	{
 		paintTextLabel(m_clip->name(), p);
 	}
+	paintLinkLabel(p);
 
 	if( !( fixedClips() && beatClip ) )
 	{
