@@ -328,7 +328,7 @@ public:
 
 	Metronome& metronome() { return m_metronome; }
 
-	void removeOldAutomatedValue(AutomatableModel * am);
+	void removeOldAutomatedValue(AutomatableModel* am);
 
 public slots:
 	void playSong();
