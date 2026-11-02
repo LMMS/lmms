@@ -60,7 +60,7 @@ std::shared_ptr<ClipContent> SharedContentRepository::get(QString linkName)
 	{
 		return s_contents.at(linkName).lock();
 	}
-	catch (std::out_of_range)
+	catch (std::out_of_range&)
 	{
 		return nullptr;
 	}
