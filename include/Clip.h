@@ -76,7 +76,7 @@ public:
 
 	inline QString contentLink() const
 	{
-		if (!m_content || m_content.unique()) { QString(); }
+		if (!m_content || m_content.use_count() < 2) { QString(); }
 		return m_content->linkName();
 	}
 
