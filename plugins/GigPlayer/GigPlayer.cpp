@@ -139,7 +139,7 @@ void GigInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void GigInstrument::loadFile( const QString & _file )
+void GigInstrument::loadFile(const QString& _file)
 {
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{
@@ -297,7 +297,7 @@ QString GigInstrument::getCurrentPatchName()
 
 
 // A key has been pressed
-void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
+void GigInstrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>>)
 {
 	const float LOG440 = 2.643452676f;
 
@@ -319,7 +319,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 		const uint velocity = _n->midiVelocity( baseVelocity );
 
 		QMutexLocker locker( &m_notesMutex );
-		m_notes.push_back( GigNote( midiNote, velocity, _n->unpitchedFrequency(), pluginData ) );
+		m_notes.emplace_back(midiNote, velocity, _n->unpitchedFrequency(), pluginData);
 	}
 }
 
@@ -328,13 +328,13 @@ void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 
 // Process the notes and output a certain number of frames (e.g. 256, set in
 // the preferences)
-void GigInstrument::play( SampleFrame* _working_buffer )
+void GigInstrument::play(std::optional<PlanarBufferView<float>> out)
 {
 	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 	const auto rate = Engine::audioEngine()->outputSampleRate();
 
 	// Initialize to zeros
-	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
+	MixHelpers::zero(out.value());
 
 	m_synthMutex.lock();
 	m_notesMutex.lock();
@@ -346,7 +346,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 		return;
 	}
 
-	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
+	for (auto it = m_notes.begin(); it != m_notes.end(); ++it)
 	{
 		// Process notes in the KeyUp state, adding release samples if desired
 		if( it->state == GigState::KeyUp )
@@ -466,20 +466,21 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				if (sample.m_mixBufferView.empty()) { sample.m_mixBufferView = sample.m_mixBuffer; }
 
 				const auto [inputFramesUsed, outputFramesGenerated] = sample.m_resampler.process(
-					{&sample.m_sourceBufferView.data()[0][0], 2, sample.m_sourceBufferView.size()},
-					{&sample.m_mixBufferView.data()[0][0], 2, sample.m_mixBufferView.size()});
+					InterleavedBufferSpan{sample.m_sourceBufferView},
+					InterleavedBufferSpan{sample.m_mixBufferView}
+				);
 
 				if (inputFramesUsed == 0 && outputFramesGenerated == 0)
 				{
-					std::fill_n(&_working_buffer[framesMixed], frames - framesMixed, SampleFrame{});
+					MixHelpers::zero(PlanarBufferSpan{*out, framesMixed});
 					break;
 				}
 
 				const auto framesToMix = std::min(outputFramesGenerated, frames - framesMixed);
-				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
-				{
-					_working_buffer[framesMixed + i] += sample.m_mixBufferView[i];
-				}
+				MixHelpers::add(
+					PlanarBufferSpan{*out, framesMixed},
+					InterleavedBufferSpan<const float, 2>{sample.m_mixBufferView.first(framesToMix)}
+				);
 
 				sample.m_sourceBufferView = sample.m_sourceBufferView.subspan(inputFramesUsed);
 				sample.m_mixBufferView = sample.m_mixBufferView.subspan(framesToMix);
@@ -492,11 +493,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 	m_synthMutex.unlock();
 
 	// Set gain properly based on volume control
-	for( f_cnt_t i = 0; i < frames; ++i )
-	{
-		_working_buffer[i][0] *= m_gain.value();
-		_working_buffer[i][1] *= m_gain.value();
-	}
+	MixHelpers::multiply(*out, m_gain.value());
 }
 
 
@@ -1091,7 +1088,7 @@ GigSample::GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, flo
 	, region(pDimRegion)
 	, attenuation(attenuation)
 	, pos(0)
-	, m_resampler(interpolation)
+	, m_resampler(interpolation, 2, true)
 	, sampleFreq(0)
 	, freqFactor(1)
 {
@@ -1113,32 +1110,6 @@ GigSample::GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, flo
 	}
 }
 
-GigSample::GigSample(const GigSample& g)
-	: sample(g.sample)
-	, region(g.region)
-	, attenuation(g.attenuation)
-	, adsr(g.adsr)
-	, pos(g.pos)
-	, m_resampler(AudioResampler::Mode::Linear, DEFAULT_CHANNELS)
-	, sampleFreq(g.sampleFreq)
-	, freqFactor(g.freqFactor)
-{
-}
-
-
-
-
-GigSample& GigSample::operator=( const GigSample& g )
-{
-	sample = g.sample;
-	region= g.region;
-	attenuation = g.attenuation;
-	adsr = g.adsr;
-	pos = g.pos;
-	sampleFreq = g.sampleFreq;
-	freqFactor = g.freqFactor;
-	return *this;
-}
 
 ADSR::ADSR()
 	: preattack( 0 ), attack( 0 ), decay1( 0 ), decay2( 0 ), infiniteSustain( false ),

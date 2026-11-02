@@ -64,26 +64,26 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-Effect::ProcessStatus StereoMatrixEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus StereoMatrixEffect::processImpl(PlanarBufferView<float> inOut)
 {
-	for (f_cnt_t f = 0; f < frames; ++f)
-	{	
-		const float d = dryLevel();
-		const float w = wetLevel();
-		
-		sample_t l = buf[f][0];
-		sample_t r = buf[f][1];
+	const float d = dryLevel();
+	const float w = wetLevel();
+
+	for (f_cnt_t f = 0; f < inOut.frames(); ++f)
+	{
+		float l = inOut[0][f];
+		float r = inOut[1][f];
 
 		// Init with dry-mix
-		buf[f][0] = l * d;
-		buf[f][1] = r * d;
+		inOut[0][f] = l * d;
+		inOut[1][f] = r * d;
 
 		// Add it wet
-		buf[f][0] += ( m_smControls.m_llModel.value( f ) * l  +
-					m_smControls.m_rlModel.value( f ) * r ) * w;
+		inOut[0][f] += (m_smControls.m_llModel.value(f) * l
+			+ m_smControls.m_rlModel.value(f) * r) * w;
 
-		buf[f][1] += ( m_smControls.m_lrModel.value( f ) * l  +
-					m_smControls.m_rrModel.value( f ) * r ) * w;
+		inOut[1][f] += (m_smControls.m_lrModel.value(f) * l
+			+ m_smControls.m_rrModel.value(f) * r) * w;
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

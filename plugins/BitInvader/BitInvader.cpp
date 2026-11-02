@@ -254,29 +254,33 @@ QString BitInvader::nodeName() const
 
 
 
-void BitInvader::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void BitInvader::playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>> out)
 {
-	if (!_n->m_pluginData)
+	assert(out.has_value());
+	if (!nph->m_pluginData)
 	{
 		float factor = !m_normalize.value() ? defaultNormalizationFactor : m_normalizeFactor;
-		_n->m_pluginData = new BSynth(
+		nph->m_pluginData = new BSynth(
 					const_cast<float*>( m_graph.samples() ),
-					_n,
+					nph,
 					m_interpolation.value(), factor,
 				Engine::audioEngine()->outputSampleRate() );
 	}
 
-	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
+	const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = nph->noteOffset();
+	assert(frames + offset <= out->frames());
 
-	auto ps = static_cast<BSynth*>(_n->m_pluginData);
-	for( f_cnt_t frame = offset; frame < frames + offset; ++frame )
+	auto ps = static_cast<BSynth*>(nph->m_pluginData);
+	for (f_cnt_t frame = offset; frame < frames + offset; ++frame)
 	{
-		_working_buffer[frame] = SampleFrame(ps->nextStringSample(m_graph.length()));
+		(*out)[0][frame] = ps->nextStringSample(m_graph.length());
 	}
 
-	applyRelease( _working_buffer, _n );
+	// mono to stereo
+	std::ranges::copy(out->buffer(0), out->bufferPtr(1));
+
+	applyRelease(*out, nph);
 }
 
 

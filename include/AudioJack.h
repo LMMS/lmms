@@ -101,7 +101,6 @@ private slots:
 
 private:
 	bool initJackClient();
-	void resizeInputBuffer(jack_nframes_t nframes);
 
 	void startProcessingImpl() override;
 	void stopProcessingImpl() override;
@@ -127,7 +126,7 @@ private:
 	std::vector<jack_port_t*> m_outputPorts;
 	std::vector<jack_port_t*> m_inputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
-	std::vector<SampleFrame> m_inputFrameBuffer;
+	std::vector<float*> m_inputFrameBuffers;
 
 #ifdef AUDIO_BUS_HANDLE_SUPPORT
 	struct StereoPort

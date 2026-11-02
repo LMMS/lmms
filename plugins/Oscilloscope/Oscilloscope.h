@@ -37,7 +37,7 @@ class Oscilloscope : public Effect
 public:
 	Oscilloscope(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 
-	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
+	ProcessStatus processImpl(PlanarBufferView<float> inOut) override;
 
 	EffectControls* controls() override { return &m_controls; }
 

@@ -28,12 +28,7 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Engine.h"
-
-#include <cstring>
-
-#include "AudioEngine.h"
-
+#include "MixHelpers.h"
 
 namespace lmms
 {
@@ -49,9 +44,9 @@ public:
 
 	~DummyInstrument() override = default;
 
-	void playNote( NotePlayHandle*, SampleFrame* buffer ) override
+	void playNote(NotePlayHandle*, std::optional<PlanarBufferView<float>> out) override
 	{
-		zeroSampleFrames(buffer, Engine::audioEngine()->framesPerPeriod());
+		if (out) { MixHelpers::zero(*out); }
 	}
 
 	void saveSettings( QDomDocument &, QDomElement & ) override

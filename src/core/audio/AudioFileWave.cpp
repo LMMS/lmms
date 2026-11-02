@@ -24,9 +24,11 @@
  */
 
 #include "AudioFileWave.h"
-#include "endian_handling.h"
-#include "AudioEngine.h"
 
+#include <memory>
+
+#include "AudioEngine.h"
+#include "endian_handling.h"
 
 namespace lmms
 {
@@ -93,30 +95,24 @@ bool AudioFileWave::startEncoding()
 	return true;
 }
 
-void AudioFileWave::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)
+void AudioFileWave::writeBuffer(PlanarBufferView<const float> buffer)
 {
-	OutputSettings::BitDepth bitDepth = getOutputSettings().getBitDepth();
+	const auto frames = static_cast<sf_count_t>(buffer.frames());
+	const auto bitDepth = getOutputSettings().getBitDepth();
 
-	if( bitDepth == OutputSettings::BitDepth::Depth32Bit || bitDepth == OutputSettings::BitDepth::Depth24Bit )
+	if (bitDepth == OutputSettings::BitDepth::Depth32Bit || bitDepth == OutputSettings::BitDepth::Depth24Bit)
 	{
-		auto buf = new float[_frames * channels()];
-		for( f_cnt_t frame = 0; frame < _frames; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				buf[frame * channels() + chnl] = _ab[frame][chnl];
-			}
-		}
-		sf_writef_float( m_sf, buf, _frames );
-		delete[] buf;
+		auto interleaved = std::make_unique_for_overwrite<float[]>(buffer.frames() * channels());
+		toInterleaved(buffer, InterleavedBufferSpan{interleaved.get(), channels(), buffer.frames()});
+
+		sf_writef_float(m_sf, interleaved.get(), frames);
 	}
 	else
 	{
-		auto buf = new int_sample_t[_frames * channels()];
-		convertToS16(_ab, _frames, buf, isBigEndian());
+		auto interleaved = std::make_unique_for_overwrite<int_sample_t[]>(buffer.frames() * channels());
+		convertToS16(buffer, interleaved.get(), isBigEndian());
 
-		sf_writef_short( m_sf, buf, _frames );
-		delete[] buf;
+		sf_writef_short(m_sf, interleaved.get(), frames);
 	}
 }
 

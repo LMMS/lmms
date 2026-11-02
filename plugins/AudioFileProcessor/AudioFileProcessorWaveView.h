@@ -125,10 +125,10 @@ private:
 
 	Sample const* m_sample;
 	QPixmap m_graph;
-	int m_from;
-	int m_to;
-	int m_last_from;
-	int m_last_to;
+	f_cnt_t m_from;
+	f_cnt_t m_to;
+	f_cnt_t m_last_from;
+	f_cnt_t m_last_to;
 	float m_last_amp;
 	knob* m_startKnob;
 	knob* m_endKnob;
@@ -153,9 +153,9 @@ public:
 
 	void updateSampleRange();
 private:
-	void setTo(int to);
-	void setFrom(int from);
-	int range() const;
+	void setTo(f_cnt_t to);
+	void setFrom(f_cnt_t from);
+	f_cnt_t range() const;
 	void zoom(const bool out = false);
 	void slide(int px);
 	void slideSamplePointByPx(Point point, int px);

@@ -745,7 +745,7 @@ ExprSynth::~ExprSynth()
 	}
 }
 
-void ExprSynth::renderOutput(f_cnt_t frames, SampleFrame* buf)
+void ExprSynth::renderOutput(PlanarBufferSpan<float> out)
 {
 	try
 	{
@@ -759,7 +759,7 @@ void ExprSynth::renderOutput(f_cnt_t frames, SampleFrame* buf)
 		float pn1 = m_pan1->value() * 0.5;
 		float pn2 = m_pan2->value() * 0.5;
 		const float new_freq = m_nph->frequency();
-		const float freq_inc = (new_freq - m_frequency) / frames;
+		const float freq_inc = (new_freq - m_frequency) / out.frames();
 		const bool is_released = m_nph->isReleased();
 
 		expression_t *o1_rawExpr = &(m_exprO1->getData()->m_expression);
@@ -772,7 +772,7 @@ void ExprSynth::renderOutput(f_cnt_t frames, SampleFrame* buf)
 		}
 		if (o1_valid && o2_valid)
 		{
-			for (f_cnt_t frame = 0; frame < frames ; ++frame)
+			for (f_cnt_t frame = 0; frame < out.frames(); ++frame)
 			{
 				if (is_released && m_released < 1)
 				{
@@ -782,8 +782,8 @@ void ExprSynth::renderOutput(f_cnt_t frames, SampleFrame* buf)
 				o2 = o2_rawExpr->value();
 				last_func1->setLastSample(o1);//put result in the circular buffer for the "last" function.
 				last_func2->setLastSample(o2);
-				buf[frame][0] = (-pn1 + 0.5) * o1 + (-pn2 + 0.5) * o2;
-				buf[frame][1] = ( pn1 + 0.5) * o1 + ( pn2 + 0.5) * o2;
+				out[0][frame] = (-pn1 + 0.5) * o1 + (-pn2 + 0.5) * o2;
+				out[1][frame] = ( pn1 + 0.5) * o1 + ( pn2 + 0.5) * o2;
 				m_note_sample++;
 				m_note_sample_sec = m_note_sample / (float)m_sample_rate;
 				if (is_released)
@@ -802,7 +802,7 @@ void ExprSynth::renderOutput(f_cnt_t frames, SampleFrame* buf)
 				last_func1 = last_func2;
 				pn1 = pn2;
 			}
-			for (f_cnt_t frame = 0; frame < frames ; ++frame)
+			for (f_cnt_t frame = 0; frame < out.frames(); ++frame)
 			{
 				if (is_released && m_released < 1)
 				{
@@ -810,8 +810,8 @@ void ExprSynth::renderOutput(f_cnt_t frames, SampleFrame* buf)
 				}
 				o1 = o1_rawExpr->value();
 				last_func1->setLastSample(o1);
-				buf[frame][0] = (-pn1 + 0.5) * o1;
-				buf[frame][1] = ( pn1 + 0.5) * o1;
+				out[0][frame] = (-pn1 + 0.5) * o1;
+				out[1][frame] = ( pn1 + 0.5) * o1;
 				m_note_sample++;
 				m_note_sample_sec = m_note_sample / (float)m_sample_rate;
 				if (is_released)

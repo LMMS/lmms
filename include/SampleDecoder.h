@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-#include "SampleFrame.h"
+#include "AudioBuffer.h"
 
 namespace lmms {
 class SampleDecoder
@@ -38,8 +38,8 @@ class SampleDecoder
 public:
 	struct Result
 	{
-		std::vector<SampleFrame> data;
-		int sampleRate;
+		AudioBuffer data;
+		sample_rate_t sampleRate;
 	};
 
 	struct AudioType

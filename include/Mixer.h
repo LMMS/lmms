@@ -145,7 +145,7 @@ public:
 	void mixToChannel(const AudioBuffer& buffer, mix_ch_t dest);
 
 	void prepareMasterMix();
-	void masterMix( SampleFrame* _buf );
+	void masterMix(PlanarBufferView<float> dest);
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

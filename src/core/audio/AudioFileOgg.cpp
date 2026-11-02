@@ -34,6 +34,7 @@
 
 #include "SampleFrame.h"
 #include "lmms_constants.h"
+#include "MixHelpers.h"
 
 namespace lmms
 {
@@ -80,7 +81,7 @@ AudioFileOgg::AudioFileOgg(OutputSettings const& outputSettings, const ch_cnt_t 
 AudioFileOgg::~AudioFileOgg()
 {
 	// writing 0 frames is how we flush any remaining data to the file
-	writeBuffer(nullptr, 0);
+	writeBuffer({});
 
 	ogg_stream_clear(&m_oss);
 	vorbis_block_clear(&m_vb);
@@ -89,31 +90,20 @@ AudioFileOgg::~AudioFileOgg()
 	vorbis_info_clear(&m_vi);
 }
 
-void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)
+void AudioFileOgg::writeBuffer(PlanarBufferView<const float> buffer)
 {
-	if (_frames == 0)
+	if (buffer.empty())
 	{
 		vorbis_analysis_wrote(&m_vds, 0);
 	}
 	else
 	{
-		const auto vab = vorbis_analysis_buffer(&m_vds, _frames);
-		for (auto c = 0; c < channels(); ++c)
-		{
-			if (c < DEFAULT_CHANNELS)
-			{
-				for (auto i = std::size_t{0}; i < _frames; ++i)
-				{
-					vab[c][i] = _ab[i][c];
-				}
-			}
-			else
-			{
-				std::fill_n(vab[c], _frames, 0.0f);
-			}
-		}
+		const auto frames = static_cast<int>(buffer.frames());
+		const auto output = PlanarBufferView{vorbis_analysis_buffer(&m_vds, frames), channels(), buffer.frames()};
 
-		vorbis_analysis_wrote(&m_vds, _frames);
+		MixHelpers::copyMixAndZero(output, buffer);
+
+		vorbis_analysis_wrote(&m_vds, frames);
 	}
 
 	while (vorbis_analysis_blockout(&m_vds, &m_vb) == 1)

@@ -65,8 +65,7 @@ class Xpressive : public Instrument
 public:
 	Xpressive(InstrumentTrack* instrument_track );
 
-	void playNote(NotePlayHandle* nph,
-						SampleFrame* working_buffer ) override;
+	void playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData( NotePlayHandle* nph ) override;
 
 

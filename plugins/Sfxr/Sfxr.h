@@ -179,7 +179,7 @@ public:
 	SfxrInstrument(InstrumentTrack * _instrument_track );
 	~SfxrInstrument() override = default;
 
-	void playNote( NotePlayHandle * _n, SampleFrame* _working_buffer ) override;
+	void playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings( QDomDocument & _doc,

@@ -217,12 +217,18 @@ inline double fastPow(double a, double b)
 template<typename T>
 constexpr T sign(T val) noexcept
 { 
-	return val >= 0 ? 1 : -1; 
+	return val >= 0 ? 1 : -1;
 }
 
 
-//! if val >= 0.0f, returns sqrt(val), else: -sqrt(-val)
-inline float sqrt_neg(float val) 
+//! if val >= 0, returns sqrt(val), else: -sqrt(-val)
+inline float sqrt_neg(float val)
+{
+	return std::sqrt(std::abs(val)) * sign(val);
+}
+
+//! if val >= 0, returns sqrt(val), else: -sqrt(-val)
+inline double sqrt_neg(double val)
 {
 	return std::sqrt(std::abs(val)) * sign(val);
 }

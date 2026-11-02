@@ -54,7 +54,7 @@ public:
 	Vibed(InstrumentTrack* instrumentTrack);
 	~Vibed() override = default;
 
-	void playNote(NotePlayHandle* n, SampleFrame* workingBuffer) override;
+	void playNote(NotePlayHandle* n, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData(NotePlayHandle* n) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;

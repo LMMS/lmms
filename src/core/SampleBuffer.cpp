@@ -34,17 +34,27 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_data(data, data + numFrames)
-	, m_sampleRate(sampleRate)
-{
-}
-
-SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate, const QString& audioFile)
+SampleBuffer::SampleBuffer(AudioBuffer data, sample_rate_t sampleRate, const QString& audioFile)
 	: m_data(std::move(data))
 	, m_audioFile(audioFile)
 	, m_sampleRate(sampleRate)
 {
+}
+
+SampleBuffer::SampleBuffer(PlanarBufferSpan<const float> data, sample_rate_t sampleRate, const QString& audioFile)
+	: m_data(data.frames(), data.channels())
+	, m_audioFile(audioFile)
+	, m_sampleRate(sampleRate)
+{
+	MixHelpers::copy(PlanarBufferSpan{m_data.allBuffers()}, data);
+}
+
+SampleBuffer::SampleBuffer(std::span<const SampleFrame> data, sample_rate_t sampleRate, const QString& audioFile)
+	: m_data(data.size(), 2)
+	, m_audioFile(audioFile)
+	, m_sampleRate(sampleRate)
+{
+	toPlanar(InterleavedBufferSpan{data}, m_data.allBuffers());
 }
 
 void swap(SampleBuffer& first, SampleBuffer& second) noexcept
@@ -58,9 +68,24 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 QString SampleBuffer::toBase64() const
 {
 	// TODO: Replace with non-Qt equivalent
-	const auto data = reinterpret_cast<const char*>(m_data.data());
-	const auto size = static_cast<int>(m_data.size() * sizeof(SampleFrame));
-	const auto byteArray = QByteArray{data, size};
+
+	// Planar data is serialized as:
+	//     [B64FrameCount, B64ChannelCount, float_ch0_f0, float_ch0_f1, ..., float_ch0_fN,
+	//                                      float_ch1_f0, float_ch1_f1, ..., float_ch1_fN, ...
+	//                                      float_chN_f0, float_chN_f1, ..., float_chN_fN]
+	auto byteArray = QByteArray{};
+
+	const auto frames = static_cast<B64FrameCount>(m_data.frames());
+	const auto channels = static_cast<B64ChannelCount>(m_data.totalChannels());
+
+	byteArray.append(reinterpret_cast<const char*>(frames), sizeof(B64FrameCount));
+	byteArray.append(reinterpret_cast<const char*>(channels), sizeof(B64ChannelCount));
+
+	for (ch_cnt_t ch = 0; ch < channels; ++ch)
+	{
+		byteArray.append(reinterpret_cast<const char*>(m_data.buffer(ch).data()), frames * sizeof(float));
+	}
+
 	return byteArray.toBase64();
 }
 
@@ -70,12 +95,12 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 	return s_buffer;
 }
 
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePath)
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& path)
 {
-	if (filePath.isEmpty()) { return SampleBuffer::emptyBuffer(); }
+	if (path.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
-	const auto absolutePath = PathUtil::toAbsolute(filePath);
-	const auto storedPath = PathUtil::toShortestRelative(filePath);
+	const auto absolutePath = PathUtil::toAbsolute(path);
+	const auto storedPath = PathUtil::toShortestRelative(path);
 
 	auto result = SampleDecoder::decode(absolutePath);
 
@@ -102,13 +127,43 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePa
 	return std::make_shared<SampleBuffer>(std::move(data), sampleRate, storedPath);
 }
 
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str, int sampleRate)
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str, sample_rate_t sampleRate)
+{
+	return fromBase64(false, str, sampleRate);
+}
+
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromLegacyBase64(const QString& str, sample_rate_t sampleRate)
+{
+	return fromBase64(true, str, sampleRate);
+}
+
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(bool legacyInterleaved,
+	const QString& str, sample_rate_t sampleRate)
 {
 	if (str.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
 	const auto bytes = QByteArray::fromBase64(str.toUtf8());
+	const auto bytesSize = static_cast<std::size_t>(bytes.size());
 
-	if (bytes.size() % sizeof(SampleFrame) != 0)
+	// NOTE: Interleaved and planar data is serialized differently.
+	//
+	// Interleaved data is serialized as:
+	//     [SampleFrame_f0, SampleFrame_f1, ..., SampleFrame_fN]
+	//
+	// Planar data is serialized as:
+	//     [B64FrameCount, B64ChannelCount, float_ch0_f0, float_ch0_f1, ..., float_ch0_fN,
+	//                                      float_ch1_f0, float_ch1_f1, ..., float_ch1_fN, ...
+	//                                      float_chM_f0, float_chM_f1, ..., float_chM_fN]
+
+	const auto dataSize = legacyInterleaved
+		? bytesSize
+		: bytesSize - sizeof(B64FrameCount) - sizeof(B64ChannelCount);
+
+	const bool invalid = legacyInterleaved
+		? dataSize % sizeof(SampleFrame) != 0
+		: (bytesSize < sizeof(B64FrameCount) + sizeof(B64ChannelCount) || dataSize % sizeof(float) != 0);
+
+	if (invalid)
 	{
 		// TODO: Improve error handling. We dont always want to show a message box on failure when there is a GUI (e.g.
 		// when loading the project), and this function also shouldn't be concerned with handling the error.
@@ -125,8 +180,55 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str,
 		return SampleBuffer::emptyBuffer();
 	}
 
-	auto data = std::vector<SampleFrame>(bytes.size() / sizeof(SampleFrame));
-	std::memcpy(reinterpret_cast<char*>(data.data()), bytes, bytes.size());
+	const auto frames = legacyInterleaved
+		? static_cast<f_cnt_t>(bytes.size() / sizeof(SampleFrame))
+		: *reinterpret_cast<const B64FrameCount*>(bytes.data());
+
+	const auto channels = legacyInterleaved
+		? static_cast<B64ChannelCount>(2)
+		: *reinterpret_cast<const B64ChannelCount*>(bytes.data() + sizeof(B64FrameCount));
+
+	const char* dataStart = legacyInterleaved
+		? bytes.data()
+		: bytes.data() + sizeof(B64FrameCount) + sizeof(B64ChannelCount);
+
+	if (!legacyInterleaved && dataSize != frames * channels * sizeof(float))
+	{
+		// TODO: Improve error handling. We dont always want to show a message box on failure when there is a GUI (e.g.
+		// when loading the project), and this function also shouldn't be concerned with handling the error.
+		if (gui::getGUI())
+		{
+			QMessageBox::warning(
+				nullptr, QObject::tr("Failed to load sample"), QObject::tr("Checksum failed."));
+		}
+		else
+		{
+			qWarning() << QObject::tr("Failed to load Base64 sample, checksum failed");
+		}
+
+		return SampleBuffer::emptyBuffer();
+	}
+
+	auto data = AudioBuffer{frames, static_cast<ch_cnt_t>(channels)};
+	if (legacyInterleaved)
+	{
+		const auto decoded = InterleavedBufferSpan{reinterpret_cast<const SampleFrame*>(dataStart), frames};
+		toPlanar(decoded, data.allBuffers());
+	}
+	else
+	{
+		const auto dataBuffers = data.allBuffers();
+		for (ch_cnt_t ch = 0; ch < channels; ++ch)
+		{
+			const auto channelBufferOffset = ch * frames * sizeof(float);
+			const auto channelBuffer = std::span {
+				reinterpret_cast<const float*>(dataStart + channelBufferOffset),
+				frames
+			};
+			std::ranges::copy(channelBuffer, dataBuffers.bufferPtr(ch));
+		}
+	}
+
 	return std::make_shared<SampleBuffer>(std::move(data), sampleRate);
 }
 

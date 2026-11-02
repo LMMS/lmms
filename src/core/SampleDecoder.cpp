@@ -37,6 +37,7 @@
 #include "DrumSynth.h"
 #include "Engine.h"
 #include "LmmsTypes.h"
+#include "MixHelpers.h"
 
 namespace lmms {
 
@@ -44,10 +45,13 @@ namespace {
 
 using Decoder = std::optional<SampleDecoder::Result> (*)(const QString&);
 
-auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
-auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleSF(const QString& audioFile)
+	-> std::optional<SampleDecoder::Result>;
+auto decodeSampleDS(const QString& audioFile)
+	-> std::optional<SampleDecoder::Result>;
 #ifdef LMMS_HAVE_OGGVORBIS
-auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDecoder::Result>;
+auto decodeSampleOggVorbis(const QString& audioFile)
+	-> std::optional<SampleDecoder::Result>;
 #endif
 
 static constexpr std::array<Decoder, 3> decoders = {&decodeSampleSF,
@@ -68,30 +72,21 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Re
 	sndFile = sf_open_fd(file.handle(), SFM_READ, &sfInfo, false);
 	if (sf_error(sndFile) != 0) { return std::nullopt; }
 
-	auto buf = std::vector<sample_t>(sfInfo.channels * sfInfo.frames);
-	sf_read_float(sndFile, buf.data(), buf.size());
+	auto buffer = std::vector<float>(sfInfo.channels * sfInfo.frames);
+	sf_read_float(sndFile, buffer.data(), buffer.size());
 
 	sf_close(sndFile);
 	file.close();
 
-	auto result = std::vector<SampleFrame>(sfInfo.frames);
-	for (int i = 0; i < static_cast<int>(result.size()); ++i)
-	{
-		if (sfInfo.channels == 1)
-		{
-			// Upmix from mono to stereo
-			result[i] = {buf[i], buf[i]};
-		}
-		else if (sfInfo.channels > 1)
-		{
-			// TODO: Add support for higher number of channels (i.e., 5.1 channel systems)
-			// The current behavior assumes stereo in all cases excluding mono.
-			// This may not be the expected behavior, given some audio files with a higher number of channels.
-			result[i] = {buf[i * sfInfo.channels], buf[i * sfInfo.channels + 1]};
-		}
-	}
+	const auto frames = static_cast<f_cnt_t>(sfInfo.frames);
+	auto result = AudioBuffer{frames, static_cast<ch_cnt_t>(sfInfo.channels)};
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sfInfo.samplerate)};
+	toPlanar(
+		InterleavedBufferSpan{buffer.data(), static_cast<ch_cnt_t>(sfInfo.channels), frames},
+		result.allBuffers()
+	);
+
+	return SampleDecoder::Result{std::move(result), static_cast<sample_rate_t>(sfInfo.samplerate)};
 }
 
 auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>
@@ -101,15 +96,16 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Re
 
 	auto ds = DrumSynth{};
 	const auto engineRate = Engine::audioEngine()->outputSampleRate();
-	const auto frames = ds.GetDSFileSamples(audioFile, dataPtr, DEFAULT_CHANNELS, engineRate);
+	const auto frames = ds.GetDSFileSamples(audioFile, dataPtr, 1, engineRate);
 	const auto data = std::unique_ptr<int_sample_t[]>{dataPtr}; // NOLINT, we have to use a C-style array here
 
 	if (frames <= 0 || !data) { return std::nullopt; }
 
-	auto result = std::vector<SampleFrame>(frames);
-	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
+	auto result = AudioBuffer{static_cast<f_cnt_t>(frames), 1};
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(engineRate)};
+	src_short_to_float_array(data.get(), result.buffer(0).data(), frames);
+
+	return SampleDecoder::Result{std::move(result), static_cast<sample_rate_t>(engineRate)};
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
@@ -172,15 +168,17 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDeco
 		totalSamplesRead += samplesRead;
 	}
 
-	auto result = std::vector<SampleFrame>(totalSamplesRead / numChannels);
-	for (auto i = std::size_t{0}; i < result.size(); ++i)
-	{
-		if (numChannels == 1) { result[i] = {buffer[i], buffer[i]}; }
-		else if (numChannels > 1) { result[i] = {buffer[i * numChannels], buffer[i * numChannels + 1]}; }
-	}
+	const auto frames = static_cast<f_cnt_t>(totalSamplesRead / numChannels);
+	auto result = AudioBuffer{frames, static_cast<ch_cnt_t>(numChannels)};
+
+	toPlanar(
+		InterleavedBufferSpan{buffer.data(), static_cast<ch_cnt_t>(numChannels), frames},
+		result.allBuffers()
+	);
 
 	ov_clear(&vorbisFile);
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sampleRate)};
+
+	return SampleDecoder::Result{std::move(result), static_cast<sample_rate_t>(sampleRate)};
 }
 #endif // LMMS_HAVE_OGGVORBIS
 } // namespace
@@ -214,7 +212,7 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 			types.push_back(AudioType{std::move(name), sfFormatInfo.extension});
 		}
 
-		std::sort(types.begin(), types.end(), [&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
+		std::sort(types.begin(), types.end(), [](const AudioType& a, const AudioType& b) { return a.name < b.name; });
 		return types;
 	}();
 	return s_audioTypes;

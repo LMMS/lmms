@@ -45,7 +45,6 @@ private slots:
 		QCOMPARE(ab.group(0).channels(), 2);
 		QCOMPARE(ab.totalChannels(), 2);
 		QCOMPARE(ab.frames(), 10);
-		QCOMPARE(ab.hasInterleavedBuffer(), false);
 	}
 
 	//! Verifies constructor with no channels does not create a first group
@@ -55,7 +54,6 @@ private slots:
 		QCOMPARE(ab.groupCount(), 0);
 		QCOMPARE(ab.totalChannels(), 0);
 		QCOMPARE(ab.frames(), 10);
-		QCOMPARE(ab.hasInterleavedBuffer(), false);
 	}
 
 	//! Verifies constructor with `SharedMemoryResource` allocates correct number of bytes
@@ -69,25 +67,10 @@ private slots:
 		QCOMPARE(ab.groupCount(), 1);
 		QCOMPARE(ab.totalChannels(), 3);
 		QCOMPARE(ab.frames(), 7);
-		QCOMPARE(ab.hasInterleavedBuffer(), false);
 
 		// All the bytes in the shared memory should have been used by AudioBuffer
 		QCOMPARE(sm.resource()->availableBytes(), 0);
 	}
-
-	//! Verifies that the `allocateInterleavedBuffer` method allocates the interleaved buffer
-	void AllocateInterleavedBuffer()
-	{
-		auto ab = AudioBuffer{10, 0};
-		QCOMPARE(ab.hasInterleavedBuffer(), false);
-
-		ab.allocateInterleavedBuffer();
-		QCOMPARE(ab.hasInterleavedBuffer(), true);
-		QVERIFY(ab.interleavedBuffer().data() != nullptr);
-		QCOMPARE(ab.interleavedBuffer().frames(), 10);
-		QCOMPARE(ab.interleavedBuffer().channels(), 2);
-	}
-
 
 	//! Verifies that the `addGroup` method can add the first group correctly
 	void AddGroup_FirstGroup()
@@ -236,8 +219,8 @@ private slots:
 	//! with shared memory as the backing array.
 	void TwoAudioBuffersWithSameSharedMemory()
 	{
-		// Use enough shared memory for 5 channels with 7 frames each + interleaved buffer
-		const auto allocationSize = AudioBuffer::allocationSize(7, 5, true);
+		// Use enough shared memory for 5 channels with 7 frames each
+		const auto allocationSize = AudioBuffer::allocationSize(7, 5);
 
 		// Split the 5 channels into 2 groups
 		auto groupVisitor = [](lmms::ch_cnt_t idx, AudioBuffer::ChannelGroup&) {
@@ -256,12 +239,10 @@ private slots:
 
 		// Create server-side AudioBuffer
 		auto abServer = AudioBuffer{7, 5, 2, smServer.resource(), groupVisitor};
-		abServer.allocateInterleavedBuffer();
 		QCOMPARE(smServer.resource()->availableBytes(), 0);
 		QCOMPARE(abServer.groupCount(), 2);
 		QCOMPARE(abServer.totalChannels(), 5);
 		QCOMPARE(abServer.frames(), 7);
-		QCOMPARE(abServer.hasInterleavedBuffer(), true);
 
 		// Connect to the server-side's SharedMemory
 		lmms::SharedMemory<std::byte[]> smClient;
@@ -270,12 +251,10 @@ private slots:
 
 		// Create client-side AudioBuffer
 		auto abClient = AudioBuffer{7, 5, 2, smClient.resource(), groupVisitor};
-		abClient.allocateInterleavedBuffer();
 		QCOMPARE(smClient.resource()->availableBytes(), 0);
 		QCOMPARE(abClient.groupCount(), 2);
 		QCOMPARE(abClient.totalChannels(), 5);
 		QCOMPARE(abClient.frames(), 7);
-		QCOMPARE(abClient.hasInterleavedBuffer(), true);
 
 		// Can write data on the server side and read it from the client side
 		abServer.buffer(1)[3] = 123.f; // 2nd channel, 4th frame

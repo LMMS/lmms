@@ -281,9 +281,9 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 }
 
 
-void SidInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void SidInstrument::playNote(NotePlayHandle* _n, std::optional<PlanarBufferView<float>> out)
 {
+	// NOTE: This instrument could be made mono in the future
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
 	const int samplerate = Engine::audioEngine()->outputSampleRate();
 
@@ -412,12 +412,13 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	// loop backwards to avoid overwriting data in the short-to-float conversion
-	for (auto frame = std::size_t{0}; frame < frames; ++frame)
+	const auto channels = out.value().channels();
+	for (f_cnt_t frame = 0; frame < frames; ++frame)
 	{
-		sample_t s = float(buf[frame])/32768.0;
-		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		const auto s = static_cast<float>(buf[frame]) / 32768;
+		for (ch_cnt_t ch = 0; ch < channels; ++ch)
 		{
-			_working_buffer[frame+offset][ch] = s;
+			(*out)[ch][frame + offset] = s;
 		}
 	}
 }

@@ -41,26 +41,30 @@ public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
 	~EqEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
+	ProcessStatus processImpl(PlanarBufferView<float> inOut) override;
 
 	EffectControls * controls() override
 	{
 		return &m_eqControls;
 	}
-	inline void gain( SampleFrame* buf, const f_cnt_t frames, float scale, SampleFrame* peak )
+
+	void gain(PlanarBufferView<float> inOut, float scale, float& peakL, float& peakR)
 	{
-		peak[0][0] = 0.0f; peak[0][1] = 0.0f;
-		for( f_cnt_t f = 0; f < frames; ++f )
+		assert(inOut.channels() == 2);
+		peakL = 0.0f;
+		peakR = 0.0f;
+		for (f_cnt_t f = 0; f < inOut.frames(); ++f)
 		{
-			auto & sf = buf[f];
+			float& inOutL = inOut[0][f];
+			float& inOutR = inOut[1][f];
 
 			// Apply gain to sample frame
-			sf[0] *= scale;
-			sf[1] *= scale;
+			inOutL *= scale;
+			inOutR *= scale;
 
 			// Update peaks
-			peak[0][0] = std::max(peak[0][0], (float)fabs(sf[0]));
-			peak[0][1] = std::max(peak[0][1], (float)fabs(sf[1]));
+			peakL = std::max(peakL, std::abs(inOutL));
+			peakR = std::max(peakR, std::abs(inOutR));
 		}
 	}
 

@@ -73,7 +73,7 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus ReverbSCEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -86,9 +86,9 @@ Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const f_cnt_
 	ValueBuffer * colorBuf = m_reverbSCControls.m_colorModel.valueBuffer();
 	ValueBuffer * outGainBuf = m_reverbSCControls.m_outputGainModel.valueBuffer();
 
-	for( f_cnt_t f = 0; f < frames; ++f )
+	for (f_cnt_t f = 0; f < inOut.frames(); ++f)
 	{
-		auto s = std::array{buf[f][0], buf[f][1]};
+		auto s = std::array{inOut[0][f], inOut[1][f]};
 
 		const auto inGain = fastPow10f<SPFLOAT>(
 			(inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()) / 20.f);
@@ -109,8 +109,8 @@ Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const f_cnt_
 		sp_revsc_compute(sp, revsc, &s[0], &s[1], &tmpL, &tmpR);
 		sp_dcblock_compute(sp, dcblk[0], &tmpL, &dcblkL);
 		sp_dcblock_compute(sp, dcblk[1], &tmpR, &dcblkR);
-		buf[f][0] = d * buf[f][0] + w * dcblkL * outGain;
-		buf[f][1] = d * buf[f][1] + w * dcblkR * outGain;
+		inOut[0][f] = d * inOut[0][f] + w * dcblkL * outGain;
+		inOut[1][f] = d * inOut[1][f] + w * dcblkR * outGain;
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

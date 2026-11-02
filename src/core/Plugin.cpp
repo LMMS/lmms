@@ -164,7 +164,7 @@ QString Plugin::Descriptor::SubPluginFeatures::Key::description() const
 
 
 
-void Plugin::loadFile( const QString & )
+void Plugin::loadFile(const QString&)
 {
 }
 

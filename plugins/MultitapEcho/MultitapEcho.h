@@ -26,6 +26,7 @@
 #ifndef MULTITAP_ECHO_H
 #define MULTITAP_ECHO_H
 
+#include "AudioBuffer.h"
 #include "Effect.h"
 #include "MultitapEchoControls.h"
 #include "RingBuffer.h"
@@ -39,9 +40,9 @@ class MultitapEchoEffect : public Effect
 {
 public:
 	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	~MultitapEchoEffect() override;
+	~MultitapEchoEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
+	ProcessStatus processImpl(PlanarBufferView<float> inOut) override;
 
 	EffectControls* controls() override
 	{
@@ -50,7 +51,7 @@ public:
 
 private:
 	void updateFilters( int begin, int end );
-	void runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const f_cnt_t frames );
+	void runFilter(PlanarBufferView<float> dst, PlanarBufferView<const float> src, StereoOnePole& filter);
 
 	inline void setFilterFreq( float fc, StereoOnePole & f )
 	{
@@ -71,7 +72,7 @@ private:
 	float m_sampleRate;
 	float m_sampleRatio;
 	
-	SampleFrame* m_work;
+	AudioBuffer m_work;
 
 	friend class MultitapEchoControls;
 

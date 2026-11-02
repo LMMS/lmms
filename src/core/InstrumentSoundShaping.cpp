@@ -105,15 +105,14 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 
 
 
-void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
-							const f_cnt_t frames,
-							NotePlayHandle* n )
+void InstrumentSoundShaping::processAudioBuffer(PlanarBufferSpan<float> inOut, NotePlayHandle* nph)
 {
-	const f_cnt_t envTotalFrames = n->totalFramesPlayed();
-	f_cnt_t envReleaseBegin = envTotalFrames - n->releaseFramesDone() + n->framesBeforeRelease();
+	const auto frames = inOut.frames();
+	const f_cnt_t envTotalFrames = nph->totalFramesPlayed();
+	f_cnt_t envReleaseBegin = envTotalFrames - nph->releaseFramesDone() + nph->framesBeforeRelease();
 
-	if( !n->isReleased() || ( n->instrumentTrack()->isSustainPedalPressed() &&
-		!n->isReleaseStarted() ) )
+	if (!nph->isReleased()
+		|| (nph->instrumentTrack()->isSustainPedalPressed() && !nph->isReleaseStarted()))
 	{
 		envReleaseBegin += frames;
 	}
@@ -137,11 +136,12 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 		int old_filter_cut = 0;
 		int old_filter_res = 0;
 
-		if( n->m_filter == nullptr )
+		const auto filterChannels = std::min(inOut.channels(), DEFAULT_CHANNELS);
+		if (nph->m_filter == nullptr)
 		{
-			n->m_filter = std::make_unique<BasicFilters<>>( Engine::audioEngine()->outputSampleRate() );
+			nph->m_filter = std::make_unique<BasicFilters<>>(Engine::audioEngine()->outputSampleRate());
 		}
-		n->m_filter->setFilterType( static_cast<BasicFilters<>::FilterType>(m_filterModel.value()) );
+		nph->m_filter->setFilterType(static_cast<BasicFilters<>::FilterType>(m_filterModel.value()));
 
 		if (cutoffParameters.isUsed())
 		{
@@ -158,23 +158,25 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 
 		if (cutoffParameters.isUsed() && resonanceParameters.isUsed())
 		{
-			for( f_cnt_t frame = 0; frame < frames; ++frame )
+			for (f_cnt_t frame = 0; frame < frames; ++frame)
 			{
-				const float new_cut_val = EnvelopeAndLfoParameters::expKnobVal( cutBuffer[frame] ) *
-								CUT_FREQ_MULTIPLIER + fcv;
+				const float new_cut_val = EnvelopeAndLfoParameters::expKnobVal(cutBuffer[frame])
+					* CUT_FREQ_MULTIPLIER + fcv;
 
 				const float new_res_val = frv + RES_MULTIPLIER * resBuffer[frame];
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut ||
 					static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
 				{
-					n->m_filter->calcFilterCoeffs( new_cut_val, new_res_val );
+					nph->m_filter->calcFilterCoeffs(new_cut_val, new_res_val);
 					old_filter_cut = static_cast<int>( new_cut_val );
 					old_filter_res = static_cast<int>( new_res_val*RES_PRECISION );
 				}
 
-				buffer[frame][0] = n->m_filter->update( buffer[frame][0], 0 );
-				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
+				for (ch_cnt_t ch = 0; ch < filterChannels; ++ch)
+				{
+					inOut[ch][frame] = nph->m_filter->update(inOut[ch][frame], ch);
+				}
 			}
 		}
 		else if (cutoffParameters.isUsed())
@@ -186,12 +188,14 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut )
 				{
-					n->m_filter->calcFilterCoeffs( new_cut_val, frv );
+					nph->m_filter->calcFilterCoeffs(new_cut_val, frv);
 					old_filter_cut = static_cast<int>( new_cut_val );
 				}
 
-				buffer[frame][0] = n->m_filter->update( buffer[frame][0], 0 );
-				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
+				for (ch_cnt_t ch = 0; ch < filterChannels; ++ch)
+				{
+					inOut[ch][frame] = nph->m_filter->update(inOut[ch][frame], ch);
+				}
 			}
 		}
 		else if(resonanceParameters.isUsed() )
@@ -202,22 +206,26 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 
 				if( static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
 				{
-					n->m_filter->calcFilterCoeffs( fcv, new_res_val );
+					nph->m_filter->calcFilterCoeffs(fcv, new_res_val);
 					old_filter_res = static_cast<int>( new_res_val*RES_PRECISION );
 				}
 
-				buffer[frame][0] = n->m_filter->update( buffer[frame][0], 0 );
-				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
+				for (ch_cnt_t ch = 0; ch < filterChannels; ++ch)
+				{
+					inOut[ch][frame] = nph->m_filter->update(inOut[ch][frame], ch);
+				}
 			}
 		}
 		else
 		{
-			n->m_filter->calcFilterCoeffs( fcv, frv );
+			nph->m_filter->calcFilterCoeffs(fcv, frv);
 
 			for( f_cnt_t frame = 0; frame < frames; ++frame )
 			{
-				buffer[frame][0] = n->m_filter->update( buffer[frame][0], 0 );
-				buffer[frame][1] = n->m_filter->update( buffer[frame][1], 1 );
+				for (ch_cnt_t ch = 0; ch < filterChannels; ++ch)
+				{
+					inOut[ch][frame] = nph->m_filter->update(inOut[ch][frame], ch);
+				}
 			}
 		}
 	}
@@ -233,8 +241,8 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 		{
 			float vol_level = volBuffer[frame];
 			vol_level = vol_level * vol_level;
-			buffer[frame][0] = vol_level * buffer[frame][0];
-			buffer[frame][1] = vol_level * buffer[frame][1];
+			inOut[0][frame] *= vol_level;
+			inOut[1][frame] *= vol_level;
 		}
 	}
 
@@ -247,7 +255,7 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 			vol_level = vol_level*vol_level;
 			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
-				buffer[frame][chnl] = vol_level * buffer[frame][chnl];
+				inOut[chnl][frame] *= vol_level;
 			}
 		}
 	}*/

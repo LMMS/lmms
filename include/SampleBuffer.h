@@ -29,6 +29,7 @@
 #include <memory>
 #include <vector>
 
+#include "AudioBuffer.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "LmmsTypes.h"
@@ -38,57 +39,49 @@ namespace lmms {
 class LMMS_EXPORT SampleBuffer
 {
 public:
-	using value_type = SampleFrame;
-	using reference = SampleFrame&;
-	using const_reference = const SampleFrame&;
-	using iterator = std::vector<SampleFrame>::iterator;
-	using const_iterator = std::vector<SampleFrame>::const_iterator;
-	using difference_type = std::vector<SampleFrame>::difference_type;
-	using size_type = std::vector<SampleFrame>::size_type;
-	using reverse_iterator = std::vector<SampleFrame>::reverse_iterator;
-	using const_reverse_iterator = std::vector<SampleFrame>::const_reverse_iterator;
-
 	SampleBuffer() = default;
-	SampleBuffer(std::vector<SampleFrame> data, int sampleRate, const QString& audioFile = "");
-	SampleBuffer(
-		const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	// TODO: Give `mod` parameters default values then simplify call sites
+	SampleBuffer(AudioBuffer data,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
+	SampleBuffer(PlanarBufferSpan<const float> data,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
+	SampleBuffer(std::span<const SampleFrame> data,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate(), const QString& audioFile = "");
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 	auto toBase64() const -> QString;
 
+	//! @returns a view providing channel-wise access to the SampleBuffer
+	auto data() const -> PlanarBufferView<const float> { return m_data.allBuffers(); }
+
 	auto audioFile() const -> const QString& { return m_audioFile; }
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
-	auto begin() -> iterator { return m_data.begin(); }
-	auto end() -> iterator { return m_data.end(); }
-
-	auto begin() const -> const_iterator { return m_data.begin(); }
-	auto end() const -> const_iterator { return m_data.end(); }
-
-	auto cbegin() const -> const_iterator { return m_data.cbegin(); }
-	auto cend() const -> const_iterator { return m_data.cend(); }
-
-	auto rbegin() -> reverse_iterator { return m_data.rbegin(); }
-	auto rend() -> reverse_iterator { return m_data.rend(); }
-
-	auto rbegin() const -> const_reverse_iterator { return m_data.rbegin(); }
-	auto rend() const -> const_reverse_iterator { return m_data.rend(); }
-
-	auto crbegin() const -> const_reverse_iterator { return m_data.crbegin(); }
-	auto crend() const -> const_reverse_iterator { return m_data.crend(); }
-
-	auto data() const -> const SampleFrame* { return m_data.data(); }
-	auto size() const -> size_type { return m_data.size(); }
+	auto channels() const -> ch_cnt_t { return m_data.totalChannels(); }
+	auto frames() const -> f_cnt_t { return m_data.frames(); }
 	auto empty() const -> bool { return m_data.empty(); }
 
 	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
 
+	//! Loads sample from file path
 	static std::shared_ptr<const SampleBuffer> fromFile(const QString& path);
-	static std::shared_ptr<const SampleBuffer> fromBase64(
-		const QString& str, int sampleRate = Engine::audioEngine()->outputSampleRate());
+
+	//! Loads sample from planar base64 data
+	static std::shared_ptr<const SampleBuffer> fromBase64(const QString& str,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate());
+
+	//! Loads sample from old `SampleFrame` base64 data
+	static std::shared_ptr<const SampleBuffer> fromLegacyBase64(const QString& str,
+		sample_rate_t sampleRate = Engine::audioEngine()->outputSampleRate());
 
 private:
-	std::vector<SampleFrame> m_data;
+	static std::shared_ptr<const SampleBuffer> fromBase64(bool legacyInterleaved,
+		const QString& str, sample_rate_t sampleRate);
+
+	using B64FrameCount = std::uint64_t;
+	using B64ChannelCount = std::uint16_t;
+
+	AudioBuffer m_data;
 	QString m_audioFile;
 	sample_rate_t m_sampleRate = Engine::audioEngine()->outputSampleRate();
 };

@@ -43,7 +43,7 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~DynProcEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
+	ProcessStatus processImpl(PlanarBufferView<float> inOut) override;
 	void processBypassedImpl() override;
 
 	EffectControls * controls() override

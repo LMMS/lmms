@@ -108,7 +108,7 @@ public:
 		m_userAntiAliasWaveTable = waveform;
 	}
 
-	void update(SampleFrame* ab, const f_cnt_t frames, const ch_cnt_t chnl, bool modulator = false);
+	void update(std::span<sample_t> out, bool modulator = false);
 
 	// now follow the wave-shape-routines...
 	static inline sample_t sinSample( const float _sample )
@@ -167,12 +167,14 @@ public:
 
 	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
 	{
-		if (buffer == nullptr || buffer->size() == 0) { return 0; }
-		const auto frames = buffer->size();
+		if (buffer == nullptr || buffer->empty()) { return 0; }
+
+		const auto frames = buffer->frames();
 		const auto frame = absFraction(sample) * frames;
 		const auto f1 = static_cast<f_cnt_t>(frame);
 
-		return std::lerp(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
+		const auto data = buffer->data().bufferPtr(0);
+		return std::lerp(data[f1], data[(f1 + 1) % frames], fraction(frame));
 	}
 
 	struct wtSampleControl {
@@ -215,7 +217,7 @@ public:
 		);
 	}
 
-	inline sample_t wtSample(sample_t **table, const float sample) const
+	inline sample_t wtSample(const sample_t* const* table, const float sample) const
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
@@ -274,41 +276,34 @@ private:
 	/* End Multiband wavetable */
 
 
-	void updateNoSub( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
-	void updatePM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
-	void updateAM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
-	void updateMix( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
-	void updateSync( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
-	void updateFM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
+	void updateNoSub(std::span<sample_t> out);
 
-	float syncInit( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
+	void updatePM(std::span<sample_t> out);
+	void updateAM(std::span<sample_t> out);
+	void updateMix(std::span<sample_t> out);
+	void updateSync(std::span<sample_t> out);
+	void updateFM(std::span<sample_t> out);
+
+	float syncInit(std::span<sample_t> out);
 	inline bool syncOk( float _osc_coeff );
 
 	template<WaveShape W>
-	void updateNoSub( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
+	void updateNoSub(std::span<sample_t> out);
+
 	template<WaveShape W>
-	void updatePM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
+	void updatePM(std::span<sample_t> out);
+
 	template<WaveShape W>
-	void updateAM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
+	void updateAM(std::span<sample_t> out);
+
 	template<WaveShape W>
-	void updateMix( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
+	void updateMix(std::span<sample_t> out);
+
 	template<WaveShape W>
-	void updateSync( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
+	void updateSync(std::span<sample_t> out);
+
 	template<WaveShape W>
-	void updateFM( SampleFrame* _ab, const f_cnt_t _frames,
-							const ch_cnt_t _chnl );
+	void updateFM(std::span<sample_t> out);
 
 	template<WaveShape W>
 	inline sample_t getSample( const float _sample );

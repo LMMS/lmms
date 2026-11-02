@@ -61,11 +61,11 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
+Effect::ProcessStatus GranularPitchShifterEffect::processImpl(PlanarBufferView<float> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
-	
+
 	const ValueBuffer* pitchBuf = m_granularpitchshifterControls.m_pitchModel.valueBuffer();
 	const ValueBuffer* pitchSpreadBuf = m_granularpitchshifterControls.m_pitchSpreadModel.valueBuffer();
 
@@ -82,40 +82,40 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 	const float feedback = m_granularpitchshifterControls.m_feedbackModel.value();
 	const float fadeLength = 1.f / m_granularpitchshifterControls.m_fadeLengthModel.value();
 	const bool prefilter = m_granularpitchshifterControls.m_prefilterModel.value();
-	
+
 	if (glide != m_oldGlide)
 	{
 		m_oldGlide = glide;
 		m_glideCoef = glide > 0 ? std::exp(-1 / (glide * m_sampleRate)) : 0;
 	}
-	
+
 	const float shapeK = cosWindowApproxK(shape);
 	const int sizeSamples = m_sampleRate / size;
 	const float waitMult = sizeSamples / (density * 2);
 
-	for (f_cnt_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < inOut.frames(); ++f)
 	{
 		const double pitch = (pitchBuf ? pitchBuf->value(f) : m_granularpitchshifterControls.m_pitchModel.value()) * (1. / 12.);
 		const double pitchSpread = (pitchSpreadBuf ? pitchSpreadBuf->value(f) : m_granularpitchshifterControls.m_pitchSpreadModel.value()) * (1. / 24.);
-		
+
 		// interpolate pitch depending on glide
 		for (int i = 0; i < 2; ++i)
 		{
 			double targetVal = pitch + pitchSpread * (i ? 1. : -1.);
-			
+
 			if (targetVal == m_truePitch[i]) { continue; }
 			m_updatePitches = true;
-			
+
 			m_truePitch[i] = m_glideCoef * m_truePitch[i] + (1. - m_glideCoef) * targetVal;
 			// we crudely lock the pitch to the target value once it gets close enough, so we can save on CPU
 			if (std::abs(targetVal - m_truePitch[i]) < GlideSnagRadius) { m_truePitch[i] = targetVal; }
 		}
-		
+
 		// this stuff is computationally expensive, so we should only do it when necessary
 		if (m_updatePitches)
 		{
 			m_updatePitches = false;
-			
+
 			std::array<double, 2> speed = {
 				std::exp2(m_truePitch[0]),
 				std::exp2(m_truePitch[1])
@@ -124,13 +124,13 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 				speed[0] / m_speed[0],
 				speed[1] / m_speed[1]
 			};
-			
+
 			for (int i = 0; i < m_grainCount; ++i)
 			{
 				for (int j = 0; j < 2; ++j)
 				{
 					m_grains[i].grainSpeed[j] *= ratio[j];
-					
+
 					// we unfortunately need to do extra stuff to ensure these don't shoot past the write index...
 					if (m_grains[i].grainSpeed[j] > 1)
 					{
@@ -143,15 +143,15 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 			}
 			m_speed[0] = speed[0];
 			m_speed[1] = speed[1];
-			
+
 			// prevent aliasing by lowpassing frequencies that the pitch shifting would push above nyquist
 			m_prefilter[0].setCoefs(m_sampleRate, std::min(m_nyquist / static_cast<float>(speed[0]), m_nyquist) * PrefilterBandwidth);
 			m_prefilter[1].setCoefs(m_sampleRate, std::min(m_nyquist / static_cast<float>(speed[1]), m_nyquist) * PrefilterBandwidth);
 		}
-		
+
 		std::array<float, 2> s = {0, 0};
-		std::array<float, 2> filtered = {buf[f][0], buf[f][1]};
-		
+		std::array<float, 2> filtered = {inOut[0][f], inOut[1][f]};
+
 		// spawn a new grain if it's time
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
 		{
@@ -166,7 +166,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 				sprayResult[0] = fastRand(spray * m_sampleRate);
 				sprayResult[1] = std::lerp(sprayResult[0], fastRand(spray * m_sampleRate), spraySpread);
 			}
-			
+
 			std::array<int, 2> readPoint;
 			int latency = std::max(static_cast<int>(std::max(sizeSamples * (std::max(m_speed[0], m_speed[1]) * grainSpeed - 1.), 0.) + SafetyLatency), minLatency);
 			for (int i = 0; i < 2; ++i)
@@ -178,7 +178,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 			m_grains.push_back(Grain(grainSpeed * m_speed[0], grainSpeed * m_speed[1], phaseInc, phaseInc, readPoint[0], readPoint[1]));
 			++m_grainCount;
 		}
-		
+
 		for (int i = 0; i < m_grainCount; ++i)
 		{
 			m_grains[i].phase += std::max(m_grains[i].phaseSpeed[0], m_grains[i].phaseSpeed[1]);
@@ -191,33 +191,33 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 				--m_grainCount;
 				continue;
 			}
-			
+	
 			m_grains[i].readPoint[0] += m_grains[i].grainSpeed[0];
 			m_grains[i].readPoint[1] += m_grains[i].grainSpeed[1];
 			if (m_grains[i].readPoint[0] >= m_ringBufLength) { m_grains[i].readPoint[0] -= m_ringBufLength; }
 			if (m_grains[i].readPoint[1] >= m_ringBufLength) { m_grains[i].readPoint[1] -= m_ringBufLength; }
-			
+
 			const float fadePos = std::clamp((-std::abs(-2.f * static_cast<float>(m_grains[i].phase) + 1.f) + 0.5f) * fadeLength + 0.5f, 0.f, 1.f);
 			const float windowVal = cosHalfWindowApprox(fadePos, shapeK);
 			s[0] += getHermiteSample(m_grains[i].readPoint[0], 0) * windowVal;
 			s[1] += getHermiteSample(m_grains[i].readPoint[1], 1) * windowVal;
 		}
-		
+
 		// note that adding two signals together, when uncorrelated, results in a signal power multiplication of sqrt(2), not 2
 		s[0] *= densityInvRoot;
 		s[1] *= densityInvRoot;
-		
+
 		// 1-pole highpass for DC offset removal, to make feedback safer
 		s[0] -= (m_dcVal[0] = (1.f - m_dcCoeff) * s[0] + m_dcCoeff * m_dcVal[0]);
 		s[1] -= (m_dcVal[1] = (1.f - m_dcCoeff) * s[1] + m_dcCoeff * m_dcVal[1]);
-		
+
 		// cheap safety saturator to protect against infinite feedback
 		if (feedback > 0)
 		{
 			s[0] = safetySaturate(s[0]);
 			s[1] = safetySaturate(s[1]);
 		}
-		
+
 		if (++m_writePoint >= m_ringBufLength)
 		{
 			m_writePoint = 0;
@@ -227,14 +227,14 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 			filtered[0] = m_prefilter[0].process(filtered[0]);
 			filtered[1] = m_prefilter[1].process(filtered[1]);
 		}
-		
+
 		m_ringBuf[m_writePoint][0] = filtered[0] + s[0] * feedback;
 		m_ringBuf[m_writePoint][1] = filtered[1] + s[1] * feedback;
-			
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+
+		inOut[0][f] = d * inOut[0][f] + w * s[0];
+		inOut[1][f] = d * inOut[1][f] + w * s[1];
 	}
-	
+
 	if (m_sampleRateNeedsUpdate)
 	{
 		m_sampleRateNeedsUpdate = false;

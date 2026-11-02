@@ -44,14 +44,13 @@ class AudioFileProcessor : public Instrument
 public:
 	AudioFileProcessor( InstrumentTrack * _instrument_track );
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
+	void playNote(NotePlayHandle* nph, std::optional<PlanarBufferView<float>> out) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
 	void loadSettings(const QDomElement& elem) override;
 
-	void loadFile( const QString & _file ) override;
+	void loadFile(const QString& file) override;
 
 	QString nodeName() const override;
 
@@ -77,7 +76,7 @@ public:
 
 
 public slots:
-	void setAudioFile(const QString& _audio_file, bool _rename = true);
+	void setAudioFile(const QString& audioFile, bool rename = true);
 
 private slots:
 	void reverseModelChanged();
@@ -87,7 +86,7 @@ private slots:
 	void endPointChanged();
 	void pointChanged();
 	void stutterModelChanged();
-
+	void loopModeChanged();
 
 signals:
 	void isPlaying( lmms::f_cnt_t _current_frame );

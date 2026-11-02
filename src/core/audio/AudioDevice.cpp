@@ -90,38 +90,37 @@ void AudioDevice::renamePort(AudioBusHandle*)
 {
 }
 
-int AudioDevice::convertToS16(const SampleFrame* _ab,
-								const f_cnt_t _frames,
-								int_sample_t * _output_buffer,
-								const bool _convert_endian )
+int AudioDevice::convertToS16(PlanarBufferView<const float> input, int_sample_t* output,
+	const bool convertEndian) const
 {
-	if( _convert_endian )
-	{
-		for( f_cnt_t frame = 0; frame < _frames; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				auto temp = static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
+	const auto channels = this->channels();
+	const auto frames = input.frames();
+	assert(input.channels() >= channels);
 
-				( _output_buffer + frame * channels() )[chnl] =
-						( temp & 0x00ff ) << 8 |
-						( temp & 0xff00 ) >> 8;
+	if (convertEndian)
+	{
+		for (ch_cnt_t channel = 0; channel < channels; ++channel)
+		{
+			for (f_cnt_t frame = 0; frame < frames; ++frame)
+			{
+				auto temp = static_cast<int_sample_t>(AudioEngine::clip(input[channel][frame]) * OUTPUT_SAMPLE_MULTIPLIER);
+				(output + frame * channels)[channel] = (temp & 0x00ff) << 8 | (temp & 0xff00) >> 8;
 			}
 		}
 	}
 	else
 	{
-		for( f_cnt_t frame = 0; frame < _frames; ++frame )
+		for (ch_cnt_t channel = 0; channel < channels; ++channel)
 		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+			for (f_cnt_t frame = 0; frame < frames; ++frame)
 			{
-				(_output_buffer + frame * channels())[chnl]
-					= static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
+				(output + frame * channels)[channel]
+					= static_cast<int_sample_t>(AudioEngine::clip(input[channel][frame]) * OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
 	}
 
-	return _frames * channels() * BYTES_PER_INT_SAMPLE;
+	return frames * channels * BYTES_PER_INT_SAMPLE;
 }
 
 

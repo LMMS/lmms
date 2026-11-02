@@ -183,7 +183,7 @@ int NotePlayHandle::midiKey() const
 
 
 
-void NotePlayHandle::play( SampleFrame* _working_buffer )
+void NotePlayHandle::play(std::optional<PlanarBufferView<float>> buffer)
 {
 	if (m_muted)
 	{
@@ -260,7 +260,7 @@ void NotePlayHandle::play( SampleFrame* _working_buffer )
 	if( framesLeft() > 0 )
 	{
 		// play note!
-		m_instrumentTrack->playNote( this, _working_buffer );
+		m_instrumentTrack->playNote(this, buffer);
 	}
 
 	if( m_released && (!instrumentTrack()->isSustainPedalPressed() ||

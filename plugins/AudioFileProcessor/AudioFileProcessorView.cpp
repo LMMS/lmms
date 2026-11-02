@@ -196,11 +196,17 @@ void AudioFileProcessorView::dropEvent(QDropEvent* de)
 	const auto type = StringPairDrag::decodeKey(de);
 	const auto value = StringPairDrag::decodeValue(de);
 
-	if (type == "samplefile") { castModel<AudioFileProcessor>()->setAudioFile(value); }
+	if (type == "samplefile")
+	{
+		castModel<AudioFileProcessor>()->setAudioFile(value);
+	}
 	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
 		DataFile dataFile(value.toUtf8());
-		castModel<AudioFileProcessor>()->setAudioFile(dataFile.content().firstChild().toElement().attribute("src"));
+		const auto elem = dataFile.content().firstChild().toElement();
+		const auto file = elem.attribute("src");
+
+		castModel<AudioFileProcessor>()->setAudioFile(file);
 	}
 	else
 	{

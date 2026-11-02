@@ -40,7 +40,7 @@ public:
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	~StereoMatrixEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
+	ProcessStatus processImpl(PlanarBufferView<float> inOut) override;
 
 	EffectControls* controls() override
 	{

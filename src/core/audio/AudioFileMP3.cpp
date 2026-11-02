@@ -25,12 +25,10 @@
 
 #include "AudioFileMP3.h"
 
-#include "SampleFrame.h"
-
 #ifdef LMMS_HAVE_MP3LAME
 
-
 #include <cassert>
+#include <memory>
 
 namespace lmms
 {
@@ -55,27 +53,45 @@ AudioFileMP3::~AudioFileMP3()
 	tearDownEncoder();
 }
 
-void AudioFileMP3::writeBuffer(const SampleFrame* _buf, const f_cnt_t _frames)
+void AudioFileMP3::writeBuffer(PlanarBufferView<const float> buffer)
 {
-	if (_frames < 1)
+	if (buffer.empty()) { return; }
+
+	const auto frames = buffer.frames();
+
+	auto stereoInterleaved = std::make_unique_for_overwrite<float[]>(frames * 2);
+	if (buffer.channels() == 1)
 	{
-		return;
+		// upmix mono to stereo
+		for (f_cnt_t i = 0; i < frames; ++i)
+		{
+			float sample = buffer[0][i];
+			stereoInterleaved[2 * i] = sample;
+			stereoInterleaved[2 * i + 1] = sample;
+		}
+	}
+	else // >= 2 channels
+	{
+		for (f_cnt_t i = 0; i < frames; ++i)
+		{
+			stereoInterleaved[2 * i] = buffer[0][i];
+			stereoInterleaved[2 * i + 1] = buffer[1][i];
+		}
 	}
 
-	std::vector<float> interleavedDataBuffer(_frames * 2);
-	for (f_cnt_t i = 0; i < _frames; ++i)
-	{
-		interleavedDataBuffer[2*i] = _buf[i][0];
-		interleavedDataBuffer[2*i + 1] = _buf[i][1];
-	}
-
-	size_t minimumBufferSize = 1.25 * _frames + 7200;
+	size_t minimumBufferSize = 1.25 * frames + 7200;
 	std::vector<unsigned char> encodingBuffer(minimumBufferSize);
 
-	int bytesWritten = lame_encode_buffer_interleaved_ieee_float(m_lame, &interleavedDataBuffer[0], _frames, &encodingBuffer[0], static_cast<int>(encodingBuffer.size()));
-	assert (bytesWritten >= 0);
+	int bytesWritten = lame_encode_buffer_interleaved_ieee_float(
+		m_lame,
+		stereoInterleaved.get(),
+		frames,
+		encodingBuffer.data(),
+		static_cast<int>(encodingBuffer.size())
+	);
+	assert(bytesWritten >= 0);
 
-	writeData(&encodingBuffer[0], bytesWritten);
+	writeData(encodingBuffer.data(), bytesWritten);
 }
 
 void AudioFileMP3::flushRemainingBuffers()

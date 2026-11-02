@@ -74,7 +74,6 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_dependenciesMet(0),
 	m_channelIndex(idx)
 {
-	m_buffer.allocateInterleavedBuffer();
 }
 
 
@@ -163,8 +162,6 @@ void MixerChannel::unmuteReceiverForSolo()
 
 void MixerChannel::doProcessing()
 {
-	const f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
-
 	if( m_muted == false )
 	{
 		for( MixerRoute * senderRoute : m_receives )
@@ -175,36 +172,36 @@ void MixerChannel::doProcessing()
 
 			if (sender->m_buffer.hasAnySignal() || sender->m_stillRunning)
 			{
-				auto buffer = m_buffer.interleavedBuffer().asSampleFrames();
+				auto buffer = m_buffer.allBuffers();
 
 				// figure out if we're getting sample-exact input
-				ValueBuffer * sendBuf = sendModel->valueBuffer();
-				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
+				ValueBuffer* sendAmountBuf = sendModel->valueBuffer();
+				ValueBuffer* volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
-				auto ch_buf = sender->m_buffer.interleavedBuffer().asSampleFrames();
+				auto senderBuffer = sender->m_buffer.allBuffers();
 
 				// use sample-exact mixing if sample-exact values are available
-				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
+				if (!volBuf && !sendAmountBuf) // neither volume nor send has sample-exact data...
 				{
 					const float v = sender->m_volumeModel.value() * sendModel->value();
-					MixHelpers::addMultiplied(buffer.data(), ch_buf.data(), v, fpp);
+					MixHelpers::addMultiplied(buffer, senderBuffer, v);
 				}
-				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
+				else if (volBuf && sendAmountBuf) // both volume and send have sample-exact data
 				{
-					MixHelpers::addMultipliedByBuffers(buffer.data(), ch_buf.data(), volBuf, sendBuf, fpp);
+					MixHelpers::addMultipliedByBuffers(buffer, senderBuffer, volBuf, sendAmountBuf);
 				}
 				else if( volBuf ) // volume has sample-exact data but send does not
 				{
 					const float v = sendModel->value();
-					MixHelpers::addMultipliedByBuffer(buffer.data(), ch_buf.data(), v, volBuf, fpp);
+					MixHelpers::addMultipliedByBuffer(buffer, senderBuffer, v, volBuf);
 				}
 				else // vice versa
 				{
 					const float v = sender->m_volumeModel.value();
-					MixHelpers::addMultipliedByBuffer(buffer.data(), ch_buf.data(), v, sendBuf, fpp);
+					MixHelpers::addMultipliedByBuffer(buffer, senderBuffer, v, sendAmountBuf);
 				}
-				toPlanar(m_buffer.interleavedBuffer(), m_buffer.groupBuffers(0));
+
 				m_buffer.mixSilenceFlags(sender->m_buffer);
 			}
 		}
@@ -645,12 +642,10 @@ void Mixer::mixToChannel(const AudioBuffer& buffer, mix_ch_t dest)
 	if (!channel->m_muteModel.value())
 	{
 		channel->m_lock.lock();
+
 		MixHelpers::add(channel->m_buffer.groupBuffers(0), buffer.groupBuffers(0));
-
-		// Copy the planar buffer to the temporary interleaved buffer so they stay in sync
-		toInterleaved(channel->m_buffer.groupBuffers(0), channel->m_buffer.interleavedBuffer());
-
 		channel->m_buffer.mixSilenceFlags(buffer);
+
 		channel->m_lock.unlock();
 	}
 }
@@ -665,7 +660,7 @@ void Mixer::prepareMasterMix()
 
 
 
-void Mixer::masterMix( SampleFrame* _buf )
+void Mixer::masterMix(PlanarBufferView<float> dest)
 {
 	const int fpp = Engine::audioEngine()->framesPerPeriod();
 
@@ -711,7 +706,8 @@ void Mixer::masterMix( SampleFrame* _buf )
 		AudioEngineWorkerThread::startAndWaitForJobs();
 	}
 
-	auto buffer = m_mixerChannels[0]->m_buffer.interleavedBuffer().asSampleFrames();
+	auto buffer = m_mixerChannels[0]->m_buffer.allBuffers();
+	assert(buffer.channels() == 2);
 
 	// handle sample-exact data in master volume fader
 	ValueBuffer * volBuf = m_mixerChannels[0]->m_volumeModel.valueBuffer();
@@ -720,15 +716,15 @@ void Mixer::masterMix( SampleFrame* _buf )
 	{
 		for( int f = 0; f < fpp; f++ )
 		{
-			buffer[f][0] *= volBuf->values()[f];
-			buffer[f][1] *= volBuf->values()[f];
+			buffer[0][f] *= volBuf->values()[f];
+			buffer[1][f] *= volBuf->values()[f];
 		}
 	}
 
 	const float v = volBuf
 		? 1.0f
 		: m_mixerChannels[0]->m_volumeModel.value();
-	MixHelpers::addMultiplied(_buf, buffer.data(), v, fpp);
+	MixHelpers::addMultiplied(dest, buffer, v);
 
 	// clear all channel buffers and
 	// reset channel process state

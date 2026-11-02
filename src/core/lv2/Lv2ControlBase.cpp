@@ -40,8 +40,8 @@ namespace lmms
 {
 
 
-Plugin::Type Lv2ControlBase::check(const LilvPlugin *plugin,
-	std::vector<PluginIssue> &issues)
+Plugin::Type Lv2ControlBase::check(const LilvPlugin* plugin,
+	std::vector<PluginIssue>& issues)
 {
 	// for some reason, all checks can be done by one processor...
 	return Lv2Proc::check(plugin, issues);
@@ -50,7 +50,7 @@ Plugin::Type Lv2ControlBase::check(const LilvPlugin *plugin,
 
 
 
-Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
+Lv2ControlBase::Lv2ControlBase(Model* that, const QString& uri) :
 	m_plugin(Engine::getLv2Manager()->getPlugin(uri))
 {
 	if (m_plugin)
@@ -107,7 +107,7 @@ void Lv2ControlBase::reload()
 
 
 
-LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx)
+LinkedModelGroup* Lv2ControlBase::getGroup(std::size_t idx)
 {
 	return (m_procs.size() > idx) ? m_procs[idx].get() : nullptr;
 }
@@ -115,7 +115,7 @@ LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx)
 
 
 
-const LinkedModelGroup *Lv2ControlBase::getGroup(std::size_t idx) const
+const LinkedModelGroup* Lv2ControlBase::getGroup(std::size_t idx) const
 {
 	return (m_procs.size() > idx) ? m_procs[idx].get() : nullptr;
 }
@@ -138,11 +138,12 @@ void Lv2ControlBase::copyModelsToLmms() const
 
 
 
-void Lv2ControlBase::copyBuffersFromLmms(const SampleFrame* buf, f_cnt_t frames) {
+void Lv2ControlBase::copyBuffersFromLmms(PlanarBufferView<const float> buf)
+{
 	unsigned firstChan = 0; // tell the procs which channels they shall read from
-	for (const auto& c : m_procs) 
+	for (const auto& c : m_procs)
 	{
-		c->copyBuffersFromCore(buf, firstChan, m_channelsPerProc, frames);
+		c->copyBuffersFromCore(buf, firstChan, m_channelsPerProc);
 		firstChan += m_channelsPerProc;
 	}
 }
@@ -150,10 +151,25 @@ void Lv2ControlBase::copyBuffersFromLmms(const SampleFrame* buf, f_cnt_t frames)
 
 
 
-void Lv2ControlBase::copyBuffersToLmms(SampleFrame* buf, f_cnt_t frames) const {
+void Lv2ControlBase::copyBuffersToLmms(PlanarBufferView<float> buf) const
+{
 	unsigned firstChan = 0; // tell the procs which channels they shall write to
-	for (const auto& c : m_procs) {
-		c->copyBuffersToCore(buf, firstChan, m_channelsPerProc, frames);
+	for (const auto& c : m_procs)
+	{
+		c->copyBuffersToCore(buf, firstChan, m_channelsPerProc);
+		firstChan += m_channelsPerProc;
+	}
+}
+
+
+
+
+void Lv2ControlBase::copyBuffersToLmms(PlanarBufferView<float> buf, float wet, float dry) const
+{
+	unsigned firstChan = 0; // tell the procs which channels they shall write to
+	for (const auto& c : m_procs)
+	{
+		c->copyBuffersToCore(buf, firstChan, m_channelsPerProc, wet, dry);
 		firstChan += m_channelsPerProc;
 	}
 }
@@ -168,7 +184,7 @@ void Lv2ControlBase::run(f_cnt_t frames) {
 
 
 
-void Lv2ControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
+void Lv2ControlBase::saveSettings(QDomDocument& doc, QDomElement& that)
 {
 	LinkedModelGroups::saveSettings(doc, that);
 	
@@ -178,7 +194,7 @@ void Lv2ControlBase::saveSettings(QDomDocument &doc, QDomElement &that)
 
 
 
-void Lv2ControlBase::loadSettings(const QDomElement &that)
+void Lv2ControlBase::loadSettings(const QDomElement& that)
 {
 	LinkedModelGroups::loadSettings(that);
 	
@@ -188,7 +204,7 @@ void Lv2ControlBase::loadSettings(const QDomElement &that)
 
 
 
-void Lv2ControlBase::loadFile(const QString &file)
+void Lv2ControlBase::loadFile(const QString& file)
 {
 	(void)file;
 }
@@ -214,8 +230,8 @@ bool Lv2ControlBase::hasNoteInput() const
 
 
 
-void Lv2ControlBase::handleMidiInputEvent(const MidiEvent &event,
-	const TimePos &time, f_cnt_t offset)
+void Lv2ControlBase::handleMidiInputEvent(const MidiEvent& event,
+	const TimePos& time, f_cnt_t offset)
 {
 	for (const auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
 }

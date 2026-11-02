@@ -312,36 +312,44 @@ Audio::Audio(std::size_t bufferSize, bool isSidechain)
 
 
 
-void Audio::copyBuffersFromCore(const SampleFrame* lmmsBuf,
-	unsigned channel, f_cnt_t frames)
+void Audio::copyBuffersFromCore(std::span<const float> lmmsBuf)
 {
-	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
+	for (f_cnt_t f = 0; f < lmmsBuf.size(); ++f)
 	{
-		m_buffer[f] = lmmsBuf[f][channel];
+		m_buffer[f] = lmmsBuf[f];
 	}
 }
 
 
 
 
-void Audio::averageWithBuffersFromCore(const SampleFrame* lmmsBuf,
-	unsigned channel, f_cnt_t frames)
+void Audio::averageWithBuffersFromCore(std::span<const float> lmmsBuf)
 {
-	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
+	for (f_cnt_t f = 0; f < lmmsBuf.size(); ++f)
 	{
-		m_buffer[f] = (m_buffer[f] + lmmsBuf[f][channel]) / 2.0f;
+		m_buffer[f] = (m_buffer[f] + lmmsBuf[f]) / 2.0f;
 	}
 }
 
 
 
 
-void Audio::copyBuffersToCore(SampleFrame* lmmsBuf,
-	unsigned channel, f_cnt_t frames) const
+void Audio::copyBuffersToCore(std::span<float> lmmsBuf) const
 {
-	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
+	for (f_cnt_t f = 0; f < lmmsBuf.size(); ++f)
 	{
-		lmmsBuf[f][channel] = m_buffer[f];
+		lmmsBuf[f] = m_buffer[f];
+	}
+}
+
+
+
+
+void Audio::copyBuffersToCore(std::span<float> lmmsBuf, float wet, float dry) const
+{
+	for (f_cnt_t f = 0; f < lmmsBuf.size(); ++f)
+	{
+		lmmsBuf[f] = lmmsBuf[f] * dry + m_buffer[f] * wet;
 	}
 }
 

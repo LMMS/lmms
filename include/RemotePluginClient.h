@@ -38,7 +38,7 @@
 #	include <unistd.h>
 #endif
 
-#include "LmmsTypes.h"
+#include "AudioBufferSpan.h"
 #include "MidiEvent.h"
 #include "SharedMemory.h"
 #include "VstSyncData.h"
@@ -46,7 +46,6 @@
 namespace lmms
 {
 
-class SampleFrame;
 
 class RemotePluginClient : public RemotePluginBase
 {
@@ -62,8 +61,7 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	virtual void process( const SampleFrame* _in_buf,
-					SampleFrame* _out_buf ) = 0;
+	virtual void process(PlanarBufferView<const float> in, PlanarBufferView<float> out) = 0;
 
 	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
 	{
@@ -87,35 +85,24 @@ public:
 		return m_bufferSize;
 	}
 
-	void setInputCount( int _i )
+	void setInputOutputCount(ch_cnt_t i, ch_cnt_t o)
 	{
-		m_inputCount = _i;
-		sendMessage( message( IdChangeInputCount ).addInt( _i ) );
+		m_audioBufferAccessIn.resize(i);
+		m_audioBufferAccessOut.resize(o);
+		sendMessage(message(IdChangeInputOutputCount)
+			.addInt(static_cast<int>(i))
+			.addInt(static_cast<int>(o))
+		);
 	}
 
-	void setOutputCount( int _i )
+	virtual ch_cnt_t inputCount() const
 	{
-		m_outputCount = _i;
-		sendMessage( message( IdChangeOutputCount ).addInt( _i ) );
+		return static_cast<ch_cnt_t>(m_audioBufferAccessIn.size());
 	}
 
-	void setInputOutputCount( int i, int o )
+	virtual ch_cnt_t outputCount() const
 	{
-		m_inputCount = i;
-		m_outputCount = o;
-		sendMessage( message( IdChangeInputOutputCount )
-				.addInt( i )
-				.addInt( o ) );
-	}
-
-	virtual int inputCount() const
-	{
-		return m_inputCount;
-	}
-
-	virtual int outputCount() const
-	{
-		return m_outputCount;
+		return static_cast<ch_cnt_t>(m_audioBufferAccessOut.size());
 	}
 
 	void debugMessage( const std::string & _s )
@@ -128,11 +115,11 @@ private:
 	void setShmKey(const std::string& key);
 	void doProcessing();
 
-	SharedMemory<float[]> m_audioBuffer;
-	SharedMemory<const VstSyncData> m_vstSyncData;
+	SharedMemory<float[]> m_audioBuffer; // NOLINT
+	std::vector<float*> m_audioBufferAccessIn;  //!< size() is input count
+	std::vector<float*> m_audioBufferAccessOut; //!< size() is output count
 
-	int m_inputCount;
-	int m_outputCount;
+	SharedMemory<const VstSyncData> m_vstSyncData;
 
 	sample_rate_t m_sampleRate;
 	f_cnt_t m_bufferSize;
@@ -186,8 +173,6 @@ RemotePluginClient::RemotePluginClient( const std::string& _shm_in, const std::s
 RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	RemotePluginBase(),
 #endif
-	m_inputCount( 0 ),
-	m_outputCount( 0 ),
 	m_sampleRate( 44100 ),
 	m_bufferSize( 0 )
 {
@@ -278,7 +263,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 			// Should LMMS gain the ability to change buffer size
 			// without a restart, it must wait for this message to
 			// complete processing or else risk VST crashes
-			m_bufferSize = _m.getInt();
+			m_bufferSize = static_cast<f_cnt_t>(_m.getInt());
 			updateBufferSize();
 			break;
 
@@ -346,9 +331,32 @@ void RemotePluginClient::doProcessing()
 {
 	if (m_audioBuffer)
 	{
-		process( (SampleFrame*)( m_inputCount > 0 ? m_audioBuffer.get() : nullptr ),
-				(SampleFrame*)( m_audioBuffer.get() +
-					( m_inputCount*m_bufferSize ) ) );
+		const auto inputCount = RemotePluginClient::inputCount();
+		const auto outputCount = RemotePluginClient::outputCount();
+
+		PlanarBufferView<const float> inputs;
+		if (inputCount > 0)
+		{
+			float* ptr = m_audioBuffer.get();
+			for (ch_cnt_t ch = 0; ch < inputCount; ++ch, ptr += m_bufferSize)
+			{
+				m_audioBufferAccessIn[ch] = ptr;
+			}
+			inputs = PlanarBufferView{m_audioBufferAccessIn.data(), inputCount, m_bufferSize};
+		}
+
+		PlanarBufferView<float> outputs;
+		if (outputCount > 0)
+		{
+			float* ptr = m_audioBuffer.get();
+			for (ch_cnt_t ch = 0; ch < outputCount; ++ch, ptr += m_bufferSize)
+			{
+				m_audioBufferAccessOut[ch] = ptr;
+			}
+			outputs = PlanarBufferView<float>{m_audioBufferAccessOut.data(), outputCount, m_bufferSize};
+		}
+
+		process(inputs, outputs);
 	}
 	else
 	{

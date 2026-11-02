@@ -33,10 +33,10 @@
 #include <memory>
 #include <vector>
 
-#include "AudioBufferView.h"
+#include "AudioBufferSpan.h"
 #include "AudioDevice.h"
 #include "LmmsTypes.h"
-#include "SampleFrame.h"
+#include "MixHelpers.h"
 #include "LocklessList.h"
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"
@@ -55,7 +55,6 @@ constexpr f_cnt_t MAXIMUM_BUFFER_SIZE = 4096;
 
 constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
 constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
-constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
 constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
@@ -228,11 +227,32 @@ public:
 
 	bool criticalXRuns() const;
 
-	void pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames );
-
-	inline const SampleFrame* inputBuffer()
+	void pushInputFrames(AudioBufferSpan<const float> auto buffer)
 	{
-		return m_inputBuffer[ m_inputBufferRead ];
+		requestChangeInModel();
+
+		const f_cnt_t frameOffset = m_inputBufferFrames[m_inputBufferWrite];
+		const auto framesNeeded = frameOffset + buffer.frames();
+		preparePushInputFrames(framesNeeded);
+
+		auto& channelBuffer = m_inputBufferChannels[m_inputBufferWrite];
+		auto dest = PlanarBufferSpan {
+			channelBuffer.data(),
+			static_cast<ch_cnt_t>(channelBuffer.size()),
+			framesNeeded,
+			frameOffset
+		};
+		MixHelpers::copy(dest, buffer);
+
+		m_inputBufferFrames[m_inputBufferWrite] += buffer.frames();
+
+		doneChangeInModel();
+	}
+
+	PlanarBufferView<const float> inputBuffer()
+	{
+		auto& channelBuffers = m_inputBufferChannels[m_inputBufferRead];
+		return {channelBuffers.data(), static_cast<ch_cnt_t>(channelBuffers.size()), inputBufferFrames()};
 	}
 
 	inline f_cnt_t inputBufferFrames() const
@@ -262,14 +282,14 @@ public:
 	 * engine's output. The rendering is chunked into smaller periods to timely handle per-buffer updates like
 	 * non-sample-accurate automation, as well as to improve memory cache performance.
 	 *
-	 * The audio period generated is interleaved and stereo.
+	 * The audio period generated is planar and stereo.
 	 *
 	 * @note The audio period returned is non-owning and will be changed on subsequent calls to @ref renderNextPeriod()
 	 * and @ref renderNextBuffer(). Callers must copy the data into their own local buffers if they need it to persist.
 	 *
 	 * @returns A non-owning buffer to the next audio period.
 	 */
-	std::span<const SampleFrame> renderNextPeriod();
+	PlanarBufferView<const float> renderNextPeriod();
 
 	/**
 	 * @brief Renders an audio buffer into @a dst.
@@ -278,16 +298,30 @@ public:
 	 * size, the remaining frames are partially rendered (an extra period may be rendered in such cases, which can
 	 * degrade performance).
 	 *
-	 * If @a dst has 1 channel, the channels are averaged to mono.
+	 * If @a dst has 1 channel, the channels are downmixed to mono.
 	 * If @a dst has 2 channels, the channels are directly copied.
 	 * If @a dst has more than 2 channels, the stereo channels are copied and the rest are zero-filled.
 	 *
 	 * @param dst An audio buffer view to write into. Both interleaved and planar overloads are provided.
 	 */
-	void renderNextBuffer(InterleavedBufferView<float> dst) { renderNextBuffer<InterleavedBufferView<float>>(dst); }
+	void renderNextBuffer(InterleavedBufferSpan<float> dst);
 
-	//! @copydoc renderNextBuffer(InterleavedBufferView<float>)
-	void renderNextBuffer(PlanarBufferView<float> dst) { renderNextBuffer<PlanarBufferView<float>>(dst); }
+	/**
+	 * @brief Renders an audio buffer into @a dst.
+	 *
+	 * Renders @ref renderNextPeriod() "audio periods" into @a dst. If @a dst is not a multiple of the period
+	 * size, the remaining frames are partially rendered (an extra period may be rendered in such cases, which can
+	 * degrade performance).
+	 *
+	 * If @a dst has 1 channel but @a src has 2, the channels are downmixed to mono.
+	 * If @a dst has 2 channels but @a src has 1, the channel is upmixed to stereo.
+	 * If @a dst and @a src have an equal number of channels, the channels are directly copied.
+	 * If @a dst has more channels than @a src (excluding the stereo-mono case mentioned above), the channels
+	 *     in common are copied and the rest are zero-filled.
+	 *
+	 * @param dst An audio buffer view to write into. Both interleaved and planar overloads are provided.
+	 */
+	void renderNextBuffer(PlanarBufferView<float> dst);
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
@@ -310,43 +344,10 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer(const lmms::SampleFrame* buffer);
+	void nextAudioBuffer(const float* const* buffer, unsigned short channels, unsigned long frames);
 
 
 private:
-	void renderNextBuffer(AudioBufferView<float> auto dst)
-	{
-		for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
-		{
-			if (m_outputBufferReadIndex == m_framesPerPeriod) { m_outputBufferReadIndex = 0; }
-			if (m_outputBufferReadIndex == 0) { renderNextPeriod(); }
-
-			switch (dst.channels())
-			{
-			case 0:
-				assert(false);
-				break;
-			case 1:
-				dst.sample(0, frame) = m_outputBufferRead[m_outputBufferReadIndex].average();
-				break;
-			case 2:
-				dst.sample(0, frame) = m_outputBufferRead[m_outputBufferReadIndex][0];
-				dst.sample(1, frame) = m_outputBufferRead[m_outputBufferReadIndex][1];
-				break;
-			default:
-				dst.sample(0, frame) = m_outputBufferRead[m_outputBufferReadIndex][0];
-				dst.sample(1, frame) = m_outputBufferRead[m_outputBufferReadIndex][1];
-				for (auto channel = 2; channel < dst.channels(); ++channel)
-				{
-					dst.sample(channel, frame) = 0.f;
-				}
-				break;
-			}
-
-			++m_outputBufferReadIndex;
-		}
-	}
-
 	AudioEngine( bool renderOnly );
 	~AudioEngine() override;
 
@@ -362,8 +363,8 @@ private:
 	void renderStageEffects();
 	void renderStageMix();
 
-
 	void swapBuffers();
+	void preparePushInputFrames(f_cnt_t framesNeeded);
 
 	void clearInternal();
 
@@ -375,14 +376,15 @@ private:
 	f_cnt_t m_framesPerPeriod;
 	sample_rate_t m_baseSampleRate;
 
-	SampleFrame* m_inputBuffer[2];
+	// TODO: Use AudioBuffer m_inputBuffer[2];
+	std::vector<float> m_inputBufferSource[2];
+	std::vector<float*> m_inputBufferChannels[2]; //!< points into m_inputBufferSource
 	f_cnt_t m_inputBufferFrames[2];
-	f_cnt_t m_inputBufferSize[2];
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
-	std::unique_ptr<SampleFrame[]> m_outputBufferRead;
-	std::unique_ptr<SampleFrame[]> m_outputBufferWrite;
+	AudioBuffer m_outputBufferRead;
+	AudioBuffer m_outputBufferWrite;
 	f_cnt_t m_outputBufferReadIndex;
 
 	// worker thread stuff
