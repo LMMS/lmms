@@ -4,7 +4,7 @@
 set_directory_properties(PROPERTIES SYSTEM TRUE)
 
 # Parse version info from autoconf
-FILE(READ veal/configure.ac VERSION_FILE)
+FILE(READ veal/configure.ac.deprecated VERSION_FILE)
 STRING(REPLACE "[" ";" VERSION_FILE ${VERSION_FILE} )
 STRING(REPLACE "]" ";" VERSION_FILE ${VERSION_FILE} )
 LIST(GET VERSION_FILE 2 VERSION)
