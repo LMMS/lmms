@@ -526,8 +526,8 @@ QToolButton* buildDeviceButton(QWidget* parent, const QString& currentNodeName, 
 }
 
 
-AudioPipeWire::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioPipeWire::name(), _parent )
+AudioPipeWire::setupWidget::setupWidget(QWidget* parent)
+	: AudioDeviceSetupWidget(AudioPipeWire::name(), parent)
 {
 	QFormLayout* form = new QFormLayout(this);
 	form->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
@@ -536,10 +536,10 @@ AudioPipeWire::setupWidget::setupWidget( QWidget * _parent ) :
 	const auto cm = ConfigManager::inst();
 
 	m_outputDevice = buildDeviceButton(this, cm->value(audioPipeWireClass, outputKey), tr("Default"), nodes.sinks);
-	form->addRow(tr("Output") + ":", m_outputDevice);
+	form->addRow(tr("Output:"), m_outputDevice);
 
 	m_inputDevice = buildDeviceButton(this, cm->value(audioPipeWireClass, inputKey), disconnectedRepresentation, nodes.sources);
-	form->addRow(tr("Input") + ":", m_inputDevice);
+	form->addRow(tr("Input:"), m_inputDevice);
 }
 
 AudioPipeWire::setupWidget::~setupWidget()
