@@ -57,8 +57,8 @@ public:
 		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PipeWire" );
 	}
 
-	void processStreams();
-	void processCapture();
+	void processOutputStreams();
+	void processCaptureStreams();
 
 	// Called on the PipeWire thread when a stream's format has been negotiated.
 	void onFormatNegotiated(bool capture, uint32_t rate);
@@ -84,7 +84,7 @@ private:
 	pw_thread_loop* m_loop = nullptr;
 	pw_context* m_context = nullptr;
     pw_core* m_core = nullptr;
-    pw_stream* m_stream = nullptr;
+    pw_stream* m_outputStream = nullptr;
 	pw_stream* m_captureStream = nullptr;
 
 	std::vector<SampleFrame> m_captureBuffer;

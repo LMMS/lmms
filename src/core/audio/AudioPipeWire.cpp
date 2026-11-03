@@ -53,27 +53,33 @@ const auto inputKey = QString{"input"};
 
 // An empty output selects the default device; an empty or "-" input disables capture.
 const auto disconnectedRepresentation = QString{"-"};
+
+// Used to save the name of a PipeWire node as a property on a QObject
 const char* const nodeNameProperty = "nodeName";
 
+// Describes the properties of a PipeWire node. Used for the device dialog.
 struct NodeEntry
 {
 	QString name;
 	QString description;
 };
 
+// A list of potential PipeWire outputs (sinks) and inputs (sources)
 struct NodeLists
 {
 	std::vector<NodeEntry> sinks;
 	std::vector<NodeEntry> sources;
 };
 
-struct EnumerationData
+// User data which is only used during the enumeration of the devices in a dedicated synchronous loop.
+struct EnumerationUserData
 {
 	pw_main_loop* loop = nullptr;
 	NodeLists nodes;
 	int pendingSeq = 0;
 };
 
+// This callback function extracts the sinks and sources. It is called individually for each sink/sources (and some other properties).
 void onRegistryGlobal(void* userdata, uint32_t /*id*/, uint32_t /*permissions*/, const char* type, uint32_t /*version*/, const spa_dict* props)
 {
 	if (props == nullptr || std::strcmp(type, PW_TYPE_INTERFACE_Node) != 0) { return; }
@@ -85,23 +91,36 @@ void onRegistryGlobal(void* userdata, uint32_t /*id*/, uint32_t /*permissions*/,
 	const char* description = spa_dict_lookup(props, PW_KEY_NODE_DESCRIPTION);
 	NodeEntry entry{QString::fromUtf8(name), QString::fromUtf8(description != nullptr ? description : name)};
 
-	auto data = static_cast<EnumerationData*>(userdata);
+	auto data = static_cast<EnumerationUserData*>(userdata);
 	if (std::strcmp(mediaClass, "Audio/Sink") == 0) { data->nodes.sinks.push_back(entry); }
 	else if (std::strcmp(mediaClass, "Audio/Source") == 0) { data->nodes.sources.push_back(entry); }
 }
 
+// Callback which ends the enumeration main loop once all events have been triggered
 void onCoreDone(void* userdata, uint32_t id, int seq)
 {
-	auto data = static_cast<EnumerationData*>(userdata);
+	auto data = static_cast<EnumerationUserData*>(userdata);
 	if (id == PW_ID_CORE && seq == data->pendingSeq) { pw_main_loop_quit(data->loop); }
 }
 
-// Returns empty lists if no PipeWire daemon is reachable.
+/**
+ * @brief Returns a snapshot of all available sinks and sources.
+ * 
+ * The sinks and sources are sorted by description.
+ * 
+ * @return NodeLists A snapshot of all available sinks and sources or
+ *         an empty lists if no PipeWire daemon is reachable.
+ */
 NodeLists listAudioNodes()
 {
+	// The idea is to setup a main loop, evaluate the relevant events, e.g., registry events which
+	// enumerate the sinks and sources, and to immediately tear everything down again after that.
+	//
+	// This is very similar to the mechanism that is used in the JACK driver.
+
 	pw_init(nullptr, nullptr);
 
-	EnumerationData data;
+	EnumerationUserData data;
 	data.loop = pw_main_loop_new(nullptr);
 	auto context = pw_context_new(pw_main_loop_get_loop(data.loop), nullptr, 0);
 	auto core = pw_context_connect(context, nullptr, 0);
@@ -136,6 +155,7 @@ NodeLists listAudioNodes()
 	pw_context_destroy(context);
 	pw_main_loop_destroy(data.loop);
 
+	// Sort sinks and sources by description
 	auto byDescription = [](const NodeEntry& a, const NodeEntry& b) { return a.description < b.description; };
 	std::sort(data.nodes.sinks.begin(), data.nodes.sinks.end(), byDescription);
 	std::sort(data.nodes.sources.begin(), data.nodes.sources.end(), byDescription);
@@ -182,18 +202,21 @@ QToolButton* buildDeviceButton(QWidget* parent, const QString& currentNodeName, 
 
 } // namespace
 
-static void on_process(void *userdata)
+// Callback method which is called by PipeWire whenever the output stream must be processed
+static void on_output_process(void *userdata)
 {
 	AudioPipeWire* data = static_cast<AudioPipeWire*>(userdata);
-	data->processStreams();
+	data->processOutputStreams();
 }
 
+// Callback method which is called by PipeWire whenever the capture stream must be processed
 static void on_capture_process(void *userdata)
 {
 	AudioPipeWire* data = static_cast<AudioPipeWire*>(userdata);
-	data->processCapture();
+	data->processCaptureStreams();
 }
 
+// This callback method is used to determine the negotiated sample rates for output and capture
 static void notifyFormat(void* userdata, bool capture, uint32_t id, const spa_pod* param)
 {
 	if (id != SPA_PARAM_Format || param == nullptr) { return; }
@@ -209,7 +232,7 @@ static void notifyFormat(void* userdata, bool capture, uint32_t id, const spa_po
 	static_cast<AudioPipeWire*>(userdata)->onFormatNegotiated(capture, info.rate);
 }
 
-static void on_param_changed(void* userdata, uint32_t id, const spa_pod* param)
+static void on_output_param_changed(void* userdata, uint32_t id, const spa_pod* param)
 {
 	notifyFormat(userdata, false, id, param);
 }
@@ -219,10 +242,10 @@ static void on_capture_param_changed(void* userdata, uint32_t id, const spa_pod*
 	notifyFormat(userdata, true, id, param);
 }
 
-static const struct pw_stream_events stream_events = {
+static const struct pw_stream_events output_stream_events = {
         .version = PW_VERSION_STREAM_EVENTS,
-        .param_changed = on_param_changed,
-        .process = on_process,
+        .param_changed = on_output_param_changed,
+        .process = on_output_process,
 };
 
 static const struct pw_stream_events capture_stream_events = {
@@ -245,53 +268,57 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 {
 	m_supportsCapture = true;
 
+	// Pipewire initializations
 	pw_init(nullptr, nullptr);
- 
 	m_loop = pw_thread_loop_new("LMMS", nullptr);
-
 	m_context = pw_context_new(pw_thread_loop_get_loop(m_loop), NULL /* properties */, 0 /* user_data size */);
- 
 	m_core = pw_context_connect(m_context, NULL /* properties */, 0 /* user_data size */);
 
+	// Fetch the preferred output and capture device from the configuration
 	const auto cm = ConfigManager::inst();
 	const auto outputNode = cm->value(audioPipeWireClass, outputKey).toUtf8();
 	const auto inputNode = cm->value(audioPipeWireClass, inputKey).toUtf8();
+	const auto lmmsSampleRate = sampleRate();
 
+	// Set the playback properties, among them the preferred sample rate and target output device
 	auto playbackProps = pw_properties_new(
 					PW_KEY_MEDIA_TYPE, "Audio",
 					PW_KEY_MEDIA_CATEGORY, "Playback",
 					PW_KEY_MEDIA_ROLE, "Music",
+					PW_KEY_NODE_RATE, QString{"1/%1"}.arg(lmmsSampleRate).toUtf8().constData(),
 					NULL);
-	const auto nodeRate = QString{"1/%1"}.arg(sampleRate()).toUtf8();
-	pw_properties_set(playbackProps, PW_KEY_NODE_RATE, nodeRate.constData());
+
 	if (!outputNode.isEmpty())
 	{
 		pw_properties_set(playbackProps, PW_KEY_TARGET_OBJECT, outputNode.constData());
 	}
 
-	m_stream = pw_stream_new_simple(
+	// Now create the actual output stream using the properties
+	m_outputStream = pw_stream_new_simple(
 				pw_thread_loop_get_loop(m_loop),
 				"LMMS",
 				playbackProps,
-				&stream_events,
+				&output_stream_events,
 				this);
 	
+	// Finally connect the output stream
 	const struct spa_pod *params[1];
     struct spa_pod_builder b = SPA_POD_BUILDER_INIT(m_podBuilderBuffer, sizeof(m_podBuilderBuffer));
 
 	auto audioInfoRaw = SPA_AUDIO_INFO_RAW_INIT(
 							.format = SPA_AUDIO_FORMAT_F32,
-							.rate = sampleRate(),
+							.rate = lmmsSampleRate,
 							.channels = DEFAULT_CHANNELS);
 
 	params[0] = spa_format_audio_raw_build(&b, SPA_PARAM_EnumFormat, &audioInfoRaw);
  
-	pw_stream_connect(m_stream,
+	pw_stream_connect(m_outputStream,
 						PW_DIRECTION_OUTPUT,
 						PW_ID_ANY,
 						static_cast<pw_stream_flags>(PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS | PW_STREAM_FLAG_RT_PROCESS),
 						params, 1);
 
+	// Prepare the capture stream if it is configured
 	if (!inputNode.isEmpty() && inputNode != disconnectedRepresentation.toUtf8())
 	{
 		auto captureProps = pw_properties_new(
@@ -315,17 +342,20 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 							params, 1);
 	}
 
-	// Wait for the negotiated rates and adopt the playback rate; the loop is stopped again
-	// afterwards so that startProcessingImpl() can start it.
+	// A tempory loop is started here, so that we can find out the negotiated sample rates via callbacks
+	// and inform LMMS about it.
+	//
+	// The loop is stopped again afterwards so that startProcessingImpl() can finally start it for good.
 	successful = false;
 	if (m_core)
 	{
 		pw_thread_loop_start(m_loop);
 		pw_thread_loop_lock(m_loop);
 
+		// Initialize a deadline time spec 2 seconds from the current time
 		timespec deadline{};
-		// Deadline is 2 seconds from the current time
 		pw_thread_loop_get_time(m_loop, &deadline, 2'000'000'000LL);
+
 		auto negotiated = [this] { return m_playbackRate != 0 && (!m_captureStream || m_captureRate != 0); };
 		while (!negotiated())
 		{
@@ -340,6 +370,7 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 			successful = true;
 			if (m_playbackRate != sampleRate()) { setSampleRate(static_cast<sample_rate_t>(m_playbackRate.load())); }
 		}
+
 		if (m_captureRate != 0 && m_captureRate != sampleRate())
 		{
 			pw_log_warn("capture rate %u differs from playback rate %u", m_captureRate.load(), sampleRate());
@@ -355,16 +386,16 @@ AudioPipeWire::~AudioPipeWire()
 	stopProcessing();
 
 	if (m_captureStream) { pw_stream_destroy(m_captureStream); }
-	if (m_stream) { pw_stream_destroy(m_stream); }
+	if (m_outputStream) { pw_stream_destroy(m_outputStream); }
 	if (m_core) { pw_core_disconnect(m_core); }
 	if (m_context) { pw_context_destroy(m_context); }
 	if (m_loop) { pw_thread_loop_destroy(m_loop); }
 }
 
-void AudioPipeWire::processStreams()
+void AudioPipeWire::processOutputStreams()
 {
 	// Fetch the buffer from the stream
-	struct pw_buffer* b = pw_stream_dequeue_buffer(m_stream);
+	struct pw_buffer* b = pw_stream_dequeue_buffer(m_outputStream);
 	if (b == nullptr)
 	{
 		pw_log_warn("out of buffers: %m");
@@ -397,10 +428,10 @@ void AudioPipeWire::processStreams()
 	buf->datas[0].chunk->stride = stride;
 	buf->datas[0].chunk->size = n_frames * stride;
 
-	pw_stream_queue_buffer(m_stream, b);
+	pw_stream_queue_buffer(m_outputStream, b);
 }
 
-void AudioPipeWire::processCapture()
+void AudioPipeWire::processCaptureStreams()
 {
 	struct pw_buffer* b = pw_stream_dequeue_buffer(m_captureStream);
 	if (b == nullptr) { return; }
