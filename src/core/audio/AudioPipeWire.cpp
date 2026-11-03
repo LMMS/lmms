@@ -28,6 +28,7 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "lmms_constants.h"
 
 #include <spa/param/audio/format-utils.h>
 
@@ -38,8 +39,6 @@
 
 #include <algorithm>
 #include <cstring>
-
-#define DEFAULT_CHANNELS 2
 
 
 namespace lmms
