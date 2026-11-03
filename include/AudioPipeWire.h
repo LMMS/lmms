@@ -32,13 +32,10 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-#include <pipewire/pipewire.h>
-
 #include <QObject>
 
-#include <atomic>
 #include <cstdint>
-#include <vector>
+#include <memory>
 
 class QToolButton;
 
@@ -81,20 +78,8 @@ private:
 	void stopProcessingImpl() override;
 
 private:
-	pw_thread_loop* m_loop = nullptr;
-	pw_context* m_context = nullptr;
-    pw_core* m_core = nullptr;
-    pw_stream* m_outputStream = nullptr;
-	pw_stream* m_captureStream = nullptr;
-
-	std::vector<SampleFrame> m_captureBuffer;
-
-	// 0 until the respective stream has negotiated its format
-	std::atomic<uint32_t> m_playbackRate = 0;
-	std::atomic<uint32_t> m_captureRate = 0;
-
-	// This is a scratch space like buffer that is used by PipeWire to create POD (plain old data) objects on the stack.
-	uint8_t m_podBuilderBuffer[1024];
+	struct Impl;
+	std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace lmms

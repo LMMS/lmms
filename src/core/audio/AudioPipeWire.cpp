@@ -30,6 +30,7 @@
 #include "ConfigManager.h"
 #include "lmms_constants.h"
 
+#include <pipewire/pipewire.h>
 #include <spa/param/audio/format-utils.h>
 
 #include <QAction>
@@ -39,6 +40,8 @@
 
 #include <algorithm>
 #include <cstring>
+#include <atomic>
+#include <vector>
 
 
 namespace lmms
@@ -262,17 +265,48 @@ static void fillWithSilence(float* buffer, unsigned long numberOfFrames)
 	}
 }
 
-AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
-	AudioDevice(DEFAULT_CHANNELS, audioEngine),
-	m_captureBuffer(this->audioEngine()->framesPerAudioBuffer())
+struct AudioPipeWire::Impl
 {
+public:
+	~Impl()
+	{
+		if (m_captureStream) { pw_stream_destroy(m_captureStream); }
+		if (m_outputStream) { pw_stream_destroy(m_outputStream); }
+		if (m_core) { pw_core_disconnect(m_core); }
+		if (m_context) { pw_context_destroy(m_context); }
+		if (m_loop) { pw_thread_loop_destroy(m_loop); }
+	}
+
+	pw_thread_loop* m_loop = nullptr;
+	pw_context* m_context = nullptr;
+    pw_core* m_core = nullptr;
+    pw_stream* m_outputStream = nullptr;
+	pw_stream* m_captureStream = nullptr;
+
+	std::vector<SampleFrame> m_captureBuffer;
+
+	// 0 until the respective stream has negotiated its format
+	std::atomic<uint32_t> m_playbackRate = 0;
+	std::atomic<uint32_t> m_captureRate = 0;
+
+	// This is a scratch space like buffer that is used by PipeWire to create POD (plain old data) objects on the stack.
+	uint8_t m_podBuilderBuffer[1024];
+};
+
+AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
+	AudioDevice(DEFAULT_CHANNELS, audioEngine)
+{
+	m_impl = std::make_unique<Impl>();
+
+	m_impl->m_captureBuffer.resize(this->audioEngine()->framesPerAudioBuffer());
+
 	m_supportsCapture = true;
 
 	// Pipewire initializations
 	pw_init(nullptr, nullptr);
-	m_loop = pw_thread_loop_new("LMMS", nullptr);
-	m_context = pw_context_new(pw_thread_loop_get_loop(m_loop), NULL /* properties */, 0 /* user_data size */);
-	m_core = pw_context_connect(m_context, NULL /* properties */, 0 /* user_data size */);
+	m_impl->m_loop = pw_thread_loop_new("LMMS", nullptr);
+	m_impl->m_context = pw_context_new(pw_thread_loop_get_loop(m_impl->m_loop), NULL /* properties */, 0 /* user_data size */);
+	m_impl->m_core = pw_context_connect(m_impl->m_context, NULL /* properties */, 0 /* user_data size */);
 
 	// Fetch the preferred output and capture device from the configuration
 	const auto cm = ConfigManager::inst();
@@ -294,8 +328,8 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 	}
 
 	// Now create the actual output stream using the properties
-	m_outputStream = pw_stream_new_simple(
-				pw_thread_loop_get_loop(m_loop),
+	m_impl->m_outputStream = pw_stream_new_simple(
+				pw_thread_loop_get_loop(m_impl->m_loop),
 				"LMMS",
 				playbackProps,
 				&output_stream_events,
@@ -303,7 +337,7 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 	
 	// Finally connect the output stream
 	const struct spa_pod *params[1];
-    struct spa_pod_builder b = SPA_POD_BUILDER_INIT(m_podBuilderBuffer, sizeof(m_podBuilderBuffer));
+    struct spa_pod_builder b = SPA_POD_BUILDER_INIT(m_impl->m_podBuilderBuffer, sizeof(m_impl->m_podBuilderBuffer));
 
 	auto audioInfoRaw = SPA_AUDIO_INFO_RAW_INIT(
 							.format = SPA_AUDIO_FORMAT_F32,
@@ -312,7 +346,7 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 
 	params[0] = spa_format_audio_raw_build(&b, SPA_PARAM_EnumFormat, &audioInfoRaw);
  
-	pw_stream_connect(m_outputStream,
+	pw_stream_connect(m_impl->m_outputStream,
 						PW_DIRECTION_OUTPUT,
 						PW_ID_ANY,
 						static_cast<pw_stream_flags>(PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS | PW_STREAM_FLAG_RT_PROCESS),
@@ -328,14 +362,14 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 					PW_KEY_TARGET_OBJECT, inputNode.constData(),
 					NULL);
 
-		m_captureStream = pw_stream_new_simple(
-					pw_thread_loop_get_loop(m_loop),
+		m_impl->m_captureStream = pw_stream_new_simple(
+					pw_thread_loop_get_loop(m_impl->m_loop),
 					"LMMS Capture",
 					captureProps,
 					&capture_stream_events,
 					this);
 
-		pw_stream_connect(m_captureStream,
+		pw_stream_connect(m_impl->m_captureStream,
 							PW_DIRECTION_INPUT,
 							PW_ID_ANY,
 							static_cast<pw_stream_flags>(PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS | PW_STREAM_FLAG_RT_PROCESS),
@@ -347,55 +381,49 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 	//
 	// The loop is stopped again afterwards so that startProcessingImpl() can finally start it for good.
 	successful = false;
-	if (m_core)
+	if (m_impl->m_core)
 	{
-		pw_thread_loop_start(m_loop);
-		pw_thread_loop_lock(m_loop);
+		pw_thread_loop_start(m_impl->m_loop);
+		pw_thread_loop_lock(m_impl->m_loop);
 
 		// Initialize a deadline time spec 2 seconds from the current time
 		timespec deadline{};
-		pw_thread_loop_get_time(m_loop, &deadline, 2'000'000'000LL);
+		pw_thread_loop_get_time(m_impl->m_loop, &deadline, 2'000'000'000LL);
 
-		auto negotiated = [this] { return m_playbackRate != 0 && (!m_captureStream || m_captureRate != 0); };
+		auto negotiated = [this] { return m_impl->m_playbackRate != 0 && (!m_impl->m_captureStream || m_impl->m_captureRate != 0); };
 		while (!negotiated())
 		{
-			if (pw_thread_loop_timed_wait_full(m_loop, &deadline) != 0) { break; }
+			if (pw_thread_loop_timed_wait_full(m_impl->m_loop, &deadline) != 0) { break; }
 		}
 
 		// Without a negotiated rate LMMS cannot know what PipeWire runs at.
 		// In case the rate was not negotiated, the "successful" flag remains false
 		// and lets the engine try another device.
-		if (m_playbackRate != 0)
+		if (m_impl->m_playbackRate != 0)
 		{
 			successful = true;
-			if (m_playbackRate != sampleRate()) { setSampleRate(static_cast<sample_rate_t>(m_playbackRate.load())); }
+			if (m_impl->m_playbackRate != sampleRate()) { setSampleRate(static_cast<sample_rate_t>(m_impl->m_playbackRate.load())); }
 		}
 
-		if (m_captureRate != 0 && m_captureRate != sampleRate())
+		if (m_impl->m_captureRate != 0 && m_impl->m_captureRate != sampleRate())
 		{
-			pw_log_warn("capture rate %u differs from playback rate %u", m_captureRate.load(), sampleRate());
+			pw_log_warn("capture rate %u differs from playback rate %u", m_impl->m_captureRate.load(), sampleRate());
 		}
 
-		pw_thread_loop_unlock(m_loop);
-		pw_thread_loop_stop(m_loop);
+		pw_thread_loop_unlock(m_impl->m_loop);
+		pw_thread_loop_stop(m_impl->m_loop);
 	}
 }
 
 AudioPipeWire::~AudioPipeWire()
 {
 	stopProcessing();
-
-	if (m_captureStream) { pw_stream_destroy(m_captureStream); }
-	if (m_outputStream) { pw_stream_destroy(m_outputStream); }
-	if (m_core) { pw_core_disconnect(m_core); }
-	if (m_context) { pw_context_destroy(m_context); }
-	if (m_loop) { pw_thread_loop_destroy(m_loop); }
 }
 
 void AudioPipeWire::processOutputStreams()
 {
 	// Fetch the buffer from the stream
-	struct pw_buffer* b = pw_stream_dequeue_buffer(m_outputStream);
+	struct pw_buffer* b = pw_stream_dequeue_buffer(m_impl->m_outputStream);
 	if (b == nullptr)
 	{
 		pw_log_warn("out of buffers: %m");
@@ -428,12 +456,12 @@ void AudioPipeWire::processOutputStreams()
 	buf->datas[0].chunk->stride = stride;
 	buf->datas[0].chunk->size = n_frames * stride;
 
-	pw_stream_queue_buffer(m_outputStream, b);
+	pw_stream_queue_buffer(m_impl->m_outputStream, b);
 }
 
 void AudioPipeWire::processCaptureStreams()
 {
-	struct pw_buffer* b = pw_stream_dequeue_buffer(m_captureStream);
+	struct pw_buffer* b = pw_stream_dequeue_buffer(m_impl->m_captureStream);
 	if (b == nullptr) { return; }
 
 	const struct spa_buffer* buf = b->buffer;
@@ -446,40 +474,40 @@ void AudioPipeWire::processCaptureStreams()
 
 		while (framesLeft > 0)
 		{
-			const auto frames = std::min<size_t>(framesLeft, m_captureBuffer.size());
+			const auto frames = std::min<size_t>(framesLeft, m_impl->m_captureBuffer.size());
 			for (size_t i = 0; i < frames; ++i)
 			{
-				m_captureBuffer[i] = SampleFrame(src[0], src[1]);
+				m_impl->m_captureBuffer[i] = SampleFrame(src[0], src[1]);
 				src += DEFAULT_CHANNELS;
 			}
 
 			if (AudioDevice::isRunning())
 			{
-				this->audioEngine()->pushInputFrames(m_captureBuffer.data(), static_cast<f_cnt_t>(frames));
+				this->audioEngine()->pushInputFrames(m_impl->m_captureBuffer.data(), static_cast<f_cnt_t>(frames));
 			}
 			framesLeft -= frames;
 		}
 	}
 
-	pw_stream_queue_buffer(m_captureStream, b);
+	pw_stream_queue_buffer(m_impl->m_captureStream, b);
 }
 
 void AudioPipeWire::onFormatNegotiated(bool capture, uint32_t rate)
 {
-	(capture ? m_captureRate : m_playbackRate) = rate;
-	pw_thread_loop_signal(m_loop, false);
+	(capture ? m_impl->m_captureRate : m_impl->m_playbackRate) = rate;
+	pw_thread_loop_signal(m_impl->m_loop, false);
 }
 
 void AudioPipeWire::startProcessingImpl()
 {
-	pw_thread_loop_start(m_loop);
+	pw_thread_loop_start(m_impl->m_loop);
 }
 
 void AudioPipeWire::stopProcessingImpl()
 {
-	if (m_loop)
+	if (m_impl->m_loop)
 	{
-		pw_thread_loop_stop(m_loop);
+		pw_thread_loop_stop(m_impl->m_loop);
 	}
 }
 
