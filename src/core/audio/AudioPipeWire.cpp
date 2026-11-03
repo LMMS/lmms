@@ -57,152 +57,6 @@ const auto inputKey = QString{"input"};
 // An empty output selects the default device; an empty or "-" input disables capture.
 const auto disconnectedRepresentation = QString{"-"};
 
-// Used to save the name of a PipeWire node as a property on a QObject
-const char* const nodeNameProperty = "nodeName";
-
-// Describes the properties of a PipeWire node. Used for the device dialog.
-struct NodeEntry
-{
-	QString name;
-	QString description;
-};
-
-// A list of potential PipeWire outputs (sinks) and inputs (sources)
-struct NodeLists
-{
-	std::vector<NodeEntry> sinks;
-	std::vector<NodeEntry> sources;
-};
-
-// User data which is only used during the enumeration of the devices in a dedicated synchronous loop.
-struct EnumerationUserData
-{
-	pw_main_loop* loop = nullptr;
-	NodeLists nodes;
-	int pendingSeq = 0;
-};
-
-// This callback function extracts the sinks and sources. It is called individually for each sink/sources (and some other properties).
-void onRegistryGlobal(void* userdata, uint32_t /*id*/, uint32_t /*permissions*/, const char* type, uint32_t /*version*/, const spa_dict* props)
-{
-	if (props == nullptr || std::strcmp(type, PW_TYPE_INTERFACE_Node) != 0) { return; }
-
-	const char* mediaClass = spa_dict_lookup(props, PW_KEY_MEDIA_CLASS);
-	const char* name = spa_dict_lookup(props, PW_KEY_NODE_NAME);
-	if (mediaClass == nullptr || name == nullptr) { return; }
-
-	const char* description = spa_dict_lookup(props, PW_KEY_NODE_DESCRIPTION);
-	NodeEntry entry{QString::fromUtf8(name), QString::fromUtf8(description != nullptr ? description : name)};
-
-	auto data = static_cast<EnumerationUserData*>(userdata);
-	if (std::strcmp(mediaClass, "Audio/Sink") == 0) { data->nodes.sinks.push_back(entry); }
-	else if (std::strcmp(mediaClass, "Audio/Source") == 0) { data->nodes.sources.push_back(entry); }
-}
-
-// Callback which ends the enumeration main loop once all events have been triggered
-void onCoreDone(void* userdata, uint32_t id, int seq)
-{
-	auto data = static_cast<EnumerationUserData*>(userdata);
-	if (id == PW_ID_CORE && seq == data->pendingSeq) { pw_main_loop_quit(data->loop); }
-}
-
-/**
- * @brief Returns a snapshot of all available sinks and sources.
- * 
- * The sinks and sources are sorted by description.
- * 
- * @return NodeLists A snapshot of all available sinks and sources or
- *         an empty lists if no PipeWire daemon is reachable.
- */
-NodeLists listAudioNodes()
-{
-	// The idea is to setup a main loop, evaluate the relevant events, e.g., registry events which
-	// enumerate the sinks and sources, and to immediately tear everything down again after that.
-	//
-	// This is very similar to the mechanism that is used in the JACK driver.
-
-	pw_init(nullptr, nullptr);
-
-	EnumerationUserData data;
-	data.loop = pw_main_loop_new(nullptr);
-	auto context = pw_context_new(pw_main_loop_get_loop(data.loop), nullptr, 0);
-	auto core = pw_context_connect(context, nullptr, 0);
-
-	if (core != nullptr)
-	{
-		spa_hook coreListener{};
-		spa_hook registryListener{};
-
-		static const pw_core_events coreEvents = {
-			.version = PW_VERSION_CORE_EVENTS,
-			.done = onCoreDone,
-		};
-		static const pw_registry_events registryEvents = {
-			.version = PW_VERSION_REGISTRY_EVENTS,
-			.global = onRegistryGlobal,
-		};
-
-		pw_core_add_listener(core, &coreListener, &coreEvents, &data);
-		auto registry = pw_core_get_registry(core, PW_VERSION_REGISTRY, 0);
-		pw_registry_add_listener(registry, &registryListener, &registryEvents, &data);
-
-		data.pendingSeq = pw_core_sync(core, PW_ID_CORE, 0);
-		pw_main_loop_run(data.loop);
-
-		spa_hook_remove(&registryListener);
-		spa_hook_remove(&coreListener);
-		pw_proxy_destroy(reinterpret_cast<pw_proxy*>(registry));
-		pw_core_disconnect(core);
-	}
-
-	pw_context_destroy(context);
-	pw_main_loop_destroy(data.loop);
-
-	// Sort sinks and sources by description
-	auto byDescription = [](const NodeEntry& a, const NodeEntry& b) { return a.description < b.description; };
-	std::sort(data.nodes.sinks.begin(), data.nodes.sinks.end(), byDescription);
-	std::sort(data.nodes.sources.begin(), data.nodes.sources.end(), byDescription);
-
-	return data.nodes;
-}
-
-QToolButton* buildDeviceButton(QWidget* parent, const QString& currentNodeName, const QString& emptyLabel,
-	const std::vector<NodeEntry>& entries)
-{
-	auto toolButton = new QToolButton(parent);
-	toolButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	toolButton->setPopupMode(QToolButton::InstantPopup);
-
-	auto select = [toolButton, emptyLabel](const QString& nodeName, const QString& label)
-	{
-		toolButton->setProperty(nodeNameProperty, nodeName);
-		toolButton->setText(nodeName.isEmpty() ? emptyLabel : label);
-	};
-
-	auto menu = new QMenu(toolButton);
-
-	auto emptyAction = menu->addAction(emptyLabel);
-	QObject::connect(emptyAction, &QAction::triggered, toolButton, [select]() { select(QString{}, QString{}); });
-
-	select(QString{}, QString{});
-	for (const auto& entry : entries)
-	{
-		auto action = menu->addAction(entry.description);
-		QObject::connect(action, &QAction::triggered, toolButton, [select, entry]() { select(entry.name, entry.description); });
-
-		if (entry.name == currentNodeName) { select(entry.name, entry.description); }
-	}
-
-	// Keep a saved device selected even if it is currently not available
-	if (!currentNodeName.isEmpty() && toolButton->property(nodeNameProperty).toString().isEmpty())
-	{
-		select(currentNodeName, currentNodeName);
-	}
-
-	toolButton->setMenu(menu);
-	return toolButton;
-}
-
 } // namespace
 
 // Callback method which is called by PipeWire whenever the output stream must be processed
@@ -510,6 +364,164 @@ void AudioPipeWire::stopProcessingImpl()
 		pw_thread_loop_stop(m_impl->m_loop);
 	}
 }
+
+
+// === Setup widget related code ===
+//
+// Please note that as of now there's also PipeWire related code found in this section,
+// because we start a short PipeWire main loop to enumerate all sinks and sources that
+// are presented in the dialog.
+
+namespace
+{
+// Used to save the name of a PipeWire node as a property on a QObject
+const char* const nodeNameProperty = "nodeName";
+
+// Describes the properties of a PipeWire node. Used for the device dialog.
+struct NodeEntry
+{
+	QString name;
+	QString description;
+};
+
+// A list of potential PipeWire outputs (sinks) and inputs (sources)
+struct NodeLists
+{
+	std::vector<NodeEntry> sinks;
+	std::vector<NodeEntry> sources;
+};
+
+// User data which is only used during the enumeration of the devices in a dedicated synchronous loop.
+struct EnumerationUserData
+{
+	pw_main_loop* loop = nullptr;
+	NodeLists nodes;
+	int pendingSeq = 0;
+};
+
+// This callback function extracts the sinks and sources. It is called individually for each sink/sources (and some other properties).
+void onRegistryGlobal(void* userdata, uint32_t /*id*/, uint32_t /*permissions*/, const char* type, uint32_t /*version*/, const spa_dict* props)
+{
+	if (props == nullptr || std::strcmp(type, PW_TYPE_INTERFACE_Node) != 0) { return; }
+
+	const char* mediaClass = spa_dict_lookup(props, PW_KEY_MEDIA_CLASS);
+	const char* name = spa_dict_lookup(props, PW_KEY_NODE_NAME);
+	if (mediaClass == nullptr || name == nullptr) { return; }
+
+	const char* description = spa_dict_lookup(props, PW_KEY_NODE_DESCRIPTION);
+	NodeEntry entry{QString::fromUtf8(name), QString::fromUtf8(description != nullptr ? description : name)};
+
+	auto data = static_cast<EnumerationUserData*>(userdata);
+	if (std::strcmp(mediaClass, "Audio/Sink") == 0) { data->nodes.sinks.push_back(entry); }
+	else if (std::strcmp(mediaClass, "Audio/Source") == 0) { data->nodes.sources.push_back(entry); }
+}
+
+// Callback which ends the enumeration main loop once all events have been triggered
+void onCoreDone(void* userdata, uint32_t id, int seq)
+{
+	auto data = static_cast<EnumerationUserData*>(userdata);
+	if (id == PW_ID_CORE && seq == data->pendingSeq) { pw_main_loop_quit(data->loop); }
+}
+
+/**
+ * @brief Returns a snapshot of all available sinks and sources.
+ * 
+ * The sinks and sources are sorted by description.
+ * 
+ * @return NodeLists A snapshot of all available sinks and sources or
+ *         an empty lists if no PipeWire daemon is reachable.
+ */
+NodeLists listAudioNodes()
+{
+	// The idea is to setup a main loop, evaluate the relevant events, e.g., registry events which
+	// enumerate the sinks and sources, and to immediately tear everything down again after that.
+	//
+	// This is very similar to the mechanism that is used in the JACK driver.
+
+	pw_init(nullptr, nullptr);
+
+	EnumerationUserData data;
+	data.loop = pw_main_loop_new(nullptr);
+	auto context = pw_context_new(pw_main_loop_get_loop(data.loop), nullptr, 0);
+	auto core = pw_context_connect(context, nullptr, 0);
+
+	if (core != nullptr)
+	{
+		spa_hook coreListener{};
+		spa_hook registryListener{};
+
+		static const pw_core_events coreEvents = {
+			.version = PW_VERSION_CORE_EVENTS,
+			.done = onCoreDone,
+		};
+		static const pw_registry_events registryEvents = {
+			.version = PW_VERSION_REGISTRY_EVENTS,
+			.global = onRegistryGlobal,
+		};
+
+		pw_core_add_listener(core, &coreListener, &coreEvents, &data);
+		auto registry = pw_core_get_registry(core, PW_VERSION_REGISTRY, 0);
+		pw_registry_add_listener(registry, &registryListener, &registryEvents, &data);
+
+		data.pendingSeq = pw_core_sync(core, PW_ID_CORE, 0);
+		pw_main_loop_run(data.loop);
+
+		spa_hook_remove(&registryListener);
+		spa_hook_remove(&coreListener);
+		pw_proxy_destroy(reinterpret_cast<pw_proxy*>(registry));
+		pw_core_disconnect(core);
+	}
+
+	pw_context_destroy(context);
+	pw_main_loop_destroy(data.loop);
+
+	// Sort sinks and sources by description
+	auto byDescription = [](const NodeEntry& a, const NodeEntry& b) { return a.description < b.description; };
+	std::sort(data.nodes.sinks.begin(), data.nodes.sinks.end(), byDescription);
+	std::sort(data.nodes.sources.begin(), data.nodes.sources.end(), byDescription);
+
+	return data.nodes;
+}
+
+QToolButton* buildDeviceButton(QWidget* parent, const QString& currentNodeName, const QString& emptyLabel,
+	const std::vector<NodeEntry>& entries)
+{
+	auto toolButton = new QToolButton(parent);
+	toolButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	toolButton->setPopupMode(QToolButton::InstantPopup);
+
+	auto select = [toolButton, emptyLabel](const QString& nodeName, const QString& label)
+	{
+		toolButton->setProperty(nodeNameProperty, nodeName);
+		toolButton->setText(nodeName.isEmpty() ? emptyLabel : label);
+	};
+
+	auto menu = new QMenu(toolButton);
+
+	auto emptyAction = menu->addAction(emptyLabel);
+	QObject::connect(emptyAction, &QAction::triggered, toolButton, [select]() { select(QString{}, QString{}); });
+
+	select(QString{}, QString{});
+	for (const auto& entry : entries)
+	{
+		auto action = menu->addAction(entry.description);
+		QObject::connect(action, &QAction::triggered, toolButton, [select, entry]() { select(entry.name, entry.description); });
+
+		if (entry.name == currentNodeName) { select(entry.name, entry.description); }
+	}
+
+	// Keep a saved device selected even if it is currently not available
+	if (!currentNodeName.isEmpty() && toolButton->property(nodeNameProperty).toString().isEmpty())
+	{
+		select(currentNodeName, currentNodeName);
+	}
+
+	toolButton->setMenu(menu);
+	return toolButton;
+}
+
+}
+
 
 AudioPipeWire::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioPipeWire::name(), _parent )
