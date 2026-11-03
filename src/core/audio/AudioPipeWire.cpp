@@ -259,9 +259,12 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 			if (m_impl->m_playbackRate != sampleRate()) { setSampleRate(static_cast<sample_rate_t>(m_impl->m_playbackRate.load())); }
 		}
 
+		// Finally check if we have different sample rates for output and capture
 		if (m_impl->m_captureRate != 0 && m_impl->m_captureRate != sampleRate())
 		{
-			pw_log_warn("capture rate %u differs from playback rate %u", m_impl->m_captureRate.load(), sampleRate());
+			// Make driver initialization fail if the capture rate differs from LMMS internal sample rate
+			successful = false;
+			pw_log_warn("Capture rate %u differs from LMMS internal playback rate %u", m_impl->m_captureRate.load(), sampleRate());
 		}
 
 		pw_thread_loop_unlock(m_impl->m_loop);
