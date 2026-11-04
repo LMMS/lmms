@@ -285,6 +285,9 @@ void MixerChannelView::renameFinished()
 	{
 		mc->m_name = newName;
 		m_renameLineEdit->setText(elideName(newName));
+		mc->m_volumeModel.setDisplayName(newName + ">" + tr("Volume"));
+		mc->m_muteModel.setDisplayName(newName + ">" + tr("Mute"));
+		mc->m_soloModel.setDisplayName(newName + ">" + tr("Solo"));
 		Engine::getSong()->setModified();
 	}
 
