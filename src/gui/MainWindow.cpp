@@ -1867,6 +1867,8 @@ void MainWindow::MovableQMdiArea::mousePanEnd()
 
 void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
 {
+	if (event->button() != Qt::LeftButton) { return; }
+
 	const auto pos = event->globalPos();
 	m_isUniversalPan = false;
 	m_lastX = pos.x();
@@ -1909,7 +1911,6 @@ bool MainWindow::MovableQMdiArea::hasActiveMaxWindow()
 
 bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 {
-
 	// First try to detect if this is a subwindow and whether it is being modified in a way that would affect
 	// the scrollbars.
 	if (auto* sw = qobject_cast<QMdiSubWindow*>(watched); sw != nullptr)
