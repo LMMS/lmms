@@ -142,8 +142,6 @@ private:
 	f_cnt_t m_framesPlayed;
 	bool m_animation;
 
-	friend class AudioFileProcessorView;
-
 public:
 	AudioFileProcessorWaveView(QWidget* parent, int w, int h, Sample const* buf,
 		knob* start, knob* end, knob* loop);
