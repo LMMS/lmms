@@ -146,7 +146,7 @@ void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 	{
 		const auto guard = Engine::audioEngine()->requestChangesGuard();
 		m_sample = Sample(std::move(sb));
-		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(*m_sample.buffer());
+		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
 	}
 
 	updateLength();

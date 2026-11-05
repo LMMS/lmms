@@ -227,7 +227,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
 		m_sample = Sample{SampleBuffer::fromBase64(sampleData)};
-		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(*m_sample.buffer());
+		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
