@@ -26,6 +26,8 @@
 #define LMMS_FILE_RESOURCE_CACHE_H
 
 #include <filesystem>
+#include <memory>
+#include <type_traits>
 #include <unordered_map>
 
 namespace lmms {
