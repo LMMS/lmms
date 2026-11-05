@@ -155,6 +155,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_sf2File(QDir::toNativeSeparators(ConfigManager::inst()->sf2File())),
 #endif
+	m_sfzDir(QDir::toNativeSeparators(ConfigManager::inst()->sfzDir())),
 	m_themeDir(QDir::toNativeSeparators(ConfigManager::inst()->themeDir())),
 	m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile()))
 {
@@ -844,6 +845,10 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		SLOT(openSF2File()),
 		m_sf2FileLineEdit);
 #endif
+	addPathEntry(tr("SFZ directory"), m_sfzDir,
+		SLOT(setSFZDir(const QString&)),
+		SLOT(openSFZDir()),
+		m_sfzDirLineEdit);
 	addPathEntry(tr("GIG directory"), m_gigDir,
 		SLOT(setGIGDir(const QString&)),
 		SLOT(openGIGDir()),
@@ -1031,6 +1036,7 @@ void SetupDialog::accept()
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	ConfigManager::inst()->setSF2File(m_sf2File);
 #endif
+	ConfigManager::inst()->setSFZDir(QDir::fromNativeSeparators(m_sfzDir));
 	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
 	ConfigManager::inst()->setThemeDir(QDir::fromNativeSeparators(m_themeDir));
 	ConfigManager::inst()->setBackgroundPicFile(m_backgroundPicFile);
@@ -1412,6 +1418,23 @@ void SetupDialog::setSF2File(const QString & sf2File)
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_sf2File = sf2File;
 #endif
+}
+
+
+void SetupDialog::openSFZDir()
+{
+	QString new_dir = FileDialog::getExistingDirectory(this,
+		tr("Choose your SFZ directory"), m_sfzDir);
+	if (!new_dir.isEmpty())
+	{
+		m_sfzDirLineEdit->setText(new_dir);
+	}
+}
+
+
+void SetupDialog::setSFZDir(const QString & sfzDir)
+{
+	m_sfzDir = sfzDir;
 }
 
 
