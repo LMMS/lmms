@@ -375,7 +375,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		auto buffer = SampleBuffer::fromBase64(sampleData);
 		m_originalSample = Sample{std::move(buffer)};
-		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(*buffer);
+		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_originalSample.buffer());
 	}
 
 	if (!element.attribute("totalSlices").isEmpty())
