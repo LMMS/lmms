@@ -484,7 +484,6 @@ public:
 		{
 			ret.resize(static_cast<std::size_t>(len));
 			read(ret.data(), len);
-			ret[len] = '\0';
 		}
 		return ret;
 	}
