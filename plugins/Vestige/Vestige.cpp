@@ -423,8 +423,31 @@ bool VestigeInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& 
 	return true;
 }
 
+bool VestigeInstrument::presetChangeSupported()
+{
+	return true;
+}
 
+bool VestigeInstrument::setMidiPatch(std::optional<uint16_t> bank, std::optional<uint8_t> preset)
+{
+	if (m_plugin == nullptr) { return false; }
 
+	uint32_t currentProgramNumber = m_plugin->currentProgram();
+	uint16_t targetBank = currentProgramNumber >> 7;
+	uint8_t targetPreset = currentProgramNumber & 0x7F;
+
+	if (bank.has_value()) { targetBank = *bank; }
+	if (preset.has_value()) { targetPreset = *preset; }
+
+	uint32_t newProgramNumber = (targetBank << 7) | targetPreset;
+	if (newProgramNumber != currentProgramNumber)
+	{
+		m_plugin->setProgram(newProgramNumber);
+		emit presetChanged();
+		return true;
+	}
+	return false;
+}
 
 void VestigeInstrument::closePlugin( void )
 {
@@ -570,6 +593,8 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
+	m_selPresetButton->setIcon(embed::getIconPixmap("stepper-down"));
+
 	m_selPresetButton->setMenu(menu);
 
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
@@ -647,6 +672,8 @@ void VestigeInstrumentView::updateMenu( void )
 void VestigeInstrumentView::modelChanged()
 {
 	m_vi = castModel<VestigeInstrument>();
+	connect(m_vi, &VestigeInstrument::presetChanged,
+		this, &VestigeInstrumentView::changedProgram);
 }
 
 
@@ -771,8 +798,10 @@ void VestigeInstrumentView::previousProgram()
 	}
 }
 
-
-
+void VestigeInstrumentView::changedProgram()
+{
+	QWidget::update();
+}
 
 void VestigeInstrumentView::selPreset( void )
 {
