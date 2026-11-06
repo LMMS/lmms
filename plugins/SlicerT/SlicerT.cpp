@@ -363,7 +363,14 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			updateFile(srcFile);
+			if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(srcFile)))
+			{
+				m_originalSample = Sample{std::move(buffer)};
+			}
+			else
+			{
+				Engine::getSong()->collectError(tr("Failed to load sample: %1").arg(srcFile));
+			}
 		}
 		else
 		{
