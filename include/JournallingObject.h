@@ -65,6 +65,9 @@ public:
 
 	void restoreState( const QDomElement & _this ) override;
 
+
+	void cloneState( QDomDocument & _doc, QDomElement & _parent );
+
 	inline bool isJournalling() const
 	{
 		return m_journalling;
