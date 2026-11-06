@@ -164,6 +164,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	const int horizontalNoteSpacing = pixelsPerBar() / TimePos::stepsPerBar() * m_noteHorizontalSpacing;
 
 	float lastY = height() * m_verticalPadding;
+	std::vector<QRect> noteRects;
 	for (const auto& track : Engine::patternStore()->tracks())
 	{
 		const MidiClip* const mClip = dynamic_cast<MidiClip*>(track->getClip(patternIndex));
@@ -184,16 +185,23 @@ void PatternClipView::paintEvent(QPaintEvent*)
 				std::max(1.0f, trackHeight - verticalNoteSpacing)
 			);
 			// Loop through all the possible bars this pattern could affect. Starting at -1 for the possibility of start offset
-			const auto noteColor = QColor(m_noteColor.red(), m_noteColor.green(), m_noteColor.blue(), std::clamp(note->getVolume() * 255 / 100, 50, 255));
 			for (int i = -1; i < maxPossibleRepetions - 1; i++)
 			{
 				noteRect.moveLeft(note->pos() * pixelsPerBar() / TimePos::ticksPerBar() + offset + i * pixelsPerPattern + horizontalNoteSpacing / 2);
-				p.fillRect(noteRect, noteColor);
+				noteRects.emplace_back(noteRect);
 			}
 		}
+
 		lastY += trackHeight;
 	}
-	
+	const auto noteColor = QColor(m_noteColor.red(), m_noteColor.green(), m_noteColor.blue());
+	p.setPen(Qt::NoPen);
+	p.setBrush(QBrush(noteColor));
+	p.drawRects(noteRects.data(), static_cast<int>(noteRects.size()));
+	//Reset painter to default brush
+	p.setPen(QPen(Qt::black, 1));
+	p.setBrush(Qt::NoBrush);
+
 	// bar lines
 	const int lineSize = 3;
 
