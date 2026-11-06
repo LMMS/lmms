@@ -124,13 +124,14 @@ enum class ExecutableType
 	Unknown, Win32, Win64, Linux64,
 };
 
-VstPlugin::VstPlugin( const QString & _plugin ) :
+VstPlugin::VstPlugin(const QString & _plugin, bool skipInit) :
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
 	m_embedMethod( (gui::getGUI() != nullptr)
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
 	m_version( 0 ),
+	m_isSynth{false},
 	m_currentProgram()
 {
 	setSplittedChannels( true );
@@ -168,14 +169,14 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	switch(pluginType)
 	{
 	case ExecutableType::Win64:
-		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_64 ); // Default: RemoteVstPlugin64
+		tryLoad(REMOTE_VST_PLUGIN_FILEPATH_64, skipInit); // Default: RemoteVstPlugin64
 		break;
 	case ExecutableType::Win32:
-		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_32 ); // Default: 32/RemoteVstPlugin32
+		tryLoad(REMOTE_VST_PLUGIN_FILEPATH_32, skipInit); // Default: 32/RemoteVstPlugin32
 		break;
 #ifdef LMMS_BUILD_LINUX
 	case ExecutableType::Linux64:
-		tryLoad( NATIVE_LINUX_REMOTE_VST_PLUGIN_FILEPATH_64 ); // Default: NativeLinuxRemoteVstPlugin32
+		tryLoad(NATIVE_LINUX_REMOTE_VST_PLUGIN_FILEPATH_64, skipInit); // Default: NativeLinuxRemoteVstPlugin32
 		break;
 #endif
 	default:
@@ -207,9 +208,9 @@ VstPlugin::~VstPlugin()
 
 
 
-void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
+void VstPlugin::tryLoad(const QString &remoteVstPluginExecutable, bool skipInit)
 {
-	init( remoteVstPluginExecutable, false, {m_embedMethod} );
+	init( remoteVstPluginExecutable, false, {m_embedMethod, QString::number(skipInit)} );
 
 	waitForHostInfoGotten();
 	if( failed() )
@@ -431,6 +432,10 @@ bool VstPlugin::processMessage( const message & _m )
 								  _m.getInt( 1 ) );
 			break;
 
+		case IdVstIsSynth:
+			m_isSynth = true;
+			break;
+
 		case IdVstPluginName:
 			m_name = _m.getQString();
 			break;
@@ -495,6 +500,7 @@ bool VstPlugin::processMessage( const message & _m )
 
 		case IdVstPluginUniqueID:
 			// TODO: display graphically in case of failure
+			m_uniqueID = _m.getQString();
 			printf("unique ID: %s\n", _m.getString().c_str() );
 			break;
 

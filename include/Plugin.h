@@ -88,7 +88,7 @@ public:
 	//! Descriptor holds information about a plugin - every external plugin
 	//! has to instantiate such a Descriptor in an extern "C"-section so that
 	//! the plugin-loader is able to access information about the plugin
-	struct Descriptor
+	struct LMMS_EXPORT Descriptor
 	{
 		const char * name;
 		const char * displayName;
@@ -132,7 +132,7 @@ public:
 					SubPluginFeatures, which are like values
 					in a key-value map).
 			*/
-			struct Key
+			struct LMMS_EXPORT Key
 			{
 				using AttributeMap = QMap<QString, QString>;
 
