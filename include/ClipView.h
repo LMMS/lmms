@@ -28,6 +28,7 @@
 #include <optional>
 
 #include <QVector>
+#include <qpainter.h>
 
 #include "ModelView.h"
 #include "Rubberband.h"
@@ -115,7 +116,7 @@ public:
 	QVector<ClipView *> getClickedClips();
 
 	// Methods to remove, copy, cut, paste and mute a QVector of Clip views
-	void copy( QVector<ClipView *> clipvs );
+	void copy(QVector<ClipView *> clipvs, bool linkContent = false);
 	void cut( QVector<ClipView *> clipvs );
 	void paste();
 	// remove and toggleMute are static because they don't depend
@@ -162,6 +163,7 @@ protected:
 		Remove,
 		Cut,
 		Copy,
+		CopyLinked,
 		Paste,
 		Mute
 	};
@@ -258,6 +260,8 @@ protected:
 	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
+
+	void paintLinkLabel(QPainter& p);
 
 	auto hasCustomColor() const -> bool;
 

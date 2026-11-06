@@ -25,9 +25,11 @@
 #include "Clip.h"
 
 #include <QDomDocument>
+#include <memory>
 
 #include "AutomationEditor.h"
 #include "AutomationClip.h"
+#include "ClipContent.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "Song.h"
@@ -173,6 +175,26 @@ void Clip::setColor(const std::optional<QColor>& color)
 {
 	m_color = color;
 	emit colorChanged();
+}
+
+
+void Clip::prepareContentLink()
+{
+	if (m_content == nullptr) {return;}
+	
+	if (m_content->linkName().isEmpty())
+	{
+		m_content->setLinkName(
+			SharedContentRepository::submit(std::weak_ptr<ClipContent>(m_content))
+		);
+	}
+	m_content->m_shareToCopy = true;
+}
+
+void Clip::replaceContent(std::shared_ptr<ClipContent>&& content)
+{
+	m_content = std::move(content);
+	connect(m_content.get(), &ClipContent::contentChanged, this, &Clip::contentChanged);
 }
 
 } // namespace lmms

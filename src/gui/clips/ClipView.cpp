@@ -24,6 +24,8 @@
 
 #include "ClipView.h"
 
+#include <qnamespace.h>
+#include <qobject.h>
 #include <set>
 #include <cassert>
 
@@ -443,6 +445,43 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
+void ClipView::paintLinkLabel(QPainter& p)
+{
+	QString text = m_clip->contentLink();
+	if (text.isEmpty()) { return; }
+
+	p.setRenderHint(QPainter::TextAntialiasing);
+
+	QFont labelFont = this->font();
+	labelFont.setHintingPreference(QFont::PreferFullHinting);
+	p.setFont(labelFont);
+	QFontMetrics fontMetrics(labelFont);
+
+	const int textBottom = BORDER_WIDTH + 1;
+	const int textRight = BORDER_WIDTH + 3;
+
+	p.fillRect(QRect(
+		width() - (fontMetrics.horizontalAdvance(text) + (1 + 2 * textRight)),
+		height() - (fontMetrics.height() + 2 * textBottom),
+		fontMetrics.horizontalAdvance(text) + (1 + 2 * textRight),
+		fontMetrics.height() + 2 * textBottom),
+		textBackgroundColor()
+	);
+
+	p.setPen(textShadowColor());
+	p.drawText(
+		width() - (fontMetrics.horizontalAdvance(text) + 2 * textRight) + 1,
+		height() - (2 * textBottom) + 1,
+		text
+	);
+	p.setPen(textColor());
+	p.drawText(
+		width() - (fontMetrics.horizontalAdvance(text) + 2 * textRight),
+		height() - 2 * textBottom,
+		text
+	);
+}
+
 void ClipView::mousePressEvent( QMouseEvent * me )
 {
 	const auto pos = position(me);
@@ -626,6 +665,12 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			{
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				clipViews.push_back( this );
+
+				if (me->modifiers() & Qt::ShiftModifier)
+				{
+					// With Ctrl+Shift, we initiate a linked copy
+					m_clip->prepareContentLink();
+				}
 			}
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
@@ -917,11 +962,29 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 			: tr("Copy selection"),
 		[this](){ contextMenuAction( ContextMenuAction::Copy ); } );
 
+	if (individualClip && m_clip->hasContent())
+	{
+		contextMenu.addAction(
+			embed::getIconPixmap("edit_copy"),
+			tr("Copy linked"),
+			[this](){ contextMenuAction(ContextMenuAction::CopyLinked); }
+		);
+	}
+
 	auto pasteAction = contextMenu.addAction(
 		embed::getIconPixmap("edit_paste"),
 		tr("Paste"),
 		[this](){ contextMenuAction(ContextMenuAction::Paste); }
 	);
+
+	if (individualClip && !m_clip->contentLink().isEmpty())
+	{
+		contextMenu.addAction(
+			embed::getIconPixmap("edit_unlink"),
+			tr("Break link"),
+			[this](){ m_clip->breakContentLink(); }
+		);
+	}
 
 	pasteAction->setEnabled(
 		Clipboard::hasFormat(Clipboard::MimeType::StringPair) && getTrackView()->getTrackContentWidget()
@@ -972,7 +1035,10 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 			cut( active );
 			break;
 		case ContextMenuAction::Copy:
-			copy( active );
+			copy(active, false);
+			break;
+		case ContextMenuAction::CopyLinked:
+			copy(active, true);
 			break;
 		case ContextMenuAction::Paste:
 			paste();
@@ -1015,10 +1081,15 @@ void ClipView::remove( QVector<ClipView *> clipvs )
 	}
 }
 
-void ClipView::copy( QVector<ClipView *> clipvs )
+void ClipView::copy(QVector<ClipView *> clipvs, bool linkContent)
 {
 	// For copyStringPair()
 	using namespace Clipboard;
+
+	if (linkContent)
+	{
+		for (auto clip : clipvs) { clip->m_clip->prepareContentLink(); }
+	}
 
 	// Write the Clips to a DataFile for copying
 	DataFile dataFile = createClipDataFiles( clipvs );
