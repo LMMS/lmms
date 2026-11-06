@@ -54,13 +54,14 @@ void TapTempo::tap(bool play)
 {
 	using namespace std::literals;
 
+	const auto numerator = Engine::getSong()->getTimeSigModel().getNumerator();
+
 	if (play)
 	{
-		const auto metronomeFile = m_beat == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg";
-		Engine::audioEngine()->addPlayHandle(new SamplePlayHandle(metronomeFile));
+		m_metronome.processBeat(m_beat, numerator);
 	}
 
-	m_beat = (m_beat + 1) % Engine::getSong()->getTimeSigModel().getNumerator();
+	m_beat = (m_beat + 1) % numerator;
 
 	if (m_lastTap.time_since_epoch() == 0ms)
 	{

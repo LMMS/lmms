@@ -23,8 +23,11 @@
  */
 
 #include "SamplePlayHandle.h"
-#include "AudioEngine.h"
+
+#include <QDebug>
+
 #include "AudioBusHandle.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "PatternTrack.h"
 #include "SampleClip.h"
@@ -33,30 +36,23 @@
 namespace lmms
 {
 
-SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle)
+SamplePlayHandle::SamplePlayHandle(SampleBuffer buffer)
 	: PlayHandle(Type::SamplePlayHandle)
-	, m_sample(sample)
-	, m_ownAudioBusHandle(ownAudioBusHandle)
+	, m_ownedSample{std::make_unique<Sample>(std::move(buffer))}
+	, m_sample{m_ownedSample.get()}
 {
-	if (ownAudioBusHandle)
-	{
-		setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
-	}
+	setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
 }
 
-
-
-
-SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle(new Sample(SampleBuffer::fromFile(sampleFile)), true)
+SamplePlayHandle::SamplePlayHandle(Sample* sample)
+	: PlayHandle(Type::SamplePlayHandle)
+	, m_sample{sample}
 {
+	setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
 }
 
-
-
-
-SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
-	SamplePlayHandle(&clip->sample(), false)
+SamplePlayHandle::SamplePlayHandle(SampleClip* clip)
+	: SamplePlayHandle(&clip->sample())
 {
 	m_track = clip->getTrack();
 	setAudioBusHandle(((SampleTrack *)clip->getTrack())->audioBusHandle());
@@ -67,11 +63,7 @@ SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
 
 SamplePlayHandle::~SamplePlayHandle()
 {
-	if(m_ownAudioBusHandle)
-	{
-		delete audioBusHandle();
-		delete m_sample;
-	}
+	if (m_ownedSample) { delete audioBusHandle(); }
 }
 
 
@@ -139,6 +131,5 @@ f_cnt_t SamplePlayHandle::totalFrames() const
 	return (m_sample->endFrame() - m_sample->startFrame()) *
 			(static_cast<float>(Engine::audioEngine()->outputSampleRate()) / m_sample->sampleRate());
 }
-
 
 } // namespace lmms
