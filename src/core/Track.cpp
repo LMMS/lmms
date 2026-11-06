@@ -37,6 +37,7 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "MidiClip.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "SampleTrack.h"
@@ -139,6 +140,9 @@ Track* Track::clone()
 	QDomDocument doc;
 	QDomElement parent = doc.createElement("clonedtrack");
 	saveState(doc, parent);
+	// Linked clips must still stay linked (but not to the clip from the original track)
+	// Maybe we should give an option? Idk. Copying clips between tracks works just fine.
+	MidiClip::renewLinkIds(parent);
 	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
 
 	AutomationClip::resolveAllIDs();

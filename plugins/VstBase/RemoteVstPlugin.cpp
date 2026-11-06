@@ -618,7 +618,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdVstSetTempo:
-			setBPM( _m.getInt() );
+			setBPM(_m.getFloat(0));
 			break;
 
 		case IdVstSetLanguage:

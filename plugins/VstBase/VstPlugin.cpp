@@ -330,7 +330,7 @@ void VstPlugin::toggleUI()
 void VstPlugin::setTempo( bpm_t _bpm )
 {
 	lock();
-	sendMessage( message( IdVstSetTempo ).addInt( _bpm ) );
+	sendMessage(message(IdVstSetTempo).addFloat(_bpm));
 	unlock();
 }
 

@@ -56,8 +56,11 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 
 
 SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
-	SamplePlayHandle(&clip->sample(), false)
+	// Copy the sample (sharing its buffer), so that the clip can change the start and end frames
+	// for a following play handle, e.g. when it loops, without affecting this one
+	SamplePlayHandle(new Sample(clip->sample()), false)
 {
+	m_ownSample = true;
 	m_track = clip->getTrack();
 	setAudioBusHandle(((SampleTrack *)clip->getTrack())->audioBusHandle());
 }
@@ -70,6 +73,9 @@ SamplePlayHandle::~SamplePlayHandle()
 	if(m_ownAudioBusHandle)
 	{
 		delete audioBusHandle();
+	}
+	if (m_ownAudioBusHandle || m_ownSample)
+	{
 		delete m_sample;
 	}
 }

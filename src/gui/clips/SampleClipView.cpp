@@ -31,6 +31,7 @@
 #include "FileDialog.h"
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
+#include "TimePos.h"
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
@@ -205,6 +206,33 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
+// "Reduced complexity"
+void SampleClipView::paintSample(QPainter& p, SampleThumbnail::VisualizeParameters param, float pixelsPerTick)
+{
+	const std::vector<TimePos> loopStarts = fixedClips() ? std::vector<TimePos>{} : loopIterationStarts();
+	if (loopStarts.empty())
+	{
+		m_sampleThumbnail.visualize(param, p);
+		return;
+	}
+
+	// Paint the looped section of the sample once per iteration and cut off where the next one starts
+	const float iterationWidth = m_clip->loopLength() * pixelsPerTick;
+	for (const TimePos& start : loopStarts)
+	{
+		const float iterationX = start * pixelsPerTick - m_paintPixmapXPosition;
+		if (iterationX + iterationWidth < 0 || iterationX > param.viewportRect.width()) { continue; }
+
+		p.save();
+		p.setClipRect(QRectF(iterationX, 0, iterationWidth, height()));
+		param.sampleRect.moveLeft(static_cast<int>(iterationX - m_clip->loopStart() * pixelsPerTick));
+		m_sampleThumbnail.visualize(param, p);
+		p.restore();
+	}
+}
+
+
+
 
 void SampleClipView::paintEvent( QPaintEvent * pe )
 {
@@ -285,18 +313,19 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	const auto& sample = m_clip->m_sample;
 
 	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
+	const float pixelsPerTick = ppb / ticksPerBar;
 
 	if (sample.sampleSize() > 0)
 	{
-		const auto param = SampleThumbnail::VisualizeParameters{
+		paintSample(p, {
 			.sampleRect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
 			.viewportRect = viewPortRect,
 			.amplification = sample.amplification(),
 			.reversed = sample.reversed()
-		};
-
-		m_sampleThumbnail.visualize(param, p);
+		}, pixelsPerTick);
 	}
+
+	if (!fixedClips()) { paintLoopBoundaries(p, pixelsPerTick, -m_paintPixmapXPosition); }
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);

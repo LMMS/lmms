@@ -82,7 +82,7 @@ void VstSyncController::setPlaybackState(bool enabled)
 
 
 
-void VstSyncController::setTempo(int newTempo)
+void VstSyncController::setTempo(float newTempo)
 {
 	if (!m_syncData) { return; }
 

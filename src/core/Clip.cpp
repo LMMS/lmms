@@ -25,8 +25,10 @@
 #include "Clip.h"
 
 #include <QDomDocument>
+#include <QDomElement>
 
 #include "AutomationEditor.h"
+#include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -64,6 +66,8 @@ Clip::Clip(const Clip& other):
 	m_startPosition(other.m_startPosition),
 	m_length(other.m_length),
 	m_startTimeOffset(other.m_startTimeOffset),
+	m_loopStart(other.m_loopStart),
+	m_loopLength(other.m_loopLength),
 	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
 	m_autoResize(other.m_autoResize),
 	m_selectViewOnCreate{other.m_selectViewOnCreate},
@@ -168,6 +172,47 @@ void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
 {
 	m_startTimeOffset = startTimeOffset;
 }
+
+// Looping clips logic
+void Clip::setLoop(const TimePos& start, const TimePos& length)
+{
+	const auto newLength = TimePos{std::max(0, length.getTicks())};
+	const auto newStart = newLength > 0 ? start : TimePos{0};
+	if (m_loopStart == newStart && m_loopLength == newLength) { return; }
+
+	Engine::audioEngine()->requestChangeInModel();
+	m_loopStart = newStart;
+	m_loopLength = newLength;
+	Engine::audioEngine()->doneChangeInModel();
+	emit dataChanged();
+}
+
+
+TimePos Clip::contentPosition(const TimePos& clipPos) const
+{
+	const tick_t contentPos = clipPos - m_startTimeOffset;
+	if (!isLooping()) { return contentPos; }
+
+	// Wrap into [loopStart, loopEnd), also for positions before the loop start
+	const tick_t length = m_loopLength;
+	const tick_t wrapped = ((contentPos - m_loopStart) % length + length) % length;
+	return m_loopStart + wrapped;
+}
+
+
+void Clip::saveLoopSettings(QDomElement& element) const
+{
+	if (!isLooping()) { return; }
+	element.setAttribute("loopstart", m_loopStart);
+	element.setAttribute("looplen", m_loopLength);
+}
+
+
+void Clip::loadLoopSettings(const QDomElement& element)
+{
+	setLoop(element.attribute("loopstart", "0").toInt(), element.attribute("looplen", "0").toInt());
+}
+
 
 void Clip::setColor(const std::optional<QColor>& color)
 {

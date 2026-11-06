@@ -60,13 +60,14 @@ class ControllerRackView;
 const bpm_t MinTempo = 10;
 const bpm_t DefaultTempo = 140;
 const bpm_t MaxTempo = 999;
+const bpm_t TempoStep = 0.001f; // Tempo can be set to the thousandth
 const tick_t MaxSongLength = 9999 * DefaultTicksPerBar;
 
 
 class LMMS_EXPORT Song : public TrackContainer
 {
 	Q_OBJECT
-	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
+	mapPropertyFromModel( float,getTempo,setTempo,m_tempoModel );
 	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
 	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
 public:
@@ -305,7 +306,7 @@ public:
 		return m_timeSigModel;
 	}
 
-	IntModel& tempoModel()
+	FloatModel& tempoModel()
 	{
 		return m_tempoModel;
 	}
@@ -406,7 +407,7 @@ private:
 
 	AutomationTrack * m_globalAutomationTrack;
 
-	IntModel m_tempoModel;
+	FloatModel m_tempoModel;
 	MeterModel m_timeSigModel;
 	int m_oldTicksPerBar;
 	IntModel m_masterVolumeModel;

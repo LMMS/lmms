@@ -37,6 +37,7 @@
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "MidiClip.h"
 #include "PatternTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -437,7 +438,9 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	else if( type.left( 6 ) == "track_" )
 	{
 		DataFile dataFile( value.toUtf8() );
-		Track::create( dataFile.content().firstChild().toElement(), m_tc );
+		QDomElement trackElement = dataFile.content().firstChild().toElement();
+		MidiClip::renewLinkIds(trackElement);
+		Track::create(trackElement, m_tc);
 		_de->accept();
 	}
 }

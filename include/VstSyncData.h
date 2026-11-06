@@ -51,7 +51,7 @@ struct VstSyncData
 	bool playbackJumped;
 	int bufferSize;
 	int sampleRate;
-	int bpm;
+	float bpm;
 
 #ifdef VST_SNC_LATENCY
 	float latency;

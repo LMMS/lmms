@@ -42,6 +42,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <stack>
 
 #include "endian_handling.h"
@@ -164,7 +165,7 @@ void MidiFile::Track::addNote(std::uint8_t pitch, std::uint8_t volume,
 	}, time);
 }
 
-void MidiFile::Track::addTempo(std::uint32_t tempo, tick_t time)
+void MidiFile::Track::addTempo(float tempo, tick_t time)
 {
 	addEvent({.type = Event::Tempo, .tempo = tempo}, time);
 }
@@ -260,7 +261,7 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 			writeBytes({code, 0x51, 0x03});
 
 			// Convert to microseconds before writing
-			const auto usec = static_cast<std::uint32_t>(6e7 / event.tempo);
+			const auto usec = static_cast<std::uint32_t>(std::round(6e7 / event.tempo));
 			const auto usecBigEndian = std::bit_cast<std::array<std::uint8_t, 4>>(byteswapIfLE(usec));
 			writeBytes({usecBigEndian[1], usecBigEndian[2], usecBigEndian[3]});
 			break;

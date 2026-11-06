@@ -69,7 +69,7 @@ Song::Song() :
 	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
 				Track::create( Track::Type::HiddenAutomation,
 								this ) ) ),
-	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
+	m_tempoModel(DefaultTempo, MinTempo, MaxTempo, TempoStep, this, tr("Tempo")),
 	m_timeSigModel( this ),
 	m_oldTicksPerBar( DefaultTicksPerBar ),
 	m_masterVolumeModel( 100, 0, 200, this, tr( "Master volume" ) ),
@@ -158,7 +158,7 @@ void Song::masterVolumeChanged()
 void Song::setTempo()
 {
 	Engine::audioEngine()->requestChangeInModel();
-	const auto tempo = (bpm_t)m_tempoModel.value();
+	const auto tempo = getTempo();
 	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	for (const auto& playHandle : playHandles)
 	{
@@ -833,7 +833,7 @@ void Song::addAutomationTrack()
 
 bpm_t Song::getTempo()
 {
-	return ( bpm_t )m_tempoModel.value();
+	return m_tempoModel.value();
 }
 
 

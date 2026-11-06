@@ -64,6 +64,9 @@ protected:
 
 
 private:
+	//! Paints the sample, or for a looping clip its looped section once per repetition
+	void paintSample(QPainter& p, SampleThumbnail::VisualizeParameters param, float pixelsPerTick);
+
 	SampleClip * m_clip;
 	SampleThumbnail m_sampleThumbnail;
 	QPixmap m_paintPixmap;

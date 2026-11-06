@@ -791,6 +791,7 @@ lmms--gui--ClipView   {
 	qproperty-mutedColor: rgb( 128, 128, 128 );
 	qproperty-mutedBackgroundColor: rgb( 80, 80, 80 );
 	qproperty-selectedColor: rgb( 0, 125, 255 );
+	qproperty-loopedColor: rgb(19, 170, 94);
 	qproperty-patternClipBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 100);

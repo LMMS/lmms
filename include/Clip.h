@@ -148,6 +148,29 @@ public:
 	TimePos startTimeOffset() const;
 	virtual void setStartTimeOffset(const TimePos& startTimeOffset);
 
+	//! @brief Whether this kind of clip can repeat a section of its content
+	virtual bool supportsLooping() const { return false; }
+
+	//! @brief Whether a section of the content repeats over the whole length of the clip
+	bool isLooping() const { return m_loopLength > 0; }
+
+	//! @brief Start of the looped section, in content time (the timeline of the clip's notes or sample)
+	TimePos loopStart() const { return m_loopStart; }
+
+	//! @brief Length of the looped section; 0 if the clip doesn't loop
+	TimePos loopLength() const { return m_loopLength; }
+
+	TimePos loopEnd() const { return m_loopStart + m_loopLength; }
+
+	//! @brief Repeat the content section [@p start, @p start + @p length) over the clip. A length of 0 disables looping.
+	void setLoop(const TimePos& start, const TimePos& length);
+
+	//! @brief Loop the section of content that is currently visible in the clip
+	void loopVisibleContent() { setLoop(-startTimeOffset(), length()); }
+
+	//! @brief Maps a position relative to the clip's start position to content time, taking looping into account
+	TimePos contentPosition(const TimePos& clipPos) const;
+
 	//! @brief Copies the state of a clip to another clip
 	static void copyStateTo(Clip* src, Clip* dst);
 
@@ -170,6 +193,9 @@ protected:
 	//! @param other The clip object which will be copied.
 	Clip(const Clip& other);
 
+	void saveLoopSettings(QDomElement& element) const;
+	void loadLoopSettings(const QDomElement& element);
+
 private:
 	Track * m_track;
 	QString m_name;
@@ -177,6 +203,8 @@ private:
 	TimePos m_startPosition;
 	TimePos m_length;
 	TimePos m_startTimeOffset;
+	TimePos m_loopStart;
+	TimePos m_loopLength;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;

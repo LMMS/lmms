@@ -35,6 +35,7 @@
 #include "DeprecationHelper.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "MidiClip.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
 #include "Song.h"
@@ -402,6 +403,9 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 
 	// Extract the track index that was originally clicked
 	QDomElement metadata = dataFile.content().firstChildElement( "copyMetadata" );
+
+	// Ordinary copies are independent of the copied clips (but copies of linked clips are linked with each other)
+	if (metadata.attribute("linked") != "1") { MidiClip::renewLinkIds(clipParent); }
 	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
 	int initialTrackIndex = tiAttr.value().toInt();
 	QDomAttr clipPosAttr = metadata.attributeNode( "grabbedClipPos" );

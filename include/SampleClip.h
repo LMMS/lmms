@@ -56,6 +56,8 @@ public:
 	void changeLength( const TimePos & _length ) override;
 	void updateLength() override;
 
+	bool supportsLooping() const override { return !isInPattern(); }
+
 	const QString& sampleFile() const;
 	bool hasSampleFileLoaded(const QString & filename) const;
 

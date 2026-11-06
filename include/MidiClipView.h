@@ -81,6 +81,7 @@ protected slots:
 	void resetName();
 	void changeName();
 	void transposeSelection();
+	void unlinkSelection();
 	void clearNotesOutOfBounds();
 
 
@@ -114,6 +115,7 @@ private:
 	bool isResizableBeforeStart() override { return false; }
 	
 	bool destructiveSplitClip(const TimePos pos) override;
+	void paintLinkBadge(QPainter& p);
 } ;
 
 
