@@ -26,6 +26,7 @@
 #define LMMS_PLUGIN_ISSUE_H
 
 #include <QDebug>
+#include <compare>
 #include <string>
 
 namespace lmms
@@ -75,8 +76,7 @@ public:
 	{
 	}
 	PluginIssueType type() const { return m_issueType; }
-	bool operator==(const PluginIssue& other) const;
-	bool operator<(const PluginIssue& other) const;
+	auto operator<=>(const PluginIssue&) const = default;
 	friend QDebug operator<<(QDebug stream, const PluginIssue& iss);
 };
 
