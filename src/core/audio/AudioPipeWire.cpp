@@ -111,14 +111,6 @@ static const struct pw_stream_events capture_stream_events = {
         .process = on_capture_process,
 };
 
-static void fillWithSilence(float* buffer, unsigned long numberOfFrames)
-{
-	for (unsigned long i = 0; i < numberOfFrames * DEFAULT_CHANNELS; ++i)
-	{
-		*buffer++ = 0;
-	}
-}
-
 struct AudioPipeWire::Impl
 {
 public:
@@ -230,7 +222,7 @@ AudioPipeWire::AudioPipeWire(bool& successful, AudioEngine* audioEngine) :
 							params, 1);
 	}
 
-	// A tempory loop is started here, so that we can find out the negotiated sample rates via callbacks
+	// A temporary loop is started here, so that we can find out the negotiated sample rates via callbacks
 	// and inform LMMS about it.
 	//
 	// The loop is stopped again afterwards so that startProcessingImpl() can finally start it for good.
@@ -302,7 +294,7 @@ void AudioPipeWire::processOutputStreams()
 
 	if (!AudioDevice::isRunning())
 	{
-		fillWithSilence(dst, n_frames);
+		std::fill_n(dst, n_frames * DEFAULT_CHANNELS, 0.0f);
 	}
 	else
 	{
