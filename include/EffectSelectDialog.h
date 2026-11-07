@@ -32,8 +32,8 @@
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QHBoxLayout>
-#include <qlist.h>
-#include <qobject.h>
+#include <QList>
+#include <QObject>
 
 class QScrollArea;
 class QTableView;
@@ -131,7 +131,7 @@ private:
 	QStringList getEffectCategoryLabels();
 	QHBoxLayout* buildCategoryFilterLayout();
 	QHBoxLayout* buildFavoriteOnlyFilterLayout();
-	void showContextMenu(const QPoint &);
+	void showContextMenu(const QPoint&);
 	void showEffectCategoryEditDialog(QString effectName, QString currentCategory);
 };
 

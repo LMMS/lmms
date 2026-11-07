@@ -26,13 +26,11 @@
 #include <QFile>
 #include <QList>
 #include <QObject>
-#include <qdebug.h>
-#include <qdir.h>
-#include <qdom.h>
-#include <qfileinfo.h>
-#include <qobject.h>
-#include <qregion.h>
-#include <qstandardpaths.h>
+#include <QDir>
+#include <QFileInfo>
+#include <QObject>
+#include <QRegion>
+#include <QStandardPaths>
 
 namespace lmms {
 

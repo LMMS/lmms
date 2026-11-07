@@ -31,7 +31,6 @@
 #include "lmms_export.h"
 namespace lmms {
 
-
 class EffectCategoryData {
 public:
 	QString m_category;

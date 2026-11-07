@@ -49,13 +49,6 @@
 #include <QCheckBox>
 #include <QDialog>
 #include <QDialogButtonBox>
-#include <qglobal.h>
-#include <QIcon>
-#include <QLabel>
-#include <qnamespace.h>
-#include <qobject.h>
-#include <qobjectdefs.h>
-#include <qstandarditemmodel.h>
 
 #include "DummyEffect.h"
 #include "Effect.h"
@@ -66,7 +59,7 @@
 
 namespace lmms::gui {
 
-const int nameColumnIdx = 0; 
+const int nameColumnIdx = 0;
 const int categoryColumnIdx = 1;
 const int typeColumnIdx = 2;
 const int favoritesColumnIdx = 3;
@@ -130,7 +123,6 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 			{
 				categoryItem->setData(getEffectCategory()->getCategoryName(name), Qt::DisplayRole);
 				emit m_sourceModel.dataChanged(m_sourceModel.index(row, nameColumnIdx), m_sourceModel.index(row, 1), {Qt::DisplayRole});
-
 			}
 		});
 		m_sourceModel.setItem(row, categoryColumnIdx, categoryItem);
@@ -147,7 +139,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 			}
 		});
 		favoriteItem->setText("");
-		if (getEffectCategory()->getIsFavorite(name)) 
+		if(getEffectCategory()->getIsFavorite(name)) 
 		{ 
 			favoriteItem->setIcon(favoriteIcon); 
 			favoriteItem->setText(" "); // HACK : Trick to allow sorting without reimplementing the entire thing
@@ -389,7 +381,8 @@ QHBoxLayout* EffectSelectDialog::buildTypeFilterLayout()
 	return layout;
 }
 
-QStringList EffectSelectDialog::getEffectCategoryLabels(){
+QStringList EffectSelectDialog::getEffectCategoryLabels()
+{
 	QStringList categories = getEffectCategory()->getCategories();
 	QStringList labels = categories;
 	labels.push_front(tr("All"));
