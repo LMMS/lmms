@@ -28,8 +28,6 @@
 #include <QElapsedTimer>
 #include <QWidget>
 
-#include "SampleThumbnailCache.h"
-
 namespace lmms {
 
 class SlicerT;
