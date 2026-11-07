@@ -241,7 +241,6 @@ private:
 	// QPointers to set to nullptr on deletion
 	QPointer<MidiClip> m_ghostNotes = nullptr; 
 	QPointer<SampleClip> m_ghostSample = nullptr;
-	const SampleThumbnailCache* m_ghostSampleThumbnailCache;
 	bool m_renderSample = false;
 
 	void centerTopBottomScroll();
