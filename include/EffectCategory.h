@@ -23,15 +23,16 @@
 #ifndef LMMS_EFFECT_CATEGORY_H
 #define LMMS_EFFECT_CATEGORY_H
 
+#include <QDomDocument>
+#include <QDomElement>
 #include <QLabel>
 #include <QList>
-#include <QDomElement>
-#include <QDomDocument>
 
 #include "lmms_export.h"
 namespace lmms {
 
-class EffectCategoryData {
+class EffectCategoryData
+{
 public:
 	QString m_category;
 	bool m_is_favorite;

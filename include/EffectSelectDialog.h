@@ -25,28 +25,28 @@
 #ifndef LMMS_GUI_EFFECT_SELECT_DIALOG_H
 #define LMMS_GUI_EFFECT_SELECT_DIALOG_H
 
-#include "Effect.h"
-
 #include <QDialog>
-#include <QRegularExpression>
-#include <QSortFilterProxyModel>
-#include <QStandardItemModel>
 #include <QHBoxLayout>
 #include <QList>
 #include <QObject>
+#include <QRegularExpression>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
+
+#include "Effect.h"
 
 class QScrollArea;
 class QTableView;
 class QLineEdit;
 
-namespace lmms::gui
-{
+namespace lmms::gui {
 
 class MultipleColumnFilterProxyModel : public QSortFilterProxyModel
 {
 	Q_OBJECT
 public:
-	MultipleColumnFilterProxyModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent)
+	MultipleColumnFilterProxyModel(QObject* parent = nullptr)
+		: QSortFilterProxyModel(parent)
 	{
 	}
 
@@ -83,7 +83,7 @@ protected:
 
 		QRegularExpression nameRegularExpression(filterRegularExpression());
 		nameRegularExpression.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-		
+
 		bool nameFilterPassed = nameRegularExpression.match(name).capturedStart() != -1;
 		bool typeFilterPassed = type.contains(m_effectTypeFilter, Qt::CaseInsensitive);
 		bool categoryFilterPassed = category.contains(m_effectCategoryFilter, Qt::CaseInsensitive);
@@ -97,7 +97,6 @@ private:
 	QString m_effectCategoryFilter;
 	bool m_effectFavoriteOnlyFilter;
 };
-
 
 class EffectSelectDialog : public QDialog
 {
@@ -113,7 +112,7 @@ protected slots:
 	void acceptSelection();
 	void rowChanged(const QModelIndex&, const QModelIndex&);
 	void updateSelection();
-	
+
 	bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:

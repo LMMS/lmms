@@ -22,12 +22,11 @@
 
 #include "EffectCategory.h"
 
+#include <QDir>
 #include <QDomDocument>
 #include <QFile>
-#include <QList>
-#include <QObject>
-#include <QDir>
 #include <QFileInfo>
+#include <QList>
 #include <QObject>
 #include <QRegion>
 #include <QStandardPaths>
@@ -342,7 +341,7 @@ void EffectCategory::toggleFavorite(QString effectName, bool isFavorite)
 	{
 		m_categories_map.at(effectName).m_is_favorite = isFavorite;
 	}
-	else 
+	else
 	{
 		m_categories_map[effectName] = {defaultCategory, isFavorite};
 	}

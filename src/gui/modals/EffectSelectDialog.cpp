@@ -25,9 +25,14 @@
 
 #include "EffectSelectDialog.h"
 
+#include <QAction>
 #include <QApplication>
+#include <QBoxLayout>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QCompleter>
+#include <QCursor>
+#include <QDialog>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -42,13 +47,6 @@
 #include <QScrollArea>
 #include <QTableView>
 #include <QVBoxLayout>
-#include <QCompleter>
-#include <QCursor>
-#include <QAction>
-#include <QBoxLayout>
-#include <QCheckBox>
-#include <QDialog>
-#include <QDialogButtonBox>
 
 #include "DummyEffect.h"
 #include "Effect.h"
@@ -117,31 +115,32 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 		}
 		m_sourceModel.setItem(row, nameColumnIdx, new QStandardItem(name));
 		auto* categoryItem = new QStandardItem(getEffectCategory()->getCategoryName(name));
-		connect(this, &EffectSelectDialog::refreshData, this, [this, name, categoryItem, row](QString nameToRefresh)
-		{
-			if(QString::compare(name, nameToRefresh) == 0)
+		connect(this, &EffectSelectDialog::refreshData, this, [this, name, categoryItem, row](QString nameToRefresh) {
+			if (QString::compare(name, nameToRefresh) == 0)
 			{
 				categoryItem->setData(getEffectCategory()->getCategoryName(name), Qt::DisplayRole);
-				emit m_sourceModel.dataChanged(m_sourceModel.index(row, nameColumnIdx), m_sourceModel.index(row, 1), {Qt::DisplayRole});
+				emit m_sourceModel.dataChanged(
+					m_sourceModel.index(row, nameColumnIdx), m_sourceModel.index(row, 1), {Qt::DisplayRole});
 			}
 		});
 		m_sourceModel.setItem(row, categoryColumnIdx, categoryItem);
 		m_sourceModel.setItem(row, typeColumnIdx, new QStandardItem(type));
 		auto* favoriteItem = new QStandardItem();
-		connect(this, &EffectSelectDialog::refreshData, this, [this, name, favoriteIcon, favoriteItem, row](QString nameToRefresh)
-		{
-			if(QString::compare(name, nameToRefresh) == 0)
-			{
-		  		bool isFavorite = getEffectCategory()->getIsFavorite(name);
-				favoriteItem->setData(isFavorite ? favoriteIcon : QIcon(), Qt::DecorationRole);
-		  		favoriteItem->setText(isFavorite ? " " : "");
-				emit m_sourceModel.dataChanged(m_sourceModel.index(row, favoritesColumnIdx), m_sourceModel.index(row, 3), {Qt::DecorationRole});
-			}
-		});
+		connect(this, &EffectSelectDialog::refreshData, this,
+			[this, name, favoriteIcon, favoriteItem, row](QString nameToRefresh) {
+				if (QString::compare(name, nameToRefresh) == 0)
+				{
+					bool isFavorite = getEffectCategory()->getIsFavorite(name);
+					favoriteItem->setData(isFavorite ? favoriteIcon : QIcon(), Qt::DecorationRole);
+					favoriteItem->setText(isFavorite ? " " : "");
+					emit m_sourceModel.dataChanged(m_sourceModel.index(row, favoritesColumnIdx),
+						m_sourceModel.index(row, 3), {Qt::DecorationRole});
+				}
+			});
 		favoriteItem->setText("");
-		if(getEffectCategory()->getIsFavorite(name)) 
-		{ 
-			favoriteItem->setIcon(favoriteIcon); 
+		if (getEffectCategory()->getIsFavorite(name))
+		{
+			favoriteItem->setIcon(favoriteIcon);
 			favoriteItem->setText(" "); // HACK : Trick to allow sorting without reimplementing the entire thing
 		}
 		m_sourceModel.setItem(row, favoritesColumnIdx, favoriteItem);
@@ -298,18 +297,18 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 		else
 		{
 			// HACK: Markup inside translation strings due to RTL not being handled correctly.
-			// Move the markup out of the translation strings and into the QString template as soon as RTL layout works properly
-			auto labelText = QString{
-				"<p>%1%2</p>"
-				"<p>%3%4</p>"
-				"<p>%5%6</p>"
-			}.arg(
-				tr("<b>Name: </b>"), descriptor.displayName,
-				tr("<b>Author: </b>"), QString::fromUtf8(descriptor.author)
-					.replace("/dot/", ".").replace("/at/", "@").toHtmlEscaped(),
-				tr("<b>Description: </b>"), qApp->translate("PluginBrowser", descriptor.description)
-					.toHtmlEscaped()
-			);
+			// Move the markup out of the translation strings and into the QString template as soon as RTL layout works
+			// properly
+			auto labelText = QString{"<p>%1%2</p>"
+									 "<p>%3%4</p>"
+									 "<p>%5%6</p>"}
+								 .arg(tr("<b>Name: </b>"), descriptor.displayName, tr("<b>Author: </b>"),
+									 QString::fromUtf8(descriptor.author)
+										 .replace("/dot/", ".")
+										 .replace("/at/", "@")
+										 .toHtmlEscaped(),
+									 tr("<b>Description: </b>"),
+									 qApp->translate("PluginBrowser", descriptor.description).toHtmlEscaped());
 			auto label = new QLabel(labelText, m_descriptionWidget);
 			label->setWordWrap(true);
 			textWidgetLayout->addWidget(label);
@@ -370,8 +369,7 @@ QHBoxLayout* EffectSelectDialog::buildTypeFilterLayout()
 	auto* buttonFilter = new QComboBox();
 	QStringList labels = {tr("All"), "LMMS", "LADSPA", "LV2", "VST"};
 	buttonFilter->addItems(labels);
-	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) 
-	{
+	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) {
 		m_model.setEffectTypeFilter(value == tr("All") ? "" : value);
 		updateSelection();
 	});
@@ -394,13 +392,11 @@ QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
 	auto* label = new QLabel(tr("Category"));
 	auto* buttonFilter = new QComboBox();
 	buttonFilter->addItems(getEffectCategoryLabels());
-	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) 
-	{
+	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) {
 		m_model.setEffectCategoryFilter(value == tr("All") ? "" : value);
 		updateSelection();
 	});
-	connect(this, &EffectSelectDialog::refreshData, this, [this, buttonFilter](QString value)
-	{
+	connect(this, &EffectSelectDialog::refreshData, this, [this, buttonFilter](QString value) {
 		buttonFilter->clear();
 		buttonFilter->addItems(getEffectCategoryLabels());
 	});
@@ -413,8 +409,7 @@ QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
 QHBoxLayout* EffectSelectDialog::buildFavoriteOnlyFilterLayout()
 {
 	auto* checkBoxFilter = new QCheckBox(tr("Favorites only"));
-	connect(checkBoxFilter, &QCheckBox::toggled, this, [this](bool checked) 
-	{
+	connect(checkBoxFilter, &QCheckBox::toggled, this, [this](bool checked) {
 		m_model.setFavoriteOnlyFilter(checked);
 		updateSelection();
 	});
@@ -432,16 +427,13 @@ void EffectSelectDialog::showContextMenu(const QPoint& pos)
 	QString selectedCategory = selectedItem.siblingAtColumn(categoryColumnIdx).data(Qt::DisplayRole).toString();
 	bool selectedIsFavorite = !selectedItem.siblingAtColumn(favoritesColumnIdx).data(Qt::DecorationRole).isNull();
 	auto* setFavoriteAction = new QAction(tr("Toggle favorite"), this);
-	connect(setFavoriteAction, &QAction::triggered, this, [selectedName, selectedIsFavorite]() 
-	{
+	connect(setFavoriteAction, &QAction::triggered, this, [selectedName, selectedIsFavorite]() {
 		getEffectCategory()->toggleFavorite(selectedName, !selectedIsFavorite);
 	});
 	menu.addAction(setFavoriteAction);
 	auto* setCategoryAction = new QAction(tr("Set category"), this);
-	connect(setCategoryAction, &QAction::triggered, this, [this, selectedName, selectedCategory]()
-	{
-		showEffectCategoryEditDialog(selectedName, selectedCategory);
-	});
+	connect(setCategoryAction, &QAction::triggered, this,
+		[this, selectedName, selectedCategory]() { showEffectCategoryEditDialog(selectedName, selectedCategory); });
 	menu.addAction(setCategoryAction);
 	menu.exec(QCursor::pos());
 	emit this->refreshData(selectedName);
@@ -467,9 +459,8 @@ void EffectSelectDialog::showEffectCategoryEditDialog(QString effectName, QStrin
 	buttonBox->setFocusPolicy(Qt::NoFocus);
 	layout->addWidget(buttonBox);
 	effectSelectDialog->setLayout(layout);
-	connect(buttonBox, &QDialogButtonBox::accepted, this, [this, lineEdit, effectName, effectSelectDialog]()
-	{
-		getEffectCategory()->setCategory(effectName,lineEdit->text());
+	connect(buttonBox, &QDialogButtonBox::accepted, this, [this, lineEdit, effectName, effectSelectDialog]() {
+		getEffectCategory()->setCategory(effectName, lineEdit->text());
 		refreshData(effectName);
 		effectSelectDialog->close();
 	});
