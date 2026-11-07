@@ -79,6 +79,9 @@ namespace lmms::PathUtil
 
 	//! Converts std::filesystem::path to a UTF-8 encoded std::string
 	LMMS_EXPORT auto pathToString(const std::filesystem::path& path) -> std::string;
+
+	//! Converts std::filesystem::path to QString
+	LMMS_EXPORT auto pathToQString(const std::filesystem::path& path) -> QString;
 } // namespace lmms::PathUtil
 
 #endif // LMMS_PATHUTIL_H
