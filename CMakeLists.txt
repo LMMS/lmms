@@ -87,6 +87,7 @@ OPTION(WANT_LV2		"Include Lv2 plugins" ON)
 OPTION(WANT_SUIL	"Include SUIL for LV2 plugin UIs" ON)
 OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
+OPTION(WANT_PIPEWIRE	"Include PipeWire support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
 OPTION(WANT_SNDIO	"Include sndio support" ON)
@@ -190,9 +191,11 @@ IF(LMMS_BUILD_APPLE)
 	# Fix linking on 10.14+. See issue #4762 on github
 	LINK_DIRECTORIES("${APPLE_PREFIX}/lib")
 	SET(WANT_ALSA OFF)
+	SET(WANT_PIPEWIRE OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_VST OFF)
 	SET(STATUS_ALSA "<not supported on this platform>")
+	SET(STATUS_PIPEWIRE "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_APPLEMIDI "OK")
 ELSE(LMMS_BUILD_APPLE)
@@ -202,6 +205,7 @@ ENDIF(LMMS_BUILD_APPLE)
 
 IF(LMMS_BUILD_WIN32 OR LMMS_BUILD_CYGWIN)
 	SET(WANT_ALSA OFF)
+	SET(WANT_PIPEWIRE OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_SNDIO OFF)
 	SET(WANT_WINMM ON)
@@ -211,6 +215,7 @@ IF(LMMS_BUILD_WIN32 OR LMMS_BUILD_CYGWIN)
 		set(WANT_VST_64 OFF)
 	endif()
 	SET(STATUS_ALSA "<not supported on this platform>")
+	SET(STATUS_PIPEWIRE "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_SNDIO "<not supported on this platform>")
 	SET(STATUS_WINMM "OK")
@@ -478,6 +483,25 @@ IF(WANT_PORTAUDIO)
 			"if you require PortAudio support")
 	ENDIF()
 ENDIF(WANT_PORTAUDIO)
+
+# Check for PipeWire
+IF(WANT_PIPEWIRE)
+	IF(PKG_CONFIG_FOUND)
+		PKG_CHECK_MODULES(PIPEWIRE QUIET IMPORTED_TARGET libpipewire-0.3)
+	ENDIF()
+
+	IF(PIPEWIRE_FOUND)
+		SET(LMMS_HAVE_PIPEWIRE TRUE)
+		SET(STATUS_PIPEWIRE "OK (version ${PIPEWIRE_VERSION}, includes: ${PIPEWIRE_INCLUDE_DIRS}, library: ${PIPEWIRE_LIBRARIES})")
+	ELSE()
+		SET(STATUS_PIPEWIRE "not found, please install the development packages of libpipewire for your distribution if you require PipeWire support")
+	ENDIF()
+ENDIF()
+
+IF(NOT LMMS_HAVE_PIPEWIRE)
+	SET(PIPEWIRE_INCLUDE_DIRS "")
+	SET(PIPEWIRE_LIBRARIES "")
+ENDIF()
 
 # check for PulseAudio
 IF(WANT_PULSEAUDIO)
@@ -887,6 +911,7 @@ MESSAGE(
 "* JACK                        : ${STATUS_JACK}\n"
 "* Sndio                       : ${STATUS_SNDIO}\n"
 "* PortAudio                   : ${STATUS_PORTAUDIO}\n"
+"* PipeWire                    : ${STATUS_PIPEWIRE}\n"
 "* PulseAudio                  : ${STATUS_PULSEAUDIO}\n"
 "* SDL                         : ${STATUS_SDL}\n"
 )
