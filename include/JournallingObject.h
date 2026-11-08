@@ -101,6 +101,7 @@ private:
 
 	QStack<bool> m_journallingStateStack;
 
+	static void replaceJournalIDs(QDomElement current);
 } ;
 
 
