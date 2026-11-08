@@ -217,7 +217,7 @@ void EqControlsDialog::mouseDoubleClickEvent(QMouseEvent *event)
 	if (this->height() == ArtworkFullHeight)
 	{
 		// Collapse expanded area
-				this->setFixedHeight(ArtworkCollapsedHeight);
+		this->setFixedHeight(ArtworkCollapsedHeight);
 	}
 	else
 	{
