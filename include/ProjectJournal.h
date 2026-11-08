@@ -27,6 +27,7 @@
 
 #include <QHash>
 #include <QStack>
+#include <set>
 
 #include "LmmsTypes.h"
 #include "DataFile.h"
@@ -68,6 +69,9 @@ public:
 
 	// alloc new ID and register object _obj to it
 	jo_id_t allocID( JournallingObject * _obj );
+
+	//Create a new id without registering any object
+	jo_id_t generateId();
 
 	// if there's already something known about ID _id, but it is currently
 	// unused (e.g. after jouralling object was deleted), register object
@@ -115,6 +119,7 @@ private:
 	using CheckPointStack = QStack<CheckPoint>;
 
 	JoIdMap m_joIDs;
+	std::set<jo_id_t> m_unregisteredIds;
 
 	CheckPointStack m_undoCheckPoints;
 	CheckPointStack m_redoCheckPoints;
