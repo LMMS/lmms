@@ -32,9 +32,29 @@
 
 namespace lmms {
 
+/**
+ * @brief A non-owning cache for resources loaded from file paths.
+ *
+ * @todo In the future, this class should have a cache replacement policy in order to
+ * cache unused resources temporarily until they are requested again, or if the eviction criteria is met.
+ *
+ * @tparam T The type of resource to cache.
+ */
 template <typename T> class FileResourceCache
 {
 public:
+	/**
+	 * Retrieves a cached resource or creates a new one.
+	 *
+	 * The factory must be invocable without arguments and return a
+	 * std::shared_ptr<const T>.
+	 *
+	 * If the factory returns nullptr, no resource is cached.
+	 *
+	 * @param path Filesystem path identifying the resource.
+	 * @param factory Callable used to create the resource when necessary.
+	 * @return The cached or newly created resource, or nullptr on failure.
+	 */
 	template <typename Factory>
 		requires(std::is_invocable_r_v<std::shared_ptr<const T>, Factory>)
 	auto fetch(const std::filesystem::path& path, Factory&& factory) -> std::shared_ptr<const T>
