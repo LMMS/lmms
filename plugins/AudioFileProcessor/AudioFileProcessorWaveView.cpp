@@ -24,10 +24,12 @@
 
 #include "AudioFileProcessorWaveView.h"
 
+#include "AudioFileProcessor.h"
+#include "AudioFileProcessorView.h"
 #include "Sample.h"
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
-#include "SampleThumbnail.h"
+#include "SampleThumbnailRenderer.h"
 #include "FontHelper.h"
 
 
@@ -83,8 +85,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, i
 	m_isDragging(false),
 	m_reversed(false),
 	m_framesPlayed(0),
-	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt()),
-	m_sampleThumbnail(*buf)
+	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt())
 {
 	setFixedSize(w, h);
 	setMouseTracking(true);
@@ -346,17 +347,17 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 
-	m_sampleThumbnail = SampleThumbnail{*m_sample};
-
-	const auto param = SampleThumbnail::VisualizeParameters{
-		.sampleRect = m_graph.rect(),
+	const auto param = SampleThumbnailRenderer::VisualizeParameters{
+		.cache
+		= static_cast<AudioFileProcessorView*>(parent())->castModel<AudioFileProcessor>()->sampleThumbnailCache(),
+		.rect = m_graph.rect(),
+		.sampleStart = static_cast<double>(m_from) / m_sample->sampleSize(),
+		.sampleEnd = static_cast<double>(m_to) / m_sample->sampleSize(),
 		.amplification = m_sample->amplification(),
-		.sampleStart = static_cast<float>(m_from) / m_sample->sampleSize(),
-		.sampleEnd = static_cast<float>(m_to) / m_sample->sampleSize(),
 		.reversed = m_sample->reversed(),
 	};
 
-	m_sampleThumbnail.visualize(param, p);
+	SampleThumbnailRenderer::visualize(param, p);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)

@@ -283,4 +283,14 @@ namespace lmms::PathUtil
 		return path.string();
 #endif
 	}
+
+	auto pathToQString(const std::filesystem::path& path) -> QString
+	{
+#if defined(LMMS_BUILD_WIN32)
+		return QString::fromStdWString(path.native());
+#else
+		return QString::fromStdString(path.native());
+#endif
+	}
+
 } // namespace lmms::PathUtil
