@@ -27,6 +27,8 @@
 
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
+#include "SampleCache.h"
+#include "SampleThumbnailCache.h"
 #include "Song.h"
 
 #include "LmmsTypes.h"
@@ -224,7 +226,8 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(SampleBuffer::fromBase64(sampleData));
+		m_sample = Sample{SampleBuffer::fromBase64(sampleData)};
+		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -307,6 +310,16 @@ gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 
 void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
+	const auto path = PathUtil::stringToPath(_audio_file);
+
+	// TODO: Return an error value back to the caller (via std::expected or our own polyfill)
+	auto buffer = SampleCache::instance().fetchBuffer(path);
+	if (!buffer) { return; }
+
+	// TODO: Return an error value back to the caller (via std::expected or our own polyfill)
+	auto thumbnailCache = SampleCache::instance().fetchThumbnailCache(path);
+	if (!thumbnailCache) { return; }
+
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
 		( instrumentTrack()->name() ==
@@ -318,7 +331,9 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(SampleBuffer::fromFile(_audio_file));
+	m_sample = Sample{std::move(buffer)};
+	m_sampleThumbnailCache = std::move(thumbnailCache);
+
 	loopPointChanged();
 	ampModelChanged();
 	reverseModelChanged();
