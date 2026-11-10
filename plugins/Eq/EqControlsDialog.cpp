@@ -41,6 +41,9 @@
 namespace lmms::gui
 {
 
+static constexpr int ArtworkWidth = 500;
+static constexpr int ArtworkFullHeight = 500;
+static constexpr int ArtworkCollapsedHeight =  260;
 
 EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	EffectControlDialog( controls ),
@@ -50,7 +53,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 500, 500 );
+	setFixedSize(ArtworkWidth, ArtworkFullHeight);
 
 	auto inSpec = new EqSpectrumView(&controls->m_inFftBands, this);
 	inSpec->move( 26, 17 );
@@ -209,13 +212,18 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	hpBtnGrp->setModel(&m_controls->m_hpTypeModel);
 }
 
-
-
-
 void EqControlsDialog::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	m_originalHeight = parentWidget()->height() == 283 ? m_originalHeight : parentWidget()->height() ;
-	parentWidget()->setFixedHeight( parentWidget()->height() == m_originalHeight ? 283 : m_originalHeight  );
+	if (this->height() == ArtworkFullHeight)
+	{
+		// Collapse expanded area
+		this->setFixedHeight(ArtworkCollapsedHeight);
+	}
+	else
+	{
+		// Expand area to original height
+		this->setFixedHeight(ArtworkFullHeight);
+	}
 	update();
 }
 
