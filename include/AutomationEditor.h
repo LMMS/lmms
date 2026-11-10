@@ -36,7 +36,6 @@
 #include "LmmsTypes.h"
 #include "MidiClip.h"
 #include "SampleClip.h"
-#include "SampleThumbnailCache.h"
 #include "TimePos.h"
 
 class QPushButton;

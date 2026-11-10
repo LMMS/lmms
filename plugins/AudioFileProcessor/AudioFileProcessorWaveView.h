@@ -27,7 +27,6 @@
 
 
 #include "Knob.h"
-#include "SampleThumbnailCache.h"
 
 namespace lmms
 {
