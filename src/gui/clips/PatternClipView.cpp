@@ -174,7 +174,6 @@ void PatternClipView::paintEvent(QPaintEvent*)
 
 	TimePos longestLength(-1);
 	float lastY = height() * m_verticalPadding;
-	std::vector<QRect> noteRects;
 	for (const auto& track : Engine::patternStore()->tracks())
 	{
 		const MidiClip* const mClip = dynamic_cast<MidiClip*>(track->getClip(patternIndex));
@@ -193,14 +192,14 @@ void PatternClipView::paintEvent(QPaintEvent*)
 				std::max(1.0f, pixelsPerBar() / TimePos::stepsPerBar() - horizontalNoteSpacing),
 				std::max(1.0f, trackHeight - verticalNoteSpacing)
 			);
-			noteRects.emplace_back(noteRect);
+			pixPainter.setOpacity(std::clamp(note->getVolume() / 100.0, 0.2, 1.0));
+			pixPainter.drawRect(noteRect);
 		}
 
 		lastY += trackHeight;
 	}
 	// Compare how long the longest clip view is compared to the underlying pattern. First +1 for ceiling, second +1 for possible previous bar.
 	const int maxPossibleRepetions = getClip()->length() / longestLength + 1 + 1;
-	pixPainter.drawRects(noteRects.data(), static_cast<int>(noteRects.size()));
 	p.drawTiledPixmap(offset + horizontalNoteSpacing / 2 -pixelsPerPattern, 0, width() + (maxPossibleRepetions-1)*pixelsPerPattern, height(), mPatternPixmap);
 
 	// bar lines
