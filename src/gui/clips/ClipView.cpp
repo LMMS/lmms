@@ -665,17 +665,24 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			{
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				clipViews.push_back( this );
-
-				if (me->modifiers() & Qt::ShiftModifier)
-				{
-					// With Ctrl+Shift, we initiate a linked copy
-					m_clip->prepareContentLink();
-				}
 			}
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
 			m_action = Action::None;
 
+			for (auto cw : clipViews)
+			{
+				if (me->modifiers() & Qt::ShiftModifier)
+				{
+					// With Ctrl+Shift, we initiate a linked copy...
+					cw->getClip()->prepareContentLink();
+				}
+				else
+				{
+					// ..else, a standard copy
+					cw->getClip()->omitLinkOnNextExport();
+				}
+			}
 			// Write the Clips to the DataFile for copying
 			DataFile dataFile = createClipDataFiles( clipViews );
 
@@ -1075,9 +1082,10 @@ void ClipView::copy(QVector<ClipView *> clipvs, bool linkContent)
 	// For copyStringPair()
 	using namespace Clipboard;
 
-	if (linkContent)
+	for (auto clip : clipvs)
 	{
-		for (auto clip : clipvs) { clip->m_clip->prepareContentLink(); }
+		if (linkContent) {clip->getClip()->prepareContentLink();}
+		else {clip->getClip()->omitLinkOnNextExport();}
 	}
 
 	// Write the Clips to a DataFile for copying

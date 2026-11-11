@@ -171,6 +171,9 @@ public:
 	void prepareContentLink();
 	virtual void breakContentLink() {}
 
+	//! @brief Enable standard copy (no content link)
+	void omitLinkOnNextExport() {m_serializeLink = false;}
+
 public slots:
 	void toggleMute(); //!< Mutes this Clip
 
@@ -187,8 +190,10 @@ protected:
 	//! @param other The clip object which will be copied.
 	Clip(const Clip& other);
 
-	//!
+	//! Clip types allowing linked copies should store their data there
 	std::shared_ptr<ClipContent> m_content;
+	//! public flag used by clips to know if their content link should be serialized
+	bool m_serializeLink;
 
 	void replaceContent(std::shared_ptr<ClipContent>&& content);
 

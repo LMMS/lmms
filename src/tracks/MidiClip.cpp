@@ -454,11 +454,11 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 	midiClipElement.setAttribute("steps", content()->m_steps);
 	midiClipElement.setAttribute("len", length());
 
-	if (content()->m_shareToCopy && !content()->linkName().isEmpty())
+	if (m_serializeLink && content() && !content()->linkName().isEmpty())
 	{
 		midiClipElement.setAttribute("linkName", content()->linkName());
-		content()->m_shareToCopy = false;
 	}
+	m_serializeLink = true;
 
 	// now save settings of all notes
 	for (auto& note : content()->m_notes)

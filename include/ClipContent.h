@@ -55,9 +55,6 @@ public:
 
 	Type type() { return m_type; }
 
-	// public flag used by clips to know if the link should be serialized
-	bool m_shareToCopy;
-
 signals:
 	void contentChanged();
 

@@ -188,7 +188,7 @@ void Clip::prepareContentLink()
 			SharedContentRepository::submit(std::weak_ptr<ClipContent>(m_content))
 		);
 	}
-	m_content->m_shareToCopy = true;
+	m_serializeLink = true;
 }
 
 void Clip::replaceContent(std::shared_ptr<ClipContent>&& content)
