@@ -451,11 +451,7 @@ void VestigeInstrument::closePlugin( void )
 
 	if( m_subWindow != nullptr )
 	{
-
-		if( m_subWindow != nullptr )
-		{
-			delete m_subWindow;
-		}
+		delete m_subWindow;
 		m_subWindow = nullptr;
 	}
 
@@ -1097,9 +1093,7 @@ ManageVestigeInstrumentView::~ManageVestigeInstrumentView()
 	}
 
 	if ( m_vi->m_subWindow != nullptr ) {
-
-		if ( m_vi->m_subWindow != nullptr )
-			delete m_vi->m_subWindow;
+		delete m_vi->m_subWindow;
 		m_vi->m_subWindow = nullptr;
 	}
 
