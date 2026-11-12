@@ -84,6 +84,9 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	setSampleFile( "" );
 	restoreJournallingState();
 
+	if (orig.m_name_set)
+		setName(orig.getName());
+
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
 	connect(Engine::getSong(), &Song::tempoChanged, this, &SampleClip::tempoChanged, Qt::DirectConnection);
@@ -154,6 +157,16 @@ void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 	Engine::getSong()->setModified();
 }
 
+QString SampleClip::getName() const
+{
+	return m_name;
+}
+
+const QString& SampleClip::getNameRef() const
+{
+	return m_name;
+}
+
 void SampleClip::setSampleFile(const QString& sf)
 {
 	if (sf.isEmpty())
@@ -182,6 +195,9 @@ void SampleClip::setSampleFile(const QString& sf)
 		m_sampleThumbnailCache = std::move(thumbnailCache);
 		updateLength();
 	}
+
+	if (!m_name_set) // If file changed but name already modified, keep old name. (Prefer user-set over filename)
+		m_name = PathUtil::cleanName(m_sample.sampleFile());
 
 	emit sampleChanged();
 	emit playbackPositionChanged();
@@ -324,6 +340,11 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute("reversed", "true");
 	}
 	// TODO: start- and end-frame
+
+	if (m_name_set) // Only if it's changed from the filename
+	{
+		_this.setAttribute( "name", m_name );
+	}
 }
 
 
@@ -367,6 +388,11 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		m_sample.setReversed(true);
 		emit wasReversed(); // tell SampleClipView to update the view
 	}
+
+	if (_this.hasAttribute("name"))
+	{
+		setName( _this.attribute( "name") );
+	}
 }
 
 
@@ -375,6 +401,15 @@ void SampleClip::loadSettings( const QDomElement & _this )
 gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 {
 	return new gui::SampleClipView( this, _tv );
+}
+
+
+
+
+void SampleClip::setName( const QString& name )
+{
+	m_name = name;
+	m_name_set = true;
 }
 
 

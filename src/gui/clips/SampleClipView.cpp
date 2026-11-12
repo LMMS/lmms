@@ -27,11 +27,15 @@
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
+#include <QGraphicsView>
+#include <QLineEdit>
+#include <QVBoxLayout>
 
 #include "FileDialog.h"
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleThumbnailRenderer.h"
@@ -50,8 +54,39 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	m_paintPixmap(),
 	m_paintPixmapXPosition(0)
 {
+	auto renameLineEditScene = new QGraphicsScene{};
+	m_renameLineEdit = new QLineEdit{m_clip->getName(), nullptr};
+
 	// update UI and tooltip
 	updateSample();
+
+	// Initialize renaming-related data
+	{
+		m_renameLineEdit->setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
+		m_renameLineEdit->setReadOnly(true);
+		m_renameLineEdit->installEventFilter(this);
+
+		m_renameLineEditView = new QGraphicsView{};
+		m_renameLineEditView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		m_renameLineEditView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		m_renameLineEditView->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+		m_renameLineEditView->setScene(renameLineEditScene);
+
+		m_renameLineEditView->setStyleSheet("background:transparent; border: 0px;");
+
+		renameLineEditScene->addWidget(m_renameLineEdit);
+
+		auto mainLayout = new QVBoxLayout{this};
+		mainLayout->setContentsMargins(0, 0, 0, 0);
+		mainLayout->setSpacing(0);
+
+		mainLayout->addWidget(m_renameLineEditView, 0, Qt::AlignTop | Qt::AlignLeft);
+
+		m_renameLineEditView->hide();
+
+		connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &SampleClipView::renameFinished);
+	}
+
 
 	// track future changes of SampleClip
 	connect(m_clip, SIGNAL(sampleChanged()), this, SLOT(updateSample()));
@@ -59,6 +94,26 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	connect(m_clip, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
+}
+
+void SampleClipView::keyPressEvent(QKeyEvent* ke)
+{
+	if (!m_inRename) // Only care about key inputs if in rename process
+		return;
+
+	if (ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return)
+	{
+		renameFinished();
+	}
+	else if (ke->key() == Qt::Key_Escape)
+	{
+		m_renameCancelled = true;
+		renameFinished();
+	}
+	else
+	{
+		ke->ignore();
+	}
 }
 
 void SampleClipView::updateSample()
@@ -99,6 +154,11 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 		SLOT(setAutomationGhost())
 	);
 
+	cm->addAction(
+		tr("Rename clip"),
+		this,
+		SLOT(renameClip())
+	);
 }
 
 
@@ -296,8 +356,21 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		SampleThumbnailRenderer::visualize(param, p);
 	}
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
-	paintTextLabel(name, p);
+	if (!m_inRename) // Otherwise replaced by renaming QLineEdit
+	{
+		paintTextLabel(m_clip->getNameRef(), p);
+	}
+	else
+	{
+		if (m_renameLineEditMaxWidth > width())
+		{
+			m_renameLineEdit->setFixedWidth(width());
+		}
+		else
+		{
+			m_renameLineEdit->setFixedWidth(m_renameLineEditMaxWidth);
+		}
+	}
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
@@ -368,6 +441,61 @@ void SampleClipView::setAutomationGhost()
 	aEditor->parentWidget()->show();
 	aEditor->show();
 	aEditor->setFocus();
+}
+
+
+
+void SampleClipView::renameClip()
+{
+	m_inRename = true;
+	m_renameLineEdit->setReadOnly(false);
+
+	m_renameLineEdit->setText(m_clip->getNameRef());
+
+	QFontMetrics fontMetrics(font());
+	// Multiply width by 1.2 to give some breathing room
+	m_renameLineEditMaxWidth = fontMetrics.horizontalAdvance(m_clip->getNameRef()) * 1.2;
+
+	m_renameLineEdit->setFixedWidth(m_renameLineEditMaxWidth);
+	m_renameLineEditView->setFixedSize(m_renameLineEdit->width(), m_renameLineEdit->height());
+
+	update();
+
+	m_renameLineEditView->show();
+
+	m_renameLineEditView->setFocus();
+	m_renameLineEdit->selectAll();
+	m_renameLineEdit->setFocus();
+}
+
+
+
+void SampleClipView::renameFinished()
+{
+	m_inRename = false;
+
+	m_renameLineEdit->deselect();
+	m_renameLineEdit->setReadOnly(true);
+	m_renameLineEdit->setFixedWidth(m_renameLineEdit->width());
+
+	if (!m_renameCancelled)
+	{
+		auto newName = m_renameLineEdit->text();
+
+		if (!newName.isEmpty() && m_clip->getNameRef() != newName)
+		{
+			m_clip->setName(newName);
+			m_renameLineEdit->setText(newName);
+			Engine::getSong()->setModified();
+		}
+	}
+
+	setFocus();
+	m_renameLineEditView->hide();
+
+	m_renameCancelled = false;
+
+	update();
 }
 
 } // namespace lmms::gui
