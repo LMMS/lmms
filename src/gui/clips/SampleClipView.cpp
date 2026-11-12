@@ -154,11 +154,12 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 		SLOT(setAutomationGhost())
 	);
 
-	cm->addAction(
+	auto renameAction = cm->addAction(
 		tr("Rename clip"),
 		this,
 		SLOT(renameClip())
 	);
+	renameAction->setEnabled(m_clip->sampleLength() != 0);
 }
 
 
