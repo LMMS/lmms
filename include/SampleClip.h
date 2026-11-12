@@ -26,7 +26,6 @@
 #define LMMS_SAMPLE_CLIP_H
 
 #include <memory>
-#include <string>
 
 #include "Clip.h"
 #include "Sample.h"
