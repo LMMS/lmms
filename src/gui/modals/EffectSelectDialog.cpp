@@ -58,8 +58,8 @@
 namespace lmms::gui {
 
 const int nameColumnIdx = 0;
-const int categoryColumnIdx = 1;
-const int typeColumnIdx = 2;
+const int typeColumnIdx = 1;
+const int categoryColumnIdx = 2;
 const int favoritesColumnIdx = 3;
 
 EffectSelectDialog::EffectSelectDialog(QWidget* parent)
@@ -178,7 +178,6 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	m_pluginList->horizontalHeader()->setSectionResizeMode(favoritesColumnIdx, QHeaderView::ResizeToContents);
 	m_pluginList->setFocusPolicy(Qt::NoFocus);
 	m_pluginList->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(m_pluginList, &QTableView::customContextMenuRequested, this, &EffectSelectDialog::showContextMenu);
 
 	// Scroll Area
 	m_scrollArea->setWidgetResizable(true);
@@ -209,7 +208,8 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	m_pluginList->setSelectionModel(selectionModel);
 	connect(selectionModel, &QItemSelectionModel::currentRowChanged, this, &EffectSelectDialog::rowChanged);
 
-	connect(m_pluginList, &QTableView::doubleClicked, this, &EffectSelectDialog::acceptSelection);
+	connect(m_pluginList, &QTableView::doubleClicked, this,
+		[this](const QModelIndex& index) { EffectSelectDialog::selectPlugin(index); });
 
 	setModal(true);
 	installEventFilter(this);
@@ -419,24 +419,25 @@ QHBoxLayout* EffectSelectDialog::buildFavoriteOnlyFilterLayout()
 	return layout;
 }
 
-void EffectSelectDialog::showContextMenu(const QPoint& pos)
+void EffectSelectDialog::selectPlugin(const QModelIndex& index)
 {
-	QMenu menu(this);
-	QModelIndex selectedItem = m_pluginList->indexAt(pos);
-	QString selectedName = selectedItem.siblingAtColumn(nameColumnIdx).data(Qt::DisplayRole).toString();
-	QString selectedCategory = selectedItem.siblingAtColumn(categoryColumnIdx).data(Qt::DisplayRole).toString();
-	bool selectedIsFavorite = !selectedItem.siblingAtColumn(favoritesColumnIdx).data(Qt::DecorationRole).isNull();
-	auto* setFavoriteAction = new QAction(tr("Toggle favorite"), this);
-	connect(setFavoriteAction, &QAction::triggered, this, [selectedName, selectedIsFavorite]() {
-		getEffectCategory()->toggleFavorite(selectedName, !selectedIsFavorite);
-	});
-	menu.addAction(setFavoriteAction);
-	auto* setCategoryAction = new QAction(tr("Set category"), this);
-	connect(setCategoryAction, &QAction::triggered, this,
-		[this, selectedName, selectedCategory]() { showEffectCategoryEditDialog(selectedName, selectedCategory); });
-	menu.addAction(setCategoryAction);
-	menu.exec(QCursor::pos());
-	emit this->refreshData(selectedName);
+
+	const auto column = index.column();
+	const auto effectName = index.siblingAtColumn(nameColumnIdx).data().toString();
+	if (column == categoryColumnIdx)
+	{
+		const auto currentCategory = index.data().toString();
+		showEffectCategoryEditDialog(effectName, currentCategory);
+		return;
+	}
+	if (column == favoritesColumnIdx)
+	{
+		const auto isFavorite = !index.data(Qt::DecorationRole).isNull();
+		getEffectCategory()->toggleFavorite(effectName, !isFavorite);
+		emit this->refreshData(effectName);
+		return;
+	}
+	acceptSelection();
 }
 
 void EffectSelectDialog::showEffectCategoryEditDialog(QString effectName, QString currentCategory)

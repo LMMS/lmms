@@ -32,6 +32,7 @@
 #include <QRegularExpression>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <qabstractitemmodel.h>
 
 #include "Effect.h"
 
@@ -72,13 +73,13 @@ protected:
 	bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
 	{
 		QModelIndex nameIndex = sourceModel()->index(source_row, 0, source_parent);
-		QModelIndex categoryIndex = sourceModel()->index(source_row, 1, source_parent);
-		QModelIndex typeIndex = sourceModel()->index(source_row, 2, source_parent);
+		QModelIndex typeIndex = sourceModel()->index(source_row, 1, source_parent);
+		QModelIndex categoryIndex = sourceModel()->index(source_row, 2, source_parent);
 		QModelIndex favoriteIndex = sourceModel()->index(source_row, 3, source_parent);
 
 		QString name = sourceModel()->data(nameIndex, Qt::DisplayRole).toString();
-		QString category = sourceModel()->data(categoryIndex, Qt::DisplayRole).toString();
 		QString type = sourceModel()->data(typeIndex, Qt::DisplayRole).toString();
+		QString category = sourceModel()->data(categoryIndex, Qt::DisplayRole).toString();
 		bool isFavorite = !sourceModel()->data(favoriteIndex, Qt::DecorationRole).isNull();
 
 		QRegularExpression nameRegularExpression(filterRegularExpression());
@@ -130,7 +131,7 @@ private:
 	QStringList getEffectCategoryLabels();
 	QHBoxLayout* buildCategoryFilterLayout();
 	QHBoxLayout* buildFavoriteOnlyFilterLayout();
-	void showContextMenu(const QPoint&);
+	void selectPlugin(const QModelIndex& index);
 	void showEffectCategoryEditDialog(QString effectName, QString currentCategory);
 };
 
