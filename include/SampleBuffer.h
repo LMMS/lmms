@@ -26,7 +26,6 @@
 #define LMMS_SAMPLE_BUFFER_H
 
 #include <QString>
-#include <filesystem>
 #include <memory>
 #include <vector>
 
