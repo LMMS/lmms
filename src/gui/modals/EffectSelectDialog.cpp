@@ -208,9 +208,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	m_pluginList->setSelectionModel(selectionModel);
 	connect(selectionModel, &QItemSelectionModel::currentRowChanged, this, &EffectSelectDialog::rowChanged);
 
-	connect(m_pluginList, &QTableView::doubleClicked, this,
-		[this](const QModelIndex& index) { EffectSelectDialog::selectPlugin(index); });
-
+	connect(m_pluginList, &QTableView::doubleClicked, this, &EffectSelectDialog::selectPlugin);
 	setModal(true);
 	installEventFilter(this);
 
