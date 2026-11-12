@@ -160,7 +160,7 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	m_settings = new_fluid_settings();
 
-	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::audioEngine()->framesPerPeriod() );
+	fluid_settings_setint(m_settings, "synth.dynamic-sample-loading", 1);
 
 	// This sets up m_synth and updates reverb/chorus/gain
 	reloadSynth();
