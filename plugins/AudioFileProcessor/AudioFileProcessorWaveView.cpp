@@ -314,6 +314,7 @@ void AudioFileProcessorWaveView::paintEvent(QPaintEvent * pe)
 
 void AudioFileProcessorWaveView::updateGraph()
 {
+	if (m_sample->buffer().empty()) return;
 	if (m_to == 1)
 	{
 		setTo(m_sample->sampleSize() * 0.7);
