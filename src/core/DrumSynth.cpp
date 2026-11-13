@@ -191,6 +191,7 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 	QString file)
 {
 	const auto maxlen = std::max(std::size_t{1}, size) - 1; // TODO C++26: Use std::sub_sat(size, 1)
+	std::size_t len = 0;
 	stringstream is;
 	bool inSection = false;
 	std::array<char, 200> line = {};
@@ -201,11 +202,6 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 	f.open(QIODevice::ReadOnly);
 	QByteArray dat = f.readAll().constData();
 	is.str(string(dat.constData(), dat.size()));
-
-	// If buffer[0] isn't overwritten after reading file, default value
-	// `def` will be used.
-	std::memset(buffer, '\0', size);
-
 	while (is.good())
 	{
 		if (!inSection)
@@ -221,28 +217,33 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 		{
 			is.getline(line.data(), line.size());
 			if (line[0] == '[') { break; }
-
 			char* k = std::strtok(line.data(), " \t=");
 			char* b = std::strtok(nullptr, "\n\r\0");
 			if (k && !strcasecmp(k, key))
 			{
 				if (b)
 				{
-					// Trim trailing whitespace
-					k = &b[std::strlen(b)];
-					while (k >= b && (*k == ' ' || *k == '\t')) { --k; }
+					k = &b[strlen(b) - 1];
+					while (k >= b && (*k == ' ' || *k == '\t')) { --k; } // Trim trailing whitespace
 					k[1] = '\0'; // k == b - 1 when string is empty or all whitespace
-					std::strncpy(buffer, b, maxlen);
+					len = std::clamp<ptrdiff_t>(1 + k - b, 0, maxlen);
+					std::strncpy(buffer, b, len + 1);
+				}
+				else
+				{
+					len = 0;
+					buffer[0] = '\0';
 				}
 				break;
 			}
 		}
 	}
-
-	// Use default value `def` if value is missing
-	if (!buffer[0]) { std::strncpy(buffer, def, maxlen); }
-	// Since nothing ever copies past `maxlen`, buffer must be null-terminated
-	const auto len = std::strlen(buffer);
+	// Use default value if missing
+	if (!len)
+	{
+		len = std::strlen(def);
+		std::strncpy(buffer, def, size);
+	}
 	return len;
 }
 
