@@ -98,8 +98,8 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 
 void SampleClipView::keyPressEvent(QKeyEvent* ke)
 {
-	if (!m_inRename) // Only care about key inputs if in rename process
-		return;
+	// Only care about key inputs if in rename process
+	if (!m_inRename) { return; }
 
 	if (ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return)
 	{
