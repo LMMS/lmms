@@ -346,7 +346,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	if (m_name_set) // Only if it's changed from the filename
 	{
-		_this.setAttribute( "name", m_name );
+		_this.setAttribute("name", m_name);
 	}
 }
 
