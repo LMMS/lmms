@@ -42,9 +42,7 @@ namespace lmms
 {
 
 AudioSndio::AudioSndio(bool& _success_ful, AudioEngine* _audioEngine)
-	: AudioDevice(std::clamp<ch_cnt_t>(ConfigManager::inst()->value("audiosndio", "channels").toInt(), DEFAULT_CHANNELS,
-					  DEFAULT_CHANNELS),
-		  _audioEngine)
+	: AudioDevice(DEFAULT_CHANNELS, _audioEngine)
 {
 	_success_ful = false;
 
