@@ -22,10 +22,10 @@
  *
  */
 
-#include <cstring>
-
 #include "AudioDevice.h"
 #include "AudioEngine.h"
+#include "endian_handling.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -90,49 +90,40 @@ void AudioDevice::renamePort(AudioBusHandle*)
 {
 }
 
-int AudioDevice::convertToS16(const SampleFrame* _ab,
-								const f_cnt_t _frames,
-								int_sample_t * _output_buffer,
-								const bool _convert_endian )
+void AudioDevice::toInt16leInterleaved(std::span<const SampleFrame>&& src, std::span<int_sample_t>&& dst)
 {
-	if( _convert_endian )
+	// FIXME: SampleFrame is hardcoded stereo (DEFAULT_CHANNELS) so this function cannot fully respect
+	// AudioDevice::m_channels.
+	assert(m_channels <= 2);
+	if (m_channels == 2)
 	{
-		for( f_cnt_t frame = 0; frame < _frames; ++frame )
+		assert(dst.size() == src.size() * 2); // Every SampleFrame corresponds to two int_sample_t
+		for (f_cnt_t f = 0; f < src.size(); ++f)
 		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				auto temp = static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
-
-				( _output_buffer + frame * channels() )[chnl] =
-						( temp & 0x00ff ) << 8 |
-						( temp & 0xff00 ) >> 8;
-			}
+			const sample_t l = AudioEngine::clip(src[f].left()) * OUTPUT_SAMPLE_MULTIPLIER;
+			const sample_t r = AudioEngine::clip(src[f].right()) * OUTPUT_SAMPLE_MULTIPLIER;
+			dst[DEFAULT_CHANNELS * f + 0] = byteswapIfBE(static_cast<int_sample_t>(l));
+			dst[DEFAULT_CHANNELS * f + 1] = byteswapIfBE(static_cast<int_sample_t>(r));
 		}
 	}
-	else
+	else if (m_channels == 1) // Mixdown to mono if only one channel
 	{
-		for( f_cnt_t frame = 0; frame < _frames; ++frame )
+		assert(dst.size() == src.size()); // Every SampleFrame corresponds to one int_sample_t
+		for (f_cnt_t f = 0; f < src.size(); ++f)
 		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				(_output_buffer + frame * channels())[chnl]
-					= static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
-			}
+			const sample_t c = AudioEngine::clip(src[f].average()) * OUTPUT_SAMPLE_MULTIPLIER;
+			dst[f] = byteswapIfBE(static_cast<int_sample_t>(c));
 		}
 	}
-
-	return _frames * channels() * BYTES_PER_INT_SAMPLE;
 }
 
-
-
-
-void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const f_cnt_t _frames )
+void AudioDevice::toInt16(std::span<const sample_t>&& src, std::span<int_sample_t>&& dst)
 {
-
-	assert( _outbuf != nullptr );
-
-	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
+	assert(dst.size() == src.size());
+	for (f_cnt_t f = 0; f < src.size(); ++f)
+	{
+		dst[f] = static_cast<int_sample_t>(AudioEngine::clip(src[f]) * OUTPUT_SAMPLE_MULTIPLIER);
+	}
 }
 
 } // namespace lmms
