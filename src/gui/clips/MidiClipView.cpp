@@ -31,9 +31,11 @@
 #include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
+#include <qobjectdefs.h>
 #include <set>
 
 #include "AutomationEditor.h"
+#include "Clip.h"
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
@@ -63,6 +65,7 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 {
 	connect( getGUI()->pianoRoll(), SIGNAL(currentMidiClipChanged()),
 			this, SLOT(update()));
+	connect(m_clip, &MidiClip::contentChanged, this, &MidiClipView::update);
 	update();
 
 	setStyle( QApplication::style() );
@@ -380,7 +383,7 @@ void MidiClipView::clearNotesOutOfBounds()
 	TimePos startBound = -m_clip->startTimeOffset();
 	TimePos endBound = m_clip->length() - m_clip->startTimeOffset();
 
-	for (Note const* note: m_clip->m_notes)
+	for (Note const* note: m_clip->content()->m_notes)
 	{
 		const TimePos newNoteStart = std::max(note->pos(), startBound) - startBound;
 		const TimePos newNoteEnd = std::min(note->endPos(), endBound) - startBound;
@@ -433,14 +436,14 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 //	get the step number that was clicked on and
 //	do calculations in floats to prevent rounding errors...
 		float tmp = ((static_cast<float>(pos.x()) - BORDER_WIDTH)
-			* static_cast<float>(m_clip->m_steps)) / static_cast<float>(width() - BORDER_WIDTH * 2);
+			* static_cast<float>(m_clip->content()->m_steps)) / static_cast<float>(width() - BORDER_WIDTH * 2);
 
 		int step = int( tmp );
 
 //	debugging to ensure we get the correct step...
 //		qDebug( "Step (%f) %d", tmp, step );
 
-		if( step >= m_clip->m_steps )
+		if( step >= m_clip->content()->m_steps )
 		{
 			qDebug( "Something went wrong in clip.cpp: step %d doesn't exist in clip!", step );
 			return;
@@ -503,11 +506,11 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
 		float tmp = ((float(pos.x()) - BORDER_WIDTH) *
-				float(m_clip -> m_steps)) / float(width() - BORDER_WIDTH*2);
+				float(m_clip ->content()->m_steps)) / float(width() - BORDER_WIDTH*2);
 
 		int step = int( tmp );
 
-		if( step >= m_clip->m_steps )
+		if( step >= m_clip->content()->m_steps )
 		{
 			return;
 		}
@@ -629,7 +632,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	const int x_base = BORDER_WIDTH;
 
 	bool displayPattern = fixedClips() || (pixelsPerBar >= 96 && m_legacySEPattern);
-	NoteVector const & noteCollection = m_clip->m_notes;
+	NoteVector const & noteCollection = m_clip->content()->m_notes;
 
 	// Beat clip paint event (on BB Editor)
 	if (beatClip && displayPattern)
@@ -639,7 +642,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		QPixmap stepoff;
 		QPixmap stepoffl;
 		QPixmap stephighlight;
-		const int steps = std::max(1, m_clip->m_steps);
+		const int steps = std::max(1, m_clip->content()->m_steps);
 		const int w = width() - 2 * BORDER_WIDTH;
 
 		// scale step graphics to fit the beat clip length
@@ -838,6 +841,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	{
 		paintTextLabel(m_clip->name(), p);
 	}
+	paintLinkLabel(p);
 
 	if( !( fixedClips() && beatClip ) )
 	{
@@ -888,7 +892,7 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 	auto rightClip =  m_clip->clone();
 	rightClip->clearNotes();
 
-	for (Note const* note : m_clip->m_notes)
+	for (Note const* note : m_clip->content()->m_notes)
 	{
 		if (note->pos() >= internalSplitPos)
 		{
@@ -905,7 +909,7 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 		}
 	}
 
-	for (Note const* note : m_clip->m_notes)
+	for (Note const* note : m_clip->content()->m_notes)
 	{
 		if (note->endPos() <= internalSplitPos)
 		{
