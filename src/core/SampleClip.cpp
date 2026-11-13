@@ -409,7 +409,7 @@ gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 
 
 
-void SampleClip::setName( const QString& name )
+void SampleClip::setName(const QString& name)
 {
 	m_name = name;
 	m_name_set = true;
