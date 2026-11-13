@@ -82,18 +82,6 @@ public:
 	auto frame(f_cnt_t frameIndex) const -> std::span<const float>
 	{ return {&m_data[frameIndex * m_channels], m_channels}; }
 
-	//! @returns A frame iterator at the beginning of the buffer
-	auto begin() { return view().framesView().begin(); }
-
-	//! @returns A frame iterator at the beginning of the buffer
-	auto begin() const { return view().framesView().begin(); }
-
-	//! @returns A frame iterator at the end of the buffer
-	auto end() { return view().framesView().end(); }
-
-	//! @returns A frame iterator at the end of the buffer
-	auto end() const { return view().framesView().end(); }
-
 	//! @returns An interleaved view of the buffer
 	auto view() -> InterleavedBufferView<float> { return {m_data.data(), m_channels, frames()}; }
 
