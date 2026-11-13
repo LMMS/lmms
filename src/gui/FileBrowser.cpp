@@ -814,7 +814,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		if (auto buffer = SampleBuffer::fromFile(fileName))
 		{
 			auto s = new SamplePlayHandle(new lmms::Sample{std::move(*buffer)});
-			s->setDoneMayReturnTrue(false);
+			s->setAutoFinish(false);
 			newPPH = s;
 		}
 		delete tf;

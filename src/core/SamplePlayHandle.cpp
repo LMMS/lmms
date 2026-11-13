@@ -94,7 +94,7 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 
 bool SamplePlayHandle::isFinished() const
 {
-	return framesDone() >= totalFrames() && m_doneMayReturnTrue == true;
+	return framesDone() >= totalFrames() && m_autoFinish;
 }
 
 

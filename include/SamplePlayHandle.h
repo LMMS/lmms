@@ -60,9 +60,10 @@ public:
 	{
 		return( m_frame );
 	}
-	void setDoneMayReturnTrue( bool _enable )
+
+	void setAutoFinish(bool _enable)
 	{
-		m_doneMayReturnTrue = _enable;
+		m_autoFinish = _enable;
 	}
 
 	void setPatternTrack(PatternTrack* pt)
@@ -77,7 +78,7 @@ private:
 	f_cnt_t m_frame = 0;
 	Track* m_track = nullptr;
 	PatternTrack* m_patternTrack = nullptr;
-	bool m_doneMayReturnTrue = true;
+	bool m_autoFinish = true;
 } ;
 
 
