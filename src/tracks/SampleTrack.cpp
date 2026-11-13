@@ -93,7 +93,7 @@ bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 		clips.push_back(sClip);
 		if (trackContainer() == Engine::patternStore())
 		{
-			auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
+			auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().buffer().sampleRate());
 			f_cnt_t sampleStart = bufferFramesPerTick * _start;
 			pattern_track = PatternTrack::findPatternTrack(_clip_num);
 			sClip->setSampleStartFrame(sampleStart);
@@ -113,10 +113,10 @@ bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 			{
 				if( sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset()) )
 				{
-					auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
+					auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().buffer().sampleRate());
 					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() );
 					f_cnt_t clipFrameLength = bufferFramesPerTick * ( sClip->endPosition() - sClip->startPosition() - sClip->startTimeOffset() );
-					f_cnt_t sampleBufferLength = sClip->sample().frames();
+					f_cnt_t sampleBufferLength = sClip->sample().buffer().frames();
 					//if the Clip smaller than the sample length we play only until Clip end
 					//else we play the sample to the end but nothing more
 					f_cnt_t samplePlayLength = clipFrameLength > sampleBufferLength ? sampleBufferLength : clipFrameLength;
