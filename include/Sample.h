@@ -83,11 +83,7 @@ public:
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 
-	auto path() const -> const QString& { return m_buffer->path(); }
-	auto sampleRate() const -> int { return m_buffer->sampleRate(); }
-	auto frames() const -> size_t { return m_buffer->frames(); }
-
-	auto buffer() const -> const SampleBuffer& { return *m_buffer.get(); }
+	auto buffer() const -> const SampleBuffer& { return *m_buffer; }
 	auto shareBuffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
 
 	auto startFrame() const -> int { return m_startFrame.load(std::memory_order_relaxed); }

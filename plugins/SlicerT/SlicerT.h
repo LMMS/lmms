@@ -34,6 +34,8 @@
 
 namespace lmms {
 
+class SampleThumbnailCache;
+
 class SlicerT : public Instrument
 {
 	Q_OBJECT
@@ -73,6 +75,7 @@ private:
 	BoolModel m_enableSync;
 
 	Sample m_originalSample;
+	std::shared_ptr<const SampleThumbnailCache> m_sampleThumbnailCache;
 
 	std::vector<float> m_slicePoints;
 
