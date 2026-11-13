@@ -1,0 +1,47 @@
+include(BuildPlugin)
+
+build_plugin(sfzplayer
+	SfzPlayer.cpp
+	SfzPlayer.h
+	SfzPlayerView.cpp
+	SfzPlayerView.h
+	SfzOpcodes.cpp
+	SfzOpcodes.h
+	SfzOpcodeState.cpp
+	SfzOpcodeState.h
+	SfzRegion.cpp
+	SfzRegion.h
+	SfzParser.cpp
+	SfzParser.h
+	SfzRegionPlayState.cpp
+	SfzRegionPlayState.h
+	SfzRegionManager.cpp
+	SfzRegionManager.h
+	SfzGlobalState.cpp
+	SfzGlobalState.h
+	SfzControlsConfig.h
+	SfzTrigger.cpp
+	SfzTrigger.h
+	SfzSampleBuffer.cpp
+	SfzSampleBuffer.h
+	SfzSamplePool.cpp
+	SfzSamplePool.h
+	SfzBasicWaves.cpp
+	SfzBasicWaves.h
+	MOCFILES
+	SfzPlayer.h
+	SfzPlayerView.h
+	SfzOpcodes.h
+	SfzOpcodeState.h
+	SfzRegion.h
+	SfzParser.h
+	SfzRegionPlayState.h
+	SfzRegionManager.h
+	SfzGlobalState.h
+	SfzControlsConfig.h
+	SfzTrigger.h
+	SfzSampleBuffer.h
+	SfzSamplePool.h
+	SfzBasicWaves.h
+	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.svg"
+)
