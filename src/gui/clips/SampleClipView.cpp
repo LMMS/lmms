@@ -72,7 +72,7 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 		m_renameLineEditView->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 		m_renameLineEditView->setScene(renameLineEditScene);
 
-		m_renameLineEditView->setStyleSheet("background:transparent; border: 0px;");
+		m_renameLineEditView->setStyleSheet("background: transparent; border: 0px;");
 
 		renameLineEditScene->addWidget(m_renameLineEdit);
 
