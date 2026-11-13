@@ -363,14 +363,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	}
 	else
 	{
-		if (m_renameLineEditMaxWidth > width())
-		{
-			m_renameLineEdit->setFixedWidth(width());
-		}
-		else
-		{
-			m_renameLineEdit->setFixedWidth(m_renameLineEditMaxWidth);
-		}
+		m_renameLineEdit->setFixedWidth(std::min(width(), m_renameLineEditMaxWidth));
 	}
 
 	// disable antialiasing for borders, since its not needed
