@@ -36,19 +36,12 @@
 namespace lmms
 {
 
-SamplePlayHandle::SamplePlayHandle(SampleBuffer buffer)
-	: PlayHandle(Type::SamplePlayHandle)
-	, m_ownedSample{std::make_unique<Sample>(std::move(buffer))}
-	, m_sample{m_ownedSample.get()}
-{
-	setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
-}
-
 SamplePlayHandle::SamplePlayHandle(Sample* sample)
 	: PlayHandle(Type::SamplePlayHandle)
 	, m_sample{sample}
+	, m_audioBusHandle{std::make_unique<AudioBusHandle>("SamplePlayHandle", false)}
 {
-	setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
+	setAudioBusHandle(m_audioBusHandle.get());
 }
 
 SamplePlayHandle::SamplePlayHandle(SampleClip* clip)
@@ -57,17 +50,6 @@ SamplePlayHandle::SamplePlayHandle(SampleClip* clip)
 	m_track = clip->getTrack();
 	setAudioBusHandle(((SampleTrack *)clip->getTrack())->audioBusHandle());
 }
-
-
-
-
-SamplePlayHandle::~SamplePlayHandle()
-{
-	if (m_ownedSample) { delete audioBusHandle(); }
-}
-
-
-
 
 void SamplePlayHandle::play( SampleFrame* buffer )
 {
