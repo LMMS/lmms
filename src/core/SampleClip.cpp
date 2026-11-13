@@ -196,8 +196,11 @@ void SampleClip::setSampleFile(const QString& sf)
 		updateLength();
 	}
 
-	if (!m_name_set) // If file changed but name already modified, keep old name. (Prefer user-set over filename)
+	if (!m_name_set)
+	{
+		// If file changed but name already modified, keep old name. (Prefer user-set over filename)
 		m_name = PathUtil::cleanName(m_sample.sampleFile());
+	}
 
 	emit sampleChanged();
 	emit playbackPositionChanged();
