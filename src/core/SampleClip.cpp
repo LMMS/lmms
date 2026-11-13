@@ -84,8 +84,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	setSampleFile( "" );
 	restoreJournallingState();
 
-	if (orig.m_name_set)
-		setName(orig.getName());
+	if (orig.m_name_set) { setName(orig.getName()); }
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
