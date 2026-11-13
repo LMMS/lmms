@@ -229,6 +229,7 @@ PianoRoll::PianoRoll() :
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
 	m_nemStr.push_back( tr( "Note Panning" ) );
+	m_nemStr.push_back( tr( "Note Rand" ) );
 
 	m_noteEditMenu = new QMenu( this );
 	m_noteEditMenu->clear();
@@ -502,6 +503,10 @@ void PianoRoll::showPanTextFloat(panning_t pan, const QPoint &pos, int timeout)
 	showTextFloat( text, pos, timeout );
 }
 
+void PianoRoll::showChanceTextFloat(noterand_t c, const QPoint &pos, int timeout)
+{
+	showTextFloat( tr("Chance: %1%").arg( qRound(c * 100.f) ), pos, timeout );
+}
 
 
 void PianoRoll::changeNoteEditMode( int i )
@@ -2609,6 +2614,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			// if middle-click, set to defaults
 			volume_t vol = DefaultVolume;
 			panning_t pan = DefaultPanning;
+			noterand_t chance = DefaultChance;
 
 			if( me->buttons() & Qt::LeftButton )
 			{
@@ -2621,6 +2627,11 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 					+ static_cast<float>(std::max(0, noteEditBottom() - pos.y()))
 					/ static_cast<float>(noteEditBottom() - noteEditTop())
 					* (PanningRight - PanningLeft)), PanningLeft, PanningRight);
+
+				chance = std::clamp(std::round(
+					static_cast<noterand_t>(std::max(0, noteEditBottom() - pos.y()))
+					/ static_cast<noterand_t>(noteEditBottom() - noteEditTop()) * 100.f) / 100.f,
+					MinChance, MaxChance);
 			}
 
 			if( m_noteEditMode == NoteEditMode::Volume )
@@ -2632,6 +2643,10 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			{
 				m_lastNotePanning = pan;
 				showPanTextFloat(pan, position(me));
+			}
+			else if( m_noteEditMode == NoteEditMode::Chance )
+			{
+				showChanceTextFloat(chance, position(me));
 			}
 
 			// When alt is pressed we only edit the note under the cursor
@@ -2669,6 +2684,10 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 						MidiEvent evt( MidiMetaEvent, -1, n->key(), panningToMidi( pan ) );
 						evt.setMetaEvent( MidiNotePanning );
 						m_midiClip->instrumentTrack()->processInEvent( evt );
+					}
+					else if( m_noteEditMode == NoteEditMode::Chance )
+					{
+						n->setChance( chance );
 					}
 				}
 				else if( n->isPlaying() && !isSelection() )
@@ -3841,6 +3860,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 						( (float)( noteEditBottom() - noteEditTop() ) ) / 2.0f,
 						    noteEditLeft() + x , editHandleTop ) );
 			}
+			else if( m_noteEditMode == NoteEditMode::Chance )
+			{
+				QColor color = note->selected() ? m_selectedNoteColor
+					: m_barColor.lighter(30 + static_cast<int>(note->getChance() * 90));
+				p.setPen( QPen( color, NOTE_EDIT_LINE_WIDTH ) );
+				editHandleTop = noteEditBottom() - note->getChance() * (noteEditBottom() - noteEditTop());
+				p.drawLine( QLineF( noteEditLeft() + x + 0.5, editHandleTop + 0.5,
+							noteEditLeft() + x + 0.5, noteEditBottom() + 0.5 ) );
+			}
+
 			editHandles << QPoint ( x + noteEditLeft(),
 						editHandleTop );
 
@@ -4151,6 +4180,15 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					// panning
 					showPanTextFloat(nv[0]->getPanning(), pos, 1000);
 				}
+			}
+			else if( m_noteEditMode == NoteEditMode::Chance )
+			{
+				for( Note * n : nv ) { n->setChance( n->getChance() + step * 0.01f ); }
+				if( std::all_of( nv.begin(), nv.end(), [&](const Note* n){ return qFuzzyCompare(n->getChance(), nv[0]->getChance()); } ) )
+				{
+					showChanceTextFloat( nv[0]->getChance(), pos, 1000 );
+				}
+				m_midiClip->dataChanged();
 			}
 			update();
 		}
@@ -4675,6 +4713,17 @@ void PianoRoll::enterValue( NoteVector* nv )
 			m_lastNotePanning = new_val;
 		}
 
+	}
+	else if( m_noteEditMode == NoteEditMode::Chance )
+	{
+		bool ok;
+		const double v = QInputDialog::getDouble( this, "Piano roll: note chance",
+			tr( "Please enter a new value between %1 and %2:" ).arg( 0 ).arg( 1 ),
+			(*nv)[0]->getChance(), MinChance, MaxChance, 2, &ok );
+		if( ok )
+		{
+			for( Note * n : *nv ) { n->setChance( static_cast<noterand_t>(v) ); }
+		}
 	}
 }
 
