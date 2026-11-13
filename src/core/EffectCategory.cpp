@@ -296,8 +296,7 @@ EffectCategory* EffectCategory::instance()
 	return s_instance.get();
 }
 
-EffectCategory* getEffectCategory()
-{ return EffectCategory::instance(); }
+EffectCategory* getEffectCategory() { return EffectCategory::instance(); }
 
 QString EffectCategory::getCategoryName(QString effectName)
 {

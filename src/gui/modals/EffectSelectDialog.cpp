@@ -432,7 +432,7 @@ void EffectSelectDialog::selectPlugin(const QModelIndex& index)
 	{
 		const auto isFavorite = !index.data(Qt::DecorationRole).isNull();
 		getEffectCategory()->toggleFavorite(effectName, !isFavorite);
-		emit this->refreshData(effectName);
+		emit refreshData(effectName);
 		return;
 	}
 	acceptSelection();

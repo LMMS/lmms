@@ -32,7 +32,6 @@
 #include <QRegularExpression>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
-#include <qabstractitemmodel.h>
 
 #include "Effect.h"
 
