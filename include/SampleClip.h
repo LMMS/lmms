@@ -111,8 +111,8 @@ private:
 	bool m_isPlaying;
 	int m_startFrameOffset;
 
-	QString m_name; // Display name
-	bool m_name_set = false; // Whether m_name was set by the user
+	QString m_name; //!< Display name
+	bool m_name_set = false; //!< Whether m_name was set by the user
 
 	friend class gui::SampleClipView;
 
