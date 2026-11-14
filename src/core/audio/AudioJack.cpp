@@ -346,7 +346,7 @@ void AudioJack::unregisterPort(AudioBusHandle* port)
 		{
 			if (m_portMap[port].ports[ch] != nullptr) { jack_port_unregister(m_client, m_portMap[port].ports[ch]); }
 		}
-		m_portMap.erase(m_portMap.find(port));
+		m_portMap.remove(port);
 	}
 #else
 	(void)port;

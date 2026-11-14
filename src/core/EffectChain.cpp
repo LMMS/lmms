@@ -28,6 +28,8 @@
 #include <QDomElement>
 #include <cassert>
 
+#include <algorithm>
+
 #include "AudioBuffer.h"
 #include "Effect.h"
 #include "DummyEffect.h"
@@ -137,7 +139,7 @@ void EffectChain::removeEffect( Effect * _effect )
 {
 	Engine::audioEngine()->requestChangeInModel();
 
-	auto found = std::find(m_effects.begin(), m_effects.end(), _effect);
+	auto found = std::ranges::find(m_effects, _effect);
 	if( found == m_effects.end() )
 	{
 		Engine::audioEngine()->doneChangeInModel();
@@ -162,7 +164,7 @@ void EffectChain::moveDown( Effect * _effect )
 {
 	if (_effect != m_effects.back())
 	{
-		auto it = std::find(m_effects.begin(), m_effects.end(), _effect);
+		auto it = std::ranges::find(m_effects, _effect);
 		assert(it != m_effects.end());
 		std::swap(*std::next(it), *it);
 	}
@@ -175,7 +177,7 @@ void EffectChain::moveUp( Effect * _effect )
 {
 	if (_effect != m_effects.front())
 	{
-		auto it = std::find(m_effects.begin(), m_effects.end(), _effect);
+		auto it = std::ranges::find(m_effects, _effect);
 		assert(it != m_effects.end());
 		std::swap(*std::prev(it), *it);
 	}

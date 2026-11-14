@@ -1173,9 +1173,8 @@ void Song::loadProject( const QString & fileName )
 	ControllerConnection::finalizeConnections();
 
 	// Remove dummy controllers that was added for correct connections
-	m_controllers.erase(std::remove_if(m_controllers.begin(), m_controllers.end(),
-		[](Controller* c){return c->type() == Controller::ControllerType::Dummy;}),
-		m_controllers.end());
+	std::erase_if(m_controllers,
+		[](Controller* c){return c->type() == Controller::ControllerType::Dummy;});
 
 	// resolve all IDs so that autoModels are automated
 	AutomationClip::resolveAllIDs();
@@ -1447,7 +1446,7 @@ void Song::setProjectFileName(QString const & projectFileName)
 
 void Song::addController( Controller * controller )
 {
-	bool containsController = std::find(m_controllers.begin(), m_controllers.end(), controller) != m_controllers.end();
+	const bool containsController = std::ranges::find(m_controllers, controller) != m_controllers.end();
 	if (controller && !containsController)
 	{
 		m_controllers.push_back(controller);
@@ -1462,7 +1461,7 @@ void Song::addController( Controller * controller )
 
 void Song::removeController( Controller * controller )
 {
-	auto it = std::find(m_controllers.begin(), m_controllers.end(), controller);
+	auto it = std::ranges::find(m_controllers, controller);
 	if (it != m_controllers.end())
 	{
 		m_controllers.erase(it);
