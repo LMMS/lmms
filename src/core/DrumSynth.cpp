@@ -190,7 +190,10 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 	const char* key, const char* def, char* buffer, std::size_t size,
 	QString file)
 {
-	const auto maxlen = std::max(std::size_t{1}, size) - 1; // TODO C++26: Use std::sub_sat(size, 1)
+	// buffer is intended to be null-terminated. size of 0 can't fit
+	// anything, size of 1 can only fit the null terminator. Neither
+	// should ever happen
+	assert(size > 1);
 	std::size_t len = 0;
 	stringstream is;
 	bool inSection = false;
@@ -226,8 +229,8 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 					k = &b[strlen(b) - 1];
 					while (k >= b && (*k == ' ' || *k == '\t')) { --k; } // Trim trailing whitespace
 					k[1] = '\0'; // k == b - 1 when string is empty or all whitespace
-					len = std::clamp<ptrdiff_t>(1 + k - b, 0, maxlen);
-					std::strncpy(buffer, b, len + 1);
+					len = std::clamp<ptrdiff_t>(1 + k - b, 0, size - 1); // Exclude null terminator from the length...
+					std::strncpy(buffer, b, len + 1); // ...but include it when copying
 				}
 				else
 				{
