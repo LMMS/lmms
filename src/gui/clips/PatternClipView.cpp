@@ -164,15 +164,15 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	const int horizontalNoteSpacing = pixelsPerBar() / TimePos::stepsPerBar() * m_noteHorizontalSpacing;
 
 	// This pixmap is a batching optimization which draws notes into one vertical strip for tiling patterns.
-	QPixmap mPatternPixmap(pixelsPerPattern, m_paintPixmap.height());
-	mPatternPixmap.fill(Qt::transparent);
+	QPixmap midiPatternPixmap(pixelsPerPattern, m_paintPixmap.height());
+	midiPatternPixmap.fill(Qt::transparent);
 
-	QPainter pixPainter(&mPatternPixmap);
+	QPainter pixPainter(&midiPatternPixmap);
 	pixPainter.setPen(Qt::NoPen);
 	const auto noteColor = QColor(m_noteColor.red(), m_noteColor.green(), m_noteColor.blue());
 	pixPainter.setBrush(QBrush(noteColor));
 
-	TimePos longestLength(-1);
+	TimePos longestLength(1);
 	float lastY = height() * m_verticalPadding;
 	for (const auto& track : Engine::patternStore()->tracks())
 	{
@@ -200,7 +200,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	}
 	// Compare how long the longest clip view is compared to the underlying pattern. First +1 for ceiling, second +1 for possible previous bar.
 	const int maxPossibleRepetions = getClip()->length() / longestLength + 1 + 1;
-	p.drawTiledPixmap(offset + horizontalNoteSpacing / 2 - pixelsPerPattern, 0, width() + (maxPossibleRepetions - 1) * pixelsPerPattern, height(), mPatternPixmap);
+	p.drawTiledPixmap(offset + horizontalNoteSpacing / 2 - pixelsPerPattern, 0, width() + (maxPossibleRepetions - 1) * pixelsPerPattern, height(), midiPatternPixmap);
 
 	// bar lines
 	const int lineSize = 3;
