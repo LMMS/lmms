@@ -228,9 +228,10 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 				{
 					k = &b[strlen(b) - 1];
 					while (k >= b && (*k == ' ' || *k == '\t')) { --k; } // Trim trailing whitespace
-					k[1] = '\0'; // k == b - 1 when string is empty or all whitespace
-					len = std::clamp<ptrdiff_t>(1 + k - b, 0, size - 1); // Exclude null terminator from the length...
-					std::strncpy(buffer, b, len + 1); // ...but include it when copying
+					// k == b - 1 when string is empty or all whitespace
+					len = std::clamp<ptrdiff_t>(1 + k - b, 0, size - 1);
+					std::memcpy(buffer, b, len);
+					buffer[len] = '\0';
 				}
 				else
 				{
