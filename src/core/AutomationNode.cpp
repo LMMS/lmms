@@ -64,10 +64,6 @@ AutomationNode::AutomationNode(AutomationClip* clip, float inValue, float outVal
 {
 }
 
-/**
- * @brief Sets the inValue of an automation node
- * @param Float value to be assigned
-*/
 void AutomationNode::setInValue(float value)
 {
 	m_inValue = value;
@@ -84,10 +80,6 @@ void AutomationNode::setInValue(float value)
 	m_clip->generateTangents(it, 3);
 }
 
-/**
- * @brief Sets the outValue of an automation node
- * @param Float value to be assigned
-*/
 void AutomationNode::setOutValue(float value)
 {
 	m_outValue = value;
@@ -104,9 +96,6 @@ void AutomationNode::setOutValue(float value)
 	m_clip->generateTangents(it, 3);
 }
 
-/**
- * @brief Resets the outValue so it matches inValue
-*/
 void AutomationNode::resetOutValue()
 {
 	// Calls setOutValue so it also takes care of generating

@@ -351,6 +351,11 @@ void Song::processNextBuffer()
 	m_vstSyncController.setPlaybackJumped(false);
 }
 
+void Song::removeOldAutomatedValue(AutomatableModel* am)
+{
+	// Get rid of object inside Song.m_oldAutomatedValues #8571
+	m_oldAutomatedValues.remove(am);
+}
 
 void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_cnt_t)
 {
@@ -1215,6 +1220,13 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 {
 	using gui::getGUI;
 
+	// ensure property order in file is consistent across saves
+#if QT_VERSION < QT_VERSION_CHECK(6, 6, 0)
+	qSetGlobalQHashSeed(0);
+#else
+	QHashSeed::setDeterministicGlobalSeed();
+#endif
+
 	DataFile dataFile( DataFile::Type::SongProject );
 	m_savingProject = true;
 
@@ -1242,7 +1254,16 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 
 	m_savingProject = false;
 
-	return dataFile.writeFile(filename, withResources);
+	bool writeStatus = dataFile.writeFile(filename, withResources);
+
+	// revert to a randomized global seed for Qt
+#if QT_VERSION < QT_VERSION_CHECK(6, 6, 0)
+	qSetGlobalQHashSeed(-1);
+#else
+	QHashSeed::resetRandomGlobalSeed();
+#endif
+
+	return writeStatus;
 }
 
 
@@ -1378,7 +1399,7 @@ void Song::restoreKeymapStates(const QDomElement &element)
 }
 
 
-void Song::exportProjectMidi(QString const & exportFileName) const
+void Song::exportProjectMidi(const std::filesystem::path& filePath) const
 {
 	// instantiate midi export plugin
 	TrackContainer::TrackList const & tracks = this->tracks();
@@ -1387,7 +1408,7 @@ void Song::exportProjectMidi(QString const & exportFileName) const
 	ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", nullptr, nullptr));
 	if (exf)
 	{
-		exf->tryExport(tracks, patternStoreTracks, getTempo(), m_masterPitchModel.value(), exportFileName);
+		exf->tryExport(tracks, patternStoreTracks, getTempo(), m_masterPitchModel.value(), filePath);
 	}
 	else
 	{

@@ -1,6 +1,9 @@
-SET(WIN_PLATFORM mingw)
 if(LMMS_MSVC_YEAR)
-	SET(WIN_PLATFORM "msvc${LMMS_MSVC_YEAR}")
+	set(WIN_PLATFORM "msvc${LMMS_MSVC_YEAR}")
+elseif(DEFINED ENV{MSYSTEM})
+    string(TOLOWER "$ENV{MSYSTEM}" WIN_PLATFORM)
+else()
+	set(WIN_PLATFORM mingw)
 endif()
 
 # the final slash needs to be flipped for CPACK_PACKAGE_ICON to work:

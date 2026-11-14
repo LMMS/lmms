@@ -40,6 +40,8 @@
 #include "TrackContainer.h"
 #include "VstSyncController.h"
 
+#include <filesystem> // QTBUG-73263
+
 namespace lmms
 {
 
@@ -308,7 +310,7 @@ public:
 		return m_tempoModel;
 	}
 
-	void exportProjectMidi(QString const & exportFileName) const;
+	void exportProjectMidi(const std::filesystem::path& filePath) const;
 
 	inline void setLoadOnLaunch(bool value) { m_loadOnLaunch = value; }
 	SaveOptions &getSaveOptions() {
@@ -325,6 +327,8 @@ public:
 	const std::string& syncKey() const noexcept { return m_vstSyncController.sharedMemoryKey(); }
 
 	Metronome& metronome() { return m_metronome; }
+
+	void removeOldAutomatedValue(AutomatableModel* am);
 
 public slots:
 	void playSong();

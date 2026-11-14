@@ -33,7 +33,6 @@
 #include "AudioBuffer.h"
 #include "Effect.h"
 #include "DummyEffect.h"
-#include "MixHelpers.h"
 
 namespace lmms
 {
@@ -194,8 +193,6 @@ bool EffectChain::processAudioBuffer(AudioBuffer& buffer)
 		return false;
 	}
 
-	buffer.sanitizeAll();
-
 	bool moreEffects = false;
 	for (Effect* effect : m_effects)
 	{
@@ -225,6 +222,5 @@ void EffectChain::clear()
 
 	m_enabledModel.setValue( false );
 }
-
 
 } // namespace lmms

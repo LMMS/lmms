@@ -29,6 +29,7 @@
 
 #include "PatternStore.h"
 #include "PathUtil.h"
+#include "SampleCache.h"
 #include "SampleClipView.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -49,8 +50,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying):
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
 	connect(Engine::getSong(), &Song::tempoChanged, this, &SampleClip::tempoChanged, Qt::DirectConnection);
-	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
-					this, SLOT(updateLength()));
+	connect(Engine::getSong(), &Song::timeSignatureChanged, this, &SampleClip::updateLength);
 
 	//playbutton clicked or space key / on Export Song set isPlaying to false
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
@@ -141,32 +141,46 @@ bool SampleClip::hasSampleFileLoaded(const QString & filename) const
 
 void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 {
+	if (!sb) { return; }
+
 	{
 		const auto guard = Engine::audioEngine()->requestChangesGuard();
 		m_sample = Sample(std::move(sb));
+		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
 	}
+
 	updateLength();
-
 	emit sampleChanged();
-
 	Engine::getSong()->setModified();
 }
 
 void SampleClip::setSampleFile(const QString& sf)
 {
-	// Remove any prior offset in the clip
-	setStartTimeOffset(0);
-	if (!sf.isEmpty())
-	{
-		m_sample = Sample(SampleBuffer::fromFile(sf));
-		updateLength();
-	}
-	else
+	if (sf.isEmpty())
 	{
 		// If there is no sample, make the clip a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
 		changeLength(DefaultTicksPerBar * (nom / den));
+	}
+	else
+	{
+		const auto path = PathUtil::stringToPath(sf);
+
+		// TODO: Return an error value back to the caller (via std::expected or our own polyfill)
+		auto buffer = SampleCache::instance().fetchBuffer(path);
+		if (!buffer) { return; }
+
+		// TODO: Return an error value back to the caller (via std::expected or our own polyfill)
+		auto thumbnailCache = SampleCache::instance().fetchThumbnailCache(path);
+		if (!thumbnailCache) { return; }
+
+		// Remove any prior offset in the clip
+		setStartTimeOffset(0);
+
+		m_sample = Sample{std::move(buffer)};
+		m_sampleThumbnailCache = std::move(thumbnailCache);
+		updateLength();
 	}
 
 	emit sampleChanged();
@@ -335,10 +349,9 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	{
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
 			Engine::audioEngine()->outputSampleRate();
-
-		auto buffer = SampleBuffer::fromBase64(_this.attribute("data"), sampleRate);
-		m_sample = Sample(std::move(buffer));
+		setSampleBuffer(SampleBuffer::fromBase64(_this.attribute("data"), sampleRate));
 	}
+
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );

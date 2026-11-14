@@ -63,7 +63,7 @@ private:
 	alignas(16) std::array<float, 4> m_inEnv = {0};
 	alignas(16) std::array<float, 4> m_outEnv = {0};
 	alignas(16) std::array<float, 4> m_outPeakDisplay = {0};
-	alignas(16) std::array<std::array<float, 1 << SLEWDIST_MAX_OVERSAMPLE_STAGES>, 2> m_overOuts = {{0}};
+	alignas(16) std::array<std::array<float, 1 << SLEWDIST_MAX_OVERSAMPLE_STAGES>, 2> m_overOuts = {};
 	
 	float m_sampleRate = 44100.f;
 	

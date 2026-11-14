@@ -64,6 +64,50 @@ private slots:
 		QCOMPARE(PathUtil::toAbsolute(""), empty);
 		QCOMPARE(PathUtil::toShortestRelative(""), empty);
 	}
+
+	//! Test UTF-8 encoded std::string --> std::filesystem:path conversion
+	void StringToPathTest()
+	{
+		using namespace lmms;
+
+		const auto qPath = ConfigManager::inst()->factorySamplesDir() + QString::fromUtf16(u"/fake/音楽.wav");
+		const std::filesystem::path expected = qPath.toStdU16String();
+
+		const std::filesystem::path actual = PathUtil::stringToPath(qPath.toStdString());
+
+		const auto actualComparable = QString::fromStdU16String(actual.u16string());
+		const auto expectedComparable = QString::fromStdU16String(expected.u16string());
+		QCOMPARE(actualComparable, expectedComparable);
+	}
+
+	//! Test QString --> std::filesystem:path conversion
+	void QStringToPathTest()
+	{
+		using namespace lmms;
+
+		const auto qPath = ConfigManager::inst()->factorySamplesDir() + QString::fromUtf16(u"/fake/音楽.wav");
+		const std::filesystem::path expected = qPath.toStdU16String();
+
+		const std::filesystem::path actual = PathUtil::stringToPath(qPath);
+
+		const auto actualComparable = QString::fromStdU16String(actual.u16string());
+		const auto expectedComparable = QString::fromStdU16String(expected.u16string());
+		QCOMPARE(actualComparable, expectedComparable);
+	}
+
+	//! Test std::filesystem:path --> UTF-8 encoded std::string conversion
+	void PathToStringTest()
+	{
+		using namespace lmms;
+
+		const auto expected = ConfigManager::inst()->factorySamplesDir() + QString::fromUtf16(u"/fake/音楽.wav");
+		const std::filesystem::path filePath = expected.toStdU16String();
+
+		const std::string actual = PathUtil::pathToString(filePath);
+
+		const auto actualComparable = QString::fromStdString(actual);
+		QCOMPARE(actualComparable, expected);
+	}
 };
 
 QTEST_GUILESS_MAIN(RelativePathsTest)

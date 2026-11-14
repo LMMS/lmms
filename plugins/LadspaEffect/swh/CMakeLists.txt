@@ -15,7 +15,7 @@ endif()
 FILE(WRITE ladspa/config.h "")
 
 # Precompiler PIC Macro
-IF(LMMS_BUILD_WIN32)
+IF(LMMS_BUILD_WIN32 OR LMMS_BUILD_CYGWIN)
 	SET(PIC_FLAGS "")
 ELSE()
 	SET(PIC_FLAGS -fPIC -DPIC)

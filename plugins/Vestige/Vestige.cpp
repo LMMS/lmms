@@ -72,7 +72,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-#if defined(LMMS_BUILD_WIN32)
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_CYGWIN)
 	"dll",
 #elif defined(LMMS_BUILD_LINUX)
 #	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
@@ -451,13 +451,7 @@ void VestigeInstrument::closePlugin( void )
 
 	if( m_subWindow != nullptr )
 	{
-		m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
-		m_subWindow->close();
-
-		if( m_subWindow != nullptr )
-		{
-			delete m_subWindow;
-		}
+		delete m_subWindow;
 		m_subWindow = nullptr;
 	}
 
@@ -1099,11 +1093,7 @@ ManageVestigeInstrumentView::~ManageVestigeInstrumentView()
 	}
 
 	if ( m_vi->m_subWindow != nullptr ) {
-		m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
-		m_vi->m_subWindow->close();
-
-		if ( m_vi->m_subWindow != nullptr )
-			delete m_vi->m_subWindow;
+		delete m_vi->m_subWindow;
 		m_vi->m_subWindow = nullptr;
 	}
 
@@ -1180,13 +1170,11 @@ void ManageVestigeInstrumentView::paintEvent( QPaintEvent * )
 
 extern "C"
 {
-
 // necessary for getting instance out of shared lib
 Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
 	return new VestigeInstrument( static_cast<InstrumentTrack *>( m ) );
 }
-
 
 }
 

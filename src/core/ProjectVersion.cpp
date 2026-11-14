@@ -77,7 +77,6 @@ ProjectVersion::ProjectVersion(const char* version, CompareType c) : ProjectVers
 
 
 
-//! @param c Determines the number of identifiers to check when comparing
 int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, CompareType c)
 {
 	// How many identifiers to compare before we consider the versions equal

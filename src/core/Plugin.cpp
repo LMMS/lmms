@@ -171,14 +171,6 @@ void Plugin::loadFile( const QString & )
 
 
 
-AutomatableModel * Plugin::childModel( const QString & )
-{
-	static FloatModel fm;
-	return &fm;
-}
-
-
-
 Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 				const Descriptor::SubPluginFeatures::Key *key,
 				bool keyFromDnd)

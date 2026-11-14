@@ -106,23 +106,26 @@ const int PR_TOP_MARGIN = 18;
 const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 
 
-//! Width of area used for resizing (the grip at the end of a note)
+//! @brief Width of area used for resizing (the grip at the end of a note)
 constexpr int RESIZE_GRIP_WIDTH = 9;
-//! The maximum fraction of the note width that the resize grip is allowed to take up
+
+//! @brief The maximum fraction of the note width that the resize grip is allowed to take up
 constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.25f;
 
-// width of line for setting volume/panning of note
-const int NOTE_EDIT_LINE_WIDTH = 3;
+//! @brief Width of line for setting volume/panning of note
+constexpr int NOTE_EDIT_LINE_WIDTH = 3;
 
-// key where to start
-const int INITIAL_START_KEY = Octave::Octave_4 + Key::C;
+//! @brief Key where to start
+constexpr int INITIAL_START_KEY = Octave::Octave_4 + Key::C;
 
-// number of each note to provide in quantization and note lengths
-const int NUM_EVEN_LENGTHS = 6;
-const int NUM_TRIPLET_LENGTHS = 5;
+//! @brief Number of each note to provide in quantization and note lengths
+constexpr int NUM_EVEN_LENGTHS = 6;
 
-// Radius of the automation node circles which appear when pitchbending a note
-const int DETUNING_HANDLE_RADIUS = 3;
+//! @brief Number of each note to provide in quantization and note lengths
+constexpr int NUM_TRIPLET_LENGTHS = 5;
+
+//! @brief Radius of the automation node circles which appear when pitchbending a note
+constexpr int DETUNING_HANDLE_RADIUS = 3;
 
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 
@@ -333,7 +336,7 @@ PianoRoll::PianoRoll() :
 	{
 		m_zoomingYModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
-	m_zoomingYModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollzoomvertical", QString::number(m_zoomingModel.findText("100%"))).toInt());
+	m_zoomingYModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollzoomvertical", QString::number(m_zoomingYModel.findText("100%"))).toInt());
 	zoomingYChanged();
 	connect(&m_zoomingYModel, SIGNAL(dataChanged()),
 					this, SLOT(zoomingYChanged()));
@@ -343,7 +346,7 @@ PianoRoll::PianoRoll() :
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
-	m_quantizeModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollquantization", QString::number(m_zoomingModel.findText("1/16"))).toInt());
+	m_quantizeModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollquantization", QString::number(m_quantizeModel.findText("1/16"))).toInt());
 
 	connect( &m_quantizeModel, SIGNAL(dataChanged()),
 					this, SLOT(quantizeChanged()));

@@ -519,13 +519,7 @@ ManageVSTEffectView::~ManageVSTEffectView()
 
 	if( m_vi2->m_subWindow != nullptr )
 	{
-		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
-		m_vi2->m_subWindow->close();
-
-		if( m_vi2->m_subWindow != nullptr )
-		{
-			delete m_vi2->m_subWindow;
-		}
+		delete m_vi2->m_subWindow;
 		m_vi2->m_subWindow = nullptr;
 	}
 	//delete m_vi2->m_subWindow;
