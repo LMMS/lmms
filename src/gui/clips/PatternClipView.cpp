@@ -163,6 +163,16 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	const int verticalNoteSpacing = trackHeight * m_noteVerticalSpacing;
 	const int horizontalNoteSpacing = pixelsPerBar() / TimePos::stepsPerBar() * m_noteHorizontalSpacing;
 
+	// This pixmap is a batching optimization which draws notes into one vertical strip for tiling patterns.
+	QPixmap midiPatternPixmap(pixelsPerPattern, m_paintPixmap.height());
+	midiPatternPixmap.fill(Qt::transparent);
+
+	QPainter pixPainter(&midiPatternPixmap);
+	pixPainter.setPen(Qt::NoPen);
+	const auto noteColor = QColor(m_noteColor.red(), m_noteColor.green(), m_noteColor.blue());
+	pixPainter.setBrush(QBrush(noteColor));
+
+	TimePos longestLength(1);
 	float lastY = height() * m_verticalPadding;
 	for (const auto& track : Engine::patternStore()->tracks())
 	{
@@ -173,27 +183,25 @@ void PatternClipView::paintEvent(QPaintEvent*)
 			continue;
 		}
 
-		// Compare how long the clip view is compared to the underlying pattern. First +1 for ceiling, second +1 for possible previous bar.
-		const int maxPossibleRepetions = getClip()->length() / mClip->length() + 1 + 1;
+		longestLength = std::max(longestLength, mClip->length());
 		for (const Note* note : mClip->notes())
 		{
 			QRect noteRect = QRect(
-				note->pos() * pixelsPerBar() / TimePos::ticksPerBar() + offset + horizontalNoteSpacing / 2,
+				note->pos() * pixelsPerBar() / TimePos::ticksPerBar(),
 				lastY + verticalNoteSpacing / 2,
 				std::max(1.0f, pixelsPerBar() / TimePos::stepsPerBar() - horizontalNoteSpacing),
 				std::max(1.0f, trackHeight - verticalNoteSpacing)
 			);
-			// Loop through all the possible bars this pattern could affect. Starting at -1 for the possibility of start offset
-			const auto noteColor = QColor(m_noteColor.red(), m_noteColor.green(), m_noteColor.blue(), std::clamp(note->getVolume() * 255 / 100, 50, 255));
-			for (int i = -1; i < maxPossibleRepetions - 1; i++)
-			{
-				noteRect.moveLeft(note->pos() * pixelsPerBar() / TimePos::ticksPerBar() + offset + i * pixelsPerPattern + horizontalNoteSpacing / 2);
-				p.fillRect(noteRect, noteColor);
-			}
+			pixPainter.setOpacity(std::clamp(note->getVolume() / 100.0, 0.2, 1.0));
+			pixPainter.drawRect(noteRect);
 		}
+
 		lastY += trackHeight;
 	}
-	
+	// Compare how long the longest clip view is compared to the underlying pattern. First +1 for ceiling, second +1 for possible previous bar.
+	const int maxPossibleRepetitions = getClip()->length() / longestLength + 1 + 1;
+	p.drawTiledPixmap(offset + horizontalNoteSpacing / 2 - pixelsPerPattern, 0, width() + (maxPossibleRepetitions - 1) * pixelsPerPattern, height(), midiPatternPixmap);
+
 	// bar lines
 	const int lineSize = 3;
 
