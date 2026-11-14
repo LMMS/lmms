@@ -200,7 +200,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	}
 	// Compare how long the longest clip view is compared to the underlying pattern. First +1 for ceiling, second +1 for possible previous bar.
 	const int maxPossibleRepetions = getClip()->length() / longestLength + 1 + 1;
-	p.drawTiledPixmap(offset + horizontalNoteSpacing / 2 -pixelsPerPattern, 0, width() + (maxPossibleRepetions-1)*pixelsPerPattern, height(), mPatternPixmap);
+	p.drawTiledPixmap(offset + horizontalNoteSpacing / 2 - pixelsPerPattern, 0, width() + (maxPossibleRepetions - 1) * pixelsPerPattern, height(), mPatternPixmap);
 
 	// bar lines
 	const int lineSize = 3;
