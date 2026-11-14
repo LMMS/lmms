@@ -349,7 +349,7 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			buffer[frame][0] = wave_samples[frame];
 		}
 
-		auto psample = std::make_shared<Sample>(std::make_shared<SampleBuffer>(std::move(buffer)));
+		auto psample = std::make_shared<Sample>(std::make_shared<const SampleBuffer>(std::move(buffer)));
 		psample->setFrequency(root_freq / 1000.0f);
 
 		if( modes & MODES_LOOPING )

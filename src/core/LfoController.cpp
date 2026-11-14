@@ -51,7 +51,7 @@ LfoController::LfoController( Model * _parent ) :
 	m_phaseOffset( 0 ),
 	m_currentPhase( 0 ),
 	m_sampleFunction( &Oscillator::sinSample ),
-	m_userDefSampleBuffer(std::make_shared<SampleBuffer>())
+	m_userDefSampleBuffer(std::make_shared<const SampleBuffer>())
 {
 	setSampleExact( true );
 	connect( &m_waveModel, SIGNAL(dataChanged()),
@@ -246,7 +246,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 		{
 			if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(userWaveFile)))
 			{
-				m_userDefSampleBuffer = std::make_shared<SampleBuffer>(std::move(*buffer));
+				m_userDefSampleBuffer = std::make_shared<const SampleBuffer>(std::move(*buffer));
 			}
 			else
 			{

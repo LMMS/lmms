@@ -230,7 +230,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	{
 		if (auto buffer = SampleBuffer::fromBase64(sampleData))
 		{
-			m_sample = Sample{std::make_shared<SampleBuffer>(std::move(*buffer))};
+			m_sample = Sample{std::make_shared<const SampleBuffer>(std::move(*buffer))};
 			m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
 		}
 		else

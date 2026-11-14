@@ -294,7 +294,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 			{
 				if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(userWaveFile)))
 				{
-					m_osc[i]->m_sampleBuffer = std::make_shared<SampleBuffer>(std::move(*buffer));
+					m_osc[i]->m_sampleBuffer = std::make_shared<const SampleBuffer>(std::move(*buffer));
 					m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
 				}
 				else

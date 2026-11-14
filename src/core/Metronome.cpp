@@ -54,8 +54,8 @@ void Metronome::init()
 {
 	// The metronome sounds should always load successfully, otherwise something is wrong with the installation
 	// We opt to throw an exception instead of handling the error in this case
-	s_strong = Sample{std::make_shared<SampleBuffer>(*SampleBuffer::fromFile("misc/metronome02.ogg"))};
-	s_weak = Sample{std::make_shared<SampleBuffer>(*SampleBuffer::fromFile("misc/metronome01.ogg"))};
+	s_strong = Sample{std::make_shared<const SampleBuffer>(*SampleBuffer::fromFile("misc/metronome02.ogg"))};
+	s_weak = Sample{std::make_shared<const SampleBuffer>(*SampleBuffer::fromFile("misc/metronome01.ogg"))};
 }
 
 } // namespace lmms

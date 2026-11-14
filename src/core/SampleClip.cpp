@@ -141,7 +141,7 @@ bool SampleClip::hasSampleFileLoaded(const QString & filename) const
 
 void SampleClip::setSampleBuffer(SampleBuffer buffer)
 {
-	m_sample = Sample{std::make_shared<SampleBuffer>(std::move(buffer))};
+	m_sample = Sample{std::make_shared<const SampleBuffer>(std::move(buffer))};
 	m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
 	updateLength();
 	emit sampleChanged();

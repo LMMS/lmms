@@ -391,7 +391,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 		{
 			if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(userWaveFile)))
 			{
-				m_userWave = std::make_shared<SampleBuffer>(std::move(*buffer));
+				m_userWave = std::make_shared<const SampleBuffer>(std::move(*buffer));
 			}
 			else
 			{

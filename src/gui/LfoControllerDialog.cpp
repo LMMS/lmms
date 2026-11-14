@@ -217,7 +217,7 @@ void LfoControllerDialog::askUserDefWave()
 	if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(fileName)))
 	{
 		const auto lfoModel = dynamic_cast<LfoController*>(model());
-		lfoModel->m_userDefSampleBuffer = std::make_shared<SampleBuffer>(std::move(*buffer));
+		lfoModel->m_userDefSampleBuffer = std::make_shared<const SampleBuffer>(std::move(*buffer));
 		m_userWaveBtn->setToolTip(fileName);
 	}
 	else
