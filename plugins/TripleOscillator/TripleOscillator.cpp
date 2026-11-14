@@ -25,6 +25,7 @@
 
 #include <QDomElement>
 #include <QFileInfo>
+#include <QMessageBox>
 
 #include "TripleOscillator.h"
 #include "AudioEngine.h"
@@ -38,6 +39,7 @@
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
+#include "SampleCache.h"
 #include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -137,13 +139,20 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 void OscillatorObject::oscUserDefWaveDblClick()
 {
 	auto af = gui::FileDialog::openWaveformFile();
-	if( af != "" )
+	if (af.isEmpty()) { return; }
+
+	if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(af)))
 	{
-		m_sampleBuffer = SampleBuffer::fromFile(af);
+		m_sampleBuffer = std::move(buffer);
 		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
-		// TODO:
-		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
 	}
+	else
+	{
+		QMessageBox::warning(nullptr, tr("Error"), tr("Failed to load sample"));
+	}
+
+	// TODO:
+	//m_usrWaveBtn->setToolTip(m_sampleBuffer->path());
 }
 
 
@@ -251,8 +260,7 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
 					"useWaveTable" + QString::number (i+1 ) );
-		_this.setAttribute( "userwavefile" + is,
-					m_osc[i]->m_sampleBuffer->audioFile() );
+		_this.setAttribute("userwavefile" + is, m_osc[i]->m_sampleBuffer->path());
 	}
 }
 
@@ -284,8 +292,15 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		{
 			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 			{
-				m_osc[i]->m_sampleBuffer = SampleBuffer::fromFile(userWaveFile);
-				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
+				if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(userWaveFile)))
+				{
+					m_osc[i]->m_sampleBuffer = std::make_shared<const SampleBuffer>(std::move(*buffer));
+					m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
+				}
+				else
+				{
+					Engine::getSong()->collectError(QString{"%1: %2"}.arg(tr("Failed to load sample"), userWaveFile));
+				}
 			}
 			else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 		}

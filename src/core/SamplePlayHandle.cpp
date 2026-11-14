@@ -23,8 +23,11 @@
  */
 
 #include "SamplePlayHandle.h"
-#include "AudioEngine.h"
+
+#include <QDebug>
+
 #include "AudioBusHandle.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "PatternTrack.h"
 #include "SampleClip.h"
@@ -33,49 +36,20 @@
 namespace lmms
 {
 
-SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle)
+SamplePlayHandle::SamplePlayHandle(Sample* sample)
 	: PlayHandle(Type::SamplePlayHandle)
-	, m_sample(sample)
-	, m_ownAudioBusHandle(ownAudioBusHandle)
+	, m_sample{sample}
+	, m_audioBusHandle{std::make_unique<AudioBusHandle>("SamplePlayHandle", false)}
 {
-	if (ownAudioBusHandle)
-	{
-		setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
-	}
+	setAudioBusHandle(m_audioBusHandle.get());
 }
 
-
-
-
-SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle(new Sample(SampleBuffer::fromFile(sampleFile)), true)
-{
-}
-
-
-
-
-SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
-	SamplePlayHandle(&clip->sample(), false)
+SamplePlayHandle::SamplePlayHandle(SampleClip* clip)
+	: SamplePlayHandle(&clip->sample())
 {
 	m_track = clip->getTrack();
 	setAudioBusHandle(((SampleTrack *)clip->getTrack())->audioBusHandle());
 }
-
-
-
-
-SamplePlayHandle::~SamplePlayHandle()
-{
-	if(m_ownAudioBusHandle)
-	{
-		delete audioBusHandle();
-		delete m_sample;
-	}
-}
-
-
-
 
 void SamplePlayHandle::play( SampleFrame* buffer )
 {
@@ -120,7 +94,7 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 
 bool SamplePlayHandle::isFinished() const
 {
-	return framesDone() >= totalFrames() && m_doneMayReturnTrue == true;
+	return framesDone() >= totalFrames() && m_autoFinish;
 }
 
 
@@ -136,9 +110,8 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return (m_sample->endFrame() - m_sample->startFrame()) *
-			(static_cast<float>(Engine::audioEngine()->outputSampleRate()) / m_sample->sampleRate());
+	return (m_sample->endFrame() - m_sample->startFrame())
+		* (static_cast<float>(Engine::audioEngine()->outputSampleRate()) / m_sample->buffer().sampleRate());
 }
-
 
 } // namespace lmms

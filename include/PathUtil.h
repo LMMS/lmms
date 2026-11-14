@@ -29,6 +29,7 @@
 #include <string_view>
 
 #include <QDir>
+#include <filesystem>
 
 #include "lmms_export.h"
 

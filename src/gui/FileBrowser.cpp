@@ -813,8 +813,8 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 		if (auto buffer = SampleBuffer::fromFile(fileName))
 		{
-			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
-			s->setDoneMayReturnTrue(false);
+			auto s = new SamplePlayHandle(new Sample{std::make_shared<const SampleBuffer>(std::move(*buffer))});
+			s->setAutoFinish(false);
 			newPPH = s;
 		}
 		delete tf;

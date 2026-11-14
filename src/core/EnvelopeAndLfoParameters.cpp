@@ -31,6 +31,7 @@
 #include "Engine.h"
 #include "Oscillator.h"
 #include "PathUtil.h"
+#include "SampleCache.h"
 #include "Song.h"
 
 namespace lmms
@@ -352,7 +353,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 	m_lfoAmountModel.saveSettings( _doc, _parent, "lamt" );
 	m_x100Model.saveSettings( _doc, _parent, "x100" );
 	m_controlEnvAmountModel.saveSettings( _doc, _parent, "ctlenvamt" );
-	_parent.setAttribute("userwavefile", m_userWave->audioFile());
+	_parent.setAttribute("userwavefile", m_userWave->path());
 }
 
 
@@ -388,7 +389,14 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userWave = SampleBuffer::fromFile(_this.attribute("userwavefile"));
+			if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(userWaveFile)))
+			{
+				m_userWave = std::make_shared<const SampleBuffer>(std::move(*buffer));
+			}
+			else
+			{
+				Engine::getSong()->collectError(QString{"%1: %2"}.arg(tr("Failed to load sample"), userWaveFile));
+			}
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }  
 	}
