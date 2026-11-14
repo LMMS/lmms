@@ -25,13 +25,12 @@
 
 #include "VstSyncController.h"
 
-#include <stdexcept>
-
 #include <QDebug>
+#include <stdexcept>
 
 #include "AudioEngine.h"
 #include "Engine.h"
-
+#include "Timeline.h"
 
 namespace lmms
 {
@@ -60,14 +59,14 @@ VstSyncController::VstSyncController()
 
 
 
-void VstSyncController::setAbsolutePosition(double ticks)
+void VstSyncController::setAbsolutePosition(const Timeline& timeline)
 {
 	if (!m_syncData) { return; }
 
 #ifdef VST_SNC_LATENCY
-	m_syncData->ppqPos = ((ticks + 0) / 48.0) - m_syncData->latency;
+	m_syncData->ppqPos = timeline.ppqPos() - m_syncData->latency;
 #else
-	m_syncData->ppqPos = ((ticks + 0) / 48.0);
+	m_syncData->ppqPos = timeline.ppqPos();
 #endif
 }
 
@@ -106,13 +105,13 @@ void VstSyncController::setTimeSignature(int num, int denom)
 
 
 
-void VstSyncController::startCycle(int startTick, int endTick)
+void VstSyncController::startCycle(tick_t startTick, tick_t endTick)
 {
 	if (!m_syncData) { return; }
 
 	m_syncData->isCycle = true;
-	m_syncData->cycleStart = startTick / (float)48;
-	m_syncData->cycleEnd = endTick / (float)48;
+	m_syncData->cycleStart = startTick / static_cast<float>(DefaultTicksPerBeat);
+	m_syncData->cycleEnd = endTick / static_cast<float>(DefaultTicksPerBeat);
 }
 
 
