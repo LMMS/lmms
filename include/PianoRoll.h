@@ -129,6 +129,7 @@ public:
 	inline void stopRecording()
 	{
 		m_recording = false;
+		m_autoscrollSuspended = false;
 	}
 
 	inline bool isRecording() const
@@ -388,6 +389,7 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
+	bool m_autoscrollSuspended = false;
 
 	void adjustLeftRightScoll(int value);
 

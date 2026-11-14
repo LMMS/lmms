@@ -187,7 +187,7 @@ public:
 			m_loopRenderCount = count;
 		m_loopRenderRemaining = m_loopRenderCount;
 	}
-    
+
 	inline int getLoopRenderCount() const
 	{
 		return m_loopRenderCount;
