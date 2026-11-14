@@ -317,7 +317,7 @@ void SlicerT::updateFile(QString file)
 	auto thumbnailCache = SampleCache::instance().fetchThumbnailCache(path);
 	if (!thumbnailCache) { return; }
 
-	m_originalSample = Sample{std::move(*buffer)};
+	m_originalSample = Sample{std::move(buffer)};
 	m_sampleThumbnailCache = std::move(thumbnailCache);
 
 	findBPM();
@@ -365,7 +365,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 		{
 			if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(srcFile)))
 			{
-				m_originalSample = Sample{std::move(*buffer)};
+				m_originalSample = Sample{std::move(buffer)};
 			}
 			else
 			{
@@ -382,7 +382,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (auto buffer = SampleBuffer::fromBase64(sampleData))
 		{
-			m_originalSample = Sample{std::move(*buffer)};
+			m_originalSample = Sample{std::make_shared<SampleBuffer>(std::move(*buffer))};
 			m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_originalSample.buffer());
 		}
 		else

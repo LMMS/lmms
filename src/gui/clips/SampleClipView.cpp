@@ -194,16 +194,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	const QString selectedAudioFile = FileDialog::openAudioFile();
 	if (selectedAudioFile.isEmpty() || m_clip->hasSampleFileLoaded(selectedAudioFile)) { return; }
 
-	if (auto buffer = SampleBuffer::fromFile(selectedAudioFile))
-	{
-		m_clip->setSampleBuffer(std::move(*buffer));
-		m_clip->updateLength();
-	}
-	else
-	{
-		QMessageBox::warning(
-			nullptr, tr("Error"), QString{"%1: %2"}.arg(tr("Failed to load sample"), selectedAudioFile));
-	}
+	m_clip->setSampleFile(selectedAudioFile);
 }
 
 

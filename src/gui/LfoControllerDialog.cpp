@@ -26,6 +26,8 @@
 
 #include <QMessageBox>
 #include "FileDialog.h"
+#include "PathUtil.h"
+#include "SampleCache.h"
 #include "embed.h"
 
 
@@ -212,7 +214,7 @@ void LfoControllerDialog::askUserDefWave()
 	const auto fileName = FileDialog::openWaveformFile();
 	if (fileName.isEmpty()) { return; }
 
-	if (auto buffer = SampleBuffer::fromFile(fileName))
+	if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(fileName)))
 	{
 		const auto lfoModel = dynamic_cast<LfoController*>(model());
 		lfoModel->m_userDefSampleBuffer = std::make_shared<SampleBuffer>(std::move(*buffer));

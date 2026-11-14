@@ -28,8 +28,8 @@
 
 namespace lmms {
 
-Sample::Sample(SampleBuffer buffer)
-	: m_buffer(std::make_shared<SampleBuffer>(std::move(buffer)))
+Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
+	: m_buffer(std::move(buffer))
 	, m_startFrame(0)
 	, m_endFrame(m_buffer->frames())
 	, m_loopStartFrame(0)

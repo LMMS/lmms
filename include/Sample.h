@@ -71,7 +71,7 @@ public:
 	Sample() = default;
 	Sample(const Sample& other);
 	Sample(Sample&& other) noexcept;
-	explicit Sample(SampleBuffer buffer);
+	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
 	auto operator=(const Sample&) -> Sample&;
 	auto operator=(Sample&&) noexcept -> Sample&;

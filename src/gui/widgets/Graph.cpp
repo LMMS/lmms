@@ -29,6 +29,7 @@
 #include "Graph.h"
 #include "DeprecationHelper.h"
 #include "FileDialog.h"
+#include "SampleCache.h"
 #include "StringPairDrag.h"
 #include "Oscillator.h"
 
@@ -589,20 +590,21 @@ QString graphModel::setWaveToUser()
 	QString fileName = gui::FileDialog::openWaveformFile();
 	if (fileName.isEmpty()) { return ""; }
 
-	auto buffer = SampleBuffer::fromFile(fileName);
-	if (!buffer)
+	if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(fileName)))
+	{
+		for (int i = 0; i < length(); i++)
+		{
+			m_samples[i] = Oscillator::userWaveSample(&*buffer, i / static_cast<float>(length()));
+		}
+
+		emit samplesChanged(0, length() - 1);
+		return fileName;
+	}
+	else
 	{
 		QMessageBox::warning(nullptr, tr("Error"), QString{"%1: %2"}.arg(tr("Failed to load sample"), fileName));
 		return "";
 	}
-
-	for (int i = 0; i < length(); i++)
-	{
-		m_samples[i] = Oscillator::userWaveSample(&*buffer, i / static_cast<float>(length()));
-	}
-
-	emit samplesChanged( 0, length() - 1 );
-	return fileName;
 };
 
 

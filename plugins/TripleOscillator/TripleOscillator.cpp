@@ -39,6 +39,7 @@
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
+#include "SampleCache.h"
 #include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -140,9 +141,9 @@ void OscillatorObject::oscUserDefWaveDblClick()
 	auto af = gui::FileDialog::openWaveformFile();
 	if (af.isEmpty()) { return; }
 
-	if (auto buffer = SampleBuffer::fromFile(af))
+	if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(af)))
 	{
-		m_sampleBuffer = std::make_shared<SampleBuffer>(std::move(*buffer));
+		m_sampleBuffer = std::move(buffer);
 		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
 	}
 	else
@@ -291,7 +292,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		{
 			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 			{
-				if (auto buffer = SampleBuffer::fromFile(userWaveFile))
+				if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(userWaveFile)))
 				{
 					m_osc[i]->m_sampleBuffer = std::make_shared<SampleBuffer>(std::move(*buffer));
 					m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());

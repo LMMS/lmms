@@ -31,6 +31,7 @@
 #include "Engine.h"
 #include "Oscillator.h"
 #include "PathUtil.h"
+#include "SampleCache.h"
 #include "Song.h"
 
 namespace lmms
@@ -388,7 +389,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			if (auto buffer = SampleBuffer::fromFile(userWaveFile))
+			if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(userWaveFile)))
 			{
 				m_userWave = std::make_shared<SampleBuffer>(std::move(*buffer));
 			}

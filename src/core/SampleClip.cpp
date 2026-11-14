@@ -141,7 +141,7 @@ bool SampleClip::hasSampleFileLoaded(const QString & filename) const
 
 void SampleClip::setSampleBuffer(SampleBuffer buffer)
 {
-	m_sample = Sample{std::move(buffer)};
+	m_sample = Sample{std::make_shared<SampleBuffer>(std::move(buffer))};
 	m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
 	updateLength();
 	emit sampleChanged();
@@ -173,18 +173,11 @@ void SampleClip::setSampleFile(const QString& sf)
 		// Remove any prior offset in the clip
 		setStartTimeOffset(0);
 
-		m_sample = Sample{std::move(*buffer)};
+		m_sample = Sample{std::move(buffer)};
 		m_sampleThumbnailCache = std::move(thumbnailCache);
 		updateLength();
 	}
 
-	auto buffer = SampleBuffer::fromFile(sf);
-	
-	// TODO: Return error back to be handled by caller
-	if (!buffer) { return; }
-
-	m_sample = Sample{std::move(*buffer)};
-	updateLength();
 	emit sampleChanged();
 	emit playbackPositionChanged();
 }

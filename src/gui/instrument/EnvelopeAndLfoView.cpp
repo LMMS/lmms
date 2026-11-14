@@ -38,6 +38,7 @@
 #include "LedCheckBox.h"
 #include "DataFile.h"
 #include "PixmapButton.h"
+#include "SampleCache.h"
 #include "StringPairDrag.h"
 #include "TempoSyncKnob.h"
 #include "TextFloat.h"
@@ -242,7 +243,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		if (auto buffer = SampleBuffer::fromFile(value))
+		if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(value)))
 		{
 			m_params->m_userWave = std::make_shared<SampleBuffer>(std::move(*buffer));
 			m_userLfoBtn->model()->setValue(true);
@@ -264,7 +265,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
 
-		if (auto buffer = SampleBuffer::fromFile(file))
+		if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(file)))
 		{
 			m_params->m_userWave = std::make_shared<SampleBuffer>(std::move(*buffer));
 			m_userLfoBtn->model()->setValue(true);
