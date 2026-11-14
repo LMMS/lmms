@@ -906,6 +906,28 @@ void Sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 	delete pluginData;
 }
 
+bool Sf2Instrument::presetChangeSupported()
+{
+	return true;
+}
+
+bool Sf2Instrument::setMidiPatch(std::optional<uint16_t> bank, std::optional<uint8_t> preset)
+{
+	bool presetChanged = false;
+	if (bank.has_value() && m_bankNum.value() != static_cast<int>(*bank))
+	{
+		m_bankNum.setValue(*bank);
+		presetChanged = true;
+	}
+	if (preset.has_value() && m_patchNum.value() != static_cast<int>(*preset))
+	{
+		m_patchNum.setValue(*preset);
+		presetChanged = true;
+	}
+
+	if (presetChanged) { emit patchChanged(); }
+	return presetChanged;
+}
 
 
 
@@ -1106,9 +1128,9 @@ void Sf2InstrumentView::modelChanged()
 	m_chorusDepthKnob->setModel( &k->m_chorusDepth );
 
 
-	connect( k, SIGNAL( fileChanged() ), this, SLOT( updateFilename() ) );
-
-	connect( k, SIGNAL( fileLoading() ), this, SLOT( invalidateFile() ) );
+	connect(k, &Sf2Instrument::fileChanged, this, &Sf2InstrumentView::updateFilename);
+	connect(k, &Sf2Instrument::patchChanged, this, &Sf2InstrumentView::updatePatchName);
+	connect(k, &Sf2Instrument::fileLoading, this, &Sf2InstrumentView::invalidateFile);
 
 	updateFilename();
 }
