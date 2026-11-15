@@ -190,6 +190,12 @@ void EffectView::savePreset()
 
 		effect()->saveSettings(dataFile, content);
 
+		// TODO:
+		// If guivisible for VST effects is set to 0, the LMMS GUI opens,
+		// but is drawn as empty, with no VST content drawn.
+		// This fixes it, at least for now.
+		content.setAttribute("guivisible", 1);
+
 		QString f = sfd.selectedFiles()[0];
 		dataFile.writeFile(f);
 	}
