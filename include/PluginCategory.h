@@ -1,5 +1,5 @@
 /*
- * EffectCategory - Associates an effect to a category (for grouping/filtering afterwards)
+ * PluginCategory - Associates a plugin to a category (for grouping/filtering afterwards)
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef LMMS_EFFECT_CATEGORY_H
-#define LMMS_EFFECT_CATEGORY_H
+#ifndef LMMS_PLUGIN_CATEGORY_H
+#define LMMS_PLUGIN_CATEGORY_H
 
 #include <QDomDocument>
 #include <QDomElement>
@@ -31,35 +31,35 @@
 #include "lmms_export.h"
 namespace lmms {
 
-class EffectCategoryData
+class PluginCategoryData
 {
 public:
 	QString m_category;
 	bool m_is_favorite;
 };
 
-class LMMS_EXPORT EffectCategory
+class LMMS_EXPORT PluginCategory
 {
 public:
-	static EffectCategory* instance();
-	QString getCategoryName(QString effectName);
-	bool getIsFavorite(QString effectName);
+	static PluginCategory* instance();
+	QString getCategoryName(QString pluginName);
+	bool getIsFavorite(QString pluginName);
 	QStringList getCategories();
-	void setCategory(QString effectName, QString categoryName);
-	void toggleFavorite(QString effectName, bool isFavorite);
+	void setCategory(QString pluginName, QString categoryName);
+	void toggleFavorite(QString pluginName, bool isFavorite);
 	void save();
 
 private:
-	static std::unique_ptr<EffectCategory> s_instance;
+	static std::unique_ptr<PluginCategory> s_instance;
 	QStringList m_categories_list;
-	std::map<QString, EffectCategoryData> m_categories_map;
-	QStringList getCategoriesFromMap(std::map<QString, EffectCategoryData> map);
+	std::map<QString, PluginCategoryData> m_categories_map;
+	QStringList getCategoriesFromMap(std::map<QString, PluginCategoryData> map);
 	void loadData();
 	QDomElement createXMLTag(QDomDocument doc, QString tagName, QString value);
 };
 
 // Short-hand function
-LMMS_EXPORT EffectCategory* getEffectCategory();
+LMMS_EXPORT PluginCategory* getPluginCategory();
 
 } // namespace lmms
-#endif // LMMS_EFFECT_CATEGORY_H
+#endif // LMMS_PLUGIN_CATEGORY_H

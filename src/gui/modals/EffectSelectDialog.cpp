@@ -50,8 +50,8 @@
 
 #include "DummyEffect.h"
 #include "Effect.h"
-#include "EffectCategory.h"
 #include "EffectChain.h"
+#include "PluginCategory.h"
 #include "PluginFactory.h"
 #include "embed.h"
 
@@ -114,11 +114,11 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 			type = "LMMS";
 		}
 		m_sourceModel.setItem(row, nameColumnIdx, new QStandardItem(name));
-		auto* categoryItem = new QStandardItem(getEffectCategory()->getCategoryName(name));
+		auto* categoryItem = new QStandardItem(getPluginCategory()->getCategoryName(name));
 		connect(this, &EffectSelectDialog::refreshData, this, [this, name, categoryItem, row](QString nameToRefresh) {
 			if (QString::compare(name, nameToRefresh) == 0)
 			{
-				categoryItem->setData(getEffectCategory()->getCategoryName(name), Qt::DisplayRole);
+				categoryItem->setData(getPluginCategory()->getCategoryName(name), Qt::DisplayRole);
 				emit m_sourceModel.dataChanged(
 					m_sourceModel.index(row, nameColumnIdx), m_sourceModel.index(row, 1), {Qt::DisplayRole});
 			}
@@ -130,7 +130,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 			[this, name, favoriteIcon, favoriteItem, row](QString nameToRefresh) {
 				if (QString::compare(name, nameToRefresh) == 0)
 				{
-					bool isFavorite = getEffectCategory()->getIsFavorite(name);
+					bool isFavorite = getPluginCategory()->getIsFavorite(name);
 					favoriteItem->setData(isFavorite ? favoriteIcon : QIcon(), Qt::DecorationRole);
 					favoriteItem->setText(isFavorite ? " " : "");
 					emit m_sourceModel.dataChanged(m_sourceModel.index(row, favoritesColumnIdx),
@@ -138,7 +138,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 				}
 			});
 		favoriteItem->setText("");
-		if (getEffectCategory()->getIsFavorite(name))
+		if (getPluginCategory()->getIsFavorite(name))
 		{
 			favoriteItem->setIcon(favoriteIcon);
 			favoriteItem->setText(" "); // HACK : Trick to allow sorting without reimplementing the entire thing
@@ -379,7 +379,7 @@ QHBoxLayout* EffectSelectDialog::buildTypeFilterLayout()
 
 QStringList EffectSelectDialog::getEffectCategoryLabels()
 {
-	QStringList categories = getEffectCategory()->getCategories();
+	QStringList categories = getPluginCategory()->getCategories();
 	QStringList labels = categories;
 	labels.push_front(tr("All"));
 	return labels;
@@ -431,7 +431,7 @@ void EffectSelectDialog::selectPlugin(const QModelIndex& index)
 	if (column == favoritesColumnIdx)
 	{
 		const auto isFavorite = !index.data(Qt::DecorationRole).isNull();
-		getEffectCategory()->toggleFavorite(effectName, !isFavorite);
+		getPluginCategory()->toggleFavorite(effectName, !isFavorite);
 		emit refreshData(effectName);
 		return;
 	}
@@ -449,7 +449,7 @@ void EffectSelectDialog::showEffectCategoryEditDialog(QString effectName, QStrin
 	label->setText(tr("Set the effect category for ") + effectName);
 	layout->addWidget(label);
 	auto* lineEdit = new QLineEdit(this);
-	auto* completer = new QCompleter(getEffectCategory()->getCategories(), this);
+	auto* completer = new QCompleter(getPluginCategory()->getCategories(), this);
 	completer->setCaseSensitivity(Qt::CaseInsensitive);
 	lineEdit->setCompleter(completer);
 	lineEdit->setText(currentCategory);
@@ -459,7 +459,7 @@ void EffectSelectDialog::showEffectCategoryEditDialog(QString effectName, QStrin
 	layout->addWidget(buttonBox);
 	effectSelectDialog->setLayout(layout);
 	connect(buttonBox, &QDialogButtonBox::accepted, this, [this, lineEdit, effectName, effectSelectDialog]() {
-		getEffectCategory()->setCategory(effectName, lineEdit->text());
+		getPluginCategory()->setCategory(effectName, lineEdit->text());
 		refreshData(effectName);
 		effectSelectDialog->close();
 	});

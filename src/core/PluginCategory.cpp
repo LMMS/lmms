@@ -1,5 +1,5 @@
 /*
- * EffectCategory - Associates an effect to a category (for grouping/filtering afterwards)
+ * PluginCategory - Associates a plugin to a category (for grouping/filtering afterwards)
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -20,7 +20,7 @@
  *
  */
 
-#include "EffectCategory.h"
+#include "PluginCategory.h"
 
 #include <QDir>
 #include <QDomDocument>
@@ -33,34 +33,21 @@
 
 namespace lmms {
 
-const std::map<QString, EffectCategoryData> defaultLmmsEffects = {
-	{"Amplifier", {QObject::tr("Amplifier")}},
-	{"BassBooster", {QObject::tr("Equalization")}},
-	{"Bitcrush", {QObject::tr("Bitcrush")}}, 
-	{"Compressor", {QObject::tr("Compressor")}},
-	{"Crossover Equalizer", {QObject::tr("Equalization")}}, 
-	{"Delay", {QObject::tr("Delay")}},
-	{"Dispersion", {QObject::tr("Filter")}}, 
-	{"Dual Filter", {QObject::tr("Filter")}},
-	{"Dynamics Processor", {QObject::tr("Distortion")}}, 
-	{"Equalizer", {QObject::tr("Equalization")}},
-	{"Flanger", {QObject::tr("Flanger")}}, 
-	{"Frequency Shifter", {QObject::tr("Pitch")}},
-	{"Granular Pitch Shifter", {QObject::tr("Pitch")}}, 
-	{"LOMM", {QObject::tr("Distortion")}},
-	{"Multitap Echo", {QObject::tr("Delay")}}, 
-	{"Oscilloscope", {QObject::tr("Tool")}},
-	{"Peak Controller", {QObject::tr("Automation")}}, 
-	{"ReverbSC", {QObject::tr("Reverb")}},
-	{"Slew Distortion", {QObject::tr("Distortion")}}, 
-	{"Spectrum Analyzer", {QObject::tr("Tool")}},
-	{"Stereo Matrix", {QObject::tr("Stereo")}}, 
-	{"StereoEnhancer Effect", {QObject::tr("Stereo")}},
-	{"Vectorscope", {QObject::tr("Tool")}}, 
-	{"Waveshaper Effect", {QObject::tr("Distortion")}}
-};
+const std::map<QString, PluginCategoryData> defaultLmmsPlugins
+	= {{"Amplifier", {QObject::tr("Amplifier")}}, {"BassBooster", {QObject::tr("Equalization")}},
+		{"Bitcrush", {QObject::tr("Bitcrush")}}, {"Compressor", {QObject::tr("Compressor")}},
+		{"Crossover Equalizer", {QObject::tr("Equalization")}}, {"Delay", {QObject::tr("Delay")}},
+		{"Dispersion", {QObject::tr("Filter")}}, {"Dual Filter", {QObject::tr("Filter")}},
+		{"Dynamics Processor", {QObject::tr("Distortion")}}, {"Equalizer", {QObject::tr("Equalization")}},
+		{"Flanger", {QObject::tr("Flanger")}}, {"Frequency Shifter", {QObject::tr("Pitch")}},
+		{"Granular Pitch Shifter", {QObject::tr("Pitch")}}, {"LOMM", {QObject::tr("Distortion")}},
+		{"Multitap Echo", {QObject::tr("Delay")}}, {"Oscilloscope", {QObject::tr("Tool")}},
+		{"Peak Controller", {QObject::tr("Automation")}}, {"ReverbSC", {QObject::tr("Reverb")}},
+		{"Slew Distortion", {QObject::tr("Distortion")}}, {"Spectrum Analyzer", {QObject::tr("Tool")}},
+		{"Stereo Matrix", {QObject::tr("Stereo")}}, {"StereoEnhancer Effect", {QObject::tr("Stereo")}},
+		{"Vectorscope", {QObject::tr("Tool")}}, {"Waveshaper Effect", {QObject::tr("Distortion")}}};
 
-const std::map<QString, EffectCategoryData> defaultLadspaEffects = {
+const std::map<QString, PluginCategoryData> defaultLadspaPlugins = {
 	{"4 x 4 pole allpass", {QObject::tr("Filter")}},
 	{"AM pitchshifter", {QObject::tr("Pitch")}},
 	{"Aliasing", {QObject::tr("Distortion")}},
@@ -277,48 +264,50 @@ const std::map<QString, EffectCategoryData> defaultLadspaEffects = {
 	{"z-1", {QObject::tr("Delay")}},
 };
 const QString defaultCategory = "Other";
-const QString effectCategoriesFolder = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QDir::separator() + "lmms";
-const QString effectCategoriesFileName = effectCategoriesFolder + QDir::separator() + "lmms_effect_categories.xml";
-const QString effectsRootTag = "effects";
-const QString effectTag = "effect";
-const QString effectNameTag = "name";
-const QString effectCategoryTag = "category";
-const QString effectFavoriteTag = "favorite";
+const QString pluginCategoriesFolder
+	= QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QDir::separator() + "lmms";
+const QString pluginCategoriesFileName = pluginCategoriesFolder + QDir::separator() + "lmms_plugin_categories.xml";
+const QString pluginRootTag = "plugins";
+const QString pluginTag = "plugin";
+const QString pluginNameTag = "name";
+const QString pluginCategoryTag = "category";
+const QString pluginFavoriteTag = "favorite";
 
-std::unique_ptr<EffectCategory> EffectCategory::s_instance;
+std::unique_ptr<PluginCategory> PluginCategory::s_instance;
 
 QStringList m_categories_list;
-std::map<QString, EffectCategoryData> m_categories_map;
+std::map<QString, PluginCategoryData> m_categories_map;
 
-EffectCategory* EffectCategory::instance()
+PluginCategory* PluginCategory::instance()
 {
-	if (s_instance == nullptr) { s_instance = std::make_unique<EffectCategory>(); }
+	if (s_instance == nullptr) { s_instance = std::make_unique<PluginCategory>(); }
 	return s_instance.get();
 }
 
-EffectCategory* getEffectCategory() { return EffectCategory::instance(); }
+PluginCategory* getPluginCategory()
+{ return PluginCategory::instance(); }
 
-QString EffectCategory::getCategoryName(QString effectName)
+QString PluginCategory::getCategoryName(QString pluginName)
 {
 	if (m_categories_map.empty()) { loadData(); }
-	if (m_categories_map.find(effectName) != m_categories_map.end())
+	if (m_categories_map.find(pluginName) != m_categories_map.end())
 	{
-		return m_categories_map.at(effectName).m_category;
+		return m_categories_map.at(pluginName).m_category;
 	}
 	return defaultCategory;
 }
 
-bool EffectCategory::getIsFavorite(QString effectName)
+bool PluginCategory::getIsFavorite(QString pluginName)
 {
 	if (m_categories_map.empty()) { loadData(); }
-	if (m_categories_map.find(effectName) != m_categories_map.end())
+	if (m_categories_map.find(pluginName) != m_categories_map.end())
 	{
-		return m_categories_map.at(effectName).m_is_favorite;
+		return m_categories_map.at(pluginName).m_is_favorite;
 	}
 	return false;
 }
 
-QStringList EffectCategory::getCategories()
+QStringList PluginCategory::getCategories()
 {
 	if (m_categories_list.isEmpty())
 	{
@@ -329,59 +318,59 @@ QStringList EffectCategory::getCategories()
 	return m_categories_list;
 }
 
-void EffectCategory::setCategory(QString effectName, QString categoryName)
+void PluginCategory::setCategory(QString pluginName, QString categoryName)
 {
 	if (m_categories_map.empty()) { loadData(); }
-	if (m_categories_map.find(effectName) != m_categories_map.end())
+	if (m_categories_map.find(pluginName) != m_categories_map.end())
 	{
-		m_categories_map.at(effectName).m_category = categoryName;
+		m_categories_map.at(pluginName).m_category = categoryName;
 	}
 	else
 	{
-		m_categories_map[effectName] = {categoryName};
+		m_categories_map[pluginName] = {categoryName};
 	}
 	m_categories_list = getCategoriesFromMap(m_categories_map);
 	save();
 }
 
-void EffectCategory::toggleFavorite(QString effectName, bool isFavorite)
+void PluginCategory::toggleFavorite(QString pluginName, bool isFavorite)
 {
 
 	if (m_categories_map.empty()) { loadData(); }
-	if (m_categories_map.find(effectName) != m_categories_map.end())
+	if (m_categories_map.find(pluginName) != m_categories_map.end())
 	{
-		m_categories_map.at(effectName).m_is_favorite = isFavorite;
+		m_categories_map.at(pluginName).m_is_favorite = isFavorite;
 	}
 	else
 	{
-		m_categories_map[effectName] = {defaultCategory, isFavorite};
+		m_categories_map[pluginName] = {defaultCategory, isFavorite};
 	}
 	save();
 }
 
-void EffectCategory::save()
+void PluginCategory::save()
 {
-	QDomDocument doc("effect-categories");
+	QDomDocument doc("plugin-categories");
 	QDir dir;
-	if (!dir.exists(effectCategoriesFolder)) { dir.mkpath(effectCategoriesFolder); }
-	QDomElement effectsRoot = doc.createElement(effectsRootTag);
-	for (auto& effect : m_categories_map)
+	if (!dir.exists(pluginCategoriesFolder)) { dir.mkpath(pluginCategoriesFolder); }
+	QDomElement pluginsRoot = doc.createElement(pluginRootTag);
+	for (auto& plugin : m_categories_map)
 	{
-		QDomElement effectData = doc.createElement(effectTag);
-		effectData.appendChild(createXMLTag(doc, effectNameTag, effect.first));
-		effectData.appendChild(createXMLTag(doc, effectCategoryTag, effect.second.m_category));
-		effectData.appendChild(createXMLTag(doc, effectFavoriteTag, effect.second.m_is_favorite ? "1" : "0"));
-		effectsRoot.appendChild(effectData);
+		QDomElement pluginData = doc.createElement(pluginTag);
+		pluginData.appendChild(createXMLTag(doc, pluginNameTag, plugin.first));
+		pluginData.appendChild(createXMLTag(doc, pluginCategoryTag, plugin.second.m_category));
+		pluginData.appendChild(createXMLTag(doc, pluginFavoriteTag, plugin.second.m_is_favorite ? "1" : "0"));
+		pluginsRoot.appendChild(pluginData);
 	}
-	doc.appendChild(effectsRoot);
+	doc.appendChild(pluginsRoot);
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString(2);
-	QFile outfile(effectCategoriesFileName);
+	QFile outfile(pluginCategoriesFileName);
 	outfile.open(QIODevice::ReadWrite);
 	outfile.write(xml.toUtf8());
 	outfile.close();
 }
 
-QStringList EffectCategory::getCategoriesFromMap(std::map<QString, EffectCategoryData> map)
+QStringList PluginCategory::getCategoriesFromMap(std::map<QString, PluginCategoryData> map)
 {
 	auto* categories = new QStringList();
 	for (auto& it : map)
@@ -391,33 +380,33 @@ QStringList EffectCategory::getCategoriesFromMap(std::map<QString, EffectCategor
 	return *categories;
 }
 
-void EffectCategory::loadData()
+void PluginCategory::loadData()
 {
-	QFile effectCategoriesFile(effectCategoriesFileName);
+	QFile pluginCategoriesFile(pluginCategoriesFileName);
 	m_categories_map = {};
-	if (effectCategoriesFile.exists())
+	if (pluginCategoriesFile.exists())
 	{
 		QDomDocument doc;
-		effectCategoriesFile.open(QIODevice::ReadOnly);
-		doc.setContent(&effectCategoriesFile);
+		pluginCategoriesFile.open(QIODevice::ReadOnly);
+		doc.setContent(&pluginCategoriesFile);
 		QDomElement root = doc.documentElement();
-		QDomNodeList effects = root.elementsByTagName(effectTag);
-		for (int effect_idx = 0; effect_idx < effects.size(); ++effect_idx)
+		QDomNodeList plugins = root.elementsByTagName(pluginTag);
+		for (int plugin_idx = 0; plugin_idx < plugins.size(); ++plugin_idx)
 		{
-			QDomElement effectElement = effects.at(effect_idx).toElement();
-			QString name = effectElement.elementsByTagName(effectNameTag).at(0).toElement().text();
-			QString category = effectElement.elementsByTagName(effectCategoryTag).at(0).toElement().text();
-			bool isFavorite = effectElement.elementsByTagName(effectFavoriteTag).at(0).toElement().text() == "1";
+			QDomElement pluginElement = plugins.at(plugin_idx).toElement();
+			QString name = pluginElement.elementsByTagName(pluginNameTag).at(0).toElement().text();
+			QString category = pluginElement.elementsByTagName(pluginCategoryTag).at(0).toElement().text();
+			bool isFavorite = pluginElement.elementsByTagName(pluginFavoriteTag).at(0).toElement().text() == "1";
 			m_categories_map[name] = {category, isFavorite};
 		}
 		return;
 	}
-	m_categories_map = defaultLmmsEffects;
-	m_categories_map.insert(defaultLadspaEffects.begin(), defaultLadspaEffects.end());
+	m_categories_map = defaultLmmsPlugins;
+	m_categories_map.insert(defaultLadspaPlugins.begin(), defaultLadspaPlugins.end());
 	save();
 }
 
-QDomElement EffectCategory::createXMLTag(QDomDocument doc, QString tagName, QString value)
+QDomElement PluginCategory::createXMLTag(QDomDocument doc, QString tagName, QString value)
 {
 	QDomElement element = doc.createElement(tagName);
 	QDomText text = doc.createTextNode(value);
