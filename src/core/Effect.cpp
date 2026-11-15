@@ -59,10 +59,10 @@ Effect::Effect(const Plugin::Descriptor* desc, Model* parent,
 
 void Effect::saveSettings(QDomDocument& doc, QDomElement& thisElement)
 {
-	m_enabledModel.saveSettings( doc, thisElement, "on" );
-	m_wetDryModel.saveSettings( doc, thisElement, "wet" );
-	m_autoQuitModel.saveSettings( doc, thisElement, "autoquit" );
-	controls()->saveState( doc, thisElement );
+	m_enabledModel.saveSettings(doc, thisElement, "on");
+	m_wetDryModel.saveSettings(doc, thisElement, "wet");
+	m_autoQuitModel.saveSettings(doc, thisElement, "autoquit");
+	controls()->saveState(doc, thisElement);
 }
 
 
