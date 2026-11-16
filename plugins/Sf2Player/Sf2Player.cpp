@@ -107,6 +107,11 @@ public:
 		return fluid_voice_get_id(m_voice) == m_id && fluid_voice_is_playing(m_voice);
 	}
 
+	unsigned int id() const
+	{
+		return m_id;
+	}
+
 private:
 	fluid_voice_t* m_voice;
 	unsigned int m_id;
@@ -394,6 +399,11 @@ void Sf2Instrument::freeFont()
 void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 {
 	const auto guard = std::lock_guard{m_synthMutex};
+	loadSfFile(_sf2File, updateTrackName);
+}
+
+void Sf2Instrument::loadSfFile( const QString & _sf2File, bool updateTrackName )
+{
 	emit fileLoading();
 
 	const auto filePath = PathUtil::toAbsolute(_sf2File).toStdString();
@@ -574,14 +584,14 @@ void Sf2Instrument::reloadSynth()
 
 	if( m_font )
 	{
+		m_validVoices.clear();
+
 		// Now, delete the old one and replace
-		fluid_synth_remove_sfont(m_synth, m_font);
 		delete_fluid_synth(m_synth);
 
 		// New synth
 		m_synth = new_fluid_synth( m_settings );
-		fluid_synth_add_sfont(m_synth, m_font);
-		fluid_synth_sfreload(m_synth, m_fontId);
+		loadSfFile(QString::fromStdString(m_fontPath), false);
 
 		// synth program change (set bank and patch)
 		updatePatch();
@@ -682,9 +692,10 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 
 	// Update the pitch of all the voices
 	if (const auto data = static_cast<Sf2PluginData*>(_n->m_pluginData)) {
+		const auto guard = std::lock_guard(m_synthMutex);
 		const auto detuning = _n->currentDetuning();
 		for (const auto& voice : data->fluidVoices) {
-			if (voice.isValid()) {
+			if (m_validVoices.contains(voice.id()) && voice.isValid()) {
 				fluid_voice_gen_set(voice.get(), GEN_COARSETUNE, voice.coarseTune() + detuning);
 				fluid_voice_update_param(voice.get(), GEN_COARSETUNE);
 			}
@@ -718,6 +729,7 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 			&& fluid_voice_is_on(voice)
 		) {
 			n->fluidVoices.emplace_back(voices[i]);
+			m_validVoices.insert(n->fluidVoices.end()->id());
 		}
 	}
 
@@ -733,7 +745,7 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 	);
 	// Set note panning on all the voices
 	for (const auto& voice : n->fluidVoices) {
-		if (voice.isValid()) {
+		if (m_validVoices.contains(voice.id()) && voice.isValid()) {
 			fluid_voice_gen_set(voice.get(), GEN_CUSTOM_BALANCE, balance);
 			fluid_voice_update_param(voice.get(), GEN_CUSTOM_BALANCE);
 		}
