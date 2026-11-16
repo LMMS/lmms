@@ -66,7 +66,7 @@ static PatternAnalysisResult analyzeAutomationPattern(QDomElement const & automa
 		unsigned int const id = object.attribute("id").toUInt();
 
 			   // Check if the automated object is a base note.
-		if (automatedBaseNoteIds.find(id) != automatedBaseNoteIds.end())
+		if (automatedBaseNoteIds.contains(id))
 		{
 			hasBaseNoteAutomations = true;
 		}
@@ -315,7 +315,7 @@ static void fixAutomationTracks(QDomElement & song, std::set<unsigned int> const
 				{
 					unsigned int const id = object.attribute("id").toUInt();
 
-					if (automatedBaseNoteIds.find(id) != automatedBaseNoteIds.end())
+					if (automatedBaseNoteIds.contains(id))
 					{
 						QDomElement objectToRemove = object;
 						object = object.nextSiblingElement("object");
@@ -345,7 +345,7 @@ static void fixAutomationTracks(QDomElement & song, std::set<unsigned int> const
 				{
 					unsigned int const id = object.attribute("id").toUInt();
 
-					if (automatedBaseNoteIds.find(id) == automatedBaseNoteIds.end())
+					if (!automatedBaseNoteIds.contains(id))
 					{
 						QDomElement objectToRemove = object;
 						object = object.nextSiblingElement("object");
