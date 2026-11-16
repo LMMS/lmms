@@ -76,6 +76,7 @@ ConfigManager::ConfigManager() :
 	m_dataDir = "data:/";
 	m_vstDir = m_workingDir + "vst/";
 	m_sf2Dir = m_workingDir + SF2_PATH;
+	m_sfzDir = m_workingDir + SFZ_PATH;
 	m_gigDir = m_workingDir + GIG_PATH;
 	m_themeDir = defaultThemeDir();
 	if (std::getenv("LMMS_DATA_DIR"))
@@ -278,6 +279,13 @@ void ConfigManager::setSF2File(const QString & sf2File)
 
 
 
+void ConfigManager::setSFZDir(const QString & sfzDir)
+{
+	m_sfzDir = sfzDir;
+}
+
+
+
 
 void ConfigManager::setGIGDir(const QString & gigDir)
 {
@@ -310,6 +318,7 @@ void ConfigManager::createWorkingDir()
 	QDir().mkpath(userPresetsDir());
 	QDir().mkpath(userGigDir());
 	QDir().mkpath(userSf2Dir());
+	QDir().mkpath(userSfzDir());
 	QDir().mkpath(userVstDir());
 	QDir().mkpath(userLadspaDir());
 }
@@ -526,6 +535,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 
 			setGIGDir(value("paths", "gigdir") == "" ? gigDir() : value("paths", "gigdir"));
 			setSF2Dir(value("paths", "sf2dir") == "" ? sf2Dir() : value("paths", "sf2dir"));
+			setSFZDir(value("paths", "sfzdir") == "" ? sfzDir() : value("paths", "sfzdir"));
 			setVSTDir(value("paths", "vstdir"));
 			setLADSPADir(value("paths", "ladspadir"));
 		#ifdef LMMS_HAVE_STK
@@ -622,6 +632,7 @@ void ConfigManager::saveConfigFile()
 	setValue("paths", "vstdir", m_vstDir);
 	setValue("paths", "gigdir", m_gigDir);
 	setValue("paths", "sf2dir", m_sf2Dir);
+	setValue("paths", "sfzdir", m_sfzDir);
 	setValue("paths", "ladspadir", m_ladspaDir);
 #ifdef LMMS_HAVE_STK
 	setValue("paths", "stkdir", m_stkDir);
