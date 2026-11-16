@@ -316,7 +316,7 @@ void ConfigManager::createWorkingDir()
 
 
 
-void ConfigManager::addRecentlyOpenedProject(const QString & file)
+void ConfigManager::addRecentlyOpenedProject(const QString& file)
 {
 	QFileInfo recentFile(file);
 	if(recentFile.suffix().toLower() == "mmp" ||
@@ -331,6 +331,17 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 		m_recentlyOpenedProjects.push_front(file);
 		ConfigManager::inst()->saveConfigFile();
 	}
+}
+
+void ConfigManager::addRecentlyOpenedDirectory(const QString& dir)
+{
+	m_recentlyOpenedDirectories.removeAll(dir);
+	if(m_recentlyOpenedDirectories.size() > 50)
+	{
+		m_recentlyOpenedDirectories.removeFirst();
+	}
+	m_recentlyOpenedDirectories.push_back(dir);
+	ConfigManager::inst()->saveConfigFile();
 }
 
 void ConfigManager::addFavoriteItem(const QString& item)
@@ -488,6 +499,19 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 						n = n.nextSibling();
 					}
 				}
+				else if(node.nodeName() == "recentdirectories")
+				{
+					m_recentlyOpenedDirectories.clear();
+					QDomNode n = node.firstChild();
+					while(!n.isNull())
+					{
+						if(n.isElement() && n.toElement().hasAttributes())
+						{
+							m_recentlyOpenedDirectories << n.toElement().attribute("path");
+						}
+						n = n.nextSibling();
+					}
+				}
 				else if (node.nodeName() == "favoriteitems")
 				{
 					m_favoriteItems.clear();
@@ -606,6 +630,11 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		file = PathUtil::toAbsolute(file);
 	}
 
+	for (auto& dir : m_recentlyOpenedDirectories)
+	{
+		dir = PathUtil::toAbsolute(dir);
+	}
+
 	for (auto& file : m_favoriteItems)
 	{
 		file = PathUtil::toAbsolute(file);
@@ -649,7 +678,6 @@ void ConfigManager::saveConfigFile()
 	}
 
 	QDomElement recent_files = doc.createElement("recentfiles");
-
 	for (const auto& recentlyOpenedProject : m_recentlyOpenedProjects)
 	{
 		QDomElement n = doc.createElement("file");
@@ -658,15 +686,22 @@ void ConfigManager::saveConfigFile()
 	}
 	lmms_config.appendChild(recent_files);
 
-	QDomElement favorite_items = doc.createElement("favoriteitems");
+	QDomElement recent_directories = doc.createElement("recentdirectories");
+	for (const auto& recentlyOpenedDirectory : m_recentlyOpenedDirectories)
+	{
+		QDomElement n = doc.createElement("dir");
+		n.setAttribute("path", PathUtil::toShortestRelative(recentlyOpenedDirectory));
+		recent_directories.appendChild(n);
+	}
+	lmms_config.appendChild(recent_directories);
 
+	QDomElement favorite_items = doc.createElement("favoriteitems");
 	for (const auto& favoriteItem : m_favoriteItems)
 	{
 		QDomElement n = doc.createElement("item");
 		n.setAttribute("path", PathUtil::toShortestRelative(favoriteItem));
 		favorite_items.appendChild(n);
 	}
-
 	lmms_config.appendChild(favorite_items);
 
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString(2);
