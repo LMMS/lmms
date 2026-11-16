@@ -413,6 +413,7 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 		if (fluid_synth_sfcount(m_synth) > 0)
 		{
+			m_fontPath = filePath;
 			// Grab this sf from the top of the stack and add to list
 			m_font = fluid_synth_get_sfont(m_synth, 0);
 			loaded = true;
@@ -567,9 +568,6 @@ void Sf2Instrument::updateTuning()
 
 void Sf2Instrument::reloadSynth()
 {
-	Engine::audioEngine()->requestChangesGuard();
-	const auto guard = std::lock_guard{m_synthMutex};
-
 	double tempRate;
 
 	// Set & get, returns the true sample rate
@@ -582,13 +580,14 @@ void Sf2Instrument::reloadSynth()
 	if( m_font )
 	{
 		// Now, delete the old one and replace
-		fluid_synth_remove_sfont( m_synth, m_font );
-		delete_fluid_synth( m_synth );
+		m_synthMutex.lock();
+		fluid_synth_sfunload(m_synth, m_fontId, true);
+		m_font = nullptr;
 
 		// New synth
 		m_synth = new_fluid_synth( m_settings );
-		m_fontId = fluid_synth_add_sfont( m_synth, m_font );
-		fluid_synth_sfreload(m_synth, m_fontId);
+		m_synthMutex.unlock();
+		openFile(QString::fromStdString(m_fontPath), false);
 
 		// synth program change (set bank and patch)
 		updatePatch();
@@ -596,12 +595,16 @@ void Sf2Instrument::reloadSynth()
 	else
 	{
 		// Recreate synth with no soundfonts
+		m_synthMutex.lock();
 		if (m_synth != nullptr)
 		{
 			delete_fluid_synth(m_synth);
 		}
 		m_synth = new_fluid_synth( m_settings );
+		m_synthMutex.unlock();
 	}
+
+	m_synthMutex.lock();
 
 	if (m_internalSampleRate != Engine::audioEngine()->outputSampleRate())
 	{
@@ -612,6 +615,8 @@ void Sf2Instrument::reloadSynth()
 		// supporting only up to 96 kHZ (though that may be a problem if theres a strong need for 192 kHZ).
 		fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_LINEAR);
 	}
+
+	m_synthMutex.unlock();
 
 	updateReverb();
 	updateChorus();

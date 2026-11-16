@@ -115,6 +115,7 @@ private:
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 
+	std::string m_fontPath;
 	fluid_sfont_t* m_font;
 
 	int m_fontId;
