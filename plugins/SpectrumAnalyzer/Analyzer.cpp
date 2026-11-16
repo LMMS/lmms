@@ -26,6 +26,7 @@
  */
 
 #include "Analyzer.h"
+#include "Plugin.h"
 
 #ifdef SA_DEBUG
 	#include <chrono>
@@ -52,6 +53,7 @@ extern "C" {
 		new PixmapLoader("lmms-plugin-logo"),
 		nullptr,
 		nullptr,
+		Plugin::DefaultCategories::Tool
 	};
 }
 

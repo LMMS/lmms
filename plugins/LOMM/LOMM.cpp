@@ -24,6 +24,7 @@
 
 #include "LOMM.h"
 
+#include "Plugin.h"
 #include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -43,7 +44,8 @@ extern "C"
 		Plugin::Type::Effect,
 		new PixmapLoader("lmms-plugin-logo"),
 		nullptr,
-		nullptr
+		nullptr,
+		Plugin::DefaultCategories::Distortion
 	};
 }
 

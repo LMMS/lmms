@@ -52,6 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
+	Plugin::DefaultCategories::Flanger
 } ;
 
 

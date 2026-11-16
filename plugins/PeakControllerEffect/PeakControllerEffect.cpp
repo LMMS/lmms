@@ -24,6 +24,7 @@
  */
 
 
+#include "Plugin.h"
 #include "Song.h"
 #include "PresetPreviewPlayHandle.h"
 #include "PeakController.h"
@@ -52,6 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
+	Plugin::DefaultCategories::Tool
 } ;
 
 }

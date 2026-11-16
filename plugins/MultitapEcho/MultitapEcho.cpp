@@ -24,6 +24,7 @@
  */
 
 #include "MultitapEcho.h"
+#include "Plugin.h"
 #include "embed.h"
 #include "LmmsTypes.h"
 #include "lmms_math.h"
@@ -47,6 +48,7 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
+	Plugin::DefaultCategories::Delay
 } ;
 
 }

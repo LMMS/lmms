@@ -24,6 +24,7 @@
 
 #include "Oscilloscope.h"
 
+#include "Plugin.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -43,6 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT oscilloscope_plugin_descriptor =
 	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
+	Plugin::DefaultCategories::Tool
 };
 
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)

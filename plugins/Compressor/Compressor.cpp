@@ -49,6 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
+	Plugin::DefaultCategories::Compressor
 } ;
 
 }

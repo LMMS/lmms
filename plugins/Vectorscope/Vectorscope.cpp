@@ -24,6 +24,7 @@
 
 #include "Vectorscope.h"
 
+#include "Plugin.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -43,6 +44,7 @@ extern "C" {
 		new PixmapLoader("lmms-plugin-logo"),
 		nullptr,
 		nullptr,
+		Plugin::DefaultCategories::Tool
 	};
 }
 

@@ -46,6 +46,7 @@ Plugin::Descriptor PLUGIN_EXPORT frequencyshifter_plugin_descriptor =
 	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
+	Plugin::DefaultCategories::Pitch
 };
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {

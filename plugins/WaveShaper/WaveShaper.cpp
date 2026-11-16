@@ -25,6 +25,7 @@
 
 
 #include "WaveShaper.h"
+#include "Plugin.h"
 #include "lmms_math.h"
 #include "embed.h"
 
@@ -49,6 +50,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
+	Plugin::DefaultCategories::Distortion
 } ;
 
 }

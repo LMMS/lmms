@@ -25,12 +25,11 @@
 #ifndef LMMS_PLUGIN_H
 #define LMMS_PLUGIN_H
 
-#include <QStringList>
 #include <QMap>
+#include <QStringList>
 
 #include "JournallingObject.h"
 #include "Model.h"
-
 
 class QWidget;
 
@@ -74,35 +73,85 @@ class LMMS_EXPORT Plugin : public Model, public JournallingObject
 public:
 	enum class Type
 	{
-		Instrument,	// instrument being used in channel-track
-		Effect,		// effect-plugin for effect-board
-		ImportFilter,	// filter for importing a file
-		ExportFilter,	// filter for exporting a file
-		Tool,		// additional tool (level-meter etc)
-		Library,	// simple library holding a code-base for
-				// several other plugins (e.g. VST-support)
+		Instrument,	  // instrument being used in channel-track
+		Effect,		  // effect-plugin for effect-board
+		ImportFilter, // filter for importing a file
+		ExportFilter, // filter for exporting a file
+		Tool,		  // additional tool (level-meter etc)
+		Library,	  // simple library holding a code-base for
+					  // several other plugins (e.g. VST-support)
 		Other,
 		Undefined = 255
-	} ;
+	};
+
+	enum class DefaultCategories
+	{
+		Other,
+		Amplifier,
+		Bitcrush,
+		Chorus,
+		Compressor,
+		Deesser,
+		Delay,
+		Distortion,
+		Equalization,
+		Filter,
+		Flanger,
+		Gate,
+		Limiter,
+		LowFrequencyOscillator,
+		Noise,
+		Phaser,
+		Pitch,
+		Reverb,
+		Stereo,
+		Tool,
+		Vocoder,
+		Wah
+	};
+
+	const std::map<Plugin::DefaultCategories, QString> categoriesLabels = 
+	{
+	{Plugin::DefaultCategories::Other, tr("Other")},
+	{Plugin::DefaultCategories::Amplifier, tr("Amplifier")},
+	{Plugin::DefaultCategories::Bitcrush, tr("Bitcrush")},
+	{Plugin::DefaultCategories::Chorus, tr("Chorus")},
+	{Plugin::DefaultCategories::Compressor, tr("Compressor")},
+	{Plugin::DefaultCategories::Deesser, tr("Deesser")},
+	{Plugin::DefaultCategories::Delay, tr("Delay")},
+	{Plugin::DefaultCategories::Distortion, tr("Distortion")},
+	{Plugin::DefaultCategories::Equalization, tr("Equalization")},
+	{Plugin::DefaultCategories::Filter, tr("Filter")},
+	{Plugin::DefaultCategories::Flanger, tr("Flanger")},
+	{Plugin::DefaultCategories::Gate, tr("Gate")},
+	{Plugin::DefaultCategories::Limiter, tr("Limiter")},
+	{Plugin::DefaultCategories::LowFrequencyOscillator, tr("LowFrequencyOscillator")},
+	{Plugin::DefaultCategories::Noise, tr("Noise")},
+	{Plugin::DefaultCategories::Phaser, tr("Phaser")},
+	{Plugin::DefaultCategories::Pitch, tr("Pitch")},
+	{Plugin::DefaultCategories::Reverb, tr("Reverb")},
+	{Plugin::DefaultCategories::Stereo, tr("Stereo")},
+	{Plugin::DefaultCategories::Tool, tr("Tool")},
+	{Plugin::DefaultCategories::Vocoder, tr("Vocoder")},
+	{Plugin::DefaultCategories::Wah, tr("Wah")}
+	};
 
 	//! Descriptor holds information about a plugin - every external plugin
 	//! has to instantiate such a Descriptor in an extern "C"-section so that
 	//! the plugin-loader is able to access information about the plugin
 	struct Descriptor
 	{
-		const char * name;
-		const char * displayName;
-		const char * description;
-		const char * author;
+		const char* name;
+		const char* displayName;
+		const char* description;
+		const char* author;
 		int version;
 		Type type;
-		const PixmapLoader * logo;
-		const char * supportedFileTypes; //!< csv list of extensions
+		const PixmapLoader* logo;
+		const char* supportedFileTypes; //!< csv list of extensions
 
-		inline bool supportsFileType( const QString& extension ) const
-		{
-			return QString( supportedFileTypes ).split( QChar( ',' ) ).contains( extension );
-		}
+		inline bool supportsFileType(const QString& extension) const
+		{ return QString(supportedFileTypes).split(QChar(',')).contains(extension); }
 
 		/**
 			Access to non-key-data of a sub plugin
@@ -136,25 +185,19 @@ public:
 			{
 				using AttributeMap = QMap<QString, QString>;
 
-				inline Key( const Plugin::Descriptor * desc = nullptr,
-						const QString & name = QString(),
-						const AttributeMap & am = AttributeMap()
-					)
-					:
-					desc( desc ),
-					name( name ),
-					attributes( am )
+				inline Key(const Plugin::Descriptor* desc = nullptr, const QString& name = QString(),
+					const AttributeMap& am = AttributeMap())
+					: desc(desc)
+					, name(name)
+					, attributes(am)
 				{
 				}
 
-				Key( const QDomElement & key );
+				Key(const QDomElement& key);
 
-				QDomElement saveXML( QDomDocument & doc ) const;
+				QDomElement saveXML(QDomDocument& doc) const;
 
-				inline bool isValid() const
-				{
-					return desc != nullptr;
-				}
+				inline bool isValid() const { return desc != nullptr; }
 
 				//! Key to subplugin: reference to parent descriptor
 				//! Key to plugin: reference to its descriptor
@@ -175,48 +218,38 @@ public:
 				QString displayName() const;
 				QString description() const;
 				const PixmapLoader* logo() const;
-			} ;
+			};
 
 			using KeyList = QList<Key>;
 
-			SubPluginFeatures( Plugin::Type type ) :
-				m_type( type )
+			SubPluginFeatures(Plugin::Type type)
+				: m_type(type)
 			{
 			}
 
 			virtual ~SubPluginFeatures() = default;
 
-			virtual void fillDescriptionWidget( QWidget *, const Key * ) const
-			{
-			}
+			virtual void fillDescriptionWidget(QWidget*, const Key*) const {}
 
 			//! While PluginFactory only collects the plugins,
 			//! this function is used by widgets like EffectSelectDialog
 			//! to find all possible sub plugins
-			virtual void listSubPluginKeys( const Plugin::Descriptor *, KeyList & ) const
+			virtual void listSubPluginKeys(const Plugin::Descriptor*, KeyList&) const {}
+			virtual Plugin::DefaultCategories getDefaultEffectCategory(const Plugin::Descriptor* descriptor)
 			{
+				return descriptor->defaultEffectCategory;
 			}
-
 
 		private:
 			// You can add values mapped by "Key" below
 			// The defaults are sane, i.e. redirect to sub plugin's
 			// supererior descriptor
 
-			virtual QString additionalFileExtensions(const Key&) const
-			{
-				return QString();
-			}
+			virtual QString additionalFileExtensions(const Key&) const { return QString(); }
 
-			virtual QString displayName(const Key& k) const
-			{
-				return k.isValid() ? k.name : QString();
-			}
+			virtual QString displayName(const Key& k) const { return k.isValid() ? k.name : QString(); }
 
-			virtual QString description(const Key& k) const
-			{
-				return k.isValid() ? k.desc->description : QString();
-			}
+			virtual QString description(const Key& k) const { return k.isValid() ? k.desc->description : QString(); }
 
 			virtual const PixmapLoader* logo(const Key& k) const
 			{
@@ -226,11 +259,13 @@ public:
 
 		protected:
 			const Plugin::Type m_type;
-		} ;
+		};
 
-		SubPluginFeatures * subPluginFeatures;
+		SubPluginFeatures* subPluginFeatures;
 
-	} ;
+		// Optional members
+		DefaultCategories defaultEffectCategory = Plugin::DefaultCategories::Other;
+	};
 	// typedef a list so we can easily work with list of plugin descriptors
 	using DescriptorList = QList<Descriptor*>;
 
@@ -239,11 +274,7 @@ public:
 	//! @param parent The parent Model
 	//! @param key Sub plugins must pass a key here, optional otherwise.
 	//! See the key() function
-	Plugin(
-		const Descriptor* descriptor,
-		Model* parent,
-		const Descriptor::SubPluginFeatures::Key* key = nullptr
-	);
+	Plugin(const Descriptor* descriptor, Model* parent, const Descriptor::SubPluginFeatures::Key* key = nullptr);
 
 	~Plugin() override = default;
 
@@ -251,41 +282,28 @@ public:
 	QString displayName() const override;
 
 	//! Return logo out of sub plugin or descriptor
-	const PixmapLoader *logo() const;
+	const PixmapLoader* logo() const;
 
 	//! Return plugin type
-	inline Type type() const
-	{
-		return m_descriptor->type;
-	}
+	inline Type type() const { return m_descriptor->type; }
 
 	//! Return plugin Descriptor
-	inline const Descriptor * descriptor() const
-	{
-		return m_descriptor;
-	}
+	inline const Descriptor* descriptor() const { return m_descriptor; }
 
 	//! Return the key referencing this plugin. If the Plugin has no
 	//! sub plugin features, the key is pretty useless. If it has,
 	//! this key will also contain the sub plugin attributes, and will be
 	//! a key to those SubPluginFeatures.
-	inline const Descriptor::SubPluginFeatures::Key & key() const
-	{
-		return m_key;
-	}
+	inline const Descriptor::SubPluginFeatures::Key& key() const { return m_key; }
 
 	//! Can be called if a file matching supportedFileTypes should be
 	//! loaded/processed with the help of this plugin
-	virtual void loadFile( const QString & file );
+	virtual void loadFile(const QString& file);
 
 	//! Overload if the argument passed to the plugin is a subPluginKey
 	//! If you can not pass the key and are aware that it's stored in Engine::pickDndPluginKey(), use this function, too
-	static Plugin* instantiateWithKey(
-		const QString& pluginName,
-		Model* parent,
-		const Descriptor::SubPluginFeatures::Key* key,
-		bool keyFromDnd = false
-	);
+	static Plugin* instantiateWithKey(const QString& pluginName, Model* parent,
+		const Descriptor::SubPluginFeatures::Key* key, bool keyFromDnd = false);
 
 	//! Return an instance of a plugin whose name matches to given one.
 	//!
@@ -293,27 +311,26 @@ public:
 	//!
 	//! @param pluginName The name of the desired plugin to search for
 	//! @param parent The parent Model
-	//! @param data Anything the plugin expects. If this is a pointer to a sub plugin key, use instantiateWithKey instead
+	//! @param data Anything the plugin expects. If this is a pointer to a sub plugin key, use instantiateWithKey
+	//! instead
 	static Plugin* instantiate(const QString& pluginName, Model* parent, void* data);
 
 	//! Create a view for the model
-	gui::PluginView * createView( QWidget * parent );
+	gui::PluginView* createView(QWidget* parent);
 
 protected:
 	//! Create a view for the model
-	virtual gui::PluginView* instantiateView( QWidget * ) = 0;
-	void collectErrorForUI( QString errMsg );
-
+	virtual gui::PluginView* instantiateView(QWidget*) = 0;
+	void collectErrorForUI(QString errMsg);
 
 private:
-	const Descriptor * m_descriptor;
+	const Descriptor* m_descriptor;
 
 	Descriptor::SubPluginFeatures::Key m_key;
 
 	// pointer to instantiation-function in plugin
 	using InstantiationHook = Plugin* (*)(Model*, void*);
-} ;
-
+};
 
 } // namespace lmms
 

@@ -25,6 +25,7 @@
 
 #include "StereoMatrix.h"
 
+#include "Plugin.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -47,6 +48,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
+	Plugin::DefaultCategories::Stereo
 } ;
 
 }

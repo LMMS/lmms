@@ -32,7 +32,6 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "DummyPlugin.h"
-#include "AutomatableModel.h"
 #include "Song.h"
 #include "PluginFactory.h"
 

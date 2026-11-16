@@ -48,6 +48,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
+	Plugin::DefaultCategories::Delay
 } ;
 
 

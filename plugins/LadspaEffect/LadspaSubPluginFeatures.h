@@ -46,7 +46,8 @@ public:
 
 	void listSubPluginKeys( const Plugin::Descriptor * _desc,
 												KeyList & _kl ) const override;
-
+	Plugin::DefaultCategories getDefaultEffectCategory(const Plugin::Descriptor* descriptor) override;
+	
 
 	static ladspa_key_t subPluginKeyToLadspaKey( const Key * _key );
 
