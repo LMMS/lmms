@@ -42,6 +42,7 @@
 #include "AudioJack.h"
 #include "AudioSndio.h"
 #include "AudioPortAudio.h"
+#include "AudioPipeWire.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -594,6 +595,14 @@ bool AudioEngine::isAudioDevNameValid(QString name)
 #endif
 
 
+#ifdef LMMS_HAVE_PIPEWIRE
+	if (name == AudioPipeWire::name())
+	{
+		return true;
+	}
+#endif
+
+
 #ifdef LMMS_HAVE_PULSEAUDIO
 	if (name == AudioPulseAudio::name())
 	{
@@ -716,6 +725,21 @@ AudioDevice * AudioEngine::tryAudioDevices()
 	}
 #endif
 
+// TODO Consider to move this to the top when everything works. Direct usage of PipeWire should be more efficient than SDL2.
+#ifdef LMMS_HAVE_PIPEWIRE
+	if (dev_name == AudioPipeWire::name() || dev_name.isEmpty())
+	{
+		dev = new AudioPipeWire(success_ful, this);
+
+		if (success_ful)
+		{
+			m_audioDevName = AudioPipeWire::name();
+			return dev;
+		}
+
+		delete dev;
+	}
+#endif
 
 #ifdef LMMS_HAVE_PULSEAUDIO
 	if( dev_name == AudioPulseAudio::name() || dev_name == "" )
