@@ -75,6 +75,7 @@ public slots:
 	void savePreset();
 	void loadPreset();
 	void deletePlugin();
+	void corruptStateUpdate();
 
 signals:
 	void movedUp(EffectView* view);

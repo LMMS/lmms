@@ -43,15 +43,11 @@ const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEnco
 {
 
 	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Wave,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
-					".wav", &AudioFileWave::getInst },
+		QT_TR_NOOP("WAV (*.wav)"), ".wav", &AudioFileWave::getInst},
 	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Flac,
-		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
-		".flac",
-		&AudioFileFlac::getInst
-	},
+		QT_TR_NOOP("FLAC (*.flac)"), ".flac", &AudioFileFlac::getInst},
 	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Ogg,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
+		QT_TR_NOOP("OGG (*.ogg)"),
 					".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
 					&AudioFileOgg::getInst
@@ -59,8 +55,8 @@ const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEnco
 					nullptr
 #endif
 									},
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::MP3,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
+	FileEncodeDevice{ProjectRenderer::ExportFileFormat::MP3,
+		QT_TR_NOOP("MP3 (*.mp3)"),
 					".mp3",
 #ifdef LMMS_HAVE_MP3LAME
 					&AudioFileMP3::getInst

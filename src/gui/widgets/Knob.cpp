@@ -531,20 +531,6 @@ void Knob::changeEvent(QEvent * ev)
 	}
 }
 
-
-void VolumeKnob::setModel(Model* model, bool isOldModelValid)
-{
-	AutomatableModelView::setModel(model, isOldModelValid);
-
-	if (auto m = this->model())
-	{
-		// Check for some incompatible models
-		if (m->isScaleLogarithmic()) { throw std::logic_error{"VolumeKnob: model must use linear scaling"}; } // TODO: Is this true?
-		if (m->minValue() > 0) { throw std::logic_error{"VolumeKnob: model must have a non-positive min value"}; }
-		if (m->maxValue() <= 0) { throw std::logic_error{"VolumeKnob: model must have a positive max value"}; }
-	}
-}
-
 QString VolumeKnob::currentValueToText()
 {
 	const auto* m = model();

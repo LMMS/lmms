@@ -38,39 +38,71 @@ class FadeButton : public QAbstractButton
 {
 	Q_OBJECT
 public:
-	FadeButton( const QColor & _normal_color,
-		const QColor & _activated_color,
-		const QColor & _hold_color,
-		QWidget * _parent );
+	enum class State
+	{
+		Normal,
+		Corrupted,
+	};
 
+	/**
+	 * @brief Creates a fade button with the given color palette.
+	 * 
+	 * @param inactiveColor The default color for the widget
+	 * @param normalColor The color to use on activation when in the Normal state
+	 * @param corruptedColor The color to use on activation when in the Corrupted state
+	 * @param mutedColor The color to use when the fade button is muted
+	 * @param holdColor The color after the "play" fade is done but a note is still playing
+	 */
+	FadeButton(
+		const QColor& inactiveColor,
+		const QColor& normalColor,
+		const QColor& corruptedColor,
+		const QColor& mutedColor,
+		const QColor& holdColor,
+		QWidget* parent = nullptr);
+
+	//! @brief Creates a fade button with the default application colors.
+	FadeButton(QWidget* parent = nullptr);
+
+	//! @brief Destroys the fade button.
 	~FadeButton() override = default;
-	void setActiveColor( const QColor & activated_color );
 
+	//! @returns the current state of the fade button.
+	auto state() const -> State;
+
+	//! @returns true if the fade button is muted.
+	auto muted() const -> bool;
+
+	//! Set the state of the fade button to @a state.
+	void setState(State state);
+
+	//! Mute or unmute the fade button.
+	void setMuted(bool mute);
 
 public slots:
 	void activate();
 	void activateOnce();
 	void noteEnd();
 
-
-protected:
-	void paintEvent( QPaintEvent * _pe ) override;
-
-
 private:
+	void paintEvent(QPaintEvent* pe) override;
+
+	State m_state = State::Normal;
+
 	QElapsedTimer m_stateTimer;
 	QElapsedTimer m_releaseTimer;
 
-	// the default color of the widget
+	QColor m_inactiveColor;
 	QColor m_normalColor;
-	// the color on note play
-	QColor m_activatedColor;
-	// the color after the "play" fade is done but a note is still playing
+	QColor m_corruptedColor;
+	QColor m_mutedColor;
 	QColor m_holdColor;
+
 	int activeNotes;
+	bool m_muted = false;
 
 	QColor fadeToColor(QColor, QColor, QElapsedTimer, float);
-
+	QColor activeColor() const;
 } ;
 
 

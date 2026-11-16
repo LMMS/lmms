@@ -349,6 +349,16 @@ float AutomatableModel::inverseScaledValue( float value ) const
 }
 
 
+float AutomatableModel::normValue(float value) const
+{
+	return (range() == 0) ? 1 : (inverseScaledValue(value) - minValue<float>()) / range();
+}
+
+float AutomatableModel::inverseNormValue(float value) const
+{
+	return scaledValue(value * range() + minValue<float>());
+}
+
 
 
 template<class T>
@@ -737,14 +747,7 @@ float FloatModel::getRoundedValue() const
 
 int FloatModel::getDigitCount() const
 {
-	auto steptemp = step<float>();
-	int digits = 0;
-	while ( steptemp < 1 )
-	{
-		steptemp = steptemp * 10.0f;
-		digits++;
-	}
-	return digits;
+	return static_cast<int>(std::ceil(-std::log10(step<float>())));
 }
 
 

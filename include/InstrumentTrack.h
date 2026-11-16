@@ -174,10 +174,24 @@ public:
 	}
 
 	bool keyRangeImport() const;
+
+	//! @brief Check if there is a valid mapping for the given key and it is within defined of range.
 	bool isKeyMapped(int key) const;
+
+	//! @brief Return first mapped key, based on currently selected keymap or user selection.
+	//! @return Number ranging from 0 to NumKeys -1
 	int firstKey() const;
+
+	//! @brief Return last mapped key, based on currently selected keymap or user selection.
+	//! @return Number ranging from 0 to NumKeys -1
 	int lastKey() const;
+
+	//! @brief Return base key number, based on currently selected keymap or user selection.
+	//! @return Number ranging from 0 to NumKeys -1
 	int baseNote() const;
+
+	//! @brief Return frequency assigned to the base key, based on currently selected keymap.
+	//! @return Frequency in Hz
 	float baseFreq() const;
 
 	Piano *pianoModel()
@@ -237,7 +251,9 @@ public:
 	
 	void replaceInstrument(DataFile dataFile);
 
-	void autoAssignMidiDevice( bool );
+	//! @brief Automatically assign a midi controller to this track, based on the midiautoassign setting
+	//! @param assign Set to true to connect the midi device, set to false to disconnect
+	void autoAssignMidiDevice(bool assign);
 
 	//! Returns a non-owning pointer to the model for the knob at the given index in the track's MIDI CC rack
 	FloatModel* midiCCModel(int index) const { return m_midiCCModel[index].get(); }
