@@ -852,6 +852,9 @@ void Mixer::loadSettings( const QDomElement & _this )
 		m_mixerChannels[num]->m_muteModel.loadSettings( mixch, "muted" );
 		m_mixerChannels[num]->m_soloModel.loadSettings( mixch, "soloed" );
 		m_mixerChannels[num]->m_name = mixch.attribute( "name" );
+		m_mixerChannels[num]->m_volumeModel.setDisplayName(m_mixerChannels[num]->m_name + ">" + tr("Volume"));
+		m_mixerChannels[num]->m_muteModel.setDisplayName(m_mixerChannels[num]->m_name + ">" + tr("Mute"));
+		m_mixerChannels[num]->m_soloModel.setDisplayName(m_mixerChannels[num]->m_name + ">" + tr("Solo"));
 		if (mixch.hasAttribute("color"))
 		{
 			m_mixerChannels[num]->setColor(QColor{mixch.attribute("color")});
