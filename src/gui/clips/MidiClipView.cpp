@@ -241,7 +241,7 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 						tr( "Change name" ),
 						this, SLOT(changeName()));
 
-	if (isBeat)
+	if (isBeat && m_legacySEPattern && !fixedClips())
 	{
 		_cm->addSeparator();
 

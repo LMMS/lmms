@@ -33,6 +33,7 @@
 #include "MidiClipView.h"
 #include "PatternStore.h"
 #include "PianoRoll.h"
+#include "TimePos.h"
 
 
 
@@ -572,6 +573,8 @@ void MidiClip::clear()
 void MidiClip::addSteps()
 {
 	m_steps += TimePos::stepsPerBar();
+	setAutoResize(false);
+	changeLength(length() + TimePos::ticksPerBar());
 	updateLength();
 	emit dataChanged();
 }
@@ -593,6 +596,8 @@ void MidiClip::cloneSteps()
 			newNote->setVolume( toCopy->getVolume() );
 		}
 	}
+	setAutoResize(false);
+	changeLength(length() * 2);
 	updateLength();
 	emit dataChanged();
 }
@@ -610,6 +615,8 @@ void MidiClip::removeSteps()
 			setStep( i, false );
 		}
 		m_steps -= n;
+		setAutoResize(false);
+		changeLength(length() - TimePos::ticksPerBar());
 		updateLength();
 		emit dataChanged();
 	}
