@@ -188,13 +188,13 @@ void EffectView::savePreset()
 		// Save the effect key for LADSPA instantiation, also used for Effect::instantiate
 		content.appendChild(effect()->key().saveXML(dataFile));
 
-		effect()->saveSettings(dataFile, content);
-
 		// TODO:
 		// If guivisible for VST effects is set to 0, the LMMS GUI opens,
 		// but is drawn as empty, with no VST content drawn.
 		// This fixes it, at least for now.
 		content.setAttribute("guivisible", 1);
+
+		effect()->saveSettings(dataFile, content);
 
 		QString f = sfd.selectedFiles()[0];
 		dataFile.writeFile(f);
