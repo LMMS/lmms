@@ -196,6 +196,8 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
+	connect( &m_bankNum, SIGNAL( automated() ), this, SLOT( disableDynamicSampleLoading() ) );
+	connect( &m_patchNum, SIGNAL( automated() ), this, SLOT( disableDynamicSampleLoading() ) );
 
 	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(reloadSynth()));
 
@@ -565,6 +567,9 @@ void Sf2Instrument::updateTuning()
 
 void Sf2Instrument::reloadSynth()
 {
+	Engine::audioEngine()->requestChangesGuard();
+	const auto guard = std::lock_guard{m_synthMutex};
+
 	double tempRate;
 
 	// Set & get, returns the true sample rate
@@ -577,14 +582,13 @@ void Sf2Instrument::reloadSynth()
 	if( m_font )
 	{
 		// Now, delete the old one and replace
-		m_synthMutex.lock();
 		fluid_synth_remove_sfont( m_synth, m_font );
 		delete_fluid_synth( m_synth );
 
 		// New synth
 		m_synth = new_fluid_synth( m_settings );
 		m_fontId = fluid_synth_add_sfont( m_synth, m_font );
-		m_synthMutex.unlock();
+		fluid_synth_sfreload(m_synth, m_fontId);
 
 		// synth program change (set bank and patch)
 		updatePatch();
@@ -592,16 +596,12 @@ void Sf2Instrument::reloadSynth()
 	else
 	{
 		// Recreate synth with no soundfonts
-		m_synthMutex.lock();
 		if (m_synth != nullptr)
 		{
 			delete_fluid_synth(m_synth);
 		}
 		m_synth = new_fluid_synth( m_settings );
-		m_synthMutex.unlock();
 	}
-
-	m_synthMutex.lock();
 
 	if (m_internalSampleRate != Engine::audioEngine()->outputSampleRate())
 	{
@@ -612,8 +612,6 @@ void Sf2Instrument::reloadSynth()
 		// supporting only up to 96 kHZ (though that may be a problem if theres a strong need for 192 kHZ).
 		fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_LINEAR);
 	}
-
-	m_synthMutex.unlock();
 
 	updateReverb();
 	updateChorus();
@@ -629,6 +627,16 @@ void Sf2Instrument::reloadSynth()
 }
 
 
+void Sf2Instrument::disableDynamicSampleLoading()
+{
+	int currentValue = 1;
+	fluid_settings_getint(m_settings, "synth.dynamic-sample-loading", &currentValue);
+	if (currentValue == 1)
+	{
+		fluid_settings_setint(m_settings, "synth.dynamic-sample-loading", 0);
+		reloadSynth();
+	}
+}
 
 
 void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
