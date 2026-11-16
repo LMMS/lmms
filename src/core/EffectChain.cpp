@@ -25,6 +25,7 @@
 
 #include "EffectChain.h"
 
+#include <algorithm>
 #include <QDomElement>
 #include <cassert>
 
@@ -179,6 +180,16 @@ void EffectChain::moveUp( Effect * _effect )
 		assert(it != m_effects.end());
 		std::swap(*std::prev(it), *it);
 	}
+}
+
+
+
+
+bool EffectChain::hasVisibleEffectViewState() const
+{
+	return std::any_of(m_effects.cbegin(), m_effects.cend(), [](const Effect* effect) {
+		return effect->deferredHookAttribute("visible").toInt();
+	});
 }
 
 

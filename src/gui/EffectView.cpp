@@ -99,6 +99,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_opacityEffect = new QGraphicsOpacityEffect(this);
 	m_opacityEffect->setOpacity(1);
 	setGraphicsEffect(m_opacityEffect);
+	effect()->setHook(this);
 
 	//move above vst effect view creation
 	//setModel( _model );
@@ -131,6 +132,24 @@ void EffectView::editControls()
 			effect()->controls()->setViewVisible( false );
 		}
 	}
+}
+
+
+
+
+void EffectView::saveSettings(QDomDocument&, QDomElement& element)
+{
+	if (m_subWindow) { MainWindow::saveWidgetState(m_subWindow, element); }
+}
+
+
+
+
+void EffectView::loadSettings(const QDomElement& element)
+{
+	if (!m_subWindow) { return; }
+	MainWindow::restoreWidgetState(m_subWindow, element);
+	effect()->controls()->setViewVisible(m_controlView->isVisible());
 }
 
 
