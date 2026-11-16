@@ -27,23 +27,13 @@
 #define LMMS_ENDIAN_HANDLING_H
 
 #include <bit>
-#include <type_traits>
+#include <concepts>
 
 namespace lmms {
 
-constexpr bool isLittleEndian() noexcept
-{
-	return std::endian::native == std::endian::little;
-}
-
-constexpr bool isBigEndian() noexcept
-{
-	return std::endian::native == std::endian::big;
-}
-
 //! TODO C++23: Use std::byteswap
-template<typename Int>
-	requires (sizeof(Int) <= 4 && std::is_integral_v<Int>)
+template<std::integral Int>
+requires (0 < sizeof(Int) && sizeof(Int) <= 4 && std::has_single_bit(sizeof(Int)))
 constexpr Int byteswap(Int i) noexcept
 {
 	if constexpr (sizeof(Int) == 1) { return i; }
