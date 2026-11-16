@@ -196,11 +196,13 @@ void AudioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 
 void AudioFileProcessor::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	elem.setAttribute("src", m_sample.sampleFile());
-	if (m_sample.sampleFile().isEmpty())
+	elem.setAttribute("src", m_sample.buffer().path());
+
+	if (m_sample.buffer().path().isEmpty())
 	{
 		elem.setAttribute("sampledata", m_sample.toBase64());
 	}
+
 	m_reverseModel.saveSettings(doc, elem, "reversed");
 	m_loopModel.saveSettings(doc, elem, "looped");
 	m_ampModel.saveSettings(doc, elem, "amp");
@@ -226,8 +228,15 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample{SampleBuffer::fromBase64(sampleData)};
-		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
+		if (auto buffer = SampleBuffer::fromBase64(sampleData))
+		{
+			m_sample = Sample{std::make_shared<const SampleBuffer>(std::move(*buffer))};
+			m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
+		}
+		else
+		{
+			Engine::getSong()->collectError(tr("Failed to load Base64 sample"));
+		}
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -290,7 +299,8 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> f_cnt_t
 	const auto freqFactor = baseFreq / note->frequency()
 		* Engine::audioEngine()->outputSampleRate()
 		/ Engine::audioEngine()->baseSampleRate();
-	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_sample.sampleRate();
+	const auto sampleRateRatio
+		= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_sample.buffer().sampleRate();
 
 	const auto startFrame = m_nextPlayStartPoint >= static_cast<std::size_t>(m_sample.endFrame())
 		? m_sample.startFrame()
@@ -321,10 +331,9 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	if (!thumbnailCache) { return; }
 
 	// is current channel-name equal to previous-filename??
-	if( _rename &&
-		( instrumentTrack()->name() ==
-			QFileInfo(m_sample.sampleFile()).fileName() ||
-				m_sample.sampleFile().isEmpty()))
+	if (_rename
+		&& (instrumentTrack()->name() == QFileInfo(m_sample.buffer().path()).fileName()
+			|| m_sample.buffer().path().isEmpty()))
 	{
 		// then set it to new one
 		instrumentTrack()->setName( PathUtil::cleanName( _audio_file ) );
@@ -432,9 +441,9 @@ void AudioFileProcessor::loopPointChanged()
 
 void AudioFileProcessor::pointChanged()
 {
-	const auto f_start = static_cast<f_cnt_t>(m_startPointModel.value() * m_sample.sampleSize());
-	const auto f_end = static_cast<f_cnt_t>(m_endPointModel.value() * m_sample.sampleSize());
-	const auto f_loop = static_cast<f_cnt_t>(m_loopPointModel.value() * m_sample.sampleSize());
+	const auto f_start = static_cast<f_cnt_t>(m_startPointModel.value() * m_sample.buffer().frames());
+	const auto f_end = static_cast<f_cnt_t>(m_endPointModel.value() * m_sample.buffer().frames());
+	const auto f_loop = static_cast<f_cnt_t>(m_loopPointModel.value() * m_sample.buffer().frames());
 
 	m_nextPlayStartPoint = f_start;
 	m_nextPlayBackwards = false;

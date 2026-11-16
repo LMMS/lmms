@@ -131,24 +131,18 @@ void SampleClip::changeLength( const TimePos & _length )
 
 const QString& SampleClip::sampleFile() const
 {
-	return m_sample.sampleFile();
+	return m_sample.buffer().path();
 }
 
 bool SampleClip::hasSampleFileLoaded(const QString & filename) const
 {
-	return m_sample.sampleFile() == filename;
+	return m_sample.buffer().path() == filename;
 }
 
-void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
+void SampleClip::setSampleBuffer(SampleBuffer buffer)
 {
-	if (!sb) { return; }
-
-	{
-		const auto guard = Engine::audioEngine()->requestChangesGuard();
-		m_sample = Sample(std::move(sb));
-		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
-	}
-
+	m_sample = Sample{std::make_shared<const SampleBuffer>(std::move(buffer))};
+	m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_sample.buffer());
 	updateLength();
 	emit sampleChanged();
 	Engine::getSong()->setModified();
@@ -162,6 +156,7 @@ void SampleClip::setSampleFile(const QString& sf)
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
 		changeLength(DefaultTicksPerBar * (nom / den));
+		return;
 	}
 	else
 	{
@@ -271,7 +266,7 @@ void SampleClip::setStartTimeOffset(const TimePos& startTimeOffset)
 
 TimePos SampleClip::sampleLength() const
 {
-	return static_cast<int>(m_sample.sampleSize() / Engine::framesPerTick(m_sample.sampleRate()));
+	return static_cast<int>(m_sample.buffer().frames() / Engine::framesPerTick(m_sample.buffer().sampleRate()));
 }
 
 
@@ -314,7 +309,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute("data", m_sample.toBase64());
 	}
 
-	_this.setAttribute( "sample_rate", m_sample.sampleRate());
+	_this.setAttribute("sample_rate", m_sample.buffer().sampleRate());
 	if (const auto& c = color())
 	{
 		_this.setAttribute("color", c->name());
@@ -347,9 +342,17 @@ void SampleClip::loadSettings( const QDomElement & _this )
 
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
-		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
-			Engine::audioEngine()->outputSampleRate();
-		setSampleBuffer(SampleBuffer::fromBase64(_this.attribute("data"), sampleRate));
+		const auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt()
+																  : Engine::audioEngine()->outputSampleRate();
+
+		if (auto buffer = SampleBuffer::fromBase64(_this.attribute("data"), sampleRate))
+		{
+			setSampleBuffer(std::move(*buffer));
+		}
+		else
+		{
+			Engine::getSong()->collectError(tr("Failed to load Base64 sample"));
+		}
 	}
 
 	changeLength( _this.attribute( "len" ).toInt() );

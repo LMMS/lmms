@@ -24,10 +24,12 @@
  */
 
 #include <QPainter>
+#include <QMessageBox>
 
 #include "Graph.h"
 #include "DeprecationHelper.h"
 #include "FileDialog.h"
+#include "SampleCache.h"
 #include "StringPairDrag.h"
 #include "Oscillator.h"
 
@@ -586,17 +588,23 @@ void graphModel::setWaveToNoise()
 QString graphModel::setWaveToUser()
 {
 	QString fileName = gui::FileDialog::openWaveformFile();
-	if( fileName.isEmpty() == false )
-	{
-		auto sampleBuffer = SampleBuffer::fromFile(fileName);
-		for( int i = 0; i < length(); i++ )
-		{
-			m_samples[i] = Oscillator::userWaveSample(sampleBuffer.get(), i / static_cast<float>(length()));
-		}
-	}
+	if (fileName.isEmpty()) { return ""; }
 
-	emit samplesChanged( 0, length() - 1 );
-	return fileName;
+	if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(fileName)))
+	{
+		for (int i = 0; i < length(); i++)
+		{
+			m_samples[i] = Oscillator::userWaveSample(&*buffer, i / static_cast<float>(length()));
+		}
+
+		emit samplesChanged(0, length() - 1);
+		return fileName;
+	}
+	else
+	{
+		QMessageBox::warning(nullptr, tr("Error"), QString{"%1: %2"}.arg(tr("Failed to load sample"), fileName));
+		return "";
+	}
 };
 
 

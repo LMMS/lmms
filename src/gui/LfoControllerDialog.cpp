@@ -24,7 +24,10 @@
  */
 
 
+#include <QMessageBox>
 #include "FileDialog.h"
+#include "PathUtil.h"
+#include "SampleCache.h"
 #include "embed.h"
 
 
@@ -211,11 +214,16 @@ void LfoControllerDialog::askUserDefWave()
 	const auto fileName = FileDialog::openWaveformFile();
 	if (fileName.isEmpty()) { return; }
 
-	auto lfoModel = dynamic_cast<LfoController*>(model());
-	auto& buffer = lfoModel->m_userDefSampleBuffer;
-	buffer = SampleBuffer::fromFile(fileName);
-
-	m_userWaveBtn->setToolTip(buffer->audioFile());
+	if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(fileName)))
+	{
+		const auto lfoModel = dynamic_cast<LfoController*>(model());
+		lfoModel->m_userDefSampleBuffer = std::make_shared<const SampleBuffer>(std::move(*buffer));
+		m_userWaveBtn->setToolTip(fileName);
+	}
+	else
+	{
+		QMessageBox::warning(nullptr, tr("Error"), tr("Failed to load sample: %1").arg(fileName));
+	}
 }
 
 

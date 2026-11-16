@@ -24,6 +24,7 @@
  */
 
 #include "SampleThumbnailCache.h"
+#include <numeric>
 
 namespace {
 constexpr auto AggregationPerZoomStep = 4;
@@ -32,14 +33,15 @@ constexpr auto AggregationPerZoomStep = 4;
 namespace lmms {
 
 SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
-	: m_sampleCount{buffer.size()}
+	: m_sampleCount{buffer.frames()}
 {
 	if (buffer.empty()) { return; }
 
 	auto highestResolutionThumbnail = Thumbnail{m_sampleCount};
 	for (f_cnt_t i = 0; i < highestResolutionThumbnail.width(); ++i)
 	{
-		const auto value = buffer.data()[i].average();
+		const auto frame = buffer.frame(i);
+		const auto value = std::accumulate(frame.begin(), frame.end(), 0.f) / buffer.channels();
 		highestResolutionThumbnail[i] = Thumbnail::Peak{value, value};
 	}
 

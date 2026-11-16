@@ -41,7 +41,7 @@ public:
 	{
 		return m_buffers.fetch(path, [&path] {
 			auto buffer = SampleBuffer::fromFile(PathUtil::pathToQString(path));
-			return buffer ? std::make_shared<SampleBuffer>(std::move(*buffer)) : nullptr;
+			return buffer ? std::make_shared<const SampleBuffer>(std::move(*buffer)) : nullptr;
 		});
 	}
 
@@ -49,7 +49,7 @@ public:
 	{
 		return m_thumbnailCaches.fetch(path, [&path, this] {
 			auto buffer = fetchBuffer(path);
-			return buffer ? std::make_shared<SampleThumbnailCache>(*buffer) : nullptr;
+			return buffer ? std::make_shared<const SampleThumbnailCache>(*buffer) : nullptr;
 		});
 	}
 
