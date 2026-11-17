@@ -117,6 +117,7 @@ private:
 	friend class gui::SampleClipView;
 
 	void setName(const QString& name);
+	void fileChanged(const QString& fileName);
 
 
 signals:

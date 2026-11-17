@@ -193,12 +193,8 @@ void SampleClip::setSampleFile(const QString& sf)
 		m_sample = Sample{std::move(buffer)};
 		m_sampleThumbnailCache = std::move(thumbnailCache);
 		updateLength();
-	}
 
-	if (!m_name_set)
-	{
-		// If file changed but name already modified, keep old name. (Prefer user-set over filename)
-		m_name = PathUtil::cleanName(m_sample.sampleFile());
+		fileChanged(m_sample.sampleFile());
 	}
 
 	emit sampleChanged();
@@ -412,6 +408,17 @@ void SampleClip::setName(const QString& name)
 {
 	m_name = name;
 	m_name_set = true;
+}
+
+
+
+void SampleClip::fileChanged(const QString& fileName)
+{
+	if (!m_name_set)
+	{
+		// If file changed but name already modified, keep old name. (Prefer user-set over filename)
+		m_name = PathUtil::cleanName(fileName);
+	}
 }
 
 

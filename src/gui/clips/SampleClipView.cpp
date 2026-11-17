@@ -257,6 +257,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);
+			m_clip->fileChanged(selectedAudioFile);
 		}
 	}
 	m_clip->updateLength();
