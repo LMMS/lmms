@@ -155,10 +155,10 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 	);
 
 	auto renameAction = cm->addAction(
-		tr("Rename clip"),
-		this,
-		SLOT(renameClip())
-	);
+			embed::getIconPixmap("edit_rename"),
+			tr("Change name"),
+			this,
+			SLOT(renameClip()));
 	renameAction->setEnabled(m_clip->sampleLength() != 0);
 }
 
