@@ -27,6 +27,9 @@
 
 #include "ClipView.h"
 
+class QGraphicsView;
+class QLineEdit;
+
 namespace lmms
 {
 
@@ -44,10 +47,13 @@ public:
 	SampleClipView( SampleClip * _clip, TrackView * _tv );
 	~SampleClipView() override = default;
 
+	void keyPressEvent(QKeyEvent* ke) override;
+
 public slots:
 	void updateSample();
 	void reverseSample();
 	void setAutomationGhost();
+	void renameClip();
 
 
 
@@ -59,12 +65,19 @@ protected:
 	void dropEvent( QDropEvent * _de ) override;
 	void mouseDoubleClickEvent( QMouseEvent * ) override;
 	void paintEvent( QPaintEvent * ) override;
+	void renameFinished();
 
 
 private:
 	SampleClip * m_clip;
 	QPixmap m_paintPixmap;
 	long m_paintPixmapXPosition;
+
+	QGraphicsView* m_renameLineEditView;
+	QLineEdit* m_renameLineEdit;
+	bool m_inRename = false;
+	bool m_renameCancelled = false; // Whether the user escaped the renaming QLineEdit
+	int m_renameLineEditMaxWidth = 100; // Used to set the maximum width for the renaming QLineEdit
 } ;
 
 
