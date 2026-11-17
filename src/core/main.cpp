@@ -36,6 +36,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTextStream>
+#include <cstring>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -116,8 +117,7 @@ extern "C" _CRTIMP errno_t __cdecl freopen_s(FILE** _File,
 void consoleMessageHandler(QtMsgType type,
 	const QMessageLogContext &context, const QString &msg)
 {
-    QByteArray localMsg = msg.toLocal8Bit();
-    fprintf(stderr, "%s\n", localMsg.constData());
+    fprintf(stderr, "%s\n", qUtf8Printable(msg));
 }
 #endif // LMMS_BUILD_WIN32
 
@@ -219,13 +219,13 @@ void fileCheck( QString &file )
 	if( !fileToCheck.size() )
 	{
 		printf( "The file %s does not have any content.\n",
-				file.toUtf8().constData() );
+				qUtf8Printable(file));
 		exit( EXIT_FAILURE );
 	}
 	else if( fileToCheck.isDir() )
 	{
 		printf( "%s is a directory.\n",
-				file.toUtf8().constData() );
+				qUtf8Printable(file));
 		exit( EXIT_FAILURE );
 	}
 }
@@ -243,7 +243,8 @@ int noInputFileError()
 }
 
 
-int main( int argc, char * * argv )
+// argv should be null-terminated and encoded in utf8.
+int lmmsMain( int argc, char** argv )
 {
 	using namespace lmms;
 
@@ -258,7 +259,7 @@ int main( int argc, char * * argv )
 	// first of two command-line parsing stages
 	for (int i = 1; i < argc; ++i)
 	{
-		QString arg = argv[i];
+		QString arg = QString::fromUtf8(argv[i]);
 
 		if (arg == "--help" || arg == "-h")
 		{
@@ -375,7 +376,7 @@ int main( int argc, char * * argv )
 	// second of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
 	{
-		QString arg = argv[i];
+		QString arg = QString::fromUtf8(argv[i]);
 
 		if (arg == "upgrade" || arg == "--upgrade" || arg  == "-u")
 		{
@@ -387,11 +388,11 @@ int main( int argc, char * * argv )
 			}
 
 
-			DataFile dataFile( QString::fromLocal8Bit( argv[i] ) );
+			DataFile dataFile(QString::fromUtf8(argv[i]));
 
 			if( argc > i+1 ) // output file specified
 			{
-				dataFile.writeFile( QString::fromLocal8Bit( argv[i+1] ) );
+				dataFile.writeFile(QString::fromUtf8(argv[i+1]));
 			}
 			else // no output file specified; use stdout
 			{
@@ -411,12 +412,12 @@ int main( int argc, char * * argv )
 				return noInputFileError();
 			}
 
-			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
+			DataFile dataFile(QString::fromUtf8(argv[i]));
 
 			if (argc > i+1) // Project bundle file name given
 			{
 				printf("Making bundle\n");
-				dataFile.writeFile(QString::fromLocal8Bit(argv[i+1]), true);
+				dataFile.writeFile(QString::fromUtf8(argv[i+1]), true);
 				return EXIT_SUCCESS;
 			}
 			else
@@ -445,7 +446,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			QFile f( QString::fromLocal8Bit( argv[i] ) );
+			QFile f(QString::fromUtf8(argv[i]));
 			f.open( QIODevice::ReadOnly );
 			QString d = qUncompress( f.readAll() );
 			printf( "%s\n", d.toUtf8().constData() );
@@ -461,7 +462,7 @@ int main( int argc, char * * argv )
 				return noInputFileError();
 			}
 
-			QFile f( QString::fromLocal8Bit( argv[i] ) );
+			QFile f(QString::fromUtf8(argv[i]));
 			f.open( QIODevice::ReadOnly );
 			QByteArray d = qCompress( f.readAll() ) ;
 			fwrite( d.constData(), sizeof(char), d.size(), stdout );
@@ -478,8 +479,7 @@ int main( int argc, char * * argv )
 				return noInputFileError();
 			}
 
-
-			fileToLoad = QString::fromLocal8Bit( argv[i] );
+			fileToLoad = QString::fromUtf8(argv[i]);
 			renderOut = fileToLoad;
 		}
 		else if( arg == "--loop" || arg == "-l" )
@@ -496,7 +496,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			renderOut = QString::fromLocal8Bit( argv[i] );
+			renderOut = QString::fromUtf8(argv[i]);
 		}
 		else if( arg == "--format" || arg == "-f" )
 		{
@@ -508,7 +508,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			const QString ext = QString( argv[i] );
+			const QString ext = QString::fromUtf8(argv[i]);
 
 			if( ext == "wav" )
 			{
@@ -532,7 +532,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				return usageError( QString( "Invalid output format %1" ).arg( argv[i] ) );
+				return usageError(QString("Invalid output format %1").arg(QString::fromUtf8(argv[i])));
 			}
 		}
 		else if( arg == "--samplerate" || arg == "-s" )
@@ -545,14 +545,14 @@ int main( int argc, char * * argv )
 			}
 
 
-			sample_rate_t sr = QString( argv[i] ).toUInt();
+			sample_rate_t sr = QString::fromUtf8(argv[i]).toUInt();
 			if( sr >= 44100 && sr <= 192000 )
 			{
 				os.setSampleRate(sr);
 			}
 			else
 			{
-				return usageError( QString( "Invalid samplerate %1" ).arg( argv[i] ) );
+				return usageError(QString("Invalid samplerate %1").arg(QString::fromUtf8(argv[i])));
 			}
 		}
 		else if( arg == "--bitrate" || arg == "-b" )
@@ -565,7 +565,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			int br = QString( argv[i] ).toUInt();
+			int br = QString::fromUtf8(argv[i]).toUInt();
 
 			if( br >= 64 && br <= 384 )
 			{
@@ -573,7 +573,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				return usageError( QString( "Invalid bitrate %1" ).arg( argv[i] ) );
+				return usageError(QString("Invalid bitrate %1").arg(QString::fromUtf8(argv[i])));
 			}
 		}
 		else if( arg == "--mode" || arg == "-m" )
@@ -585,7 +585,7 @@ int main( int argc, char * * argv )
 				return usageError( "No stereo mode specified" );
 			}
 
-			QString const mode( argv[i] );
+			QString const mode = QString::fromUtf8(argv[i]);
 
 			if( mode == "s" )
 			{
@@ -601,7 +601,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				return usageError( QString( "Invalid stereo mode %1" ).arg( argv[i] ) );
+				return usageError(QString("Invalid stereo mode %1").arg(QString::fromUtf8(argv[i])));
 			}
 		}
 		else if( arg =="--float" || arg == "-a" )
@@ -617,7 +617,7 @@ int main( int argc, char * * argv )
 				return usageError( "No file specified for importing" );
 			}
 
-			fileToImport = QString::fromLocal8Bit( argv[i] );
+			fileToImport = QString::fromUtf8(argv[i]);
 
 			// exit after import? (only for debugging)
 			if( QString( argv[i + 1] ) == "-e" )
@@ -636,7 +636,7 @@ int main( int argc, char * * argv )
 			}
 
 
-			profilerOutputFile = QString::fromLocal8Bit( argv[i] );
+			profilerOutputFile = QString::fromUtf8(argv[i]);
 		}
 		else if( arg == "--config" || arg == "-c" )
 		{
@@ -647,15 +647,15 @@ int main( int argc, char * * argv )
 				return usageError( "No configuration file specified" );
 			}
 
-			configFile = QString::fromLocal8Bit( argv[i] );
+			configFile = QString::fromUtf8(argv[i]);
 		}
 		else
 		{
 			if( argv[i][0] == '-' )
 			{
-				return usageError( QString( "Invalid option %1" ).arg( argv[i] ) );
+				return usageError(QString("Invalid option %1").arg(QString::fromUtf8(argv[i])));
 			}
-			fileToLoad = QString::fromLocal8Bit( argv[i] );
+			fileToLoad = QString::fromUtf8(argv[i]);
 		}
 	}
 
@@ -716,7 +716,7 @@ int main( int argc, char * * argv )
 		Engine::getSong()->loadProject( fileToLoad );
 		if( Engine::getSong()->isEmpty() )
 		{
-			printf("The project %s is empty, aborting!\n", fileToLoad.toUtf8().constData() );
+			usageError(QString("The project %1 is empty, aborting!").arg(fileToLoad));
 			exit( EXIT_FAILURE );
 		}
 		printf( "Done\n" );
@@ -934,6 +934,13 @@ int main( int argc, char * * argv )
 		SendMessage(hConsole, WM_CHAR, (WPARAM)VK_RETURN, (LPARAM)0);
 		FreeConsole();
 	}
+
+	//Cleanup windows allocated arguments
+	for(int i = 0; i < argc; i++)
+	{
+		delete[] argv[i];
+	}
+	delete[] argv;
 #endif
 
 
@@ -941,3 +948,29 @@ int main( int argc, char * * argv )
 
 	return ret;
 }
+
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
+int main()
+{
+	int argc = 0;
+	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+	char** argvArr = new char*[argc];
+	for (int i = 0; i < argc; i++)
+	{
+		auto qstr = QString::fromWCharArray(argv[i]);
+		auto byteArray = qstr.toUtf8();
+		//QString's bytearray includes null termination, and size doesn't count it.
+		argvArr[i] = new char[byteArray.size()+1];
+		std::memcpy(argvArr[i], byteArray.constData(), byteArray.size()+1);
+	}
+
+	LocalFree(argv);
+	return lmmsMain(argc, argvArr);
+}
+#else
+int main(int argc, char** argv)
+{
+	return lmmsMain(argc, argv);
+}
+#endif
