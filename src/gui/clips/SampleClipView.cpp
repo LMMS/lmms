@@ -64,7 +64,6 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	{
 		m_renameLineEdit->setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 		m_renameLineEdit->setReadOnly(true);
-		m_renameLineEdit->installEventFilter(this);
 
 		m_renameLineEditView = new QGraphicsView{};
 		m_renameLineEditView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -461,6 +460,8 @@ void SampleClipView::renameClip()
 	m_renameLineEditView->setFocus();
 	m_renameLineEdit->selectAll();
 	m_renameLineEdit->setFocus();
+
+	update();
 }
 
 
