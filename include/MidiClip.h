@@ -26,7 +26,10 @@
 #ifndef LMMS_MIDI_CLIP_H
 #define LMMS_MIDI_CLIP_H
 
+#include <memory>
+
 #include "Clip.h"
+#include "ClipContent.h"
 #include "Note.h"
 
 
@@ -72,7 +75,7 @@ public:
 
 	inline const NoteVector & notes() const
 	{
-		return m_notes;
+		return content()->m_notes;
 	}
 
 	Note * addStepNote( int step );
@@ -122,6 +125,8 @@ public:
 		return new MidiClip(*this);
 	}
 
+	void breakContentLink() override;
+
 
 	using Model::dataChanged;
 
@@ -140,6 +145,22 @@ protected slots:
 
 
 private:
+	class MidiClipContent: public ClipContent
+	{
+	public:
+		MidiClipContent(int steps);
+		~MidiClipContent() override;
+
+		// data-stuff
+		NoteVector m_notes;
+		int m_steps;
+	};
+
+	MidiClipContent* content() const
+	{
+		return static_cast<MidiClipContent*>(m_content.get());
+	}
+
 	TimePos beatClipLength() const;
 
 	void setType( Type _new_clip_type );
@@ -150,10 +171,6 @@ private:
 	InstrumentTrack * m_instrumentTrack;
 
 	Type m_clipType;
-
-	// data-stuff
-	NoteVector m_notes;
-	int m_steps;
 
 	MidiClip * adjacentMidiClipByOffset(int offset) const;
 
