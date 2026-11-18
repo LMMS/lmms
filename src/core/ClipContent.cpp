@@ -47,7 +47,8 @@ QString SharedContentRepository::submit(
 		i++;
 	}
 
-	if (s_contents.contains(linkName)) {return "";}
+	// Check link state as well as presence (if expired, replace).
+	if (s_contents.contains(linkName) && !(s_contents[linkName].expired())) {return "";}
 
 	s_contents[linkName] = std::move(content);
 	return linkName;
