@@ -51,7 +51,7 @@ public:
 
 		//!< A rectangle that covers the entire range of samples from [@a sampleStart, @a sampleEnd)
 		//!< @a rect must share the same coordinate system as that of the painter in which it is drawn with.
-		QRectF rect;
+		QRect rect;
 
 		//!< Where the sample begins for drawing.
 		double sampleStart = 0.f;

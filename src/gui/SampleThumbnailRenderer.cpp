@@ -43,7 +43,7 @@ void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter
 	const auto numSamples = (parameters.sampleEnd - parameters.sampleStart) * parameters.cache->sampleCount();
 
 	// For our rectangle, how many samples each pixel has
-	const auto samplesPerPixel = numSamples / parameters.rect.width();
+	const auto samplesPerPixel = static_cast<double>(numSamples) / parameters.rect.width();
 
 	// We want a thumbnail that has the same SPP as our own rectangle
 	// However, it needs to cover the full sample
@@ -56,15 +56,17 @@ void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter
 	// Calculate how far along we should be in the thumbnail based on where we begin and end in the sample
 	const auto nearestThumbnailStart = parameters.sampleStart * nearestThumbnail.width();
 	const auto nearestThumbnailEnd = parameters.sampleEnd * nearestThumbnail.width();
-	const auto nearestThumbnailRange = nearestThumbnailEnd - nearestThumbnailStart;
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	for (double out = 0; out < parameters.rect.width(); ++out)
+	for (int out = 0; out < parameters.rect.width(); ++out)
 	{
-		const auto peakStart = nearestThumbnailStart + (out / parameters.rect.width()) * nearestThumbnailRange;
-		const auto peakEnd = nearestThumbnailStart + ((out + 1) / parameters.rect.width()) * nearestThumbnailRange;
+		const auto peakStart = std::lerp(nearestThumbnailStart, nearestThumbnailEnd,
+			static_cast<double>(out) / parameters.rect.width());
+
+		const auto peakEnd = std::lerp(nearestThumbnailStart, nearestThumbnailEnd,
+			static_cast<double>(out + 1) / parameters.rect.width());
 
 		const auto peak = parameters.reversed
 			? std::accumulate(nearestThumbnail.rbegin() + peakStart, nearestThumbnail.rbegin() + peakEnd,
