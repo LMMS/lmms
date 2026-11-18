@@ -47,7 +47,7 @@ void SampleThumbnailRenderer::visualize(const SampleThumbnailCache& cache, Visua
 
 	// We want a thumbnail that has the same SPP as our own rectangle
 	// However, it needs to cover the full sample
-	const auto nearestThumbnail = cache.nearestThumbnailForWidth(std::round(cache.sampleCount() / samplesPerPixel));
+	const auto& nearestThumbnail = cache.nearestThumbnailForWidth(std::round(cache.sampleCount() / samplesPerPixel));
 
 	const auto yScale = parameters.rect.height() / 2 * parameters.amplification;
 	const auto yCenter = parameters.rect.center().y();
