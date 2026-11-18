@@ -950,7 +950,7 @@ int lmmsMain( int argc, char** argv )
 }
 
 #if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
-int main()
+int main(int _, char** __)
 {
 	int argc = 0;
 	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
