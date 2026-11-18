@@ -32,7 +32,7 @@
 
 namespace lmms::gui {
 
-void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter& painter)
+void SampleThumbnailRenderer::visualize(const SampleThumbnailCache& cache, VisualizeParameters parameters, QPainter& painter)
 {
 	assert(0 <= parameters.sampleStart && parameters.sampleStart < parameters.sampleEnd && parameters.sampleEnd <= 1
 		&& "invalid sample range");
@@ -40,15 +40,14 @@ void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter
 	if (parameters.rect.width() == 0) { return; }
 
 	// Get the number of samples that will be drawn in this rectangle
-	const auto numSamples = (parameters.sampleEnd - parameters.sampleStart) * parameters.cache->sampleCount();
+	const auto numSamples = (parameters.sampleEnd - parameters.sampleStart) * cache.sampleCount();
 
 	// For our rectangle, how many samples each pixel has
 	const auto samplesPerPixel = static_cast<double>(numSamples) / parameters.rect.width();
 
 	// We want a thumbnail that has the same SPP as our own rectangle
 	// However, it needs to cover the full sample
-	const auto nearestThumbnail
-		= parameters.cache->nearestThumbnailForWidth(std::round(parameters.cache->sampleCount() / samplesPerPixel));
+	const auto nearestThumbnail = cache.nearestThumbnailForWidth(std::round(cache.sampleCount() / samplesPerPixel));
 
 	const auto yScale = parameters.rect.height() / 2 * parameters.amplification;
 	const auto yCenter = parameters.rect.center().y();

@@ -348,17 +348,20 @@ void AudioFileProcessorWaveView::updateGraph()
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
 
-	const auto param = SampleThumbnailRenderer::VisualizeParameters{
-		.cache
-		= static_cast<AudioFileProcessorView*>(parent())->castModel<AudioFileProcessor>()->sampleThumbnailCache(),
-		.rect = m_graph.rect(),
-		.sampleStart = static_cast<double>(m_from) / m_sample->sampleSize(),
-		.sampleEnd = static_cast<double>(m_to) / m_sample->sampleSize(),
-		.amplification = m_sample->amplification(),
-		.reversed = m_sample->reversed(),
-	};
+	if (const auto model = static_cast<AudioFileProcessorView*>(parent())->castModel<AudioFileProcessor>();
+		model->sampleThumbnailCache())
+	{
+		const auto param = SampleThumbnailRenderer::VisualizeParameters{
+			.rect = m_graph.rect(),
+			.sampleStart = static_cast<double>(m_from) / m_sample->sampleSize(),
+			.sampleEnd = static_cast<double>(m_to) / m_sample->sampleSize(),
+			.amplification = m_sample->amplification(),
+			.reversed = m_sample->reversed(),
+		};
 
-	SampleThumbnailRenderer::visualize(param, p);
+		SampleThumbnailRenderer::visualize(*model->sampleThumbnailCache(), param, p);
+	}
+	
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)

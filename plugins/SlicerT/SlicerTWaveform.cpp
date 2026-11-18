@@ -119,15 +119,17 @@ void SlicerTWaveform::drawSeekerWaveform()
 
 	const auto& sample = m_slicerTParent->m_originalSample;
 
-	const auto param = SampleThumbnailRenderer::VisualizeParameters{
-		.cache = m_slicerTParent->m_sampleThumbnailCache.get(),
-		.sampleStart = static_cast<double>(sample.startFrame()) / sample.sampleSize(),
-		.sampleEnd = static_cast<double>(sample.endFrame()) / sample.sampleSize(),
-		.amplification = sample.amplification(),
-		.reversed = sample.reversed()
-	};
+	if (m_slicerTParent->m_sampleThumbnailCache)
+	{
+		const auto param = SampleThumbnailRenderer::VisualizeParameters{
+			.sampleStart = static_cast<double>(sample.startFrame()) / sample.sampleSize(),
+			.sampleEnd = static_cast<double>(sample.endFrame()) / sample.sampleSize(),
+			.amplification = sample.amplification(),
+			.reversed = sample.reversed()
+		};
 
-	SampleThumbnailRenderer::visualize(param, brush);
+		SampleThumbnailRenderer::visualize(*m_slicerTParent->m_sampleThumbnailCache, param, brush);
+	}
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -184,16 +186,18 @@ void SlicerTWaveform::drawEditorWaveform()
 
 	const auto& sample = m_slicerTParent->m_originalSample;
 
-	const auto param = SampleThumbnailRenderer::VisualizeParameters{
-		.cache = m_slicerTParent->m_sampleThumbnailCache.get(),
-		.rect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
-		.sampleStart = static_cast<double>(startFrame) / sample.sampleSize(),
-		.sampleEnd = static_cast<double>(endFrame) / sample.sampleSize(),
-		.amplification = sample.amplification(),
-		.reversed = sample.reversed(),
-	};
+	if (m_slicerTParent->m_sampleThumbnailCache)
+	{
+		const auto param = SampleThumbnailRenderer::VisualizeParameters{
+			.rect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
+			.sampleStart = static_cast<double>(startFrame) / sample.sampleSize(),
+			.sampleEnd = static_cast<double>(endFrame) / sample.sampleSize(),
+			.amplification = sample.amplification(),
+			.reversed = sample.reversed(),
+		};
 
-	SampleThumbnailRenderer::visualize(param, brush);
+		SampleThumbnailRenderer::visualize(*m_slicerTParent->m_sampleThumbnailCache, param, brush);
+	}
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
