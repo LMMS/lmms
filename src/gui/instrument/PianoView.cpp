@@ -159,9 +159,11 @@ static int getKeyOffsetFromKeyEvent( QKeyEvent * _ke )
 		case 24: return 26; // O = d'
 		case 11: return 27; // 0 = d'#
 		case 25: return 28; // P = e'
-		case 26: return 29; // [
-		case 13: return 30; // =
-		case 27: return 31; // ]
+		case 26: return 29; // [ = f'
+		case 13: return 30; // = = f'#
+		case 27: return 31; // ] = g'
+		case 14: return 32; // backspace = g'#
+		case 43: return 33; // \ = a'
 	}
 #endif // LMMS_BUILD_WIN32
 
@@ -203,9 +205,9 @@ static int getKeyOffsetFromKeyEvent( QKeyEvent * _ke )
 		case 32: return 26; // O = d'
 		case 19: return 27; // 0 = d'#
 		case 33: return 28; // P = e'
-		case 34: return 29; // [
-		case 21: return 30; // =
-		case 35: return 31; // ]
+		case 34: return 29; // [ = f'
+		case 21: return 30; // = = f'#
+		case 35: return 31; // ] = g'
 	}
 #endif
 #ifdef LMMS_BUILD_APPLE
