@@ -138,7 +138,7 @@ void TrackContentWidget::updateBackground()
 	pmp.setPen( QPen( embossColor(), embossWidth() ) );
 	for (float x = (coarseGridWidth() + embossOffset()); x < w * 2; x += ppb * coarseGridResolution)
 	{
-		const auto line = QLineF( x, 0.0, x, h );
+		const auto line = QLineF(x, 0.0, x, h);
 		pmp.fillRect(line.x1(), line.y1(), 1, line.y2() - line.y1() + 1, pmp.pen().color());
 	}
 
@@ -147,7 +147,6 @@ void TrackContentWidget::updateBackground()
 
 	const auto line = QLine(0, h - (horizontalWidth() + 1) / 2, w * 2, h - (horizontalWidth() + 1) / 2);
 	pmp.fillRect(line.x1(), line.y1(), line.x2() - line.x1() + 1, 1, pmp.pen().color());
-	// pmp.drawLine(0, h - (horizontalWidth() + 1) / 2, w * 2, h - (horizontalWidth() + 1) / 2);
 
 	pmp.end();
 
