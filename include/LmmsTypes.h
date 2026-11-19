@@ -35,6 +35,7 @@ using bar_t         = std::int32_t;
 using tick_t        = std::int32_t;
 using volume_t      = std::uint8_t;
 using panning_t     = std::int8_t;
+using noterand_t	= float;
 
 using sample_t      = float;         // standard sample-type
 using int_sample_t  = std::int16_t;  // 16-bit-int-sample

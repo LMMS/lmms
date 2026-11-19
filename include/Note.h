@@ -95,6 +95,9 @@ const float DefaultBaseFreq = 440.f;
 
 const float MaxDetuning = 5 * 12.0f;
 
+constexpr noterand_t MinChance = 0.0f;
+constexpr noterand_t MaxChance = 1.0f;
+constexpr noterand_t DefaultChance = 1.0f;
 
 
 class LMMS_EXPORT Note : public SerializingObject
@@ -105,7 +108,8 @@ public:
 		int key = DefaultKey,
 		volume_t volume = DefaultVolume,
 		panning_t panning = DefaultPanning,
-		std::shared_ptr<DetuningHelper> detuning = nullptr);
+		std::shared_ptr<DetuningHelper> detuning = nullptr,
+		noterand_t chance = DefaultChance);
 	Note( const Note & note );
 	~Note() override;
 
@@ -151,6 +155,7 @@ public:
 	void setKey( const int key );
 	virtual void setVolume( volume_t volume );
 	virtual void setPanning( panning_t panning );
+	void setChance(noterand_t chance);
 	void quantizeLength( const int qGrid );
 	void quantizePos( const int qGrid );
 
@@ -236,6 +241,8 @@ public:
 		return m_panning;
 	}
 
+	inline noterand_t getChance() const { return m_chance; }
+
 	static QString classNodeName()
 	{
 		return "note";
@@ -272,6 +279,7 @@ private:
 	int m_key;
 	volume_t m_volume;
 	panning_t m_panning;
+	noterand_t m_chance;
 	TimePos m_length;
 	TimePos m_pos;
 	std::shared_ptr<DetuningHelper> m_detuning;
