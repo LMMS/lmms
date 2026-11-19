@@ -658,7 +658,7 @@ void Song::stop()
 
 	auto& timeline = getTimeline();
 	m_paused = false;
-	m_recording = true;
+	m_recording = false;
 	m_playing = false;
 
 	switch (timeline.stopBehaviour())

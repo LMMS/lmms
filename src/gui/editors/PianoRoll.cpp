@@ -312,8 +312,8 @@ PianoRoll::PianoRoll() :
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
-	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
-						SLOT(horScrolled(int)));
+	connect(m_leftRightScroll, &QScrollBar::valueChanged, this, &PianoRoll::horScrolled);
+	connect(m_leftRightScroll, &QScrollBar::sliderReleased, this, &PianoRoll::updatePosition);
 
 	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
 	m_topBottomScroll->setSingleStep( 1 );
@@ -462,6 +462,7 @@ PianoRoll::~PianoRoll()
 
 void PianoRoll::reset()
 {
+	m_autoscrollSuspended = false;
 	m_lastNoteVolume = DefaultVolume;
 	m_lastNotePanning = DefaultPanning;
 	clearGhostClip();
@@ -1428,6 +1429,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				else
 				{
 					// scroll
+					m_autoscrollSuspended = true;
 					m_leftRightScroll->setValue( m_leftRightScroll->value() +
 						direction * cm_scrollAmtHoriz );
 
@@ -4058,6 +4060,7 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 
 void PianoRoll::adjustLeftRightScoll(int value)
 {
+	m_autoscrollSuspended = true;
 	m_leftRightScroll->setValue(m_leftRightScroll->value() -
 							value * 0.3f / m_zoomLevels[m_zoomingModel.value()]);
 }
@@ -4188,6 +4191,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
+		m_autoscrollSuspended = true;
 		int z = m_zoomingModel.value();
 		if(we->angleDelta().y() > 0)
 		{
@@ -4320,6 +4324,8 @@ Song::PlayMode PianoRoll::desiredPlayModeForAccompany() const
 
 void PianoRoll::play()
 {
+	m_autoscrollSuspended = false;
+
 	if( ! hasValidMidiClip() )
 	{
 		return;
@@ -4363,6 +4369,8 @@ void PianoRoll::record()
 
 void PianoRoll::recordAccompany()
 {
+	m_autoscrollSuspended = false;
+
 	if( Engine::getSong()->isPlaying() )
 	{
 		stop();
@@ -4424,9 +4432,11 @@ bool PianoRoll::toggleStepRecording()
 
 void PianoRoll::stop()
 {
+	m_scrollBack = true;
+	m_autoscrollSuspended = false;
+
 	Engine::getSong()->stop();
 	m_recording = false;
-	m_scrollBack = m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled;
 
 	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
 
@@ -4841,8 +4851,11 @@ bool PianoRoll::deleteSelectedNotes()
 
 void PianoRoll::autoScroll( const TimePos & t )
 {
+	// Manual scrolling overrides autoscroll
+	if (m_leftRightScroll->isSliderDown() || m_autoscrollSuspended) { return; }
+
 	const int w = width() - m_whiteKeyWidth;
-	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
+	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)
 	{
 		if (t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
 		{
