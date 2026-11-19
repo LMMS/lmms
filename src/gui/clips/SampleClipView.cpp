@@ -284,16 +284,16 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
 
-	if (sample.sampleSize() > 0)
+	if (m_clip->sampleThumbnailCache())
 	{
 		const auto param = SampleThumbnailRenderer::VisualizeParameters{
-			.cache = m_clip->sampleThumbnailCache(),
 			.rect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
+			.viewport = pe->rect().translated(-m_paintPixmapXPosition, 0),
 			.amplification = sample.amplification(),
 			.reversed = sample.reversed()
 		};
 
-		SampleThumbnailRenderer::visualize(param, p);
+		SampleThumbnailRenderer::visualize(*m_clip->sampleThumbnailCache(), param, p);
 	}
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());

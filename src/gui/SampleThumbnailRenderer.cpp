@@ -32,23 +32,23 @@
 
 namespace lmms::gui {
 
-void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter& painter)
+void SampleThumbnailRenderer::visualize(const SampleThumbnailCache& cache, VisualizeParameters parameters, QPainter& painter)
 {
 	assert(0 <= parameters.sampleStart && parameters.sampleStart < parameters.sampleEnd && parameters.sampleEnd <= 1
 		&& "invalid sample range");
 
-	if (parameters.rect.width() == 0) { return; }
+	if (parameters.viewport.isNull()) { parameters.viewport = parameters.rect; }
+	if (parameters.rect.width() == 0 || parameters.viewport.isEmpty()) { return; }
 
 	// Get the number of samples that will be drawn in this rectangle
-	const auto numSamples = (parameters.sampleEnd - parameters.sampleStart) * parameters.cache->sampleCount();
+	const auto numSamples = (parameters.sampleEnd - parameters.sampleStart) * cache.sampleCount();
 
 	// For our rectangle, how many samples each pixel has
-	const auto samplesPerPixel = numSamples / parameters.rect.width();
+	const auto samplesPerPixel = static_cast<double>(numSamples) / parameters.rect.width();
 
 	// We want a thumbnail that has the same SPP as our own rectangle
 	// However, it needs to cover the full sample
-	const auto nearestThumbnail
-		= parameters.cache->nearestThumbnailForWidth(std::round(parameters.cache->sampleCount() / samplesPerPixel));
+	const auto& nearestThumbnail = cache.nearestThumbnailForWidth(std::round(cache.sampleCount() / samplesPerPixel));
 
 	const auto yScale = parameters.rect.height() / 2 * parameters.amplification;
 	const auto yCenter = parameters.rect.center().y();
@@ -56,15 +56,21 @@ void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter
 	// Calculate how far along we should be in the thumbnail based on where we begin and end in the sample
 	const auto nearestThumbnailStart = parameters.sampleStart * nearestThumbnail.width();
 	const auto nearestThumbnailEnd = parameters.sampleEnd * nearestThumbnail.width();
-	const auto nearestThumbnailRange = nearestThumbnailEnd - nearestThumbnailStart;
+
+	// Where in the viewport to draw
+	const auto drawStart = parameters.viewport.left() - parameters.rect.x();
+	const auto drawEnd = parameters.viewport.right() - parameters.rect.x();
 
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	for (double out = 0; out < parameters.rect.width(); ++out)
+	for (int out = drawStart; out < drawEnd; ++out)
 	{
-		const auto peakStart = nearestThumbnailStart + (out / parameters.rect.width()) * nearestThumbnailRange;
-		const auto peakEnd = nearestThumbnailStart + ((out + 1) / parameters.rect.width()) * nearestThumbnailRange;
+		const auto peakStart = std::lerp(nearestThumbnailStart, nearestThumbnailEnd,
+			static_cast<double>(out) / parameters.rect.width());
+
+		const auto peakEnd = std::lerp(nearestThumbnailStart, nearestThumbnailEnd,
+			static_cast<double>(out + 1) / parameters.rect.width());
 
 		const auto peak = parameters.reversed
 			? std::accumulate(nearestThumbnail.rbegin() + peakStart, nearestThumbnail.rbegin() + peakEnd,

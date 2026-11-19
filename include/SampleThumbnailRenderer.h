@@ -46,12 +46,13 @@ class LMMS_EXPORT SampleThumbnailRenderer
 public:
 	struct VisualizeParameters
 	{
-		//!< The sample thumbnail cache to use.
-		const SampleThumbnailCache* cache;
-
 		//!< A rectangle that covers the entire range of samples from [@a sampleStart, @a sampleEnd)
 		//!< @a rect must share the same coordinate system as that of the painter in which it is drawn with.
-		QRectF rect;
+		QRect rect;
+
+		//!< Visible region to draw into.
+		//!< Must be in the same coordinate system as @a rect.
+		QRect viewport;
 
 		//!< Where the sample begins for drawing.
 		double sampleStart = 0.f;
@@ -66,8 +67,8 @@ public:
 		bool reversed = false;
 	};
 
-	//! Visualize sample thumbnails with the given @a parameters and @a painter object.
-	static void visualize(VisualizeParameters parameters, QPainter& painter);
+	//! Visualize sample thumbnails with the given @a cache, @a parameters and @a painter object.
+	static void visualize(const SampleThumbnailCache& cache, VisualizeParameters parameters, QPainter& painter);
 };
 
 } // namespace lmms::gui
