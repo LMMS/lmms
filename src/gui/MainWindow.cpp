@@ -790,7 +790,7 @@ bool MainWindow::saveProject()
 bool MainWindow::saveProjectAs()
 {
 	auto optionsWidget = new SaveOptionsWidget(Engine::getSong()->getSaveOptions());
-	VersionedSaveDialog sfd( this, optionsWidget, tr("Save Project"), "",
+	VersionedSaveDialog sfd(this, optionsWidget, tr("Save Project"), "",
 			tr("LMMS Project") + " (*.mmpz);;" +
 				tr("LMMS Uncompressed Project") + " (*.mmp);;" + 
 				tr("LMMS Project Template") + " (*.mpt)");
