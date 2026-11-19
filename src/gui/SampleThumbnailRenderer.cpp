@@ -36,7 +36,7 @@ void SampleThumbnailRenderer::visualize(const SampleThumbnailCache& cache, Visua
 {
 	assert(0 <= parameters.sampleStart && parameters.sampleStart < parameters.sampleEnd && parameters.sampleEnd <= 1
 		&& "invalid sample range");
-	
+
 	if (parameters.viewport.isNull()) { parameters.viewport = parameters.rect; }
 	if (parameters.rect.width() == 0 || parameters.viewport.isEmpty()) { return; }
 
