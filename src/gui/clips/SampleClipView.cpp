@@ -288,6 +288,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	{
 		const auto param = SampleThumbnailRenderer::VisualizeParameters{
 			.rect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
+			.viewport = pe->rect().translated(-m_paintPixmapXPosition, 0),
 			.amplification = sample.amplification(),
 			.reversed = sample.reversed()
 		};
