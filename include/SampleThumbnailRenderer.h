@@ -50,6 +50,10 @@ public:
 		//!< @a rect must share the same coordinate system as that of the painter in which it is drawn with.
 		QRect rect;
 
+		//!< Visible region to draw into.
+		//!< Must be in the same coordinate system as @a rect.
+		QRect viewport;
+
 		//!< Where the sample begins for drawing.
 		double sampleStart = 0.f;
 

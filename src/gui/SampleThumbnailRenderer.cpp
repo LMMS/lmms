@@ -36,8 +36,9 @@ void SampleThumbnailRenderer::visualize(const SampleThumbnailCache& cache, Visua
 {
 	assert(0 <= parameters.sampleStart && parameters.sampleStart < parameters.sampleEnd && parameters.sampleEnd <= 1
 		&& "invalid sample range");
-
-	if (parameters.rect.width() == 0) { return; }
+	
+	if (parameters.viewport.isNull()) { parameters.viewport = parameters.rect; }
+	if (parameters.rect.width() == 0 || parameters.viewport.isEmpty()) { return; }
 
 	// Get the number of samples that will be drawn in this rectangle
 	const auto numSamples = (parameters.sampleEnd - parameters.sampleStart) * cache.sampleCount();
@@ -56,10 +57,14 @@ void SampleThumbnailRenderer::visualize(const SampleThumbnailCache& cache, Visua
 	const auto nearestThumbnailStart = parameters.sampleStart * nearestThumbnail.width();
 	const auto nearestThumbnailEnd = parameters.sampleEnd * nearestThumbnail.width();
 
+	// Where in the viewport to draw
+	const auto drawStart = parameters.viewport.left() - parameters.rect.x();
+	const auto drawEnd = parameters.viewport.right() - parameters.rect.x();
+
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	for (int out = 0; out < parameters.rect.width(); ++out)
+	for (int out = drawStart; out < drawEnd; ++out)
 	{
 		const auto peakStart = std::lerp(nearestThumbnailStart, nearestThumbnailEnd,
 			static_cast<double>(out) / parameters.rect.width());
