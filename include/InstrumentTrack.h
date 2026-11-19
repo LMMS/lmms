@@ -63,6 +63,7 @@ class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 	Q_OBJECT
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
+
 	InstrumentTrack( TrackContainer* tc );
 	~InstrumentTrack() override;
 
@@ -248,6 +249,8 @@ public:
 	{
 		return m_previewMode;
 	}
+
+	bool processPresetSelectEvents(const MidiEvent& event);
 	
 	void replaceInstrument(DataFile dataFile);
 
@@ -284,6 +287,13 @@ protected slots:
 
 private:
 	void processCCEvent(int controller);
+
+	void changePreset();
+
+    void onProgramChangeEvent(MidiPort::PresetSelectPolicy policy, int16_t key);
+    bool onControlChangeEvent(MidiPort::PresetSelectPolicy policy, uint8_t ctrlNumber, uint8_t ctrlValue);
+    bool onControllerBankSelectMSB(MidiPort::PresetSelectPolicy policy, uint8_t ctrlValue);
+    bool onControllerBankSelectLSB(MidiPort::PresetSelectPolicy policy, uint8_t ctrlValue);
 
 	MidiPort m_midiPort;
 
@@ -327,6 +337,10 @@ private:
 
 	Microtuner m_microtuner;
 
+    std::optional<uint8_t> m_programNumber;
+	std::optional<uint8_t> m_programBankMSB;
+	std::optional<uint8_t> m_programBankLSB;
+
 	std::unique_ptr<BoolModel> m_midiCCEnable;
 	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
 
@@ -335,7 +349,6 @@ private:
 	friend class NotePlayHandle;
 	friend class gui::InstrumentTuningView;
 	friend class gui::MidiCCRackView;
-
 } ;
 
 
