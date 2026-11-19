@@ -790,9 +790,10 @@ bool MainWindow::saveProject()
 bool MainWindow::saveProjectAs()
 {
 	auto optionsWidget = new SaveOptionsWidget(Engine::getSong()->getSaveOptions());
-	VersionedSaveDialog sfd( this, optionsWidget, tr( "Save Project" ), "",
-			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
-				tr( "LMMS Project Template" ) + " (*.mpt)" );
+	VersionedSaveDialog sfd(this, optionsWidget, tr("Save Project"), "",
+			tr("LMMS Project") + " (*.mmpz);;" +
+				tr("LMMS Uncompressed Project") + " (*.mmp);;" + 
+				tr("LMMS Project Template") + " (*.mpt)");
 	QString f = Engine::getSong()->projectFileName();
 	if( f != "" )
 	{
