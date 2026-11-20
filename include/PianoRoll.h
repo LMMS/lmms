@@ -556,7 +556,6 @@ private:
 	QBrush m_blackKeyDisabledBackground;
 
 	Note *m_drawingNewNote = nullptr;
-	TimePos m_newNotePos = {};
 } ;
 
 

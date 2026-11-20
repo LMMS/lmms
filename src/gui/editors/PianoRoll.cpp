@@ -1854,7 +1854,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					if (me->modifiers() & Qt::ShiftModifier)
 					{
 						// Shift held : Draw note instead of placing
-						m_newNotePos = note_pos;
 						drawingNote = true;
 					}
 
@@ -2379,7 +2378,6 @@ void PianoRoll::computeSelectedNotes(bool shift)
 void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 {
 	m_drawingNewNote = nullptr; // Stop drawing new note if doing so
-	m_newNotePos = {}; // Strictly speaking don't need to reset this, but best to be clear in case someone else uses
 
 	bool mustRepaint = false;
 
