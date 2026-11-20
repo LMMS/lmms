@@ -28,6 +28,7 @@
 #include <QHash>
 #include <QStack>
 #include <set>
+#include <shared_mutex>
 
 #include "LmmsTypes.h"
 #include "DataFile.h"
@@ -118,6 +119,7 @@ private:
 	} ;
 	using CheckPointStack = QStack<CheckPoint>;
 
+	std::shared_mutex m_joIdMutex;
 	JoIdMap m_joIDs;
 	std::set<jo_id_t> m_unregisteredIds;
 
