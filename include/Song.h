@@ -280,6 +280,12 @@ public:
 		return m_modified;
 	}
 
+
+	bool isModifiedAutosave() const
+	{
+		return m_modifiedautosave;
+	}
+
 	QString nodeName() const override
 	{
 		return "song";
@@ -344,6 +350,7 @@ public slots:
 
 
 	void setModified();
+	void setModifiedAutosave(bool value);
 
 	void clearProject();
 
@@ -421,6 +428,7 @@ private:
 	QString m_fileName;
 	QString m_oldFileName;
 	bool m_modified;
+	bool m_modifiedautosave;
 	bool m_loadOnLaunch;
 
 	volatile bool m_recording;
