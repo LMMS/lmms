@@ -159,7 +159,7 @@ void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 	//printf("realloc %d %d\n", _id, _obj );
 //	if( m_joIDs.contains( _id ) )
 	{
-		m_unregisteredIds.erase(_id);
+		m_unregisteredIds.extract(_id);
 		m_joIDs[_id] = _obj;
 	}
 }
