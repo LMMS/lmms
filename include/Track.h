@@ -220,12 +220,17 @@ public:
 	// name-stuff
 	virtual const QString & name() const
 	{
-		return m_name;
+		return m_nameQString;
 	}
 
 	QString displayName() const override
 	{
 		return name();
+	}
+
+	const std::string& displayNameUtf8() const
+	{
+		return m_name;
 	}
 
 	using Model::dataChanged;
@@ -306,7 +311,8 @@ private:
 private:
 	TrackContainer* m_trackContainer;
 	Type m_type;
-	QString m_name;
+	std::string m_name;
+	QString m_nameQString;
 	int m_height;
 
 protected:

@@ -63,6 +63,7 @@ known_no_namespace_lmms = {
     'src/core/main.cpp',
     # nothing to set under a namespace
     'include/debug.h',
+    'include/TracyProfiling.h',
     'include/versioninfo.h',
     'plugins/CarlaBase/CarlaConfig/config.h',
     'plugins/CarlaBase/DummyCarla.cpp',

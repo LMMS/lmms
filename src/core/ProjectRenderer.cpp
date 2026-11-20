@@ -28,6 +28,7 @@
 #include "ProjectRenderer.h"
 #include "Song.h"
 #include "PerfLog.h"
+#include "TracyProfiling.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
@@ -149,6 +150,7 @@ void ProjectRenderer::startProcessing()
 
 void ProjectRenderer::run()
 {
+	ZoneScoped;
 	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();

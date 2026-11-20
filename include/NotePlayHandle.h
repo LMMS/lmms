@@ -172,7 +172,7 @@ public:
 		return m_totalFramesPlayed;
 	}
 
-	/*! Returns volume level at given frame (envelope/LFO) */
+	/*! Returns volume level at given frame (envelope/LFO) TODO: Remove? (dead code) */
 	float volumeLevel( const f_cnt_t frame );
 
 	/*! Returns instrument track which is being played by this handle (const version) */

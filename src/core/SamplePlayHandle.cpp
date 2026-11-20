@@ -29,6 +29,7 @@
 #include "PatternTrack.h"
 #include "SampleClip.h"
 #include "SampleTrack.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -79,6 +80,9 @@ SamplePlayHandle::~SamplePlayHandle()
 
 void SamplePlayHandle::play( SampleFrame* buffer )
 {
+	ZoneScopedC(0xff7f50); // #ff7f50 (tracy::Color::Coral)
+	ZoneNameF("SamplePlayHandle::play [%s]", m_track ? m_track->displayNameUtf8().c_str() : "no track");
+
 	const f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
@@ -101,6 +105,7 @@ void SamplePlayHandle::play( SampleFrame* buffer )
 	if( !( m_track && m_track->isMuted() )
 				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
+		ZoneScoped;
 /*		StereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/

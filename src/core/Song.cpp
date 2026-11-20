@@ -55,7 +55,7 @@
 #include "Scale.h"
 #include "SongEditor.h"
 #include "PeakController.h"
-
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -206,6 +206,8 @@ void Song::savePlayStartPosition()
 
 void Song::processNextBuffer()
 {
+	ZoneScoped;
+
 	// If nothing is playing, there is nothing to do
 	if (!m_playing) { return; }
 
@@ -359,8 +361,9 @@ void Song::removeOldAutomatedValue(AutomatableModel* am)
 
 void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_cnt_t)
 {
-	AutomatedValueMap values;
+	ZoneScoped;
 
+	AutomatedValueMap values;
 	QSet<const AutomatableModel*> recordedModels;
 
 	TrackContainer* container = this;
