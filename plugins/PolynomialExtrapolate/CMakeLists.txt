@@ -1,0 +1,3 @@
+INCLUDE(BuildPlugin)
+
+BUILD_PLUGIN(PolynomialExtrapolate PolynomialExtrapolate.cpp PolynomialExtrapolateControls.cpp PolynomialExtrapolateControlDialog.cpp MOCFILES PolynomialExtrapolateControls.h PolynomialExtrapolateControlDialog.h EMBEDDED_RESOURCES artwork.svg logo.svg)
