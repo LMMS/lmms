@@ -26,36 +26,24 @@
 
 
 #include <QLabel>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QMdiArea>
-#include <QInputDialog>
-#include <QVBoxLayout>
-
 #include "ControllerView.h"
-
 #include <QInputDialog>
 #include <QLabel>
-#include <QLayout>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPushButton>
-
-
 #include "CaptionMenu.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "ToolTip.h"
-#include "SubWindow.h"
+
 namespace lmms::gui
 {
 
@@ -77,7 +65,7 @@ ControllerView::ControllerView(Controller* controller, QWidget * parent) :
 	m_controllerDlg->move(1, m_titleBarHeight);
 
 	controllerTypeLabel = new QLabel(this);
-	controllerTypeLabel->setText(QString(getController()->type() == Controller::LfoController
+	controllerTypeLabel->setText(QString(getController()->type() == Controller::ControllerType::Lfo
 										 ? QString("LFO: ")
 										 : QString("PEAK: ")));
 	controllerTypeLabel->move(3, 3);
@@ -93,7 +81,7 @@ ControllerView::ControllerView(Controller* controller, QWidget * parent) :
 	setFixedWidth(m_controllerDlg->width() + 2);
 	setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
 
-	m_collapseButton = new QPushButton(embed::getIconPixmap("stepper-down"), QString::null, this );
+	m_collapseButton = new QPushButton(embed::getIconPixmap("arrow-down"), QString::null, this );
 	m_collapseButton->resize(buttonsize);
 	m_collapseButton->setFocusPolicy(Qt::NoFocus);
 	m_collapseButton->setCursor(Qt::ArrowCursor);
@@ -128,7 +116,7 @@ void ControllerView::collapseController(bool collapse)
 {
 	if (collapse)
 	{
-		m_collapseButton->setIcon(embed::getIconPixmap("stepper-left"));
+		m_collapseButton->setIcon(embed::getIconPixmap("arrow-left"));
 		m_controllerDlg->hide();
 		setFixedHeight(m_titleBarHeight);
 		emit controllerCollapsed();
@@ -137,7 +125,7 @@ void ControllerView::collapseController(bool collapse)
 	{
 		m_controllerDlg->show();
 		setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
-		m_collapseButton->setIcon(embed::getIconPixmap("stepper-down"));
+		m_collapseButton->setIcon(embed::getIconPixmap("arrow-down"));
 	}
 }
 
@@ -177,6 +165,12 @@ void ControllerView::renameFinished()
 }
 
 
+void ControllerView::rename()
+{
+	m_nameLineEdit->setReadOnly(false);
+	m_nameLineEdit->setFocus();
+	m_nameLineEdit->selectAll();
+}
 
 
 void ControllerView::mouseDoubleClickEvent(QMouseEvent * me)
@@ -254,16 +248,16 @@ void ControllerView::contextMenuEvent(QContextMenuEvent *)
 
 	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, SLOT(deleteController()));
 
-	contextMenu->addAction(embed::getIconPixmap("stepper-left"), tr("&Collaps all controllers"),
+	contextMenu->addAction(embed::getIconPixmap("arrow-left"), tr("&Collaps all controllers"),
 												this, SIGNAL(collapseAll())
-						   )->setDisabled(gui->getControllerRackView()->allCollapsed());
-	contextMenu->addAction(embed::getIconPixmap("stepper-down"), tr("&Expand all controllers"),
+						   )->setDisabled(getGUI()->getControllerRackView()->allCollapsed());
+	contextMenu->addAction(embed::getIconPixmap("arrow-down"), tr("&Expand all controllers"),
 												this, SIGNAL(expandAll())
-						   )->setDisabled(gui->getControllerRackView()->allExpanded());
-	contextMenu->addAction(embed::getIconPixmap("stepper-up"), tr("Move &up"), this, SLOT(moveUp())
-						   )->setDisabled(gui->getControllerRackView()->controllerViews().first() == this);
-	contextMenu->addAction(embed::getIconPixmap("stepper-down"), tr("Move &down"), this, SLOT(moveDown())
-						   )->setDisabled(gui->getControllerRackView()->controllerViews().last() == this);
+						   )->setDisabled(getGUI()->getControllerRackView()->allExpanded());
+	contextMenu->addAction(embed::getIconPixmap("arrow-up"), tr("Move &up"), this, SLOT(moveUp())
+						   )->setDisabled(getGUI()->getControllerRackView()->controllerViews().first() == this);
+	contextMenu->addAction(embed::getIconPixmap("arrow-down"), tr("Move &down"), this, SLOT(moveDown())
+						   )->setDisabled(getGUI()->getControllerRackView()->controllerViews().last() == this);
 	contextMenu->addSeparator();
 
 	contextMenu->exec(QCursor::pos());

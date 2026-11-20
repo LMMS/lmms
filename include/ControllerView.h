@@ -28,6 +28,8 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
 
 #include "AutomatableModel.h"
 #include "Controller.h"
@@ -38,8 +40,6 @@ namespace lmms::gui
 {
 
 
-class QLineEdit;
-class QPushButton;
 
 
 class ControllerView : public QFrame, public ModelView
@@ -64,6 +64,7 @@ public:
 
 public slots:
 	void removeController();
+	void deleteController();
 	void moveUp();
 	void moveDown();
 	void collapseController(bool collapse);

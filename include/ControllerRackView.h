@@ -31,8 +31,6 @@
 #include <QMdiSubWindow>
 #include <QWidget>
 
-#include "lmms_basics.h"
-
 class QPushButton;
 class QScrollArea;
 class QVBoxLayout;
@@ -72,6 +70,8 @@ public slots:
 
 	void moveUp(ControllerView* view);
 	void moveDown(ControllerView* view);
+	void addController(Controller* controller);
+	void removeController(Controller* controller);
 	void deleteController(ControllerView * view);
 	void collapsingAll();
 	void expandAll();

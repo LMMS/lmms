@@ -23,18 +23,14 @@
  *
  */
 
-
+#include <QIcon>
 #include <QLabel>
 #include <QPainter>
-#include <QIcon>
 
-#include "embed.h"
-
-#include "PeakController.h"
-#include <QPainter>
 #include "EffectControlDialog.h"
-#include "plugins/peak_controller_effect/peak_controller_effect.h"
-#include "plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp"
+#include "PeakController.h"
+#include "embed.h"
+#include "plugins/PeakControllerEffect/PeakControllerEffect.h"
 
 namespace lmms::gui
 {

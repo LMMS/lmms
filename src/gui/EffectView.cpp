@@ -45,11 +45,7 @@
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
-#include "SubWindow.h"
 #include "TempoSyncKnob.h"
-#include "ToolTip.h"
-#include "Song.h"
-#include "plugins/peak_controller_effect/peak_controller_effect_control_dialog.h"
 
 
 namespace lmms::gui

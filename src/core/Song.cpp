@@ -1479,12 +1479,16 @@ void Song::removeController( Controller * controller )
 
 void Song::moveControllerUp(Controller *c)
 {
-	if (c != m_controllers.first())
+	if (c != m_controllers.front())
 	{
-		int index = m_controllers.indexOf(c);
-		m_controllers.remove(index);
-		m_controllers.insert(index - 1, c);
-		setModified();
+		auto it = std::find(m_controllers.begin(), m_controllers.end(), c);
+
+		if (it != m_controllers.end())
+		{
+			auto index = std::distance(m_controllers.begin(), it);
+			std::swap(m_controllers[index],m_controllers[index-1]);
+			setModified();
+		}
 	}
 }
 
@@ -1493,12 +1497,16 @@ void Song::moveControllerUp(Controller *c)
 
 void Song::moveControllerDown(Controller *c)
 {
-	if (c != m_controllers.last())
+	if (c != m_controllers.back())
 	{
-		int index = m_controllers.indexOf(c);
-		m_controllers.remove(index);
-		m_controllers.insert(index + 1, c);
-		setModified();
+		auto it = std::find(m_controllers.begin(), m_controllers.end(), c);
+
+		if (it != m_controllers.end())
+		{
+			auto index = std::distance(m_controllers.begin(), it);
+			std::swap(m_controllers[index],m_controllers[index+1]);
+			setModified();
+		}
 	}
 }
 

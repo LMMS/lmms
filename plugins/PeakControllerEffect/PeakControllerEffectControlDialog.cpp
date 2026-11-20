@@ -23,24 +23,16 @@
  *
  */
 
+#include "PeakControllerEffectControlDialog.h"
 
-
-
-#include <QHBoxLayout>
+#include <QLayout>
 #include <QVBoxLayout>
 
-#include "PeakControllerEffectControlDialog.h"
-#include "PeakControllerEffectControls.h"
-#include <QLayout>
-#include <QLabel>
-#include <QMdiSubWindow>
-
 #include "ControllerRackView.h"
-#include "peak_controller_effect_control_dialog.h"
-#include "peak_controller_effect_controls.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
+#include "PeakControllerEffectControls.h"
 #include "embed.h"
 
 namespace lmms::gui
@@ -111,8 +103,8 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 
 void PeakControllerEffectControlDialog::showDialog()
 {
-	gui->getControllerRackView()->show();
-	gui->getControllerRackView()->subWin()->hide();
+	getGUI()->getControllerRackView()->show();
+	getGUI()->getControllerRackView()->subWin()->hide();
 }
 
 
@@ -120,15 +112,15 @@ void PeakControllerEffectControlDialog::showDialog()
 
 void PeakControllerEffectControlDialog::toggleView()
 {
-	if (!gui->getControllerRackView()->subWin()->isVisible())
+	if (!getGUI()->getControllerRackView()->subWin()->isVisible())
 	{
-		gui->getControllerRackView()->subWin()->show();
-		gui->getControllerRackView()->subWin()->raise();
+		getGUI()->getControllerRackView()->subWin()->show();
+		getGUI()->getControllerRackView()->subWin()->raise();
 		m_effectControls->setViewVisible(true);
 	}
 	else
 	{
-		gui->getControllerRackView()->subWin()->hide();
+		getGUI()->getControllerRackView()->subWin()->hide();
 		m_effectControls->setViewVisible(false);
 	}
 }

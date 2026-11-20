@@ -52,7 +52,7 @@ void EffectControlDialog::showDialog()
 {
 	if (!m_subWindow)
 	{
-		m_subWindow = gui->mainWindow()->addWindowedWidget(this);
+		m_subWindow = getGUI()->mainWindow()->addWindowedWidget(this);
 		if (isResizable())
 		{
 			m_subWindow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

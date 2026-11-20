@@ -27,10 +27,9 @@
 #define LMMS_GUI_EFFECT_CONTROL_DIALOG_H
 
 #include <QWidget>
-#include <QMdiSubWindow>
-
 
 #include "ModelView.h"
+#include "SubWindow.h"
 
 namespace lmms
 {
@@ -57,8 +56,9 @@ signals:
 
 protected:
 	EffectControls* m_effectControls;
+	void closeEvent(QCloseEvent* _ce) override;
 private:
-	QMdiSubWindow * m_subWindow;
+	SubWindow * m_subWindow;
 
 } ;
 };// namespace gui

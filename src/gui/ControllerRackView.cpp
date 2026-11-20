@@ -85,8 +85,9 @@ ControllerRackView::ControllerRackView() :
 	m_addButton = new QPushButton(this);
 	m_addButton->setText(tr("Add LFO"));
 	connect(m_addButton, SIGNAL(clicked()), this, SLOT(addLfoController()));
-	connect(Engine::getSong(), SIGNAL(controllerAdded(Controller*)), SLOT(onControllerAdded(Controller*)));
-	connect(Engine::getSong(), SIGNAL(controllerRemoved(Controller*)), SLOT(onControllerRemoved(Controller*)));
+	Song * song = Engine::getSong();
+	connect(song, &Song::controllerAdded, this, qOverload<Controller*>(&ControllerRackView::addController));
+	connect(song, &Song::controllerRemoved, this, &ControllerRackView::removeController);
 
 	auto layout = new QVBoxLayout();
 	layout->addWidget(m_scrollArea);
@@ -204,7 +205,7 @@ void ControllerRackView::expandAll()
 
 
 
-void ControllerRackView::onControllerAdded(Controller * controller)
+void ControllerRackView::addController(Controller * controller)
 {
 	ControllerView * controllerView = new ControllerView(controller, m_scrollArea->widget());
 	connect(controllerView, SIGNAL(deleteController(ControllerView*)), this, SLOT(deleteController(ControllerView*)), Qt::QueuedConnection);
@@ -231,7 +232,7 @@ void ControllerRackView::onControllerAdded(Controller * controller)
 
 
 
-void ControllerRackView::onControllerRemoved(Controller * removedController)
+void ControllerRackView::removeController(Controller * removedController)
 {
 	for (auto &it : m_controllerViews)
 	{
