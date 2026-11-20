@@ -450,7 +450,7 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	changePreset(); // Show widget
 
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
-	m_presetsCombo->setGeometry( 140, 50, 99, ComboBox::DEFAULT_HEIGHT );
+	m_presetsCombo->setGeometry( 120, 50, 120, ComboBox::DEFAULT_HEIGHT );
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );
@@ -459,7 +459,7 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	m_spreadKnob->move( 190, 140 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
-	m_randomKnob = new Knob(KnobType::Vintage32, tr("Random"), SMALL_FONT_SIZE, this);
+	m_randomKnob = new Knob(KnobType::Vintage32, tr("Rand"), SMALL_FONT_SIZE, this);
 	m_randomKnob->move(190, 190);
 	m_randomKnob->setHintText(tr("Random:"), "");
 
@@ -494,23 +494,23 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	auto widget = new QWidget(_parent);
 	widget->setFixedSize( 250, 250 );
 		
-	m_hardnessKnob = new Knob(KnobType::Vintage32, tr("Hardness"), SMALL_FONT_SIZE, widget);
+	m_hardnessKnob = new Knob(KnobType::Vintage32, tr("Hard"), SMALL_FONT_SIZE, widget);
 	m_hardnessKnob->move( 30, 90 );
 	m_hardnessKnob->setHintText( tr( "Hardness:" ), "" );
 
-	m_positionKnob = new Knob(KnobType::Vintage32, tr("Position"), SMALL_FONT_SIZE, widget);
+	m_positionKnob = new Knob(KnobType::Vintage32, tr("Pos"), SMALL_FONT_SIZE, widget);
 	m_positionKnob->move( 110, 90 );
 	m_positionKnob->setHintText( tr( "Position:" ), "" );
 
-	m_vibratoGainKnob = new Knob(KnobType::Vintage32, tr("Vibrato gain"), SMALL_FONT_SIZE, widget);
+	m_vibratoGainKnob = new Knob(KnobType::Vintage32, tr("Vibr"), SMALL_FONT_SIZE, widget);
 	m_vibratoGainKnob->move( 30, 140 );
 	m_vibratoGainKnob->setHintText( tr( "Vibrato gain:" ), "" );
 
-	m_vibratoFreqKnob = new Knob(KnobType::Vintage32, tr("Vibrato frequency"), SMALL_FONT_SIZE, widget);
+	m_vibratoFreqKnob = new Knob(KnobType::Vintage32, tr("Vib frq"), SMALL_FONT_SIZE, widget);
 	m_vibratoFreqKnob->move( 110, 140 );
 	m_vibratoFreqKnob->setHintText( tr( "Vibrato frequency:" ), "" );
 
-	m_stickKnob = new Knob(KnobType::Vintage32, tr("Stick mix"), SMALL_FONT_SIZE, widget);
+	m_stickKnob = new Knob(KnobType::Vintage32, tr("Stick"), SMALL_FONT_SIZE, widget);
 	m_stickKnob->move( 190, 90 );
 	m_stickKnob->setHintText( tr( "Stick mix:" ), "" );
 
@@ -525,19 +525,19 @@ QWidget * MalletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 	auto widget = new QWidget(_parent);
 	widget->setFixedSize( 250, 250 );
 	
-	m_modulatorKnob = new Knob(KnobType::Vintage32, tr("Modulator"), SMALL_FONT_SIZE, widget);
+	m_modulatorKnob = new Knob(KnobType::Vintage32, tr("Mod"), SMALL_FONT_SIZE, widget);
 	m_modulatorKnob->move( 30, 90 );
 	m_modulatorKnob->setHintText( tr( "Modulator:" ), "" );
 
-	m_crossfadeKnob = new Knob(KnobType::Vintage32, tr("Crossfade"), SMALL_FONT_SIZE, widget);
+	m_crossfadeKnob = new Knob(KnobType::Vintage32, tr("Mix"), SMALL_FONT_SIZE, widget);
 	m_crossfadeKnob->move( 110, 90 );
 	m_crossfadeKnob->setHintText( tr( "Crossfade:" ), "" );
 	
-	m_lfoSpeedKnob = new Knob(KnobType::Vintage32, tr("LFO speed"), SMALL_FONT_SIZE, widget);
+	m_lfoSpeedKnob = new Knob(KnobType::Vintage32, tr("Rate"), SMALL_FONT_SIZE, widget);
 	m_lfoSpeedKnob->move( 30, 140 );
 	m_lfoSpeedKnob->setHintText( tr( "LFO speed:" ), "" );
 	
-	m_lfoDepthKnob = new Knob(KnobType::Vintage32, tr("LFO depth"), SMALL_FONT_SIZE, widget);
+	m_lfoDepthKnob = new Knob(KnobType::Vintage32, tr("LFO"), SMALL_FONT_SIZE, widget);
 	m_lfoDepthKnob->move( 110, 140 );
 	m_lfoDepthKnob->setHintText( tr( "LFO depth:" ), "" );
 	
@@ -560,7 +560,7 @@ QWidget * MalletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 /*	m_strikeLED = new LedCheckBox( tr( "Bowed" ), widget );
 	m_strikeLED->move( 138, 25 );*/
 
-	m_pressureKnob = new Knob(KnobType::Vintage32, tr("Pressure"), SMALL_FONT_SIZE, widget);
+	m_pressureKnob = new Knob(KnobType::Vintage32, tr("Press"), SMALL_FONT_SIZE, widget);
 	m_pressureKnob->move( 30, 90 );
 	m_pressureKnob->setHintText( tr( "Pressure:" ), "" );
 
