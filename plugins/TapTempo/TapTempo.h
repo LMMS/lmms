@@ -28,6 +28,7 @@
 #include <array>
 #include <chrono>
 
+#include "Metronome.h"
 #include "TapTempoView.h"
 #include "ToolPlugin.h"
 
@@ -51,6 +52,7 @@ public:
 
 private:
 	static constexpr auto MaxIntervals = 3;
+	Metronome m_metronome{true};
 	using clock = std::chrono::steady_clock;
 	std::chrono::time_point<clock> m_lastTap;
 	std::array<std::chrono::milliseconds, MaxIntervals> m_intervals;

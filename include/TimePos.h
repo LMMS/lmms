@@ -96,7 +96,6 @@ public:
 
 	operator int() const { return m_ticks; }
 
-	tick_t ticksPerBeat(const TimeSig& sig) const { return ticksPerBar(sig) / sig.numerator(); }
 
 	// Remainder ticks after bar is removed
 	tick_t getTickWithinBar(const TimeSig& sig) const { return m_ticks % ticksPerBar(sig); }
@@ -124,6 +123,7 @@ public:
 		return TimePos(static_cast<int>(frames / framesPerTick));
 	}
 
+	static tick_t ticksPerBeat(const TimeSig& sig) { return ticksPerBar(sig) / sig.numerator(); }
 	static tick_t ticksPerBar() { return s_ticksPerBar; }
 	static tick_t ticksPerBar(const TimeSig& sig) { return DefaultTicksPerBar * sig.numerator() / sig.denominator(); }
 
