@@ -38,27 +38,27 @@ SET(LMMS_PLUGIN_LIST
 	DynamicsProcessor
 	Eq
 	Flanger
+	FreeBoy
 	FrequencyShifter
+	GigPlayer
 	GranularPitchShifter
 	HydrogenImport
+	LOMM
 	LadspaBrowser
 	LadspaEffect
-	LOMM
+	Lb302
 	Lv2Effect
 	Lv2Instrument
-	Lb302
-	MidiImport
 	MidiExport
-	MultitapEcho
+	MidiImport
 	Monstro
+	MultitapEcho
 	Nes
 	OpulenZ
 	Organic
 	Oscilloscope
-	FreeBoy
 	Patman
 	PeakControllerEffect
-	GigPlayer
 	ReverbSC
 	Sf2Player
 	Sfxr
@@ -70,13 +70,13 @@ SET(LMMS_PLUGIN_LIST
 	StereoMatrix
 	Stk
 	TapTempo
-	VstBase
+	Vectorscope
 	Vestige
+	Vibed
+	VstBase
 	VstEffect
 	Watsyn
 	WaveShaper
-	Vectorscope
-	Vibed
 	Xpressive
 	ZynAddSubFx
 )
