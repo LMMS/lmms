@@ -31,23 +31,25 @@
 #include "embed.h"
 
 #include "PeakController.h"
+#include <QPainter>
+#include "EffectControlDialog.h"
+#include "plugins/peak_controller_effect/peak_controller_effect.h"
+#include "plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp"
 
 namespace lmms::gui
 {
 
 
-PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
+PeakControllerDialog::PeakControllerDialog( PeakController * _model, QWidget * _parent ) :
 	ControllerDialog( _model, _parent )
 {
+	EffectControlDialog * dlg = _model->getPeakControllerEffect()->controls()->createView();
 	setWindowTitle( tr( "PEAK" ) );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
-	setFixedSize( 256, 64 );
-	
-	setToolTip(tr("LFO Controller"));
 
-	auto l = new QLabel(this);
-	l->setText( "Use FX's controls" );
-	l->move(10, 10);
+	setFixedSize( dlg->size() );
+	dlg->setParent( this );
+	dlg->show();
 
 	setModel( _model );
 }

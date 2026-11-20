@@ -27,6 +27,8 @@
 #define LMMS_GUI_EFFECT_CONTROL_DIALOG_H
 
 #include <QWidget>
+#include <QMdiSubWindow>
+
 
 #include "ModelView.h"
 
@@ -44,11 +46,22 @@ public:
 	EffectControlDialog(EffectControls* controls);
 	~EffectControlDialog() override = default;
 
+	virtual bool isResizable() const {return false;}
+
+	virtual void showDialog();
+	virtual void toggleView();
+
+
+signals:
+	void closed();
+
 protected:
 	EffectControls* m_effectControls;
-};
+private:
+	QMdiSubWindow * m_subWindow;
 
-} // namespace gui
+} ;
+};// namespace gui
 
 } // namespace lmms
 

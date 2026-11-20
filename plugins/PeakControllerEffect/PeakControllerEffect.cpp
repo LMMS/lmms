@@ -69,9 +69,8 @@ PeakControllerEffect::PeakControllerEffect(
 	m_effectId(fastRand()),
 	m_peakControls( this ),
 	m_lastSample( 0 ),
-	m_autoController( nullptr )
+	m_autoController(new PeakController(Engine::getSong(), this))
 {
-	m_autoController = new PeakController( Engine::getSong(), this );
 	if( !Engine::getSong()->isLoadingProject() && !PresetPreviewPlayHandle::isPreviewing() )
 	{
 		Engine::getSong()->addController( m_autoController );

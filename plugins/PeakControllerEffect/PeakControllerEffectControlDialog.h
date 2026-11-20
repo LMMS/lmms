@@ -41,12 +41,13 @@ class LedCheckBox;
 
 class PeakControllerEffectControlDialog : public EffectControlDialog
 {
-	Q_OBJECT
 public:
 	PeakControllerEffectControlDialog(
 				PeakControllerEffectControls * _controls );
 	~PeakControllerEffectControlDialog() override = default;
 
+	void showDialog() override;
+	void toggleView() override;
 
 protected:
 	Knob * m_baseKnob;

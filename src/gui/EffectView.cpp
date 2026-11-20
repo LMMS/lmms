@@ -27,8 +27,15 @@
 #include <QLayout>
 #include <QMouseEvent>
 #include <QPushButton>
+#include <QLabel>
+#include <QLayout>
+#include <QPushButton>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+
 #include <QPainter>
 
+#include "ControllerRackView.h"
 #include "EffectView.h"
 #include "DummyEffect.h"
 #include "CaptionMenu.h"
@@ -40,6 +47,9 @@
 #include "MainWindow.h"
 #include "SubWindow.h"
 #include "TempoSyncKnob.h"
+#include "ToolTip.h"
+#include "Song.h"
+#include "plugins/peak_controller_effect/peak_controller_effect_control_dialog.h"
 
 
 namespace lmms::gui
@@ -48,7 +58,6 @@ namespace lmms::gui
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
-	m_subWindow( nullptr ),
 	m_controlView(nullptr),
 	m_dragging(false)
 {
@@ -90,18 +99,9 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_controlView = effect()->controls()->createView();
 		if (m_controlView)
 		{
-			m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_controlView);
-			m_subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
-			m_subWindow->hide();
+			m_controlView->showDialog();
 		}
 	}
-
-	m_opacityEffect = new QGraphicsOpacityEffect(this);
-	m_opacityEffect->setOpacity(1);
-	setGraphicsEffect(m_opacityEffect);
-
-	//move above vst effect view creation
-	//setModel( _model );
 }
 
 
@@ -109,28 +109,13 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
-	delete m_subWindow;
 }
-
 
 
 
 void EffectView::editControls()
 {
-	if( m_subWindow )
-	{
-		if (!m_controlView->isVisible())
-		{
-			m_subWindow->show();
-			m_subWindow->raise();
-			effect()->controls()->setViewVisible(true); // TODO is this even needed?
-		}
-		else
-		{
-			m_subWindow->hide();
-			effect()->controls()->setViewVisible( false );
-		}
-	}
+	m_controlView->toggleView();
 }
 
 
