@@ -80,18 +80,19 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
 
-		case BufferDataType::Floating:
-			m_knobModel.setRange( m_port->min, m_port->max,
-				( m_port->max - m_port->min )
-				/ ( m_port->name.toUpper() == "GAIN"
-					&& m_port->max == 10.0f ? 4000.0f :
-								( m_port->suggests_logscale ? 8000000.0f : 800000.0f ) ) );
+		case BufferDataType::Floating: {
+			float step = (m_port->max - m_port->min)
+				/ (m_port->name.toUpper() == "GAIN"
+				&& m_port->max == 10.0f ? 4000.0f : (m_port->suggests_logscale ? 8000000.0f : 800000.0f));
+			step = 1.0f / std::pow(10.0f, std::ceil(-std::log10(step)));
+			m_knobModel.setRange(m_port->min, m_port->max, step);
 			m_knobModel.setInitValue( m_port->def );
 			connect( &m_knobModel, SIGNAL(dataChanged()),
 						 this, SLOT(knobChanged()));
 			// TODO: careful: we must prevent saved scales
 			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
+		}
 
 		case BufferDataType::Time:
 			m_tempoSyncKnobModel.setRange( m_port->min, m_port->max,
