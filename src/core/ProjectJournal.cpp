@@ -139,7 +139,7 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 jo_id_t ProjectJournal::allocID(JournallingObject* obj)
 {
 	jo_id_t id = generateId();
-	m_unregisteredIds.erase(id);
+	m_unregisteredIds.extract(id);
 	m_joIDs[id] = obj;
 	return id;
 }
