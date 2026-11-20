@@ -70,7 +70,7 @@ public:
 	inline void setName( const QString & name )
 	{
 		m_name = name;
-		emit dataChanged();
+		emit nameChanged();
 	}
 
 	QString displayName() const override
@@ -160,6 +160,7 @@ public slots:
 
 signals:
 	void lengthChanged();
+	void nameChanged();
 	void positionChanged();
 	void destroyedClip();
 	void colorChanged();
