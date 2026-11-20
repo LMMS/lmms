@@ -31,6 +31,7 @@
 #include <QLabel>
 
 #include "ArrayVector.h"
+#include "AssetMap.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
@@ -241,60 +242,60 @@ Sf2Instrument::~Sf2Instrument()
 	delete_fluid_settings( m_settings );
 }
 
-
-
-void Sf2Instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Sf2Instrument::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
-	_this.setAttribute( "src", m_filename );
-	m_patchNum.saveSettings( _doc, _this, "patch" );
-	m_bankNum.saveSettings( _doc, _this, "bank" );
+	elem.setAttribute("src", m_filename);
+	elem.setAttribute("srcHash", AssetMap::stringFromHash(AssetMap::getHash(PathUtil::stringToPath(m_filename))));
+	m_patchNum.saveSettings(doc, elem, "patch");
+	m_bankNum.saveSettings(doc, elem, "bank");
 
-	m_gain.saveSettings( _doc, _this, "gain" );
+	m_gain.saveSettings(doc, elem, "gain");
 
-	m_reverbOn.saveSettings( _doc, _this, "reverbOn" );
-	m_reverbRoomSize.saveSettings( _doc, _this, "reverbRoomSize" );
-	m_reverbDamping.saveSettings( _doc, _this, "reverbDamping" );
-	m_reverbWidth.saveSettings( _doc, _this, "reverbWidth" );
-	m_reverbLevel.saveSettings( _doc, _this, "reverbLevel" );
+	m_reverbOn.saveSettings(doc, elem, "reverbOn");
+	m_reverbRoomSize.saveSettings(doc, elem, "reverbRoomSize");
+	m_reverbDamping.saveSettings(doc, elem, "reverbDamping");
+	m_reverbWidth.saveSettings(doc, elem, "reverbWidth");
+	m_reverbLevel.saveSettings(doc, elem, "reverbLevel");
 
-	m_chorusOn.saveSettings( _doc, _this, "chorusOn" );
-	m_chorusNum.saveSettings( _doc, _this, "chorusNum" );
-	m_chorusLevel.saveSettings( _doc, _this, "chorusLevel" );
-	m_chorusSpeed.saveSettings( _doc, _this, "chorusSpeed" );
-	m_chorusDepth.saveSettings( _doc, _this, "chorusDepth" );
+	m_chorusOn.saveSettings(doc, elem, "chorusOn");
+	m_chorusNum.saveSettings(doc, elem, "chorusNum");
+	m_chorusLevel.saveSettings(doc, elem, "chorusLevel");
+	m_chorusSpeed.saveSettings(doc, elem, "chorusSpeed");
+	m_chorusDepth.saveSettings(doc, elem, "chorusDepth");
 }
 
-
-
-
-void Sf2Instrument::loadSettings( const QDomElement & _this )
+void Sf2Instrument::loadSettings(const QDomElement& elem)
 {
-	QString src = _this.attribute("src");
+	QString src = elem.attribute("src");
 	if (!src.isEmpty())
 	{
-		openFile(src, false);
-		m_patchNum.loadSettings(_this, "patch");
-		m_bankNum.loadSettings(_this, "bank");
+		QString srcF = AssetMap::fallback(src, elem.attribute("srcHash"));
+		if (!srcF.isEmpty())
+		{
+			openFile(srcF, false);
+			m_patchNum.loadSettings(elem, "patch");
+			m_bankNum.loadSettings(elem, "bank");
+		}
+		else
+		{
+			collectErrorForUI(tr("No such file: %1").arg(src));
+		}
 	}
-	
-	m_gain.loadSettings( _this, "gain" );
 
-	m_reverbOn.loadSettings( _this, "reverbOn" );
-	m_reverbRoomSize.loadSettings( _this, "reverbRoomSize" );
-	m_reverbDamping.loadSettings( _this, "reverbDamping" );
-	m_reverbWidth.loadSettings( _this, "reverbWidth" );
-	m_reverbLevel.loadSettings( _this, "reverbLevel" );
+	m_gain.loadSettings(elem, "gain");
 
-	m_chorusOn.loadSettings( _this, "chorusOn" );
-	m_chorusNum.loadSettings( _this, "chorusNum" );
-	m_chorusLevel.loadSettings( _this, "chorusLevel" );
-	m_chorusSpeed.loadSettings( _this, "chorusSpeed" );
-	m_chorusDepth.loadSettings( _this, "chorusDepth" );
+	m_reverbOn.loadSettings(elem, "reverbOn");
+	m_reverbRoomSize.loadSettings(elem, "reverbRoomSize");
+	m_reverbDamping.loadSettings(elem, "reverbDamping");
+	m_reverbWidth.loadSettings(elem, "reverbWidth");
+	m_reverbLevel.loadSettings(elem, "reverbLevel");
 
+	m_chorusOn.loadSettings(elem, "chorusOn");
+	m_chorusNum.loadSettings(elem, "chorusNum");
+	m_chorusLevel.loadSettings(elem, "chorusLevel");
+	m_chorusSpeed.loadSettings(elem, "chorusSpeed");
+	m_chorusDepth.loadSettings(elem, "chorusDepth");
 }
-
-
-
 
 void Sf2Instrument::loadFile( const QString & _file )
 {
