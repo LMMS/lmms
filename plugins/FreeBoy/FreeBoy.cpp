@@ -547,7 +547,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_bassKnob->move( 5 + 3*32, 58 );
 	m_bassKnob->setToolTip(tr("Bass"));
 
-	m_ch1SweepDirButton = new PixmapButton( this, nullptr );
+	m_ch1SweepDirButton = new PixmapButton(this);
 	m_ch1SweepDirButton->setCheckable( true );
 	m_ch1SweepDirButton->move( 167, 108 );
 	m_ch1SweepDirButton->setActiveGraphic(
@@ -556,7 +556,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 							PLUGIN_NAME::getIconPixmap( "btn_up" ) );
 	m_ch1SweepDirButton->setToolTip(tr("Sweep direction"));
 
-	m_ch1VolSweepDirButton = new PixmapButton( this, nullptr );
+	m_ch1VolSweepDirButton = new PixmapButton(this);
 	m_ch1VolSweepDirButton->setCheckable( true );
 	m_ch1VolSweepDirButton->move( 207, 108 );
 	m_ch1VolSweepDirButton->setActiveGraphic(
@@ -567,8 +567,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 
 
 
-	m_ch2VolSweepDirButton = new PixmapButton( this,
-										tr( "Volume sweep direction" ) );
+	m_ch2VolSweepDirButton = new PixmapButton(this);
 	m_ch2VolSweepDirButton->setCheckable( true );
 	m_ch2VolSweepDirButton->move( 102, 156 );
 	m_ch2VolSweepDirButton->setActiveGraphic(
@@ -577,11 +576,10 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
 	m_ch2VolSweepDirButton->setToolTip(tr("Volume sweep direction"));
 
-	//m_ch3OnButton = new PixmapButton( this, NULL );
+	//m_ch3OnButton = new PixmapButton(this);
 	//m_ch3OnButton->move( 176, 53 );
 
-	m_ch4VolSweepDirButton = new PixmapButton( this,
-										tr( "Volume sweep direction" ) );
+	m_ch4VolSweepDirButton = new PixmapButton(this);
 	m_ch4VolSweepDirButton->setCheckable( true );
 	m_ch4VolSweepDirButton->move( 207, 157 );
 	m_ch4VolSweepDirButton->setActiveGraphic(
@@ -590,7 +588,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 								PLUGIN_NAME::getIconPixmap( "btn_down" ) );
 	m_ch4VolSweepDirButton->setToolTip(tr("Volume sweep direction"));
 
-	m_ch4ShiftRegWidthButton = new PixmapButton( this, nullptr );
+	m_ch4ShiftRegWidthButton = new PixmapButton(this);
 	m_ch4ShiftRegWidthButton->setCheckable( true );
 	m_ch4ShiftRegWidthButton->move( 207, 171 );
 	m_ch4ShiftRegWidthButton->setActiveGraphic(
@@ -602,28 +600,28 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 
 
 
-	m_ch1So1Button = new PixmapButton( this, nullptr );
+	m_ch1So1Button = new PixmapButton(this);
 	m_ch1So1Button->setCheckable( true );
 	m_ch1So1Button->move( 208, 51 );
 	m_ch1So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch1So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	m_ch1So1Button->setToolTip(tr("Channel 1 to SO1 (Right)"));
 
-	m_ch2So1Button = new PixmapButton( this, nullptr );
+	m_ch2So1Button = new PixmapButton(this);
 	m_ch2So1Button->setCheckable( true );
 	m_ch2So1Button->move( 208, 51 + 12 );
 	m_ch2So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch2So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	m_ch2So1Button->setToolTip(tr("Channel 2 to SO1 (Right)"));
 
-	m_ch3So1Button = new PixmapButton( this, nullptr );
+	m_ch3So1Button = new PixmapButton(this);
 	m_ch3So1Button->setCheckable( true );
 	m_ch3So1Button->move( 208, 51 + 2*12 );
 	m_ch3So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch3So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	m_ch3So1Button->setToolTip(tr("Channel 3 to SO1 (Right)"));
 
-	m_ch4So1Button = new PixmapButton( this, nullptr );
+	m_ch4So1Button = new PixmapButton(this);
 	m_ch4So1Button->setCheckable( true );
 	m_ch4So1Button->setChecked( false );
 	m_ch4So1Button->move( 208, 51 + 3*12 );
@@ -631,28 +629,28 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_ch4So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	m_ch4So1Button->setToolTip(tr("Channel 4 to SO1 (Right)"));
 
-	m_ch1So2Button = new PixmapButton( this, nullptr );
+	m_ch1So2Button = new PixmapButton(this);
 	m_ch1So2Button->setCheckable( true );
 	m_ch1So2Button->move( 148, 51 );
 	m_ch1So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch1So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	m_ch1So2Button->setToolTip(tr("Channel 1 to SO2 (Left)"));
 
-	m_ch2So2Button = new PixmapButton( this, nullptr );
+	m_ch2So2Button = new PixmapButton(this);
 	m_ch2So2Button->setCheckable( true );
 	m_ch2So2Button->move( 148, 51 + 12 );
 	m_ch2So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch2So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	m_ch2So2Button->setToolTip(tr("Channel 2 to SO2 (Left)"));
 
-	m_ch3So2Button = new PixmapButton( this, nullptr );
+	m_ch3So2Button = new PixmapButton(this);
 	m_ch3So2Button->setCheckable( true );
 	m_ch3So2Button->move( 148, 51 + 2*12 );
 	m_ch3So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch3So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	m_ch3So2Button->setToolTip(tr("Channel 3 to SO2 (Left)"));
 
-	m_ch4So2Button = new PixmapButton( this, nullptr );
+	m_ch4So2Button = new PixmapButton(this);
 	m_ch4So2Button->setCheckable( true );
 	m_ch4So2Button->setChecked( false );
 	m_ch4So2Button->move( 148, 51 + 3*12 );
