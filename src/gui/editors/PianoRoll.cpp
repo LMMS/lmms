@@ -1849,13 +1849,23 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					// the mouse.  We do this here instead of in note.quantized
 					// because live notes should still be quantized at the half.
 					TimePos note_pos( pos_ticks - ( quantization() / 2 ) );
-					TimePos note_len( newNoteLen() );
+
+					bool drawingNote = false;
+					if (me->modifiers() & Qt::ShiftModifier)
+					{
+						// Shift held : Draw note instead of placing
+						drawingNote = true;
+					}
+
+					TimePos note_len = drawingNote ? TimePos(0, quantization()) : newNoteLen();
 
 					Note new_note( note_len, note_pos, key_num );
 					new_note.setSelected( true );
 					new_note.setPanning( m_lastNotePanning );
 					new_note.setVolume( m_lastNoteVolume );
 					created_new_note = m_midiClip->addNote( new_note );
+
+					if (drawingNote) { m_drawingNewNote = created_new_note; }
 
 					const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
 						.getChordByName( m_chordModel.currentText() );
@@ -1963,8 +1973,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 						m_midiClip->addJournalCheckPoint();
 					}
 
-					// otherwise move it
-					m_action = Action::MoveNote;
+					// Otherwise : If note is being drawn resize it ; Else move it
+					m_action = m_drawingNewNote ? Action::ResizeNote : Action::MoveNote;
 
 					// set move-cursor
 					setCursor( Qt::SizeAllCursor );
@@ -2367,6 +2377,8 @@ void PianoRoll::computeSelectedNotes(bool shift)
 
 void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 {
+	m_drawingNewNote = nullptr; // Stop drawing new note if doing so
+
 	bool mustRepaint = false;
 
 	s_textFloat->hide();
@@ -3185,9 +3197,10 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 			off_ticks = floor(off_ticks / quantization()) * quantization();
 		}
 
-		auto selectedNotes = getSelectedNotes();
+		auto selectedNotes = m_drawingNewNote ? std::vector({m_drawingNewNote}) : getSelectedNotes();
 
-		if (shift)
+		// Only apply shifting algorithm if a note isn't currently being drawn (which requires shift to be held)
+		if (shift && !m_drawingNewNote)
 		{
 			// Algorithm:
 			// Relative to the starting point of the left-most selected note,
@@ -3254,7 +3267,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 
 				m_lenOfNewNotes = note->length();
 			}
-			if (ctrl || selectionCount() == 1)
+			if (ctrl || (selectionCount() == 1))
 			{
 				// if holding ctrl or only one note is selected, reposition posterior notes
 				for (Note *note : notes)
@@ -3269,8 +3282,10 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 		}
 		else
 		{
-			// shift is not pressed; stretch length of selected notes but not their position
+			// shift is not pressed (or note is being drawn); stretch length of selected notes but not their position
 			int minLength = alt ? 1 : m_minResizeLen.getTicks();
+
+			if (m_drawingNewNote) { minLength = quantization(); } // For some reason drawn notes can be zeroed otherwise
 
 			if (m_gridMode == GridMode::Snap)
 			{
