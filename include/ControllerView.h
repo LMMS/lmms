@@ -2,6 +2,7 @@
  * ControllerView.h - view-component for an control
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2019 Steffen Baranowsky <BaraMGB/at/freenet.de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,21 +27,19 @@
 #define LMMS_GUI_CONTROLLER_VIEW_H
 
 #include <QFrame>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
 
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "ModelView.h"
 
-class QGroupBox;
-class QLabel;
-class QPushButton;
-class QMdiSubWindow;
 
 namespace lmms::gui
 {
 
 
-class LedCheckBox;
 
 
 class ControllerView : public QFrame, public ModelView
@@ -48,44 +47,56 @@ class ControllerView : public QFrame, public ModelView
 	Q_OBJECT
 public:
 	ControllerView( Controller * _controller, QWidget * _parent );
-	~ControllerView() override;
+	~ControllerView() override = default;
 
 	inline Controller * getController()
 	{
-		return( castModel<Controller>() );
+		return castModel<Controller>();
 	}
 
 	inline const Controller * getController() const
 	{
-		return( castModel<Controller>() );
+		return castModel<Controller>();
 	}
+
+	bool isCollapsed() const;
 
 
 public slots:
-	void editControls();
 	void removeController();
-	void renameController();
 	void moveUp();
 	void moveDown();
+	void collapseController(bool collapse);
+	void toggleCollapseController();
+	void renameController();
+
 
 signals:
-	void movedUp(ControllerView* view);
-	void movedDown(ControllerView* view);
-	void removedController(ControllerView* view);
+	void removedController(ControllerView * view);
+	void controllerCollapsed();
+	void collapseAll();
+	void expandAll();
+	void movedUp(ControllerView * view);
+	void movedDown(ControllerView * view);
 
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
 	void modelChanged() override;
 	void mouseDoubleClickEvent( QMouseEvent * event ) override;
+	void paintEvent(QPaintEvent *) override;
+	void dragEnterEvent(QDragEnterEvent * dee) override;
+	void dropEvent(QDropEvent * de) override;
 
 
 private:
-	QMdiSubWindow * m_subWindow;
 	ControllerDialog * m_controllerDlg;
+	const int m_titleBarHeight;
+	QLabel * controllerTypeLabel;
 	QLabel * m_nameLabel;
+	QPushButton * m_collapseButton;
+	Controller * m_modelC;
 };
-
 
 } // namespace lmms::gui
 

@@ -2,6 +2,7 @@
  * ControllerRackView.h - view for song's controllers
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2019 Steffen Baranowsky <BaraMGB/at/freenet.de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,9 +26,10 @@
 #ifndef LMMS_GUI_CONTROLLER_RACK_VIEW_H
 #define LMMS_GUI_CONTROLLER_RACK_VIEW_H
 
-#include <QWidget>
-
 #include "SerializingObject.h"
+#include <QCloseEvent>
+#include <QMdiSubWindow>
+#include <QWidget>
 
 class QPushButton;
 class QScrollArea;
@@ -44,7 +46,7 @@ namespace gui
 
 class ControllerView;
 
-class ControllerRackView : public QWidget, public SerializingObject
+class LMMS_EXPORT ControllerRackView : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -59,29 +61,36 @@ public:
 		return "ControllerRackView";
 	}
 
+	QMdiSubWindow *subWin() const;
+
+	bool allExpanded() const;
+	bool allCollapsed() const;
 
 public slots:
-	void deleteController(ControllerView* view);
-	void moveUp(ControllerView* view);
-	void moveDown(ControllerView* view);
+
 	void addController(Controller* controller);
 	void removeController(Controller* controller);
+	void deleteController(ControllerView * view);
+	void collapsingAll();
+	void expandAll();
+	void onControllerCollapsed();
+
+	const QVector<ControllerView *> controllerViews() const;
 
 private slots:
-	void addController();
-
+	void addLfoController();
+	void moveUp(ControllerView * cv);
+	void moveDown(ControllerView * cv);
 
 private:
 	QVector<ControllerView *> m_controllerViews;
+	QVector<bool> m_collapsingStateOnLoad;
 
 	QScrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollAreaLayout;
 	QPushButton * m_addButton;
-
-	// Stores the index of where to insert the next ControllerView.
-	// Needed so that the StretchItem always stays at the last position.
-	int m_nextIndex;
-} ;
+	QMdiSubWindow * m_subWin;
+};
 
 } // namespace gui
 

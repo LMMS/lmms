@@ -51,6 +51,7 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	QString nodeName() const override;
+	PeakControllerEffect *getPeakControllerEffect();
 
 	static void initGetControllerBySetting();
 	static PeakController * getControllerBySetting( const QDomElement & _this );
@@ -90,9 +91,8 @@ class PeakControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
-	PeakControllerDialog( Controller * _controller, QWidget * _parent );
+	PeakControllerDialog( PeakController * _controller, QWidget * _parent );
 	~PeakControllerDialog() override = default;
-
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;

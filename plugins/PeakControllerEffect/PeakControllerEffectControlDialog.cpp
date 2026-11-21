@@ -23,16 +23,16 @@
  *
  */
 
+#include "PeakControllerEffectControlDialog.h"
 
-
-
-#include <QHBoxLayout>
+#include <QLayout>
 #include <QVBoxLayout>
 
-#include "PeakControllerEffectControlDialog.h"
-#include "PeakControllerEffectControls.h"
+#include "ControllerRackView.h"
+#include "GuiApplication.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
+#include "PeakControllerEffectControls.h"
 #include "embed.h"
 
 namespace lmms::gui
@@ -45,8 +45,9 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), QBrush( embed::getIconPixmap( "peak_controller_artwork" ) ) );
 	setPalette( pal );
+	setFixedSize( 240, 80 );
 
 	m_baseKnob = new Knob(KnobType::Bright26, tr("BASE"), this);
 	m_baseKnob->setModel( &_controls->m_baseModel );
@@ -100,5 +101,29 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	setLayout( mainLayout );
 }
 
+
+void PeakControllerEffectControlDialog::showDialog()
+{
+	getGUI()->getControllerRackView()->show();
+	getGUI()->getControllerRackView()->subWin()->hide();
+}
+
+
+
+
+void PeakControllerEffectControlDialog::toggleView()
+{
+	if (!getGUI()->getControllerRackView()->subWin()->isVisible())
+	{
+		getGUI()->getControllerRackView()->subWin()->show();
+		getGUI()->getControllerRackView()->subWin()->raise();
+		m_effectControls->setViewVisible(true);
+	}
+	else
+	{
+		getGUI()->getControllerRackView()->subWin()->hide();
+		m_effectControls->setViewVisible(false);
+	}
+}
 
 } // namespace lmms::gui
