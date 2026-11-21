@@ -65,10 +65,12 @@ ControllerRackView::ControllerRackView() :
 	setWindowIcon(embed::getIconPixmap("controller"));
 	setWindowTitle(tr("Controller Rack"));
 
-	m_scrollArea = new QScrollArea(this);
+	m_subWin = getGUI()->mainWindow()->addWindowedWidget(this);
+
+	m_scrollArea = new QScrollArea(m_subWin);
 	m_scrollArea->setPalette(QApplication::palette(m_scrollArea));
 	m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	m_scrollArea->setFrameStyle(QFrame::Plain);
 	m_scrollArea->setFrameShadow(QFrame::Plain);
 
@@ -82,7 +84,7 @@ ControllerRackView::ControllerRackView() :
 	m_scrollArea->setWidget(scrollAreaWidget);
 	m_scrollArea->setWidgetResizable(true);
 
-	m_addButton = new QPushButton(this);
+	m_addButton = new QPushButton(m_subWin);
 	m_addButton->setText(tr("Add LFO"));
 	connect(m_addButton, SIGNAL(clicked()), this, SLOT(addLfoController()));
 	Song * song = Engine::getSong();
@@ -95,7 +97,8 @@ ControllerRackView::ControllerRackView() :
 	layout->setMargin(0);
 	setLayout(layout);
 
-	m_subWin = getGUI()->mainWindow()->addWindowedWidget(this);
+	resize(254, 400);
+	setFixedWidth(254);
 	setMinimumHeight(200);
 
 	Qt::WindowFlags flags = m_subWin->windowFlags();
@@ -104,8 +107,6 @@ ControllerRackView::ControllerRackView() :
 
 	m_subWin->setAttribute(Qt::WA_DeleteOnClose, false);
 	m_subWin->move(680, 60);
-	m_subWin->resize(400, 249);
-	m_subWin->setFixedWidth(249);
 }
 
 
@@ -220,7 +221,6 @@ void ControllerRackView::removeController(Controller * removedController)
 						m_controllerViews.end(), viewOfRemovedController));
 
 			delete viewOfRemovedController;
-			m_scrollArea->verticalScrollBar()->hide();
 			update();
 			break;
 		}
@@ -232,8 +232,6 @@ void ControllerRackView::removeController(Controller * removedController)
 
 void ControllerRackView::onControllerCollapsed()
 {
-	//we hide the scrollbar and let update() test if a scrollbar is needed
-	m_scrollArea->verticalScrollBar()->hide();
 	update();
 }
 
@@ -323,34 +321,5 @@ QMdiSubWindow *ControllerRackView::subWin() const
 
 
 
-void ControllerRackView::closeEvent(QCloseEvent * ce)
-{
-	if (parentWidget())
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	ce->ignore();
-}
-
-
-
-
-void ControllerRackView::resizeEvent(QResizeEvent *)
-{
-	m_subWin->setFixedWidth( m_scrollArea->verticalScrollBar()->isVisible() ? 262 : 249 );
-}
-
-
-
-
-void ControllerRackView::paintEvent(QPaintEvent *)
-{
-	m_subWin->setFixedWidth(m_scrollArea->verticalScrollBar()->isVisible() ? 262 : 249);
-	m_scrollArea->verticalScrollBar()->show();
-}
 
 } // namespace lmms::gui
