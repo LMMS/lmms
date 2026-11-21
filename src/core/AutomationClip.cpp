@@ -108,6 +108,7 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 			this, SLOT(objectDestroyed(lmms::jo_id_t)),
 						Qt::DirectConnection );
 
+	emit _obj->automated();
 	emit dataChanged();
 
 	return true;
