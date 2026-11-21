@@ -68,8 +68,6 @@ public:
 
 public slots:
 
-	void moveUp(ControllerView* view);
-	void moveDown(ControllerView* view);
 	void addController(Controller* controller);
 	void removeController(Controller* controller);
 	void deleteController(ControllerView * view);
@@ -86,8 +84,8 @@ protected:
 
 private slots:
 	void addLfoController();
-	void moveControllerUp(ControllerView * cv);
-	void moveControllerDown(ControllerView * cv);
+	void moveUp(ControllerView * cv);
+	void moveDown(ControllerView * cv);
 
 private:
 	QVector<ControllerView *> m_controllerViews;

@@ -160,29 +160,6 @@ void ControllerRackView::deleteController(ControllerView * view)
 	Engine::getSong()->removeController(c);
 }
 
-void ControllerRackView::moveUp(ControllerView* view)
-{
-	if (view == m_controllerViews.first()) { return; }
-
-	const auto storedView = std::find(m_controllerViews.begin(), m_controllerViews.end(), view);
-	assert(storedView != m_controllerViews.end());
-
-	const auto index = std::distance(m_controllerViews.begin(), storedView);
-
-	std::swap(m_controllerViews[index - 1], m_controllerViews[index]);
-	m_scrollAreaLayout->removeWidget(view);
-	m_scrollAreaLayout->insertWidget(index - 1, view);
-}
-
-void ControllerRackView::moveDown(ControllerView* view)
-{
-	if (view == m_controllerViews.last()) { return; }
-
-	const auto storedView = std::find(m_controllerViews.begin(), m_controllerViews.end(), view);
-	assert(storedView != m_controllerViews.end());
-	moveUp(*std::next(storedView));
-}
-
 void ControllerRackView::collapsingAll()
 {
 	for (auto &it : m_controllerViews)
@@ -212,8 +189,8 @@ void ControllerRackView::addController(Controller * controller)
 	connect(controllerView, &ControllerView::controllerCollapsed, this, &ControllerRackView::onControllerCollapsed);
 	connect(controllerView, &ControllerView::collapseAll, this, &ControllerRackView::collapsingAll);
 	connect(controllerView, &ControllerView::expandAll, this, &ControllerRackView::expandAll);
-	connect(controllerView, &ControllerView::movedUp, this, &ControllerRackView::moveControllerUp);
-	connect(controllerView, &ControllerView::movedDown, this, &ControllerRackView::moveControllerDown);
+	connect(controllerView, &ControllerView::movedUp, this, &ControllerRackView::moveUp);
+	connect(controllerView, &ControllerView::movedDown, this, &ControllerRackView::moveDown);
 	m_controllerViews.append(controllerView);
 	int n = m_scrollAreaLayout->count() - 1;
 	m_scrollAreaLayout->insertWidget(n, controllerView);
@@ -272,7 +249,7 @@ void ControllerRackView::addLfoController()
 
 
 
-void ControllerRackView::moveControllerUp(ControllerView *cv)
+void ControllerRackView::moveUp(ControllerView *cv)
 {
 	if (cv != m_controllerViews.first())
 	{
@@ -288,13 +265,12 @@ void ControllerRackView::moveControllerUp(ControllerView *cv)
 
 
 
-void ControllerRackView::moveControllerDown(ControllerView *cv)
+void ControllerRackView::moveDown(ControllerView *cv)
 {
-	//move up the controller below, is the same
 	if (cv != m_controllerViews.last())
 	{
 		int index = m_controllerViews.indexOf(cv);
-		moveControllerUp(m_controllerViews.at(index + 1));
+		moveUp(m_controllerViews.at(index + 1));
 	}
 }
 

@@ -1495,24 +1495,6 @@ void Song::moveControllerUp(Controller *c)
 
 
 
-void Song::moveControllerDown(Controller *c)
-{
-	if (c != m_controllers.back())
-	{
-		auto it = std::find(m_controllers.begin(), m_controllers.end(), c);
-
-		if (it != m_controllers.end())
-		{
-			auto index = std::distance(m_controllers.begin(), it);
-			std::swap(m_controllers[index],m_controllers[index+1]);
-			setModified();
-		}
-	}
-}
-
-
-
-
 void Song::clearErrors()
 {
 	m_errors.clear();
