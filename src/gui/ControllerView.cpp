@@ -96,14 +96,6 @@ ControllerView::ControllerView(Controller* controller, QWidget * parent) :
 
 
 
-
-ControllerView::~ControllerView()
-{
-}
-
-
-
-
 bool ControllerView::isCollapsed() const
 {
 	return m_controllerDlg->isHidden();

@@ -105,6 +105,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
+	delete m_controlView;
 }
 
 
