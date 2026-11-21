@@ -162,6 +162,8 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	m_settings = new_fluid_settings();
 
+	// This option speeds up loading the same soundfont in multiple tracks, but must be
+	// disabled when bank or patch is automated, as it is not realtime safe in those conditions.
 	fluid_settings_setint(m_settings, "synth.dynamic-sample-loading", 1);
 
 	// This sets up m_synth and updates reverb/chorus/gain
