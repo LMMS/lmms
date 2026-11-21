@@ -171,8 +171,7 @@ public:
 	bool pitchtrack;
 
 	// Used to convert sample rates
-	AudioResampler<> m_resampler;
-	AudioResampler<>::StreamBuffer<> m_streamBuffer;
+	AudioResampler<2> m_resampler;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;

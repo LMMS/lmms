@@ -107,11 +107,7 @@ public slots:
 	void updateTuning();
 
 private:
-	AudioResampler<> m_resampler;
-	AudioResampler<>::StreamBuffer<> m_streamBuffer;
-	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_buffer;
-	std::span<SampleFrame> m_bufferView;
-
+	AudioResampler<2> m_resampler;
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 

@@ -442,9 +442,11 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
 
-			std::array<SampleFrame, MAXIMUM_BUFFER_SIZE> mixBuffer;
+			std::array<SampleFrame, MAXIMUM_BUFFER_SIZE> outputBuffer;
 
-			sample.m_resampler.process([&](InterleavedBufferView<float, 2> output) {
+			sample.m_resampler.setRatio(freq_factor);
+			sample.m_resampler.setOutputBuffer({outputBuffer.data(), frames});
+			sample.m_resampler.processUntilDone([&](InterleavedBufferView<float, 2> output) {
 				loadSample(sample, output.asSampleFrames().data(), output.frames());
 
 				for (auto* frame : output.framesView())
@@ -457,9 +459,12 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				sample.pos += output.frames();
 				sample.adsr.inc(output.frames());
 				return output.frames();
-			}, sample.m_streamBuffer, {mixBuffer.data(), mixBuffer.size()}, freq_factor);
+			});
 
-			MixHelpers::add(_working_buffer, mixBuffer.data(), frames);
+			for (auto i = 0; i < frames; ++i)
+			{
+				_working_buffer[i] += outputBuffer[i];
+			}
 		}
 	}
 

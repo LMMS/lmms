@@ -175,20 +175,11 @@ private:
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy(float* _dst, float* _src)
 	{
-		auto srcIndex = f_cnt_t{0};
-		auto dstIndex = f_cnt_t{0};
-
 		m_resampler.reset();
-
-		while (dstIndex < WAVELEN)
-		{
-			const auto input = InterleavedBufferView<const float, 1>{_src + srcIndex, GRAPHLEN - srcIndex};
-			const auto output = InterleavedBufferView<float, 1>{_dst + dstIndex, WAVELEN - dstIndex};
-			const auto result = m_resampler.process(input, output, WAVERATIO, true);
-
-			srcIndex = (srcIndex + result.inputFramesUsed) % GRAPHLEN;
-			dstIndex += result.outputFramesGenerated;
-		}
+		m_resampler.setInputBuffer({_src, 1, GRAPHLEN});
+		m_resampler.setOutputBuffer({_dst, 1, WAVELEN});
+		m_resampler.setRatio(WAVERATIO);
+		m_resampler.processUntilDone();
 	}
 
 	// memcpy utilizing cubic interpolation

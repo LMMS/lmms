@@ -855,13 +855,12 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
-	m_resampler.process(
-		[&](auto output) {
-			fluid_synth_write_float(m_synth, output.frames(), output.data(), 0, 2, output.data(), 1, 2);
-			return output.frames();
-		},
-		m_streamBuffer, {buf, frames},
-		static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_internalSampleRate);
+	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
+	m_resampler.setOutputBuffer({buf, frames});
+	m_resampler.processUntilDone([&](auto output) {
+		fluid_synth_write_float(m_synth, output.frames(), output.data(), 0, 2, output.data(), 1, 2);
+		return output.frames();
+	});
 }
 
 

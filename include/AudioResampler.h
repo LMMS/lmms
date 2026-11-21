@@ -29,174 +29,187 @@
 #include <iostream>
 #endif
 
-#include <memory>
 #include <samplerate.h>
 
 #include "AudioBufferView.h"
+#include "AudioEngine.h"
 #include "lmms_export.h"
 
 namespace lmms {
 
-/**
- * @class AudioResampler
- * @brief A utility class for resampling interleaved audio buffers using various resampling algorithms.
- *
- * This class provides support for zero-order hold, linear, and several levels of sinc-based resampling.
- *
- * @tparam Channels The number of audio channels to resample. Defaults to 2 (stereo).
- */
-template <ch_cnt_t Channels = 2> class LMMS_EXPORT AudioResampler
+template <ch_cnt_t Channels>
+class LMMS_EXPORT AudioResampler
 {
 public:
 	/**
-	 * @struct Result
-	 * @brief Result of a resampling operation.
+	 * @brief Construct a resampler with the given @a converter.
+	 * @param converter The kind of converter (SRC_LINER, SRC_SINC_MEDIUM, etc)
 	 */
-	struct Result
+	explicit AudioResampler(int converter)
+		: m_state{src_new(converter, Channels, &m_error)}
 	{
-		f_cnt_t inputFramesUsed;	   //!< The number of input frames used during processing.
-		f_cnt_t outputFramesGenerated; //!< The number of output frames generated during processing.
-	};
-
-	/**
-	 * @struct StreamBuffer
-	 * @brief Represents a buffer storage used when resampling from audio streams.
-	 * @tparam Frames The buffer capacity measured in audio frames.
-	 * @see StreamFn
-	 */
-	template <f_cnt_t Frames = 128> struct StreamBuffer
-	{
-		std::array<float, Frames * Channels> buffer;
-		f_cnt_t index = 0;
-		f_cnt_t count = 0;
-	};
-
-	/**
-	 * @brief Constructs an `AudioResampler` instance.
-	 * @param mode The resampling mode to use.
-	 */
-	AudioResampler(int mode)
-		: m_state(src_new(mode, Channels, &m_error))
-	{
-		if (!m_state)
-		{
-			throw std::runtime_error{std::string{"Error when creating AudioResampler state: "} + src_strerror(m_error)};
-		}
+		if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
 	}
 
 	/**
-	 * @brief Process a block of interleaved audio input from `input` and resample it into `output`.
-	 *
-	 * @param input The interleaved audio input.
-	 * @param output The interleaved audio output.
-	 * @param ratio The resampling ratio (output sample rate / input sample rate).
-	 * @param endOfInput true if there is no more input data available after @a input that will enter the resampler,
-	 * false otherwise.
-	 *
-	 * @throws `std::invalid_argument` if a channel mismatch has been detected.
-	 * @throws `std::runtime_error` if the resampling process has failed.
-	 *
-	 * @remark This utility class does not cache the input and output buffers, making it stateless. In other words,
-	 * `input` is directly resampled into the `output`.
-	 *
-	 * @returns the result of the resampling process. See @ref Result for more details.
+	 * @brief Deletes the internal state for the resampler and destroys the object.
 	 */
-	[[nodiscard]] auto process(InterleavedBufferView<const float, Channels> input,
-		InterleavedBufferView<float, Channels> output, double ratio, bool endOfInput) -> Result
+	~AudioResampler() { src_delete(m_state); }
+
+	/**
+	 * @brief Process audio through the resampler.
+	 * If an error occurs, the function returns 0.
+	 *
+	 * @return f_cnt_t The number of output frames generated.
+	 */
+	auto process() -> f_cnt_t
 	{
-		if (ratio == 1.)
-		{
-			const auto frames = std::min(input.frames(), output.frames());
-			std::copy_n(input.data(), frames * Channels, output.data());
-			return {frames, frames};
-		}
-
-		auto data = SRC_DATA{.data_in = input.data(),
-			.data_out = output.data(),
-			.input_frames = static_cast<long>(input.frames()),
-			.output_frames = static_cast<long>(output.frames()),
-			.end_of_input = endOfInput,
-			.src_ratio = ratio};
-
-		if ((m_error = src_process(m_state.get(), &data)))
+		if (const auto error = src_process(m_state, &m_data))
 		{
 #ifdef LMMS_DEBUG
-			std::cerr << "AudioResampler: " << src_strerror(m_error) << '\n';
+			std::cerr << "[AudioResampler::process]: " << src_strerror(error) << '\n';
 #endif
-			return {0, 0};
+			return 0;
 		}
 
-		return {static_cast<f_cnt_t>(data.input_frames_used), static_cast<f_cnt_t>(data.output_frames_gen)};
+		m_data.data_in += m_data.input_frames_used * Channels;
+		m_data.input_frames -= m_data.input_frames_used;
+
+		m_data.data_out += m_data.output_frames_gen * Channels;
+		m_data.output_frames -= m_data.output_frames_gen;
+
+		return m_data.output_frames_gen;
 	}
 
 	/**
-	 * @brief Process a block of interleaved audio input from @a streamBuffer into @a output.
+	 * @brief Input callback variant of process()
 	 *
-	 * @param streamBuffer The stream buffer where incoming audio samples are stored and refilled as needed.
-	 * @param output The final output destination.
-	 * @param ratio The resampling ratio (output sample rate / input sample rate).
+	 * @tparam InputCallback The input callback used to refill the resampler with input data.
+	 * @see process()
 	 *
-	 * @tparam Capacity The capacity of @a streamBuffer.
-	 * @tparam RefillFn The function used to refill @a streamBuffer.
-	 *
-	 * @returns The number of frames generated.
+	 * @return f_cnt_t The number of output frames generated.
 	 */
-	template <typename RefillFn, f_cnt_t Capacity>
-	auto process(RefillFn refillFn, StreamBuffer<Capacity>& streamBuffer, InterleavedBufferView<float, Channels> output,
-		double ratio) -> f_cnt_t
+	template <typename InputCallback>
+		requires(std::is_invocable_r_v<f_cnt_t, InputCallback, InterleavedBufferView<float, Channels>>)
+	auto process(InputCallback&& callback) -> f_cnt_t
 	{
-		auto outputFramesGenerated = 0;
-		while (outputFramesGenerated < output.frames())
+		if (!m_data.end_of_input && m_data.input_frames == 0)
 		{
-			if (streamBuffer.count == 0)
-			{
-				streamBuffer.index = 0;
-
-				const auto refillView = InterleavedBufferView<float, Channels>{&streamBuffer.buffer[0], Capacity};
-				streamBuffer.count = refillFn(refillView);
-			}
-
-			const auto inputView = InterleavedBufferView<float, Channels>{
-				&streamBuffer.buffer[streamBuffer.index * Channels], streamBuffer.count};
-			auto outputView = InterleavedBufferView<float, Channels>{
-				output.framePtr(outputFramesGenerated), output.frames() - outputFramesGenerated};
-			const auto result = process(inputView, outputView, ratio, false);
-
-			if (result.inputFramesUsed == 0 && result.outputFramesGenerated == 0) { return outputFramesGenerated; }
-
-			streamBuffer.index += result.inputFramesUsed;
-			streamBuffer.count -= result.inputFramesUsed;
-			outputFramesGenerated += result.outputFramesGenerated;
+			const auto view = InterleavedBufferView<float, Channels>{m_buffer.data(), m_buffer.size() / Channels};
+			const auto frames = callback(view);
+			m_data.data_in = view.data();
+			m_data.input_frames = frames;
 		}
 
-		return outputFramesGenerated;
+		return process();
 	}
 
 	/**
-	 * @brief Resets the internal resampler state.
-	 * Useful when working with unreleated pieces of audio.
+	 * @brief Input callback variant of processUntilDone()
+	 *
+	 * @tparam InputCallback The input callback used to refill the resampler with input data.
+	 * @see processUntilDone()
+	 */
+	template <typename InputCallback>
+		requires(std::is_invocable_r_v<f_cnt_t, InputCallback, InterleavedBufferView<float, Channels>>)
+	auto processUntilDone(InputCallback&& callback) -> f_cnt_t
+	{
+		auto outputFrames = 0;
+
+		do
+		{
+			outputFrames += process(std::forward<InputCallback>(callback));
+		} while (!done());
+
+		return outputFrames;
+	}
+
+	/**
+	 * @brief Processes audio through the resampler until it is done.
+	 *
+	 * @returns The total number of output frames generated.
+	 * @see done()
+	 */
+	auto processUntilDone() -> f_cnt_t
+	{
+		auto outputFrames = 0;
+
+		do
+		{
+			outputFrames += process();
+		} while (!done());
+
+		return outputFrames;
+	}
+
+	/**
+	 * @brief Checks if the resampler is done.
+	 * This is based on if the last call to process() has used up and outputted any data.
+	 *
+	 * @returns true if the resampler has not used up and outputted any data.
+	 * @returns false otherwise.
+	 */
+	bool done() const { return m_data.input_frames_used == 0 && m_data.output_frames_gen == 0; }
+
+	/**
+	 * @brief Resets the internal state of the resampler. Should be used when working on separate, unrelated pieces of
+	 * audio.
 	 */
 	void reset()
 	{
-		if ((m_error = src_reset(static_cast<SRC_STATE*>(m_state.get()))))
+		if (const auto error = src_reset(m_state))
 		{
 #ifdef LMMS_DEBUG
-			std::cerr << "AudioResampler: " << src_strerror(m_error) << '\n';
+			std::cerr << "[AudioResampler::reset]: " << src_strerror(error) << '\n';
 #endif
 		}
 	}
 
-	//! @returns the number of channels expected by the resampler.
-	constexpr auto channels() const -> ch_cnt_t { return Channels; }
+	/**
+	 * @brief Sets the input buffer for the resampler.
+	 * If @a final is set to @c true, future calls to this function will be ignored.
+	 *
+	 * @param input The input buffer.
+	 * @param final @c true if @a input is the last input buffer to be processed by the resampler, @c false otherwise.
+	 */
+	void setInputBuffer(InterleavedBufferView<const float, Channels> input, bool final = true)
+	{
+		if (m_data.end_of_input) { return; }
+
+		assert(m_data.input_frames == 0 && "input still available, risk of dropped input data");
+		m_data.data_in = input.data();
+		m_data.input_frames = input.frames();
+		m_data.end_of_input = final;
+	}
+
+	/**
+	 * @brief Sets the output buffer for the resampler.
+	 * @param output The output buffer.
+	 */
+	void setOutputBuffer(InterleavedBufferView<float, Channels> output)
+	{
+		m_data.data_out = output.data();
+		m_data.output_frames = output.frames();
+	}
+
+	/**
+	 * @brief Sets the resampling ratio to @a ratio.
+	 * @param ratio The resampling ratio.
+	 */
+	void setRatio(double ratio) { m_data.src_ratio = ratio; }
+
+	/**
+	 * @brief Set the resampling ratio to @a output / @a input.
+	 * @param input The input sample rate.
+	 * @param output The output sample rate.
+	 */
+	void setRatio(sample_rate_t input, sample_rate_t output) { m_data.src_ratio = static_cast<double>(output) / input; }
 
 private:
-	struct LMMS_EXPORT StateDeleter
-	{
-		void operator()(SRC_STATE* state) { src_delete(state); }
-	};
-
-	std::unique_ptr<SRC_STATE, StateDeleter> m_state;
-	int m_error = 0;
+	SRC_STATE* m_state{};
+	SRC_DATA m_data{};
+	std::array<float, DEFAULT_BUFFER_SIZE * Channels> m_buffer;
+	int m_error{};
 };
 
 } // namespace lmms
