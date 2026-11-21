@@ -90,15 +90,14 @@ protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
 	void modelChanged() override;
 	void mouseDoubleClickEvent( QMouseEvent * event ) override;
-	virtual void paintEvent(QPaintEvent *);
-	virtual void dragEnterEvent(QDragEnterEvent * dee);
-	virtual void dropEvent(QDropEvent * de);
+	void paintEvent(QPaintEvent *) override;
+	void dragEnterEvent(QDragEnterEvent * dee) override;
+	void dropEvent(QDropEvent * de) override;
 
 
 private:
 	ControllerDialog * m_controllerDlg;
 	const int m_titleBarHeight;
-	bool m_show;
 	QLabel * controllerTypeLabel;
 	QLineEdit * m_nameLineEdit;
 	QPushButton * m_collapseButton;
