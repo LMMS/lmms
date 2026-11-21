@@ -182,6 +182,8 @@ public:
 
 private:
 	void modelChanged() override;
+	void dragEnterEvent(QDragEnterEvent* dee) override;
+	void dropEvent(QDropEvent* de) override;
 
 	PixmapButton * m_fileDialogButton;
 	PixmapButton * m_patchDialogButton;

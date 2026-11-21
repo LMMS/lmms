@@ -32,6 +32,7 @@
 
 #include "ArrayVector.h"
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "Engine.h"
@@ -42,6 +43,7 @@
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "Song.h"
+#include "StringPairDrag.h"
 
 #include "PatchesDialog.h"
 #include "LcdSpinBox.h"
@@ -1080,6 +1082,8 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	setPalette( pal );
 
 	updateFilename();
+
+	setAcceptDrops(true);
 }
 
 
@@ -1209,6 +1213,45 @@ void Sf2InstrumentView::showPatchDialog()
 	pd.exec();
 }
 
+void Sf2InstrumentView::dragEnterEvent(QDragEnterEvent* dee)
+{
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if (dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
+	{
+		QString txt = dee->mimeData()->data(
+						mimeType(MimeType::StringPair));
+		if (txt.section(':', 0, 0) == "soundfontfile")
+		{
+			dee->acceptProposedAction();
+		}
+		else
+		{
+			dee->ignore();
+		}
+	}
+	else
+	{
+		dee->ignore();
+	}
+}
+
+void Sf2InstrumentView::dropEvent(QDropEvent* de)
+{
+	const auto type = StringPairDrag::decodeKey(de);
+	const auto value = StringPairDrag::decodeValue(de);
+
+	if (type == "soundfontfile") { castModel<Sf2Instrument>()->openFile(value); }
+	else
+	{
+		de->ignore();
+		return;
+	}
+
+	Engine::getSong()->setModified();
+	de->accept();
+}
 
 } // namespace gui
 
