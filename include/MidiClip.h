@@ -41,6 +41,65 @@ namespace gui
 class MidiClipView;
 }
 
+//! Used in MidiClip to keep track of Note families
+class NoteFamilyAlbum : public SerializingObject
+{
+public:
+	NoteFamilyAlbum();
+	NoteFamilyAlbum(const NoteFamilyAlbum& album);
+
+	NoteFamilyAlbum& operator=(const NoteFamilyAlbum& album);
+
+	const QString& getFamilyName(const int family) const;
+	const QColor& getFamilyColor(const int family) const;
+
+	bool addFamily(const QString& familyName, const QColor& familyColor);
+	bool setFamilyName(const int family, const QString& newName);
+	bool setFamilyColor(const int family, const QColor& newColor);
+
+	bool deleteFamily(const int family);
+
+	bool familyExists(const int family) const;
+
+	int familiesCount() const;
+
+	int getCleanImportedFamily(const int oldFamily) const;
+
+	static QString classNodeName()
+	{
+		return "notefamilyalbum";
+	}
+
+	inline QString nodeName() const override
+	{
+		return classNodeName();
+	}
+
+protected:
+	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
+	void loadSettings(const QDomElement& _this ) override;
+
+private:
+	friend class MidiClip;
+
+	static constexpr uint64_t s_oneBit = static_cast<uint64_t>(1);
+
+	std::vector<QString> m_familyNames = {};
+	std::vector<QColor> m_familyColors = {};
+
+	int m_lastFamily = -1;
+
+	uint64_t m_families = 0; //!< Each bit represents the existence of a family at the location (starts from right)
+
+	std::vector<int> m_importingIndices = {};
+	bool m_cleanupRequired = false;
+
+	const QString m_defaultName = {};
+	const QColor m_defaultColor = {};
+
+	void cleanupAfterLoad();
+};
+
 
 class LMMS_EXPORT MidiClip : public Clip
 {
@@ -122,6 +181,8 @@ public:
 		return new MidiClip(*this);
 	}
 
+	NoteFamilyAlbum& noteFamilyAlbum();
+
 
 	using Model::dataChanged;
 
@@ -159,7 +220,7 @@ private:
 
 	friend class gui::MidiClipView;
 
-
+	NoteFamilyAlbum m_familyAlbum = {};
 signals:
 	void destroyedMidiClip( lmms::MidiClip* );
 } ;

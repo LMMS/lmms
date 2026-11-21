@@ -3793,7 +3793,11 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				// We've done and checked all, let's draw the note with
 				// the appropriate color
-				const auto fillColor = note->type() == Note::Type::Regular ? m_noteColor : m_stepNoteColor;
+				// TODO Remove this message : NOTECOLA
+				const auto regularColor = (note->family() == -1)
+					? m_noteColor
+					: m_midiClip->noteFamilyAlbum().getFamilyColor(note->family());
+				const auto fillColor = note->type() == Note::Type::Regular ? regularColor : m_stepNoteColor;
 
 				drawNoteRect(
 					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,

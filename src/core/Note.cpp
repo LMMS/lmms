@@ -133,6 +133,13 @@ void Note::setKey( const int key )
 
 
 
+void Note::setFamily(const int family)
+{
+	m_family = family;
+}
+
+
+
 
 void Note::setVolume( volume_t volume )
 {
