@@ -64,7 +64,6 @@ public:
 
 public slots:
 	void removeController();
-	void deleteController();
 	void moveUp();
 	void moveDown();
 	void collapseController(bool collapse);
@@ -74,16 +73,12 @@ public slots:
 
 
 signals:
-	void movedUp(ControllerView* view);
-	void movedDown(ControllerView* view);
-	void removedController(ControllerView* view);
-
-	void deleteController(ControllerView * view);
+	void removedController(ControllerView * view);
 	void controllerCollapsed();
 	void collapseAll();
 	void expandAll();
-	void controllerMoveUp(ControllerView * view);
-	void controllerMoveDown(ControllerView * view);
+	void movedUp(ControllerView * view);
+	void movedDown(ControllerView * view);
 
 
 protected:

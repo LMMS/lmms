@@ -134,11 +134,6 @@ void ControllerView::moveDown() { emit movedDown(this); }
 
 void ControllerView::removeController() { emit removedController(this); }
 
-void ControllerView::deleteController()
-{
-	emit(deleteController(this));
-}
-
 
 
 
@@ -242,25 +237,20 @@ void ControllerView::contextMenuEvent(QContextMenuEvent *)
 	Controller* c = castModel<Controller>();
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(c->name(), this);
 
-	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, SLOT(deleteController()));
+	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, SLOT(removeController()));
 
-	auto collapseAction = contextMenu->addAction(QIcon(), tr("&Collapse all controllers"),
-												this, SIGNAL(collapseAll()));
+	auto collapseAction = contextMenu->addAction(embed::getIconPixmap("arrow-left"), tr("&Collapse all controllers"), this, SIGNAL(collapseAll()));
 	collapseAction->setDisabled(getGUI()->getControllerRackView()->allCollapsed());
-	collapseAction->setObjectName("btn-stepper-left");
 
-	auto expandAction = contextMenu->addAction(QIcon(), tr("&Expand all controllers"),
+	auto expandAction = contextMenu->addAction(embed::getIconPixmap("arrow-down"), tr("&Expand all controllers"),
 												this, SIGNAL(expandAll()));
 	expandAction->setDisabled(getGUI()->getControllerRackView()->allExpanded());
-	expandAction->setObjectName("btn-stepper-down");
 
-	auto moveUpAction = contextMenu->addAction(QIcon(), tr("Move &up"), this, SLOT(moveUp()));
+	auto moveUpAction = contextMenu->addAction(embed::getIconPixmap("arrow-up"), tr("Move &up"), this, SLOT(moveUp()));
 	moveUpAction->setDisabled(getGUI()->getControllerRackView()->controllerViews().first() == this);
-	moveUpAction->setObjectName("btn-stepper-up");
 
-	auto moveDownAction = contextMenu->addAction(QIcon(), tr("Move &down"), this, SLOT(moveDown()));
+	auto moveDownAction = contextMenu->addAction(embed::getIconPixmap("arrow-down"), tr("Move &down"), this, SLOT(moveDown()));
 	moveDownAction->setDisabled(getGUI()->getControllerRackView()->controllerViews().last() == this);
-	moveDownAction->setObjectName("btn-stepper-down");
 
 	contextMenu->addSeparator();
 

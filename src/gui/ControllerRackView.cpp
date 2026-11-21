@@ -208,12 +208,12 @@ void ControllerRackView::expandAll()
 void ControllerRackView::addController(Controller * controller)
 {
 	ControllerView * controllerView = new ControllerView(controller, m_scrollArea->widget());
-	connect(controllerView, SIGNAL(deleteController(ControllerView*)), this, SLOT(deleteController(ControllerView*)), Qt::QueuedConnection);
-	connect(controllerView, SIGNAL(controllerCollapsed()), this, SLOT(onControllerCollapsed()));
-	connect(controllerView, SIGNAL(collapseAll()), this, SLOT(collapsingAll()));
-	connect(controllerView, SIGNAL(expandAll()), this, SLOT(expandAll()));
-	connect(controllerView, SIGNAL(controllerMoveUp(ControllerView*)), this, SLOT(moveControllerUp(ControllerView*)));
-	connect(controllerView, SIGNAL(controllerMoveDown(ControllerView*)), this, SLOT(moveControllerDown(ControllerView*)));
+	connect(controllerView, &ControllerView::removedController, this, &ControllerRackView::deleteController, Qt::QueuedConnection);
+	connect(controllerView, &ControllerView::controllerCollapsed, this, &ControllerRackView::onControllerCollapsed);
+	connect(controllerView, &ControllerView::collapseAll, this, &ControllerRackView::collapsingAll);
+	connect(controllerView, &ControllerView::expandAll, this, &ControllerRackView::expandAll);
+	connect(controllerView, &ControllerView::movedUp, this, &ControllerRackView::moveControllerUp);
+	connect(controllerView, &ControllerView::movedDown, this, &ControllerRackView::moveControllerDown);
 	m_controllerViews.append(controllerView);
 	int n = m_scrollAreaLayout->count() - 1;
 	m_scrollAreaLayout->insertWidget(n, controllerView);
