@@ -246,7 +246,11 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 	if (!len)
 	{
 		len = std::strlen(def);
-		std::strncpy(buffer, def, size);
+		// Passing in a default value larger than the output buffer is
+		// a logic error at the callsite and should never happen
+		assert(len < size);
+		std::memcpy(buffer, def, len);
+		buffer[len] = '\0'
 	}
 	return len;
 }
