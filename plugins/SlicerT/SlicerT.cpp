@@ -31,6 +31,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
+#include "SampleCache.h"
 #include "SlicerTView.h"
 #include "Song.h"
 #include "embed.h"
@@ -306,7 +307,18 @@ std::vector<Note> SlicerT::getMidi()
 
 void SlicerT::updateFile(QString file)
 {
-	if (auto buffer = SampleBuffer::fromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
+	const auto path = PathUtil::stringToPath(file);
+
+	// TODO: Return an error value back to the caller (via std::expected or our own polyfill)
+	auto buffer = SampleCache::instance().fetchBuffer(path);
+	if (!buffer) { return; }
+
+	// TODO: Return an error value back to the caller (via std::expected or our own polyfill)
+	auto thumbnailCache = SampleCache::instance().fetchThumbnailCache(path);
+	if (!thumbnailCache) { return; }
+
+	m_originalSample = Sample{std::move(buffer)};
+	m_sampleThumbnailCache = std::move(thumbnailCache);
 
 	findBPM();
 	findSlices();
@@ -351,8 +363,14 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			auto buffer = SampleBuffer::fromFile(srcFile);
-			m_originalSample = Sample(std::move(buffer));
+			if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(srcFile)))
+			{
+				m_originalSample = Sample{std::move(buffer)};
+			}
+			else
+			{
+				Engine::getSong()->collectError(tr("Failed to load sample: %1").arg(srcFile));
+			}
 		}
 		else
 		{
@@ -363,7 +381,8 @@ void SlicerT::loadSettings(const QDomElement& element)
 	else if (auto sampleData = element.attribute("sampledata"); !sampleData.isEmpty())
 	{
 		auto buffer = SampleBuffer::fromBase64(sampleData);
-		m_originalSample = Sample(std::move(buffer));
+		m_originalSample = Sample{std::move(buffer)};
+		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_originalSample.buffer());
 	}
 
 	if (!element.attribute("totalSlices").isEmpty())

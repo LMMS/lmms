@@ -59,7 +59,7 @@ constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
 constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
-constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 192000};
+constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 176400, 192000};
 constexpr auto SUPPORTED_BITRATES = std::array{64, 128, 160, 192, 256, 320};
 
 class LMMS_EXPORT AudioEngine : public QObject
@@ -274,7 +274,7 @@ public:
 	/**
 	 * @brief Renders an audio buffer into @a dst.
 	 *
-	 * Renders @ref renderNextAudioPeriod() "audio periods" into @a dst. If @a dst is not a multiple of the period
+	 * Renders @ref renderNextPeriod() "audio periods" into @a dst. If @a dst is not a multiple of the period
 	 * size, the remaining frames are partially rendered (an extra period may be rendered in such cases, which can
 	 * degrade performance).
 	 *

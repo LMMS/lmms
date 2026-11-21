@@ -262,7 +262,7 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			fclose( fd ); \
 			return( LoadError::IO ); \
 		} \
-		x = (unsigned short)swap16IfBE( tmpshort );
+		x = byteswapIfBE<unsigned short>(tmpshort);
 
 #define READ_LONG( x ) \
 		if ( fread( &x, 4, 1, fd ) != 1 ) \
@@ -270,7 +270,7 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			fclose( fd ); \
 			return( LoadError::IO ); \
 		} \
-		x = (unsigned)swap32IfBE( x );
+		x = byteswapIfBE<unsigned int>(x);
 
 		// skip wave name, fractions
 		SKIP_BYTES( 7 + 1 );
@@ -311,7 +311,7 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 					fclose( fd );
 					return( LoadError::IO );
 				}
-				sample = swap16IfBE( sample );
+				sample = byteswapIfBE(sample);
 				if( modes & MODES_UNSIGNED )
 				{
 					sample ^= 0x8000;

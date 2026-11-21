@@ -1,5 +1,5 @@
 /*
- * MidiImport.h - support for importing MIDI-files
+ * MidiImport.h - support for importing MIDI files
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
