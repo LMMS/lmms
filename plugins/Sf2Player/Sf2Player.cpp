@@ -107,10 +107,7 @@ public:
 		return fluid_voice_get_id(m_voice) == m_id && fluid_voice_is_playing(m_voice);
 	}
 
-	unsigned int id() const
-	{
-		return m_id;
-	}
+	unsigned int id() const { return m_id; }
 
 private:
 	fluid_voice_t* m_voice;
@@ -201,8 +198,8 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
-	connect( &m_bankNum, SIGNAL( automated() ), this, SLOT( disableDynamicSampleLoading() ) );
-	connect( &m_patchNum, SIGNAL( automated() ), this, SLOT( disableDynamicSampleLoading() ) );
+	connect(&m_bankNum, SIGNAL(automated()), this, SLOT(disableDynamicSampleLoading()));
+	connect(&m_patchNum, SIGNAL(automated()), this, SLOT(disableDynamicSampleLoading()));
 
 	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(reloadSynth()));
 
@@ -402,7 +399,7 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	loadSfFile(_sf2File, updateTrackName);
 }
 
-void Sf2Instrument::loadSfFile( const QString & _sf2File, bool updateTrackName )
+void Sf2Instrument::loadSfFile(const QString& _sf2File, bool updateTrackName)
 {
 	emit fileLoading();
 

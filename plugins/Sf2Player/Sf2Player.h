@@ -157,7 +157,7 @@ private:
 	QMutex m_playingNotesMutex;
 
 private:
-	void loadSfFile(const QString & _sf2File, bool updateTrackName = true);
+	void loadSfFile(const QString& _sf2File, bool updateTrackName = true);
 	void freeFont();
 	void noteOn( Sf2PluginData * n );
 	void noteOff( Sf2PluginData * n );
