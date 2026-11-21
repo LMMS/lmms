@@ -72,12 +72,9 @@ ControllerView::ControllerView(Controller* controller, QWidget * parent) :
 	controllerTypeLabel->move(3, 3);
 	controllerTypeLabel->show();
 
-	m_nameLineEdit = new QLineEdit(this);
-	m_nameLineEdit->setText(controller->name());
-	m_nameLineEdit->setReadOnly(true);
-	m_nameLineEdit->setAttribute(Qt::WA_TransparentForMouseEvents);
-	m_nameLineEdit->move(controllerTypeLabel->sizeHint().width() + 3, 2);
-	connect(m_nameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
+	//TODO: This looks quite janky because of setReadOnly. Consider restoring the old right click->rename workflow
+	m_nameLabel = new QLabel(controller->name(), this);
+	m_nameLabel->move(controllerTypeLabel->sizeHint().width() + 3, 3);
 
 	setFixedWidth(m_controllerDlg->width() + 2);
 	setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
@@ -143,24 +140,19 @@ void ControllerView::toggleCollapseController()
 }
 
 
-void ControllerView::renameFinished()
+void ControllerView::renameController()
 {
-	m_nameLineEdit->setReadOnly(true);
+	bool ok;
 	Controller * c = castModel<Controller>();
-	QString new_name = m_nameLineEdit->text();
-	if (new_name != c->name())
+	QString new_name = QInputDialog::getText( this,
+			tr( "Rename controller" ),
+			tr( "Enter the new name for this controller" ),
+			QLineEdit::Normal, c->name() , &ok );
+	if( ok && !new_name.isEmpty() )
 	{
-		c->setName(new_name);
-		Engine::getSong()->setModified();
+		c->setName( new_name );
+		m_nameLabel->setText( new_name );
 	}
-}
-
-
-void ControllerView::rename()
-{
-	m_nameLineEdit->setReadOnly(false);
-	m_nameLineEdit->setFocus();
-	m_nameLineEdit->selectAll();
 }
 
 
@@ -168,7 +160,7 @@ void ControllerView::mouseDoubleClickEvent(QMouseEvent * me)
 {
 	if (me->y() <= m_titleBarHeight)
 	{
-		rename();
+		toggleCollapseController();
 	}
 }
 
@@ -238,6 +230,7 @@ void ControllerView::contextMenuEvent(QContextMenuEvent *)
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(c->name(), this);
 
 	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, SLOT(removeController()));
+	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
 
 	auto collapseAction = contextMenu->addAction(embed::getIconPixmap("arrow-left"), tr("&Collapse all controllers"), this, SIGNAL(collapseAll()));
 	collapseAction->setDisabled(getGUI()->getControllerRackView()->allCollapsed());

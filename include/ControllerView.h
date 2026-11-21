@@ -68,8 +68,7 @@ public slots:
 	void moveDown();
 	void collapseController(bool collapse);
 	void toggleCollapseController();
-	void rename();
-	void renameFinished();
+	void renameController();
 
 
 signals:
@@ -94,7 +93,7 @@ private:
 	ControllerDialog * m_controllerDlg;
 	const int m_titleBarHeight;
 	QLabel * controllerTypeLabel;
-	QLineEdit * m_nameLineEdit;
+	QLabel * m_nameLabel;
 	QPushButton * m_collapseButton;
 	Controller * m_modelC;
 };
