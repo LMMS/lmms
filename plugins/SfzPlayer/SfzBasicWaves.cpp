@@ -32,9 +32,11 @@ namespace lmms
 float SfzBasicWaves::generate(Shape shape, float sampleRate, int frame)
 {
 	// By default, the basic waves are played at C4 (midi key 60). This isn't in the spec afaik, but it makes things simple since pitch_keycenter defaults to 60.
-	constexpr float BaseFreq = 261.625565301f;
+	constexpr float baseFreq = 261.625565301f;
+
 	// Amount through period
 	const float t = absFraction(frame * baseFreq / sampleRate);
+
 	// The region playback state handles incrementing the frame count at different rates based on the pitch, so we don't need to handle the actual frequency calculation here.
 
 	switch (shape)
