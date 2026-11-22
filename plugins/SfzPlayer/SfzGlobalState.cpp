@@ -84,18 +84,18 @@ std::optional<int> SfzGlobalState::lastSwitchKeyPressedInRange(int lowKey, int h
 void SfzGlobalState::updateNphFreq(const int key, const float freq)
 {
 	const float originalKeyFreq = 440.0f * std::exp2((key - 69) / 12.0f);
-	m_nphFreqRatios.at(key) = freq / originalKeyFreq;
+	m_nphFreqRatios[key] = freq / originalKeyFreq;
 }
 
 void SfzGlobalState::updateNphPanning(const int key, const float panning)
 {
-	m_nphPanning.at(key) = panning;
+	m_nphPanning[key] = panning;
 }
 void SfzGlobalState::initializeMidiCCValues(const SfzControlsConfig& controlsConfig)
 {
 	for (int i = 0; i < NumMidiCCs; ++i)
 	{
-		m_ccValues.at(i) = controlsConfig.m_set_cc.at(i);
+		m_ccValues[i] = controlsConfig.m_set_cc[i];
 	}
 }
 
