@@ -61,8 +61,6 @@ public:
 
 	bool familyExists(const int family) const;
 
-	int familiesCount() const;
-
 	int lastFamilyId() const;
 
 	static QString classNodeName()
