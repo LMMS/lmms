@@ -1242,15 +1242,16 @@ void Sf2InstrumentView::dropEvent(QDropEvent* de)
 	const auto type = StringPairDrag::decodeKey(de);
 	const auto value = StringPairDrag::decodeValue(de);
 
-	if (type == "soundfontfile") { castModel<Sf2Instrument>()->openFile(value); }
+	if (type == "soundfontfile") 
+	{ 
+		castModel<Sf2Instrument>()->openFile(value); 
+		Engine::getSong()->setModified();
+		de->accept();
+	}
 	else
 	{
 		de->ignore();
-		return;
 	}
-
-	Engine::getSong()->setModified();
-	de->accept();
 }
 
 } // namespace gui
