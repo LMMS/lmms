@@ -27,10 +27,16 @@
 
 #include <algorithm>
 #include <QDomElement>
+#include <memory>
+#include <qobject.h>
+#include <qobjectdefs.h>
 
+#include "Clip.h"
+#include "ClipContent.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "MidiClipView.h"
+#include "Model.h"
 #include "PatternStore.h"
 #include "PianoRoll.h"
 
@@ -42,9 +48,10 @@ namespace lmms
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_clipType( Type::BeatClip ),
-	m_steps( TimePos::stepsPerBar() )
+	m_clipType( Type::BeatClip )
 {
+	replaceContent(std::make_shared<MidiClipContent>(TimePos::stepsPerBar()));
+
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();
@@ -58,12 +65,13 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 MidiClip::MidiClip( const MidiClip& other ) :
 	Clip(other),
 	m_instrumentTrack( other.m_instrumentTrack ),
-	m_clipType( other.m_clipType ),
-	m_steps( other.m_steps )
+	m_clipType( other.m_clipType )
 {
-	for (const auto& note : other.m_notes)
+	replaceContent(std::make_shared<MidiClipContent>(other.content()->m_steps));
+
+	for (const auto& note : other.content()->m_notes)
 	{
-		m_notes.push_back(note->clone());
+		content()->m_notes.push_back(note->clone());
 	}
 
 	init();
@@ -73,13 +81,6 @@ MidiClip::MidiClip( const MidiClip& other ) :
 MidiClip::~MidiClip()
 {
 	emit destroyedMidiClip( this );
-
-	for (const auto& note : m_notes)
-	{
-		delete note;
-	}
-
-	m_notes.clear();
 }
 
 
@@ -100,7 +101,7 @@ void MidiClip::resizeToFirstTrack()
 				const auto currentClipIt = std::find(instrumentTrackClips.begin(), instrumentTrackClips.end(), this);
 				unsigned int currentClip = currentClipIt != instrumentTrackClips.end() ?
 					std::distance(instrumentTrackClips.begin(), currentClipIt) : -1;
-				m_steps = static_cast<MidiClip*>(track->getClip(currentClip))->m_steps;
+				content()->m_steps = static_cast<MidiClip*>(track->getClip(currentClip))->content()->m_steps;
 			}
 			break;
 		}
@@ -113,6 +114,7 @@ void MidiClip::resizeToFirstTrack()
 void MidiClip::init()
 {
 	connect(Engine::getSong(), &Song::timeSignatureChanged, this, &MidiClip::changeTimeSignature);
+	connect(this, &Model::dataChanged, this, &MidiClip::contentChange);
 	if (getTrack()->trackContainer() != Engine::patternStore())
 	{
 		saveJournallingState(false);
@@ -137,7 +139,7 @@ void MidiClip::updateLength()
 		}
 		tick_t max_length = TimePos::ticksPerBar();
 
-		for (const auto& note : m_notes)
+		for (const auto& note : content()->m_notes)
 		{
 			if (note->length() > 0)
 			{
@@ -158,7 +160,7 @@ TimePos MidiClip::beatClipLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for (const auto& note : m_notes)
+	for (const auto& note : content()->m_notes)
 	{
 		if (note->type() == Note::Type::Step)
 		{
@@ -166,9 +168,9 @@ TimePos MidiClip::beatClipLength() const
 		}
 	}
 
-	if (m_steps != TimePos::stepsPerBar())
+	if (content()->m_steps != TimePos::stepsPerBar())
 	{
-		max_length = m_steps * TimePos::ticksPerBar() / TimePos::stepsPerBar();
+		max_length = content()->m_steps * TimePos::ticksPerBar() / TimePos::stepsPerBar();
 	}
 
 	return TimePos{max_length}.nextFullBar() * TimePos::ticksPerBar();
@@ -186,7 +188,7 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 	}
 
 	instrumentTrack()->lock();
-	m_notes.insert(std::upper_bound(m_notes.begin(), m_notes.end(), new_note, Note::lessThan), new_note);
+	content()->m_notes.insert(std::upper_bound(content()->m_notes.begin(), content()->m_notes.end(), new_note, Note::lessThan), new_note);
 	instrumentTrack()->unlock();
 
 	checkType();
@@ -204,7 +206,7 @@ NoteVector::const_iterator MidiClip::removeNote(NoteVector::const_iterator it)
 {
 	instrumentTrack()->lock();
 	delete *it;
-	auto new_it = m_notes.erase(it);
+	auto new_it = content()->m_notes.erase(it);
 	instrumentTrack()->unlock();
 
 	checkType();
@@ -218,11 +220,11 @@ NoteVector::const_iterator MidiClip::removeNote(Note* note)
 {
 	instrumentTrack()->lock();
 
-	auto it = std::find(m_notes.begin(), m_notes.end(), note);
-	if (it != m_notes.end())
+	auto it = std::find(content()->m_notes.begin(), content()->m_notes.end(), note);
+	if (it != content()->m_notes.end())
 	{
 		delete *it;
-		it = m_notes.erase(it);
+		it = content()->m_notes.erase(it);
 	}
 
 	instrumentTrack()->unlock();
@@ -238,7 +240,7 @@ NoteVector::const_iterator MidiClip::removeNote(Note* note)
 // Returns a pointer to the note at specified step, or nullptr if note doesn't exist
 Note * MidiClip::noteAtStep(int step)
 {
-	for (const auto& note : m_notes)
+	for (const auto& note : content()->m_notes)
 	{
 		if (note->pos() == TimePos::stepPosition(step)
 			&& note->type() == Note::Type::Step)
@@ -254,7 +256,7 @@ Note * MidiClip::noteAtStep(int step)
 void MidiClip::rearrangeAllNotes()
 {
 	// sort notes by start time
-	std::sort(m_notes.begin(), m_notes.end(), Note::lessThan);
+	std::sort(content()->m_notes.begin(), content()->m_notes.end(), Note::lessThan);
 }
 
 
@@ -262,11 +264,11 @@ void MidiClip::rearrangeAllNotes()
 void MidiClip::clearNotes()
 {
 	instrumentTrack()->lock();
-	for (const auto& note : m_notes)
+	for (const auto& note : content()->m_notes)
 	{
 		delete note;
 	}
-	m_notes.clear();
+	content()->m_notes.clear();
 	instrumentTrack()->unlock();
 
 	checkType();
@@ -418,7 +420,8 @@ void MidiClip::setType( Type _new_clip_type )
 void MidiClip::checkType()
 {
 	// If all notes are StepNotes, we have a BeatClip
-	const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
+	const auto beatClip = std::all_of(content()->m_notes.begin(), content()->m_notes.end(),
+									[](auto note) { return note->type() == Note::Type::Step; });
 
 	setType(beatClip ? Type::BeatClip : Type::MelodyClip);
 }
@@ -448,11 +451,17 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 		midiClipElement.setAttribute("pos", startPosition());
 	}
 	midiClipElement.setAttribute("muted", isMuted());
-	midiClipElement.setAttribute("steps", m_steps);
+	midiClipElement.setAttribute("steps", content()->m_steps);
 	midiClipElement.setAttribute("len", length());
 
+	if (m_serializeLink && content() && !content()->linkName().isEmpty())
+	{
+		midiClipElement.setAttribute("linkName", content()->linkName());
+	}
+	m_serializeLink = true;
+
 	// now save settings of all notes
-	for (auto& note : m_notes)
+	for (auto& note : content()->m_notes)
 	{
 		if (!onlySelectedNotes || note->selected())
 		{
@@ -500,15 +509,35 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		{
 			auto n = new Note;
 			n->restoreState( node.toElement() );
-			m_notes.push_back( n );
+			content()->m_notes.push_back( n );
 		}
 		node = node.nextSibling();
         }
 
-	m_steps = _this.attribute( "steps" ).toInt();
-	if( m_steps == 0 )
+	if (QString link = _this.attribute("linkName"); !link.isEmpty())
 	{
-		m_steps = TimePos::stepsPerBar();
+		// We attempt to fetch the shared reference of our content
+		auto content = SharedContentRepository::get(link);
+
+		if (content == nullptr)
+		{
+			// We try to submit our content, if that fails, we forget the link
+			m_content->setLinkName(
+				SharedContentRepository::submit(std::weak_ptr<ClipContent>(m_content), link)
+			);
+		}
+		else if (content->type() != ClipContent::Midi)
+		{
+			// This content is not compatible with us (this should not happen \(°-°)/)
+			m_content->setLinkName("");
+		}
+		else {replaceContent(std::dynamic_pointer_cast<ClipContent>(content));}
+	}
+
+	content()->m_steps = _this.attribute( "steps" ).toInt();
+	if( content()->m_steps == 0 )
+	{
+		content()->m_steps = TimePos::stepsPerBar();
 	}
 
 	checkType();
@@ -571,15 +600,15 @@ void MidiClip::clear()
 
 void MidiClip::addSteps()
 {
-	m_steps += TimePos::stepsPerBar();
+	content()->m_steps += TimePos::stepsPerBar();
 	updateLength();
 	emit dataChanged();
 }
 
 void MidiClip::cloneSteps()
 {
-	int oldLength = m_steps;
-	m_steps *= 2; // cloning doubles the track
+	int oldLength = content()->m_steps;
+	content()->m_steps *= 2; // cloning doubles the track
 	for(int i = 0; i < oldLength; ++i )
 	{
 		Note *toCopy = noteAtStep( i );
@@ -603,13 +632,13 @@ void MidiClip::cloneSteps()
 void MidiClip::removeSteps()
 {
 	int n = TimePos::stepsPerBar();
-	if( n < m_steps )
+	if( n < content()->m_steps )
 	{
-		for( int i = m_steps - n; i < m_steps; ++i )
+		for( int i = content()->m_steps - n; i < content()->m_steps; ++i )
 		{
 			setStep( i, false );
 		}
-		m_steps -= n;
+		content()->m_steps -= n;
 		updateLength();
 		emit dataChanged();
 	}
@@ -646,7 +675,7 @@ void MidiClip::updatePatternTrack()
 
 bool MidiClip::empty()
 {
-	for (const auto& note : m_notes)
+	for (const auto& note : content()->m_notes)
 	{
 		if (note->length() != 0)
 		{
@@ -662,7 +691,7 @@ bool MidiClip::empty()
 void MidiClip::changeTimeSignature()
 {
 	TimePos last_pos = TimePos::ticksPerBar() - 1;
-	for (const auto& note : m_notes)
+	for (const auto& note : content()->m_notes)
 	{
 		if (note->length() < 0 && note->pos() > last_pos)
 		{
@@ -670,10 +699,39 @@ void MidiClip::changeTimeSignature()
 		}
 	}
 	last_pos = last_pos.nextFullBar() * TimePos::ticksPerBar();
-	m_steps = std::max<tick_t>(TimePos::stepsPerBar(),
+	content()->m_steps = std::max<tick_t>(TimePos::stepsPerBar(),
 				last_pos.getBar() * TimePos::stepsPerBar());
 	updateLength();
 }
 
+
+void MidiClip::breakContentLink()
+{
+	auto newContent = std::make_shared<MidiClipContent>(content()->m_steps);
+
+	for (const auto& note : content()->m_notes)
+	{
+		newContent.get()->m_notes.push_back(note->clone());
+	}
+	replaceContent(newContent);
+	emit contentChanged();
+}
+
+
+
+MidiClip::MidiClipContent::MidiClipContent(int steps)
+{
+	m_steps = steps;
+	m_type = Midi;
+}
+
+MidiClip::MidiClipContent::~MidiClipContent()
+{
+	for (const auto& note : m_notes)
+	{
+		delete note;
+	}
+	m_notes.clear();
+}
 
 } // namespace lmms
