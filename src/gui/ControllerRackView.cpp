@@ -65,7 +65,7 @@ ControllerRackView::ControllerRackView()
 	auto scrollAreaWidget = new QWidget(m_scrollArea);
 	m_scrollAreaLayout = new QVBoxLayout( scrollAreaWidget );
 	m_scrollAreaLayout->addStretch();
-	m_scrollAreaLayout->setMargin(0);
+	m_scrollAreaLayout->setContentsMargins(0, 0, 0, 0);
 	m_scrollAreaLayout->setSpacing(0);
 	scrollAreaWidget->setLayout( m_scrollAreaLayout );
 
@@ -85,7 +85,7 @@ ControllerRackView::ControllerRackView()
 	auto layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	this->setLayout( layout );
 
 	setFixedWidth(254);
