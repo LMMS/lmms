@@ -247,7 +247,6 @@ QString PeakController::nodeName() const
 
 
 
-
 gui::ControllerDialog * PeakController::createDialog( QWidget * _parent )
 {
 	return new gui::PeakControllerDialog( this, _parent );

@@ -41,6 +41,7 @@ class LedCheckBox;
 
 class PeakControllerEffectControlDialog : public EffectControlDialog
 {
+	Q_OBJECT
 public:
 	PeakControllerEffectControlDialog(
 				PeakControllerEffectControls * _controls );

@@ -1477,7 +1477,7 @@ void Song::removeController( Controller * controller )
 
 
 
-void Song::moveControllerUp(Controller *c)
+void Song::moveControllerUp(Controller* c)
 {
 	if (c != m_controllers.front())
 	{

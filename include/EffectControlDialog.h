@@ -61,7 +61,7 @@ private:
 	SubWindow * m_subWindow;
 
 } ;
-};// namespace gui
+} // namespace gui
 
 } // namespace lmms
 

@@ -64,38 +64,38 @@ public:
 
 public slots:
 	void removeController();
+	void renameController();
 	void moveUp();
 	void moveDown();
 	void collapseController(bool collapse);
 	void toggleCollapseController();
-	void renameController();
 
 
 signals:
-	void removedController(ControllerView * view);
+	void movedUp(ControllerView* view);
+	void movedDown(ControllerView* view);
+	void removedController(ControllerView* view);
 	void controllerCollapsed();
 	void collapseAll();
 	void expandAll();
-	void movedUp(ControllerView * view);
-	void movedDown(ControllerView * view);
 
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
 	void modelChanged() override;
 	void mouseDoubleClickEvent( QMouseEvent * event ) override;
-	void paintEvent(QPaintEvent *) override;
-	void dragEnterEvent(QDragEnterEvent * dee) override;
-	void dropEvent(QDropEvent * de) override;
+	void paintEvent(QPaintEvent*) override;
+	void dragEnterEvent(QDragEnterEvent* dee) override;
+	void dropEvent(QDropEvent* de) override;
 
 
 private:
 	ControllerDialog * m_controllerDlg;
 	const int m_titleBarHeight;
-	QLabel * controllerTypeLabel;
-	QLabel * m_nameLabel;
-	QPushButton * m_collapseButton;
-	Controller * m_modelC;
+	QLabel* controllerTypeLabel;
+	QLabel* m_nameLabel;
+	QPushButton* m_collapseButton;
+	Controller* m_modelC;
 };
 
 } // namespace lmms::gui

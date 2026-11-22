@@ -27,11 +27,6 @@
 #include <QLayout>
 #include <QMouseEvent>
 #include <QPushButton>
-#include <QLabel>
-#include <QLayout>
-#include <QPushButton>
-#include <QMdiArea>
-#include <QMdiSubWindow>
 
 #include <QPainter>
 
@@ -98,6 +93,13 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			m_controlView->showDialog();
 		}
 	}
+
+	m_opacityEffect = new QGraphicsOpacityEffect(this);
+	m_opacityEffect->setOpacity(1);
+	setGraphicsEffect(m_opacityEffect);
+
+	//move above vst effect view creation
+	//setModel( _model );
 }
 
 

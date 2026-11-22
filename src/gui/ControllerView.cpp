@@ -24,40 +24,40 @@
  *
  */
 
-#include "ControllerView.h"
 
-#include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPushButton>
+#include <QInputDialog>
+
+#include "ControllerView.h"
 
 #include "CaptionMenu.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
+#include "embed.h"
 #include "ControllerRackView.h"
-#include "Engine.h"
 #include "GuiApplication.h"
 #include "LmmsStyle.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
-#include "Song.h"
 #include "StringPairDrag.h"
-#include "embed.h"
 
 namespace lmms::gui
 {
 
-ControllerView::ControllerView(Controller* controller, QWidget * parent) :
-	QFrame(parent),
-	ModelView(controller, this),
-	m_controllerDlg(nullptr),
-	m_titleBarHeight(24),
-	m_modelC(controller)
+
+ControllerView::ControllerView(Controller* model, QWidget* parent)
+	: QFrame{parent}
+	, ModelView{model, this}
+	, m_controllerDlg{nullptr}
+    , m_titleBarHeight(24)
+    , m_modelC(model)
 {
 	const QSize buttonsize(17, 17);
-	setFrameStyle(QFrame::Plain);
-	setFrameShadow(QFrame::Plain);
+	setFrameStyle(QFrame::StyledPanel);
+	setFrameShadow(QFrame::Raised);
 	setFocusPolicy(Qt::StrongFocus);
 	setLineWidth(0);
 	setContentsMargins(0, 0, 0, 0);
@@ -72,8 +72,7 @@ ControllerView::ControllerView(Controller* controller, QWidget * parent) :
 	controllerTypeLabel->move(3, 3);
 	controllerTypeLabel->show();
 
-	//TODO: This looks quite janky because of setReadOnly. Consider restoring the old right click->rename workflow
-	m_nameLabel = new QLabel(controller->name(), this);
+	m_nameLabel = new QLabel(model->name(), this);
 	m_nameLabel->move(controllerTypeLabel->sizeHint().width() + 3, 3);
 
 	setFixedWidth(m_controllerDlg->width() + 2);
@@ -90,7 +89,7 @@ ControllerView::ControllerView(Controller* controller, QWidget * parent) :
 	connect(m_collapseButton, SIGNAL(clicked()), this, SLOT(toggleCollapseController()));
 
 	setAcceptDrops(true);
-	setModel(controller);
+	setModel(model);
 }
 
 
@@ -143,7 +142,7 @@ void ControllerView::toggleCollapseController()
 void ControllerView::renameController()
 {
 	bool ok;
-	Controller * c = castModel<Controller>();
+	auto c = castModel<Controller>();
 	QString new_name = QInputDialog::getText( this,
 			tr( "Rename controller" ),
 			tr( "Enter the new name for this controller" ),
@@ -156,7 +155,7 @@ void ControllerView::renameController()
 }
 
 
-void ControllerView::mouseDoubleClickEvent(QMouseEvent * me)
+void ControllerView::mouseDoubleClickEvent(QMouseEvent* me)
 {
 	if (me->y() <= m_titleBarHeight)
 	{
@@ -167,7 +166,7 @@ void ControllerView::mouseDoubleClickEvent(QMouseEvent * me)
 
 
 
-void ControllerView::dragEnterEvent(QDragEnterEvent *dee)
+void ControllerView::dragEnterEvent(QDragEnterEvent* dee)
 {
 	StringPairDrag::processDragEnterEvent(dee, "automatable_model" );
 }
@@ -175,13 +174,13 @@ void ControllerView::dragEnterEvent(QDragEnterEvent *dee)
 
 
 
-void ControllerView::dropEvent(QDropEvent * de)
+void ControllerView::dropEvent(QDropEvent* de)
 {
 	QString type = StringPairDrag::decodeKey(de);
 	QString val = StringPairDrag::decodeValue(de);
 	if (type == "automatable_model")
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(Engine::projectJournal()->journallingObject(val.toInt()));
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
 		{
 			if (m_modelC->hasModel(mod))
@@ -196,7 +195,7 @@ void ControllerView::dropEvent(QDropEvent * de)
 				}
 				else
 				{
-					ControllerConnection * cc = new ControllerConnection(getController());
+					ControllerConnection* cc = new ControllerConnection(getController());
 					mod->setControllerConnection(cc);
 				}
 			}
@@ -213,6 +212,33 @@ void ControllerView::modelChanged()
 
 
 
+void ControllerView::contextMenuEvent( QContextMenuEvent * )
+{
+	Controller* c = castModel<Controller>();
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu(c->name(), this);
+	auto moveUpAction = contextMenu->addAction(embed::getIconPixmap("arp_up"), tr("Move &up"), this, &ControllerView::moveUp);
+	moveUpAction->setDisabled(getGUI()->getControllerRackView()->controllerViews().first() == this);
+
+	auto moveDownAction = contextMenu->addAction(embed::getIconPixmap("arp_down"), tr("Move &down"), this, &ControllerView::moveDown);
+	moveDownAction->setDisabled(getGUI()->getControllerRackView()->controllerViews().last() == this);
+
+	contextMenu->addSeparator();
+	contextMenu->addAction(
+		embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, &ControllerView::removeController);
+	contextMenu->addAction( tr("Re&name this controller"), this, SLOT(renameController()));
+
+	contextMenu->addSeparator();
+	auto collapseAction = contextMenu->addAction(embed::getIconPixmap("arrow-left"), tr("&Collapse all controllers"), this, SIGNAL(collapseAll()));
+	collapseAction->setDisabled(getGUI()->getControllerRackView()->allCollapsed());
+
+	auto expandAction = contextMenu->addAction(embed::getIconPixmap("arrow-down"), tr("&Expand all controllers"), this, SIGNAL(expandAll()));
+	expandAction->setDisabled(getGUI()->getControllerRackView()->allExpanded());
+
+	contextMenu->addSeparator();
+	contextMenu->exec( QCursor::pos() );
+	delete contextMenu;
+}
+
 
 void ControllerView::paintEvent(QPaintEvent*)
 {
@@ -220,37 +246,5 @@ void ControllerView::paintEvent(QPaintEvent*)
 	QRect rect(1, 1, width() - 2, m_titleBarHeight);
 	p.fillRect(rect, p.background());
 }
-
-
-
-
-void ControllerView::contextMenuEvent(QContextMenuEvent *)
-{
-	Controller* c = castModel<Controller>();
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu(c->name(), this);
-
-	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, SLOT(removeController()));
-	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
-
-	auto collapseAction = contextMenu->addAction(embed::getIconPixmap("arrow-left"), tr("&Collapse all controllers"), this, SIGNAL(collapseAll()));
-	collapseAction->setDisabled(getGUI()->getControllerRackView()->allCollapsed());
-
-	auto expandAction = contextMenu->addAction(embed::getIconPixmap("arrow-down"), tr("&Expand all controllers"),
-												this, SIGNAL(expandAll()));
-	expandAction->setDisabled(getGUI()->getControllerRackView()->allExpanded());
-
-	auto moveUpAction = contextMenu->addAction(embed::getIconPixmap("arrow-up"), tr("Move &up"), this, SLOT(moveUp()));
-	moveUpAction->setDisabled(getGUI()->getControllerRackView()->controllerViews().first() == this);
-
-	auto moveDownAction = contextMenu->addAction(embed::getIconPixmap("arrow-down"), tr("Move &down"), this, SLOT(moveDown()));
-	moveDownAction->setDisabled(getGUI()->getControllerRackView()->controllerViews().last() == this);
-
-	contextMenu->addSeparator();
-
-	contextMenu->exec(QCursor::pos());
-
-	delete contextMenu;
-}
-
 
 } // namespace lmms::gui

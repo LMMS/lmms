@@ -40,18 +40,18 @@ namespace lmms::gui
 PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
 	ControllerDialog( _model, _parent )
 {
-	auto peakController = dynamic_cast<PeakController*>( _model );
+	auto peakController = dynamic_cast<PeakController*>(_model);
 	if (peakController != nullptr)
 	{
-		EffectControlDialog * dlg = peakController->getEffectControlDialog();
-		setWindowTitle( tr( "PEAK" ) );
-		setWindowIcon( embed::getIconPixmap( "controller" ) );
+		EffectControlDialog* dlg = peakController->getEffectControlDialog();
+		setWindowTitle(tr("PEAK"));
+		setWindowIcon(embed::getIconPixmap("controller"));
 
-		setFixedSize( dlg->size() );
-		dlg->setParent( this );
+		setFixedSize(dlg->size());
+		dlg->setParent(this);
 		dlg->show();
 
-		setModel( _model );
+		setModel(_model);
 	}
 }
 

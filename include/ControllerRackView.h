@@ -67,7 +67,7 @@ public:
 	bool allCollapsed() const;
 
 public slots:
-	void deleteController(ControllerView * view);
+	void deleteController(ControllerView * _view);
 	void addController(Controller* controller);
 	void removeController(Controller* controller);
 	void collapsingAll();
@@ -77,9 +77,9 @@ public slots:
 	const QVector<ControllerView *> controllerViews() const;
 
 private slots:
-	void addLfoController();
-	void moveUp(ControllerView * cv);
-	void moveDown(ControllerView * cv);
+	void addController();
+	void moveUp(ControllerView * view);
+	void moveDown(ControllerView * view);
 
 private:
 	QVector<ControllerView *> m_controllerViews;

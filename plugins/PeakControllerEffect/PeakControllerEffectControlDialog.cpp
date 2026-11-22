@@ -47,9 +47,9 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), QBrush( embed::getIconPixmap( "peak_controller_artwork" ) ) );
+	pal.setBrush(backgroundRole(), QBrush(embed::getIconPixmap("peak_controller_artwork")));
 	setPalette( pal );
-	setFixedSize( 240, 80 );
+	setFixedSize(240, 80);
 
 	m_baseKnob = new Knob(KnobType::Bright26, tr("BASE"), this);
 	m_baseKnob->setModel( &_controls->m_baseModel );
@@ -109,8 +109,6 @@ void PeakControllerEffectControlDialog::showDialog()
 	getGUI()->getControllerRackView()->show();
 	getGUI()->getControllerRackView()->subWin()->hide();
 }
-
-
 
 
 void PeakControllerEffectControlDialog::toggleView()

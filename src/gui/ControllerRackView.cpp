@@ -37,9 +37,6 @@
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include <QMdiSubWindow>
-#include <QPushButton>
-#include <QScrollArea>
-#include <QVBoxLayout>
 
 #include "GuiApplication.h"
 #include "LfoController.h"
@@ -51,9 +48,9 @@ namespace lmms::gui
 {
 
 
-ControllerRackView::ControllerRackView() :
-	QWidget(),
-	m_collapsingStateOnLoad()
+ControllerRackView::ControllerRackView()
+	: QWidget{}
+	, m_collapsingStateOnLoad()
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
@@ -75,22 +72,24 @@ ControllerRackView::ControllerRackView() :
 	m_scrollArea->setWidget( scrollAreaWidget );
 	m_scrollArea->setWidgetResizable( true );
 
-
 	m_addButton = new QPushButton(m_subWin);
-	m_addButton->setText(tr("Add LFO"));
-	connect(m_addButton, SIGNAL(clicked()), this, SLOT(addLfoController()));
+	m_addButton->setText( tr( "Add" ) );
+
+	connect( m_addButton, SIGNAL(clicked()),
+			this, SLOT(addController()));
+
 	Song * song = Engine::getSong();
 	connect(song, &Song::controllerAdded, this, qOverload<Controller*>(&ControllerRackView::addController));
 	connect(song, &Song::controllerRemoved, this, &ControllerRackView::removeController);
 
 	auto layout = new QVBoxLayout();
-	layout->addWidget(m_scrollArea);
-	layout->addWidget(m_addButton);
+	layout->addWidget( m_scrollArea );
+	layout->addWidget( m_addButton );
 	layout->setMargin(0);
-	setLayout(layout);
+	this->setLayout( layout );
 
-	resize(254, 400);
 	setFixedWidth(254);
+	resize(254, 400);
 	setMinimumHeight(200);
 
 	Qt::WindowFlags flags = m_subWin->windowFlags();
@@ -132,59 +131,78 @@ void ControllerRackView::loadSettings(const QDomElement & _this)
 
 
 
-void ControllerRackView::deleteController(ControllerView * view)
+void ControllerRackView::deleteController( ControllerView * _view )
 {
-	Controller * c = view->getController();
+	Controller * c = _view->getController();
 
-	if (c->connectionCount() > 0)
+	if( c->connectionCount() > 0 )
 	{
 		QMessageBox msgBox;
-		msgBox.setIcon(QMessageBox::Question);
-		msgBox.setWindowTitle(tr("Confirm Delete"));
-		msgBox.setText(tr("Confirm delete? There are existing connection(s) "
-				"associated with this controller. There is no way to undo."));
+		msgBox.setIcon( QMessageBox::Question );
+		msgBox.setWindowTitle( tr("Confirm Delete") );
+		msgBox.setText( tr("Confirm delete? There are existing connection(s) "
+				"associated with this controller. There is no way to undo.") );
 		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-		if (msgBox.exec() != QMessageBox::Ok)
+		if( msgBox.exec() != QMessageBox::Ok )
 		{
 			return;
 		}
 	}
 
-	Engine::getSong()->removeController(c);
+	Song * song = Engine::getSong();
+	song->removeController( c );
 }
 
-void ControllerRackView::collapsingAll()
+void ControllerRackView::moveUp(ControllerView* view)
 {
-	for (auto &it : m_controllerViews)
+	if (view != m_controllerViews.first())
 	{
-		it->collapseController(true);
+		int index = m_controllerViews.indexOf(view);
+		m_scrollAreaLayout->removeWidget(view);
+		m_scrollAreaLayout->insertWidget(index - 1, view);
+		m_controllerViews.remove(index);
+		m_controllerViews.insert(index - 1, view);
+		Engine::getSong()->moveControllerUp(view->getController());
 	}
 }
 
 
 
 
-void ControllerRackView::expandAll()
+void ControllerRackView::moveDown(ControllerView* view)
 {
-	for (auto &it : m_controllerViews)
+	if (view != m_controllerViews.last())
 	{
-		it->collapseController(false);
+		int index = m_controllerViews.indexOf(view);
+		moveUp(m_controllerViews.at(index + 1));
 	}
 }
 
-
-
-
-void ControllerRackView::addController(Controller * controller)
+void ControllerRackView::addController(Controller* controller)
 {
-	ControllerView * controllerView = new ControllerView(controller, m_scrollArea->widget());
-	connect(controllerView, &ControllerView::removedController, this, &ControllerRackView::deleteController, Qt::QueuedConnection);
+	QWidget * scrollAreaWidget = m_scrollArea->widget();
+
+	auto controllerView = new ControllerView(controller, scrollAreaWidget);
 	connect(controllerView, &ControllerView::controllerCollapsed, this, &ControllerRackView::onControllerCollapsed);
 	connect(controllerView, &ControllerView::collapseAll, this, &ControllerRackView::collapsingAll);
 	connect(controllerView, &ControllerView::expandAll, this, &ControllerRackView::expandAll);
 	connect(controllerView, &ControllerView::movedUp, this, &ControllerRackView::moveUp);
 	connect(controllerView, &ControllerView::movedDown, this, &ControllerRackView::moveDown);
-	m_controllerViews.append(controllerView);
+	connect(controllerView, &ControllerView::removedController, this, &ControllerRackView::deleteController, Qt::QueuedConnection);
+
+	auto moveUpAction = new QAction(controllerView);
+	moveUpAction->setShortcut(keySequence(Qt::Key_Up, Qt::AltModifier));
+	moveUpAction->setShortcutContext(Qt::WidgetShortcut);
+	connect(moveUpAction, &QAction::triggered, controllerView, &ControllerView::moveUp);
+	controllerView->addAction(moveUpAction);
+
+	auto moveDownAction = new QAction(controllerView);
+	moveDownAction->setShortcut(keySequence(Qt::Key_Down, Qt::AltModifier));
+	moveDownAction->setShortcutContext(Qt::WidgetShortcut);
+	connect(moveDownAction, &QAction::triggered, controllerView, &ControllerView::moveDown);
+	controllerView->addAction(moveDownAction);
+
+	m_controllerViews.append( controllerView );
 	int n = m_scrollAreaLayout->count() - 1;
 	m_scrollAreaLayout->insertWidget(n, controllerView);
 
@@ -199,10 +217,7 @@ void ControllerRackView::addController(Controller * controller)
 	update();
 }
 
-
-
-
-void ControllerRackView::removeController(Controller * removedController)
+void ControllerRackView::removeController(Controller* removedController)
 {
 	for (auto &it : m_controllerViews)
 	{
@@ -222,49 +237,40 @@ void ControllerRackView::removeController(Controller * removedController)
 
 
 
-void ControllerRackView::onControllerCollapsed()
+void ControllerRackView::addController()
 {
-	update();
-}
+	// TODO: Eventually let the user pick from available controller types
 
+	Engine::getSong()->addController( new LfoController( Engine::getSong() ) );
 
-
-
-void ControllerRackView::addLfoController()
-{
-	Engine::getSong()->addController(new LfoController(Engine::getSong()));
+	// fix bug which always made ControllerRackView loose focus when adding
+	// new controller
 	setFocus();
 }
 
 
-
-
-void ControllerRackView::moveUp(ControllerView *cv)
+void ControllerRackView::collapsingAll()
 {
-	if (cv != m_controllerViews.first())
+	for (auto &it : m_controllerViews)
 	{
-		int index = m_controllerViews.indexOf(cv);
-		m_scrollAreaLayout->removeWidget(cv);
-		m_scrollAreaLayout->insertWidget(index - 1, cv);
-		m_controllerViews.remove(index);
-		m_controllerViews.insert(index - 1, cv);
-		Engine::getSong()->moveControllerUp(cv->getController());
+		it->collapseController(true);
+	}
+}
+
+void ControllerRackView::expandAll()
+{
+	for (auto &it : m_controllerViews)
+	{
+		it->collapseController(false);
 	}
 }
 
 
 
-
-void ControllerRackView::moveDown(ControllerView *cv)
+void ControllerRackView::onControllerCollapsed()
 {
-	if (cv != m_controllerViews.last())
-	{
-		int index = m_controllerViews.indexOf(cv);
-		moveUp(m_controllerViews.at(index + 1));
-	}
+	update();
 }
-
-
 
 
 const QVector<ControllerView *> ControllerRackView::controllerViews() const

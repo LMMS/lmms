@@ -37,11 +37,11 @@
 namespace lmms::gui
 {
 
-EffectControlDialog::EffectControlDialog( EffectControls * controls ) :
-	QWidget{nullptr},
-	ModelView( controls, this ),
-	m_effectControls( controls ),
-	m_subWindow(nullptr)
+EffectControlDialog::EffectControlDialog(EffectControls* controls)
+	: QWidget{nullptr}
+	, ModelView{controls, this}
+	, m_effectControls{controls}
+	, m_subWindow{nullptr}
 {
 	setWindowTitle(m_effectControls->effect()->displayName());
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -90,7 +90,7 @@ void EffectControlDialog::toggleView()
 		}
 }
 
-void EffectControlDialog::closeEvent( QCloseEvent * _ce )
+void EffectControlDialog::closeEvent(QCloseEvent* _ce)
 {
 	m_subWindow->hide();
 	_ce->ignore();
