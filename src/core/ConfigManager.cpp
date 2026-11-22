@@ -217,8 +217,8 @@ QStringList ConfigManager::availableVstEmbedMethods()
 QString ConfigManager::vstEmbedMethod() const
 {
 	QStringList methods = availableVstEmbedMethods();
-	QString defaultMethod = *(methods.end() - 1);
-	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
+	QString defaultMethod = "none";
+	QString currentMethod = value("ui", "vstembedmethod", defaultMethod);
 	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
 }
 

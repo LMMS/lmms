@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Install packages
@@ -27,7 +27,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends --no-install-suggests graphviz
       - name: Install doxygen
-        uses: ssciwr/doxygen-install@v2
+        uses: ssciwr/doxygen-install@fa3e94d34131d3990b6b8ba939ab982964aa3758
         with:
           version: "1.18.0"
       - name: Configure
@@ -38,10 +38,10 @@ jobs:
       - name: Setup Pages
         id: setup_pages
         continue-on-error: true
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Upload generated website
         if: ${{ steps.setup_pages.outcome == 'success' }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: 'build/doc/html'
       - name: Deploy to GitHub Pages

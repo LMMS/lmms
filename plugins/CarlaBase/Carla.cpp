@@ -878,9 +878,6 @@ CarlaParamsView::~CarlaParamsView()
 	// Close and delete m_paramsSubWindow
 	if (m_carlaInstrumentView->m_paramsSubWindow)
 	{
-		m_carlaInstrumentView->m_paramsSubWindow->setAttribute(Qt::WA_DeleteOnClose);
-		m_carlaInstrumentView->m_paramsSubWindow->close();
-
 		delete m_carlaInstrumentView->m_paramsSubWindow;
 		m_carlaInstrumentView->m_paramsSubWindow = nullptr;
 	}

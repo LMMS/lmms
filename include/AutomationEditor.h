@@ -33,11 +33,10 @@
 #include "ComboBoxModel.h"
 #include "Editor.h"
 #include "JournallingObject.h"
+#include "LmmsTypes.h"
 #include "MidiClip.h"
 #include "SampleClip.h"
 #include "TimePos.h"
-#include "LmmsTypes.h"
-#include "SampleThumbnail.h"
 
 class QPushButton;
 class QScrollBar;
@@ -300,8 +299,7 @@ private:
 	QColor m_detuningNoteColor;
 	QColor m_ghostSampleColor;
 	QColor m_outOfBoundsShade;
-	
-	SampleThumbnail m_sampleThumbnail;
+
 
 	friend class AutomationEditorWindow;
 
