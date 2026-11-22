@@ -110,7 +110,7 @@ void AudioFileFlac::writeBuffer(const SampleFrame* _ab, f_cnt_t const frames)
 	else // integer PCM encoding
 	{
 		auto buf = std::vector<int_sample_t>(frames * channels());
-		convertToS16(_ab, frames, buf.data(), !isLittleEndian());
+		convertToS16(_ab, frames, buf.data(), isBigEndian());
 		sf_writef_short(m_sf, static_cast<short*>(buf.data()), frames);
 	}
 

@@ -64,11 +64,6 @@ Keymap::Keymap(
 }
 
 
-/**
- * \brief Return scale degree for a given key, based on current map and first/middle/last notes
- * \param MIDI key to be mapped
- * \return Scale degree defined by the mapping on success, -1 if key isn't mapped
- */
 int Keymap::getDegree(int key) const
 {
 	if (key < m_firstKey || key > m_lastKey) {return -1;}
@@ -81,11 +76,6 @@ int Keymap::getDegree(int key) const
 }
 
 
-/**
- * \brief Return octave offset for a given key, based on current map and the middle note
- * \param MIDI key to be mapped
- * \return Octave offset defined by the mapping on success, 0 if key isn't mapped
- */
 int Keymap::getOctave(int key) const
 {
 	// The keymap wraparound cannot cause an octave transition if a key isn't mapped or the map is empty → return 0
