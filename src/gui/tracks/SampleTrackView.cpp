@@ -93,7 +93,6 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(3);
 	layout->addWidget(m_tlb);
-	//layout->addStretch();
 	layout->addWidget(m_mixerChannelNumber);
 	layout->addWidget(m_activityIndicator);
 	layout->addWidget(m_volumeKnob);
