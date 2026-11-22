@@ -47,7 +47,7 @@ class SfzPlayer : public Instrument
 	Q_OBJECT
 
 public:
-	SfzPlayer(InstrumentTrack* instrumentTrack);
+	explicit SfzPlayer(InstrumentTrack* instrumentTrack);
 	~SfzPlayer();
 
 	void playNote(NotePlayHandle* handle, SampleFrame* workingBuffer) override;
