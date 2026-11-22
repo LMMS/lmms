@@ -56,9 +56,6 @@ protected:
 	void dragEnterEvent(QDragEnterEvent* dee) override;
 	void dropEvent(QDropEvent* de) override;
 
-	void paintEvent(QPaintEvent* pe) override;
-	void resizeEvent(QResizeEvent* event) override;
-
 private:
 	bool isResizable() const override { return true; }
 

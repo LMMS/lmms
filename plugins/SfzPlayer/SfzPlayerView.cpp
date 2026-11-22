@@ -225,15 +225,5 @@ void SfzPlayerView::dropEvent(QDropEvent* de)
 	de->ignore();
 }
 
-void SfzPlayerView::resizeEvent(QResizeEvent* re)
-{
-}
-
-void SfzPlayerView::paintEvent(QPaintEvent* pe)
-{
-	//QPainter brush(this);
-	//brush.fillRect(rect(), QColor(19, 19, 20));
-}
-
 } // namespace gui
 } // namespace lmms
