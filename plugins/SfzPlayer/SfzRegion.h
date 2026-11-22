@@ -41,7 +41,7 @@ namespace lmms
 class SfzRegion : public SfzOpcodeState
 {
 public:
-	SfzRegion(SfzOpcodeState opcodeState);
+	explicit SfzRegion(SfzOpcodeState opcodeState);
 	SfzRegion(const SfzRegion& other); // A custom copy constructor is needed because atomic member variables have no default copy/move constructor
 
 	//! Returns true if the trigger event matches all of the requirements defined by the opcodes of this region
