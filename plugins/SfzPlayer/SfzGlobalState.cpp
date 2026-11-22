@@ -63,9 +63,10 @@ std::optional<int> SfzGlobalState::lastSwitchKeyPressedInRange(int lowKey, int h
 	// The range might only include some of the switch keys
 	// If the last played switch key happens to fall in the range, that's awesome!
 	if (m_lastPlayedSwitchKey >= lowKey && m_lastPlayedSwitchKey <= highKey) { return m_lastPlayedSwitchKey; }
+
 	// Otherwise, we need to loop over the list of when each switch key was played and figure out which one was last played
-	std::optional<int> lastPlayedKey = std::nullopt;
-	std::optional<int> bestScore = std::nullopt;
+	std::optional<int> lastPlayedKey;
+	std::optional<int> bestScore;
 	for (const auto& [key, counter] : m_lastPlayedSwitchKeys)
 	{
 		if (counter == std::nullopt) { continue; } // This key has not been played yet
