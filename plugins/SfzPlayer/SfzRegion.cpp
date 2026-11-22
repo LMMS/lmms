@@ -70,8 +70,8 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 	// Assuming the trigger has key/vel info (i.e., it's a noteOn/noteOff, not a midi CC event), make sure all the key/vel selectors match
 	if (trigger.type() == SfzTrigger::Type::NoteOn || trigger.type() == SfzTrigger::Type::NoteOff)
 	{
-		const int triggerKey = trigger.key().value();
-		const int triggerVelocity = trigger.velocity().value();
+		const int triggerKey = trigger.key();
+		const int triggerVelocity = trigger.velocity();
 
 		// Ensure the key was pressed between the `lokey` and `hikey` opcodes
 		// TODO this can be removed now that SfzRegionManager handles lookup tables for regions by key

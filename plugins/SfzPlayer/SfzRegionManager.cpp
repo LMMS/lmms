@@ -71,11 +71,13 @@ const std::vector<SfzRegion*>& SfzRegionManager::findPotentialMatchingRegions(co
 	switch (trigger.type())
 	{
 	case SfzTrigger::Type::NoteOn:
-		return m_noteOnRegions.at(trigger.key().value());
+		return m_noteOnRegions.at(trigger.key());
 	case SfzTrigger::Type::NoteOff:
-		return m_noteOffRegions.at(trigger.key().value());
+		return m_noteOffRegions.at(trigger.key());
 	case SfzTrigger::Type::ControlChange:
 		return m_allRegions; // TODO is it possible to somehow make a lookup table for CC events?
+	case SfzTrigger::Type::None:
+		assert(false); // This should never happen
 	}
 	return m_allRegions; // This was added to prevent a warning, but I don't think it's necessary, since the switch covers all cases.
 }

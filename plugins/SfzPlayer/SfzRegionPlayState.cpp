@@ -90,13 +90,13 @@ SfzRegionPlayState::SfzRegionPlayState(SfzRegion* region, const SfzTrigger& trig
 void SfzRegionPlayState::precomputeBaseValues()
 {
 	// Helper variable
-	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
+	const float normalizedVelocity = m_trigger.velocity() / 127.0f;
 
 	// Compute the base pitch
 	// The pitch env/lfo will be applied on top of this, as those are calcualted per frame
 
 	// Calculate pitch difference relative to original sample
-	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter;
+	const float semitoneDifference = m_trigger.key() - m_region->m_pitch_keycenter;
 	// The base pitch depends on 1. the key offset, 2. the fine `tune` adjustment, 3. the velocity, if pitch_veltrack is nonzero
 	// These are all in cents, so divide by 100 to get semitones
 	const float pitch = semitoneDifference * m_region->m_pitch_keytrack / 100.0f
@@ -217,12 +217,12 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 	if (m_sampleObject == nullptr && m_region->basicWaveShape() == SfzBasicWaves::Shape::Silence) { m_active = false; return false; }
 
 	// Helper variable
-	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
+	const float normalizedVelocity = m_trigger.velocity() / 127.0f;
 
 	// Pitch difference due to pitchbending/microtuning. This is provided by the NotePlayHandle every buffer. The NPH might not have been the one which created this voice (SFZ is a midi based format and doesn't really work well with the NPH system of lmms), so we just get the freq of the last NPH on the same key as the event which triggered this voice.
-	const float notePlayHandleFreqRatio = m_globalState->nphKeyFreqRatio(m_trigger.key().value()); // TODO can this ever be 0.0f, like if the midi event is processed before the note play handle and it doesn't get set in time? I don't think so but I'm not 100% sure.
+	const float notePlayHandleFreqRatio = m_globalState->nphKeyFreqRatio(m_trigger.key()); // TODO can this ever be 0.0f, like if the midi event is processed before the note play handle and it doesn't get set in time? I don't think so but I'm not 100% sure.
 	// Panning from the NotePlayHandle
-	const float notePlayHandlePanning = m_globalState->nphKeyPanning(m_trigger.key().value());
+	const float notePlayHandlePanning = m_globalState->nphKeyPanning(m_trigger.key());
 	const float nphPanningLeftAmp = std::min(1.0f, 1.0f - notePlayHandlePanning / 100.0f);
 	const float nphPanningRightAmp = std::min(1.0f, 1.0f + notePlayHandlePanning / 100.0f);
 

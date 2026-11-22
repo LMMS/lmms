@@ -34,23 +34,23 @@ void SfzGlobalState::processTrigger(const SfzTrigger& trigger)
 {
 	if (trigger.type() == SfzTrigger::Type::ControlChange)
 	{
-		m_ccValues.at(trigger.controlChangeNumber().value()) = trigger.controlChangeValue().value();
+		m_ccValues.at(trigger.controlChangeNumber()) = trigger.controlChangeValue();
 	}
 	else if (trigger.type() == SfzTrigger::Type::NoteOn)
 	{
-		if (m_lastPlayedSwitchKeys.contains(trigger.key().value()))
+		if (m_lastPlayedSwitchKeys.contains(trigger.key()))
 		{
 			m_switchKeyPressCounter++;
-			m_lastPlayedSwitchKeys.at(trigger.key().value()) = m_switchKeyPressCounter;
-			m_pressedSwitchKeys.at(trigger.key().value()) = true;
-			m_lastPlayedSwitchKey = trigger.key().value();
+			m_lastPlayedSwitchKeys.at(trigger.key()) = m_switchKeyPressCounter;
+			m_pressedSwitchKeys.at(trigger.key()) = true;
+			m_lastPlayedSwitchKey = trigger.key();
 		}
 	}
 	else if (trigger.type() == SfzTrigger::Type::NoteOff)
 	{
-		if (m_lastPlayedSwitchKeys.contains(trigger.key().value()))
+		if (m_lastPlayedSwitchKeys.contains(trigger.key()))
 		{
-			m_pressedSwitchKeys.at(trigger.key().value()) = false;
+			m_pressedSwitchKeys.at(trigger.key()) = false;
 		}
 	}
 	// Update the current random value
