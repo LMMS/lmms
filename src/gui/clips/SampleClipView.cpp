@@ -153,6 +153,15 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 		SLOT(setAutomationGhost())
 	);
 
+	cm->addSeparator();
+
+	auto resetNameAction = cm->addAction(
+			embed::getIconPixmap("reload"),
+			tr("Reset name"),
+			this,
+			SLOT(resetClipName()));
+	resetNameAction->setEnabled(m_clip->sampleLength() != 0);
+
 	auto renameAction = cm->addAction(
 			embed::getIconPixmap("edit_rename"),
 			tr("Change name"),
@@ -437,6 +446,12 @@ void SampleClipView::setAutomationGhost()
 	aEditor->setFocus();
 }
 
+
+void SampleClipView::resetClipName()
+{
+	m_clip->resetName();
+	update();
+}
 
 
 void SampleClipView::renameClip()

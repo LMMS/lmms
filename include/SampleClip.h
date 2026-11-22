@@ -112,10 +112,12 @@ private:
 	int m_startFrameOffset;
 
 	QString m_name; //!< Display name
-	bool m_name_set = false; //!< Whether m_name was set by the user
+	QString m_origName;
+	bool m_nameSet = false; //!< Whether m_name was set by the user
 
 	friend class gui::SampleClipView;
 
+	void resetName();
 	void setName(const QString& name);
 	void fileChanged(const QString& fileName);
 

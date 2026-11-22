@@ -85,7 +85,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	setSampleFile( "" );
 	restoreJournallingState();
 
-	if (orig.m_name_set) { setName(orig.getName()); }
+	if (orig.m_nameSet) { setName(orig.getName()); }
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
@@ -340,7 +340,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	// TODO: start- and end-frame
 
-	if (m_name_set) // Only if it's changed from the filename
+	if (m_nameSet) // Only if it's changed from the filename
 	{
 		_this.setAttribute("name", m_name);
 	}
@@ -391,6 +391,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	if (_this.hasAttribute("name"))
 	{
 		setName(_this.attribute("name"));
+		m_origName = m_name;
 	}
 }
 
@@ -404,21 +405,28 @@ gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 
 
 
+void SampleClip::resetName()
+{
+	m_name = m_origName;
+	m_nameSet = false;
+}
+
 
 void SampleClip::setName(const QString& name)
 {
 	m_name = name;
-	m_name_set = true;
+	m_nameSet = true;
 }
 
 
 
 void SampleClip::fileChanged(const QString& fileName)
 {
-	if (!m_name_set)
+	if (!m_nameSet)
 	{
 		// If file changed but name already modified, keep old name. (Prefer user-set over filename)
 		m_name = PathUtil::cleanName(fileName);
+		m_origName = m_name;
 	}
 }
 
