@@ -76,7 +76,8 @@ SampleClip::SampleClip(Track* track)
 
 SampleClip::SampleClip(const SampleClip& orig) :
 	Clip(orig),
-	m_sample(std::move(orig.m_sample)),
+	m_sample(orig.m_sample),
+	m_sampleThumbnailCache(orig.m_sampleThumbnailCache),
 	m_isPlaying(orig.m_isPlaying),
 	m_startFrameOffset(orig.m_startFrameOffset)
 {
