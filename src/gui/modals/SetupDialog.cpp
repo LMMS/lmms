@@ -240,7 +240,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_printNoteLabels, SLOT(toggleNoteLabels(bool)), false);
 	addCheckBox(tr("Show fader ticks"), guiGroupBox, guiGroupLayout,
 		m_showFaderTicks, SLOT(toggleShowFaderTicks(bool)), false);
-	addCheckBox(tr("Enable compact track buttons"), guiGroupBox, guiGroupLayout,
+	addCheckBox(tr("Use compact track buttons by default"), guiGroupBox, guiGroupLayout,
 		m_compactTrackButtons, SLOT(toggleCompactTrackButtons(bool)), true);
 	addCheckBox(tr("Enable one instrument-track-window mode"), guiGroupBox, guiGroupLayout,
 		m_oneInstrumentTrackWindow, SLOT(toggleOneInstrumentTrackWindow(bool)), true);
