@@ -422,11 +422,11 @@ void SampleClip::setName(const QString& name)
 
 void SampleClip::fileChanged(const QString& fileName)
 {
+	m_origName = PathUtil::cleanName(fileName);
 	if (!m_nameSet)
 	{
 		// If file changed but name already modified, keep old name. (Prefer user-set over filename)
-		m_name = PathUtil::cleanName(fileName);
-		m_origName = m_name;
+		m_name = m_origName;
 	}
 }
 
