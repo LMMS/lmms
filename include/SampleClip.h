@@ -83,7 +83,7 @@ public:
 
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
-	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
+	void setSampleBuffer(SampleBuffer buffer);
 
 	SampleClip* clone() override
 	{

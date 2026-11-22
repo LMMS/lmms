@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
+#include <QMessageBox>
 
 #include "FileDialog.h"
 #include "GuiApplication.h"
@@ -68,8 +69,8 @@ void SampleClipView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
-		!m_clip->m_sample.sampleFile().isEmpty()
-			? PathUtil::toAbsolute(m_clip->m_sample.sampleFile())
+		!m_clip->m_sample.buffer().path().isEmpty()
+			? PathUtil::toAbsolute(m_clip->m_sample.buffer().path())
 			: tr("Double-click to open sample")
 	);
 }
@@ -127,9 +128,13 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleBuffer::fromBase64(StringPairDrag::decodeValue(_de)));
-		m_clip->updateLength();
-		update();
+		if (auto buffer = SampleBuffer::fromBase64(StringPairDrag::decodeValue(_de)))
+		{
+			m_clip->setSampleBuffer(std::move(*buffer));
+			m_clip->updateLength();
+			update();
+		}
+
 		_de->accept();
 	}
 	else
@@ -187,18 +192,9 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	if (m_trackView->trackContainerView()->knifeMode()) { return; }
 
 	const QString selectedAudioFile = FileDialog::openAudioFile();
+	if (selectedAudioFile.isEmpty() || m_clip->hasSampleFileLoaded(selectedAudioFile)) { return; }
 
-	if (selectedAudioFile.isEmpty()) { return; }
-	
-	if (!m_clip->hasSampleFileLoaded(selectedAudioFile))
-	{
-		auto sampleBuffer = SampleBuffer::fromFile(selectedAudioFile);
-		if (sampleBuffer != SampleBuffer::emptyBuffer())
-		{
-			m_clip->setSampleBuffer(sampleBuffer);
-		}
-	}
-	m_clip->updateLength();
+	m_clip->setSampleFile(selectedAudioFile);
 }
 
 
@@ -284,7 +280,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
 
-	if (sample.sampleSize() > 0)
+	if (sample.buffer().frames() > 0)
 	{
 		const auto param = SampleThumbnailRenderer::VisualizeParameters{
 			.cache = m_clip->sampleThumbnailCache(),
@@ -296,7 +292,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		SampleThumbnailRenderer::visualize(param, p);
 	}
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+	QString name = PathUtil::cleanName(m_clip->m_sample.buffer().path());
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed

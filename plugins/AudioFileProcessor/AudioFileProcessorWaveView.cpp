@@ -46,7 +46,7 @@ namespace gui
 
 void AudioFileProcessorWaveView::updateSampleRange()
 {
-	if (m_sample->sampleSize() > 1)
+	if (m_sample->buffer().frames() > 1)
 	{
 		const auto marging = (m_sample->endFrame() - m_sample->startFrame()) * 0.1;
 		setFrom(m_sample->startFrame() - marging);
@@ -56,7 +56,7 @@ void AudioFileProcessorWaveView::updateSampleRange()
 
 void AudioFileProcessorWaveView::setTo(int to)
 {
-	m_to = std::min(to, static_cast<int>(m_sample->sampleSize()));
+	m_to = std::min(to, static_cast<int>(m_sample->buffer().frames()));
 }
 
 void AudioFileProcessorWaveView::setFrom(int from)
@@ -75,7 +75,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, i
 	m_sample(buf),
 	m_graph(QPixmap(w - 2 * s_padding, h - 2 * s_padding)),
 	m_from(0),
-	m_to(m_sample->sampleSize()),
+	m_to(m_sample->buffer().frames()),
 	m_last_from(0),
 	m_last_to(0),
 	m_last_amp(0),
@@ -290,7 +290,7 @@ void AudioFileProcessorWaveView::paintEvent(QPaintEvent * pe)
 	p.setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
 
 	QString length_text;
-	const int length = m_sample->sampleDuration().count();
+	const int length = m_sample->duration().count();
 
 	if (length > 20000)
 	{
@@ -317,7 +317,7 @@ void AudioFileProcessorWaveView::updateGraph()
 	if (m_sample->buffer().empty()) return;
 	if (m_to == 1)
 	{
-		setTo(m_sample->sampleSize() * 0.7);
+		setTo(m_sample->buffer().frames() * 0.7);
 		slideSamplePointToFrames(Point::End, m_to * 0.7);
 	}
 
@@ -352,8 +352,8 @@ void AudioFileProcessorWaveView::updateGraph()
 		.cache
 		= static_cast<AudioFileProcessorView*>(parent())->castModel<AudioFileProcessor>()->sampleThumbnailCache(),
 		.rect = m_graph.rect(),
-		.sampleStart = static_cast<double>(m_from) / m_sample->sampleSize(),
-		.sampleEnd = static_cast<double>(m_to) / m_sample->sampleSize(),
+		.sampleStart = static_cast<double>(m_from) / m_sample->buffer().frames(),
+		.sampleEnd = static_cast<double>(m_to) / m_sample->buffer().frames(),
 		.amplification = m_sample->amplification(),
 		.reversed = m_sample->reversed(),
 	};
@@ -365,7 +365,7 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 {
 	const auto start = m_sample->startFrame();
 	const auto end = m_sample->endFrame();
-	const auto frames = m_sample->sampleSize();
+	const auto frames = m_sample->buffer().frames();
 
 	const auto dFrom = start - m_from;
 	const auto dTo = m_to - end;
@@ -388,7 +388,7 @@ void AudioFileProcessorWaveView::zoom(const bool out)
 		? std::clamp(m_to + fromStep, static_cast<double>(end), static_cast<double>(frames))
 		: boundedTo;
 
-	if ((newTo - newFrom) / m_sample->sampleRate() > 0.05)
+	if ((newTo - newFrom) / m_sample->buffer().sampleRate() > 0.05)
 	{
 		setFrom(newFrom);
 		setTo(newTo);
@@ -403,8 +403,8 @@ void AudioFileProcessorWaveView::slide(int px)
 	const auto sampleStart = static_cast<double>(m_sample->startFrame());
 	const auto sampleEnd = static_cast<double>(m_sample->endFrame());
 
-	const auto stepFrom = std::clamp(sampleStart + step, 0.0, static_cast<double>(m_sample->sampleSize())) - sampleStart;
-	const auto stepTo = std::clamp(sampleEnd + step, sampleStart + 1.0, static_cast<double>(m_sample->sampleSize())) - sampleEnd;
+	const auto stepFrom = std::clamp(sampleStart + step, 0.0, static_cast<double>(m_sample->buffer().frames())) - sampleStart;
+	const auto stepTo = std::clamp(sampleEnd + step, sampleStart + 1.0, static_cast<double>(m_sample->buffer().frames())) - sampleEnd;
 	step = std::abs(stepFrom) < std::abs(stepTo) ? stepFrom : stepTo;
 
 	slideSampleByFrames(step);
@@ -438,7 +438,7 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames(Point point, long fram
 	}
 	else
 	{
-		const double v = static_cast<double>(frameOffset) / m_sample->sampleSize();
+		const double v = static_cast<double>(frameOffset) / m_sample->buffer().frames();
 		if (slideTo)
 		{
 			a_knob->slideTo(v);
@@ -455,11 +455,11 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames(Point point, long fram
 
 void AudioFileProcessorWaveView::slideSampleByFrames(long frameOffset)
 {
-	if (m_sample->sampleSize() <= 1)
+	if (m_sample->buffer().frames() <= 1)
 	{
 		return;
 	}
-	const double v = static_cast<double>(frameOffset) / m_sample->sampleSize();
+	const double v = static_cast<double>(frameOffset) / m_sample->buffer().frames();
 	// update knobs in the right order
 	// to avoid them clamping each other
 	if (v < 0)
@@ -478,16 +478,12 @@ void AudioFileProcessorWaveView::slideSampleByFrames(long frameOffset)
 
 void AudioFileProcessorWaveView::reverse()
 {
-	slideSampleByFrames(
-		m_sample->sampleSize()
-			- m_sample->endFrame()
-			- m_sample->startFrame()
-	);
-	
+	slideSampleByFrames(m_sample->buffer().frames() - m_sample->endFrame() - m_sample->startFrame());
+
 	const int fromTmp = m_from;
 
-	setFrom(m_sample->sampleSize() - m_to);
-	setTo(m_sample->sampleSize() - fromTmp);
+	setFrom(m_sample->buffer().frames() - m_to);
+	setTo(m_sample->buffer().frames() - fromTmp);
 	m_reversed = ! m_reversed;
 }
 
@@ -540,8 +536,9 @@ void AudioFileProcessorWaveView::knob::slideTo(double v, bool check_bound)
 
 float AudioFileProcessorWaveView::knob::getValue(const QPoint & p)
 {
-	const double dec_fact = ! m_waveView ? 1 :
-		static_cast<double>(m_waveView->m_to - m_waveView->m_from) / m_waveView->m_sample->sampleSize();
+	const double dec_fact = !m_waveView
+		? 1
+		: static_cast<double>(m_waveView->m_to - m_waveView->m_from) / m_waveView->m_sample->buffer().frames();
 	const float inc = Knob::getValue(p) * dec_fact;
 
 	return inc;
@@ -559,12 +556,12 @@ bool AudioFileProcessorWaveView::knob::checkBound(double v) const
 		return false;
 
 	const double d1 = qAbs(m_relatedKnob->model()->value() - model()->value())
-		* (m_waveView->m_sample->sampleSize())
-		/ m_waveView->m_sample->sampleRate();
+		* (m_waveView->m_sample->buffer().frames())
+		/ m_waveView->m_sample->buffer().sampleRate();
 
 	const double d2 = qAbs(m_relatedKnob->model()->value() - v)
-		* (m_waveView->m_sample->sampleSize())
-		/ m_waveView->m_sample->sampleRate();
+		* (m_waveView->m_sample->buffer().frames())
+		/ m_waveView->m_sample->buffer().sampleRate();
 
 	return d1 < d2 || d2 > 0.005;
 }
