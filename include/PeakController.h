@@ -56,7 +56,7 @@ public:
 
 	static void initGetControllerBySetting();
 	static PeakController * getControllerBySetting( const QDomElement & _this );
-	gui::EffectControlDialog* createEffectControlDialog();
+	gui::EffectControlDialog* getEffectControlDialog();
 
 	static PeakControllerEffectVector s_effects;
 

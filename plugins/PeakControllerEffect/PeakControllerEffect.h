@@ -49,6 +49,11 @@ public:
 		return &m_peakControls;
 	}
 
+	gui::EffectControlDialog * dialog()
+	{
+		return m_dialog;
+	}
+
 	float lastSample()
 	{
 		return m_lastSample;
@@ -77,6 +82,8 @@ private:
 	float m_lastSample;
 
 	PeakController * m_autoController;
+
+	gui::EffectControlDialog* m_dialog;
 
 	friend class PeakControllerEffectControls;
 

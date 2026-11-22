@@ -43,7 +43,7 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 	auto peakController = dynamic_cast<PeakController*>( _model );
 	if (peakController != nullptr)
 	{
-		EffectControlDialog * dlg = peakController->createEffectControlDialog();
+		EffectControlDialog * dlg = peakController->getEffectControlDialog();
 		setWindowTitle( tr( "PEAK" ) );
 		setWindowIcon( embed::getIconPixmap( "controller" ) );
 
