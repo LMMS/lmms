@@ -58,7 +58,7 @@ public:
 
 	//! Returns the ratio of the frequency of the last played NotePlayHandle on this key compared to the base freq of the key.
 	//! This is updated every buffer when a NotePlayHandle is active, and is useful for applying pitch bending and microtuning
-	const float nphKeyFreqRatio(const int key) const { return m_nphFreqRatios.at(key); }
+	float nphKeyFreqRatio(const int key) const { return m_nphFreqRatios[key]; }
 	//! Updates the current freq ratio of the key, given the current freq of the active NotePlayHandle
 	void updateNphFreq(const int key, const float freq);
 	// Similar functions for NotePlayHandle panning

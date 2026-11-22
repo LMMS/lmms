@@ -44,7 +44,7 @@ public:
 	//! That way, whenever a note is pressed, you can simply look up in the table a list of all the regions which might match.
 	//! This is usually 10-100x fewer regions than the total, which is much faster to loop over.
 	SfzRegionManager() = default;
-	SfzRegionManager(std::vector<SfzRegion>& regions);
+	explicit SfzRegionManager(std::vector<SfzRegion>& regions);
 
 	//! Based on the trigger type, key, etc, returns a list of regions which might match the trigger.
 	//! This is meant to intelligently narrow down the number of regions where we manually have to loop over and check

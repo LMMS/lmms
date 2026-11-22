@@ -53,6 +53,7 @@ void SfzGlobalState::processTrigger(const SfzTrigger& trigger)
 			m_pressedSwitchKeys.at(trigger.key()) = false;
 		}
 	}
+
 	// Update the current random value
 	m_rand = fastRand(1.0f);
 }
@@ -76,10 +77,8 @@ std::optional<int> SfzGlobalState::lastSwitchKeyPressedInRange(int lowKey, int h
 		}
 	}
 	// If no keys in the region have been played yet, return the default key
-	if (lastPlayedKey == std::nullopt) { return defaultKey; }
-	else { return lastPlayedKey; }
+	return lastPlayedKey.value_or(defaultKey);
 }
-
 
 void SfzGlobalState::updateNphFreq(const int key, const float freq)
 {
@@ -91,9 +90,6 @@ void SfzGlobalState::updateNphPanning(const int key, const float panning)
 {
 	m_nphPanning.at(key) = panning;
 }
-
-
-
 void SfzGlobalState::initializeMidiCCValues(const SfzControlsConfig& controlsConfig)
 {
 	for (int i = 0; i < NumMidiCCs; ++i)
