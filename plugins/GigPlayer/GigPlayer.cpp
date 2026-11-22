@@ -461,7 +461,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				return output.frames();
 			});
 
-			for (auto i = 0; i < frames; ++i)
+			for (f_cnt_t i = 0; i < frames; ++i)
 			{
 				_working_buffer[i] += outputBuffer[i];
 			}
