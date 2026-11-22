@@ -31,23 +31,19 @@
 #include "embed.h"
 
 #include "EffectControlDialog.h"
-#include "plugins/PeakControllerEffect/PeakControllerEffect.h"
 #include "PeakController.h"
 
 namespace lmms::gui
 {
 
 
-PeakControllerDialog::PeakControllerDialog( PeakController * _model, QWidget * _parent ) :
+PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
 	ControllerDialog( _model, _parent )
 {
-	EffectControlDialog * dlg = _model->getPeakControllerEffect()->controls()->createView();
 	setWindowTitle( tr( "PEAK" ) );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 
-	setFixedSize( dlg->size() );
-	dlg->setParent( this );
-	dlg->show();
+	setFixedSize(256, 64);
 
 	setModel( _model );
 }
