@@ -29,6 +29,7 @@
 #include <QtMath>  // IWYU pragma: keep
 #include <QApplication>
 #include <QCheckBox>
+#include <QColorDialog>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QInputDialog>
@@ -66,15 +67,13 @@
 #include "PatternStore.h"
 #include "PianoView.h"
 #include "PositionLine.h"
+#include "RenameDialog.h"
 #include "SimpleTextFloat.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "FileDialog.h"
-
-#include <iostream> // TODO Remove
-#include "RenameDialog.h"
 
 
 namespace lmms
@@ -885,19 +884,7 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	}
 
 	// Initialize families widget
-	{
-		resetNoteFamilyModel();
-
-		NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
-		for (int i = 0; i < album->lastFamilyId(); i++)
-		{
-			if (!album->familyExists(i))
-				continue;
-
-			m_familyModel.addItem(
-					tr(album->getFamilyName(i).toStdString().c_str())); // TODO Will break in case of fragmentation
-		}
-	}
+	loadFamilyModelFromClip();
 
 	// Scroll horizontally to the start of the clip, minus a bar for aesthetics.
 	m_leftRightScroll->setValue(std::max(0, -m_midiClip->startTimeOffset() - TimePos::ticksPerBar()));
@@ -3021,14 +3008,55 @@ void PianoRoll::addNoteFamily()
 {
 	QString s = "";
 	RenameDialog renameDlg(s);
+	renameDlg.setWindowTitle("Family name");
 	renameDlg.exec();
 
+	QColorDialog colD = QColorDialog(this);
+	colD.exec();
+	QColor color = colD.selectedColor();
+
 	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
-	int id = album->addFamily(s, QColor(255, 0, 0));
+	int id = album->addFamily(s, color);
 	m_familyModel.addItem(tr(s.toStdString().c_str()));
 
 	m_noteFamily = id;
-	m_familyModel.setValue(id + 2); // TODO Protect against fragmentation
+	m_familyModel.setValue(id + 1);
+}
+
+void PianoRoll::deleteNoteFamily()
+{
+	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
+
+    QStringList items{};
+	for (int i = 0; i <= album->lastFamilyId(); i++)
+	{
+		items << (QString::number(i) + ". " + album->getFamilyName(i));
+	}
+
+    bool ok = false;
+    QString item = QInputDialog::getItem(this, tr("QInputDialog::getItem()"),
+                                         tr("Delete :"), items, 0, false, &ok);
+    if (!ok || item.isEmpty())
+		return;
+
+	int id = item.split(".").value(0).toInt();
+
+	int idShifted = album->deleteFamily(id);
+	loadFamilyModelFromClip();
+	m_noteFamily = -1;
+
+	// One family has been shifted to fill the gap : Set all notes to the correct family
+	for (Note *note : m_midiClip->notes())
+	{
+		if (note->family() == id)
+		{
+			note->setFamily(-1);
+		}
+		else if ((idShifted != -1) && (note->family() == idShifted))
+		{
+			note->setFamily(id);
+		}
+	}
 }
 
 /*
@@ -4843,7 +4871,9 @@ void PianoRoll::pasteNotes()
 			cur_note.setSelected( true );
 
 			// add to MIDI clip
-			m_midiClip->addNote( cur_note, false );
+			auto added = m_midiClip->addNote( cur_note, false );
+			if (m_noteFamily != -1)
+				added->setFamily(m_noteFamily);
 		}
 
 		// we only have to do the following lines if we pasted at
@@ -5216,7 +5246,7 @@ void PianoRoll::changeSnapMode()
 
 void PianoRoll::changeNoteFamily()
 {
-	m_noteFamily = (m_familyModel.value() - 2);
+	m_noteFamily = (m_familyModel.value() - 1);
 }
 
 void PianoRoll::resetNoteFamilyModel()
@@ -5224,12 +5254,23 @@ void PianoRoll::resetNoteFamilyModel()
 	disconnect(&m_familyModel, SIGNAL(dataChanged()), this, SLOT(changeNoteFamily()));
 
 	m_familyModel.clear();
-	m_familyModel.addItem(tr("Add family"));
 
 	m_familyModel.addItem(tr("No family"));
-	m_familyModel.setInitValue(1);
+	m_familyModel.setInitValue(0);
 	connect(&m_familyModel, SIGNAL(dataChanged()),
 		this, SLOT(changeNoteFamily()));
+}
+
+void PianoRoll::loadFamilyModelFromClip()
+{
+	resetNoteFamilyModel();
+
+	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
+	for (int i = 0; i <= album->lastFamilyId(); i++)
+	{
+		m_familyModel.addItem(
+				tr(album->getFamilyName(i).toStdString().c_str()));
+	}
 }
 
 PianoRollWindow::PianoRollWindow() :
@@ -5341,12 +5382,15 @@ PianoRollWindow::PianoRollWindow() :
 	m_familyToolsButton->setIcon(embed::getIconPixmap("file"));
 	m_familyToolsButton->setPopupMode(QToolButton::InstantPopup);
 
-	auto addFamilyAction = new QAction(embed::getIconPixmap("file"), tr("Add Family"), m_familyToolsButton);
+	auto addFamilyAction = new QAction(embed::getIconPixmap("file"), tr("Add family..."), m_familyToolsButton);
+	auto deleteFamilyAction = new QAction(embed::getIconPixmap("file"), tr("Delete family..."), m_familyToolsButton);
 
 	m_familyToolsButton->addAction(addFamilyAction);
+	m_familyToolsButton->addAction(deleteFamilyAction);
 	familyActionsToolBar->addWidget(m_familyToolsButton);
 
 	connect(addFamilyAction, SIGNAL(triggered()), this, SLOT(addNoteFamily()));
+	connect(deleteFamilyAction, SIGNAL(triggered()), this, SLOT(deleteNoteFamily()));
 
 	// -- Note modifier tools
 	auto noteToolsButton = new QToolButton(m_toolBar);
@@ -5953,6 +5997,11 @@ void PianoRollWindow::importMidiClip()
 void PianoRollWindow::addNoteFamily()
 {
 	m_editor->addNoteFamily();
+}
+
+void PianoRollWindow::deleteNoteFamily()
+{
+	m_editor->deleteNoteFamily();
 }
 
 

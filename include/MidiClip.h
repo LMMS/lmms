@@ -57,13 +57,11 @@ public:
 	bool setFamilyName(const int family, const QString& newName);
 	bool setFamilyColor(const int family, const QColor& newColor);
 
-	bool deleteFamily(const int family);
+	int deleteFamily(const int family);
 
 	bool familyExists(const int family) const;
 
 	int familiesCount() const;
-
-	int getCleanImportedFamily(const int oldFamily) const;
 
 	int lastFamilyId() const;
 
@@ -84,22 +82,13 @@ protected:
 private:
 	friend class MidiClip;
 
-	static constexpr uint64_t s_oneBit = static_cast<uint64_t>(1);
-
 	std::vector<QString> m_familyNames = {};
 	std::vector<QColor> m_familyColors = {};
 
 	int m_lastFamily = -1;
 
-	uint64_t m_families = 0; //!< Each bit represents the existence of a family at the location (starts from right)
-
-	std::vector<int> m_importingIndices = {};
-	bool m_cleanupRequired = false;
-
 	const QString m_defaultName = {};
 	const QColor m_defaultColor = {};
-
-	void cleanupAfterLoad();
 };
 
 

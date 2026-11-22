@@ -75,13 +75,17 @@ const QColor& NoteFamilyAlbum::getFamilyColor(const int family) const
 
 int NoteFamilyAlbum::addFamily(const QString& familyName, const QColor& familyColor)
 {
-	if (m_lastFamily == 63) return -1;
-
-	m_familyNames.push_back(familyName);
-	m_familyColors.push_back(familyColor);
-
 	m_lastFamily++;
-	m_families |= (s_oneBit << m_lastFamily);
+	if (m_lastFamily < m_familyNames.size())
+	{
+		m_familyNames[m_lastFamily] = familyName;
+		m_familyColors[m_lastFamily] = familyColor;
+	}
+	else
+	{
+		m_familyNames.push_back(familyName);
+		m_familyColors.push_back(familyColor);
+	}
 
 	return m_lastFamily;
 }
@@ -102,32 +106,21 @@ bool NoteFamilyAlbum::setFamilyColor(const int family, const QColor& newColor)
 	return true;
 }
 
-bool NoteFamilyAlbum::deleteFamily(const int family)
+int NoteFamilyAlbum::deleteFamily(const int family)
 {
-	if (!familyExists(family)) return false;
+	if (!familyExists(family)) return -2;
 
-	m_families ^= (s_oneBit << family); // Must set 1 to 0 and 0 to 0, so suitable for this purpose
-	return true;
+	int id = m_lastFamily;
+	m_lastFamily--;
+	m_familyNames[family] = m_familyNames[id];
+	m_familyColors[family] = m_familyColors[id];
+
+	return id;
 }
 
 bool NoteFamilyAlbum::familyExists(const int family) const
 {
-	if ((family < 0) || (family > 64)) return false;
-
-	return (m_families & (s_oneBit << family));
-}
-
-int NoteFamilyAlbum::getCleanImportedFamily(const int oldFamily) const
-{
-	if (!m_cleanupRequired) // It's already normalized
-		return oldFamily;
-
-	// Find new family id (the old ids were fragmented)
-	const auto ptr = find(m_importingIndices.begin(), m_importingIndices.end(), oldFamily);
-
-	if (ptr == m_importingIndices.end()) { return -1; } // Invalid
-
-	return ptr - m_importingIndices.begin();
+	return (family <= m_lastFamily);
 }
 
 int NoteFamilyAlbum::lastFamilyId() const
@@ -140,25 +133,15 @@ void NoteFamilyAlbum::saveSettings(QDomDocument& doc, QDomElement& parent)
 	if (m_lastFamily == -1) // No data to write
 		return;
 
-	int i = 0;
-
-	uint64_t x = m_families;
-	// Iterate through set bits
-	while (x > 0)
+	for (int i = 0; i <= m_lastFamily; i++)
 	{
-		if (x & s_oneBit) // If last (current) bit set
-		{
-			QDomElement el = doc.createElement("family-data");
-			parent.appendChild(el);
-			el.setAttribute("familyName", m_familyNames[i]);
-			el.setAttribute("familyColor", m_familyColors[i].name(QColor::HexArgb));
-			el.setAttribute("familyId", i);
-		}
-
-		x >>= 1; // Shift to next
-		i++;
+		QDomElement el = doc.createElement("family-data");
+		parent.appendChild(el);
+		el.setAttribute("familyName", m_familyNames[i]);
+		el.setAttribute("familyColor", m_familyColors[i].name(QColor::HexArgb));
+		el.setAttribute("familyId", i);
 	}
-	parent.setAttribute("familiesCount", i);
+	parent.setAttribute("familiesCount", m_lastFamily + 1);
 }
 
 void NoteFamilyAlbum::loadSettings(const QDomElement& _this )
@@ -171,7 +154,6 @@ void NoteFamilyAlbum::loadSettings(const QDomElement& _this )
 
 	int i = 0;
 
-	m_importingIndices.clear();
 	QDomNode node = _this.firstChild();
 	while (!node.isNull()) {
 		if (node.isElement())
@@ -179,11 +161,6 @@ void NoteFamilyAlbum::loadSettings(const QDomElement& _this )
 			QDomElement el = node.toElement();
 			if (el.hasAttribute("familyName")) {
 				addFamily(el.attribute("familyName"), QColor(el.attribute("familyColor")));
-
-				int oldId = el.attribute("familyId").toInt();
-				if (m_lastFamily != oldId) { m_cleanupRequired = true; }
-
-				m_importingIndices.push_back(oldId);
 			}
 		}
 		if ((i + 1) == familiesCount) // Finished
@@ -195,11 +172,6 @@ void NoteFamilyAlbum::loadSettings(const QDomElement& _this )
 	{
 		printf("Failed to retrieve all %i note families from MidiClip XML data ! (Got : %i)", familiesCount, i + 1);
 	}
-}
-
-void NoteFamilyAlbum::cleanupAfterLoad()
-{
-	m_importingIndices.clear();
 }
 
 

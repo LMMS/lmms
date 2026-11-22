@@ -250,6 +250,7 @@ protected slots:
 	void changeSnapMode();
 	void changeNoteFamily();
 	void resetNoteFamilyModel();
+	void loadFamilyModelFromClip();
 
 
 signals:
@@ -506,6 +507,7 @@ private:
 	void setupSelectedChords();
 
 	void addNoteFamily();
+	void deleteNoteFamily();
 
 	TimePos m_strumStartTime;
 	TimePos m_strumCurrentTime;
@@ -612,6 +614,7 @@ private slots:
 	void exportMidiClip();
 	void importMidiClip();
 	void addNoteFamily();
+	void deleteNoteFamily();
 
 private:
 	void clipRenamed();
