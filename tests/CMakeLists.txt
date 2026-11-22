@@ -23,12 +23,12 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 
 	# TODO CMake 3.12: Propagate usage requirements by linking to lmmsobjs
 	target_include_directories(${LMMS_TEST_NAME} PRIVATE $<TARGET_PROPERTY:lmmsobjs,INCLUDE_DIRECTORIES>)
+	target_include_directories(${LMMS_TEST_NAME} PRIVATE "plugins/PeakControllerEffect")
 
 	target_static_libraries("${LMMS_TEST_NAME}" PRIVATE lmmsobjs)
 	target_link_libraries(${LMMS_TEST_NAME} PRIVATE
 		${QT_LIBRARIES}
 		${QT_QTTEST_LIBRARY}
-		peakcontrollereffect
 	)
 
 	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_20)
