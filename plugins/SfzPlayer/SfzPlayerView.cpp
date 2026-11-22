@@ -123,7 +123,7 @@ void SfzPlayerView::onFileLoaded()
 	for (int i = 0; i < NumMidiCCs; ++i)
 	{
 		// Only add a knob if the control is actually used
-		if (m_instrument->m_controlsConfig.m_activeMidiCCs.at(i))
+		if (m_instrument->m_controlsConfig.activeMidiCCs().at(i))
 		{
 			const QString& controlLabel = m_instrument->m_controlsConfig.m_label_cc.at(i).value_or(tr("CC %1").arg(i));
 			auto ccKnob = new Knob(KnobType::Bright26, controlLabel, m_controlsWidget);
@@ -140,16 +140,16 @@ void SfzPlayerView::onFileLoaded()
 
 	// Update the switch key list
 	QStringList switchKeyLabels;
-	for (const auto& [key, info] : m_instrument->m_controlsConfig.m_switchKeyInfo)
+	for (const auto& [key, info] : m_instrument->m_controlsConfig.switchKeyInfo())
 	{
 		QString label = QString("- %1 %2 [range: %3 - %4]")
 			.arg(keyNumToString(key))
-			.arg(info.sw_label)
-			.arg(keyNumToString(info.sw_lokey))
-			.arg(keyNumToString(info.sw_hikey));
-		if (info.sw_default != std::nullopt)
+			.arg(info.swLabel)
+			.arg(keyNumToString(info.swLokey))
+			.arg(keyNumToString(info.swHikey));
+		if (info.swDefault != std::nullopt)
 		{
-			label += QString(" default: %1").arg(keyNumToString(info.sw_default.value()));
+			label += QString(" default: %1").arg(keyNumToString(info.swDefault.value()));
 		}
 		switchKeyLabels.push_back(label);
 	}

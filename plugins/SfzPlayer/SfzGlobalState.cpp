@@ -104,7 +104,7 @@ void SfzGlobalState::initializeMidiCCValues(const SfzControlsConfig& controlsCon
 
 void SfzGlobalState::initializeSwitchKeysMap(const SfzControlsConfig& controlsConfig)
 {
-	for (const auto& [key, info] : controlsConfig.m_switchKeyInfo)
+	for (const auto& [key, info] : controlsConfig.switchKeyInfo())
 	{
 		m_lastPlayedSwitchKeys[key] = std::nullopt;
 		m_pressedSwitchKeys[key] = false;

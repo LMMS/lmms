@@ -34,18 +34,24 @@ namespace lmms
 class SfzControlsConfig : public SfzOpcodeState
 {
 public:
-	//! Keeps track of which CC's are actually used by the instrument, so that the GUI only needs to display those, not all 128
-	std::array<bool, NumMidiCCs> m_activeMidiCCs = {};
-
 	//! Stores information about each switch key, to make it easy to display on the GUI
 	struct SwitchKeyInfo
 	{
-		QString sw_label;
-		std::optional<int> sw_default;
-		int sw_lokey;
-		int sw_hikey;
+		QString swLabel;
+		std::optional<int> swDefault;
+		int swLokey;
+		int swHikey;
 	};
+
+	std::map<int, SwitchKeyInfo>& switchKeyInfo() { return m_switchKeyInfo; }
+	// Const version of getter for SfzGlobalState which stores a const version of SfzControlsConfig
+	const std::map<int, SwitchKeyInfo>& switchKeyInfo() const { return m_switchKeyInfo; }
+	std::array<bool, NumMidiCCs>& activeMidiCCs() { return m_activeMidiCCs; }
+
+private:
 	std::map<int, SwitchKeyInfo> m_switchKeyInfo;
+	//! Keeps track of which CC's are actually used by the instrument, so that the GUI only needs to display those, not all 128
+	std::array<bool, NumMidiCCs> m_activeMidiCCs = {};
 };
 
 
