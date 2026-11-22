@@ -32,6 +32,7 @@
 namespace lmms
 {
 
+//! Representation of a <region>-like object in an SFZ file, which stores all the configurations regarding how and when a sample should be played
 class SfzOpcodeState
 {
 public:

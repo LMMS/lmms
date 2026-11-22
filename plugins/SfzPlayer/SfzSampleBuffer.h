@@ -33,6 +33,7 @@ namespace lmms
 
 class SampleFrame;
 
+//! Custom sample data class
 class SfzSampleBuffer
 {
 public:

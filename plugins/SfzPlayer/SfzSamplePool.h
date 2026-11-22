@@ -33,6 +33,7 @@
 namespace lmms
 {
 
+//! Helper class for handling loading of sample files
 class SfzSamplePool
 {
 public:

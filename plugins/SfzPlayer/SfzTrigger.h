@@ -1,5 +1,5 @@
 /*
- * SfzTrigger.h - Custom class for representing MIDI events relevant to the SFZ player
+ * SfzTrigger.h - Custom data container for representing MIDI events relevant to the SFZ player
  *
  * Copyright (c) 2026 Keratin
  *
@@ -30,7 +30,7 @@
 namespace lmms
 {
 
-
+//! Custom data container for representing MIDI events relevant to the SFZ player
 struct SfzTrigger
 {
 public:

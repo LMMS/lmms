@@ -34,6 +34,7 @@
 namespace lmms
 {
 
+//! Helper class for parsing .sfz files into objects which can be used by the SFZ player
 class SfzParser
 {
 public:

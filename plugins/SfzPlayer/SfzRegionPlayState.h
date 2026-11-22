@@ -41,7 +41,7 @@ namespace lmms
 
 class SfzRegion;
 
-
+//! Handles generating audio for a single voice based on the configuration of its parent SfzRegion
 class SfzRegionPlayState
 {
 public:

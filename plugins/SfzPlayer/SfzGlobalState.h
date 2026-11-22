@@ -36,7 +36,8 @@
 namespace lmms
 {
 
-
+//! Class which holds information about the current state of the
+//! SFZ player, such as currently/previously pressed keys, and current midi CC values
 class SfzGlobalState
 {
 public:

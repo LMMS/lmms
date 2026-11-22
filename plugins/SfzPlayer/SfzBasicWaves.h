@@ -28,6 +28,7 @@
 namespace lmms
 {
 
+//! Generators for audio wave shapes such as sine, saw, triangle, noise, etc
 class SfzBasicWaves
 {
 public:

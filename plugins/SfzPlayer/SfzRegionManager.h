@@ -31,6 +31,7 @@
 namespace lmms
 {
 
+//! Helper class for optimizing region selection based on trigger
 class SfzRegionManager
 {
 public:

@@ -38,6 +38,7 @@
 namespace lmms
 {
 
+//! Wrapper class for SfzOpcodeState which handles the actual sample, along with helper functions for triggers
 class SfzRegion : public SfzOpcodeState
 {
 public:

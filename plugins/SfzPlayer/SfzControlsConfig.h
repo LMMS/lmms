@@ -31,6 +31,7 @@
 namespace lmms
 {
 
+//! Helper class for storing info about which keyswitches exist, and which midi CC's are used by the sfz
 class SfzControlsConfig : public SfzOpcodeState
 {
 public:
