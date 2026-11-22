@@ -26,10 +26,10 @@
 #ifndef LMMS_GUI_CONTROLLER_RACK_VIEW_H
 #define LMMS_GUI_CONTROLLER_RACK_VIEW_H
 
-#include "SerializingObject.h"
-#include <QCloseEvent>
-#include <QMdiSubWindow>
 #include <QWidget>
+
+#include "SerializingObject.h"
+#include <QMdiSubWindow>
 
 class QPushButton;
 class QScrollArea;
@@ -67,10 +67,9 @@ public:
 	bool allCollapsed() const;
 
 public slots:
-
+	void deleteController(ControllerView * view);
 	void addController(Controller* controller);
 	void removeController(Controller* controller);
-	void deleteController(ControllerView * view);
 	void collapsingAll();
 	void expandAll();
 	void onControllerCollapsed();

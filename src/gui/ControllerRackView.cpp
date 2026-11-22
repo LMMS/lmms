@@ -36,18 +36,11 @@
 #include "ControllerView.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
-#include <QLayout>
-#include <QMdiArea>
 #include <QMdiSubWindow>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QScrollBar>
 #include <QVBoxLayout>
 
-#include "ControllerView.h"
-#include "embed.h"
-#include "GroupBox.h"
 #include "GuiApplication.h"
 #include "LfoController.h"
 #include "MainWindow.h"
@@ -62,8 +55,8 @@ ControllerRackView::ControllerRackView() :
 	QWidget(),
 	m_collapsingStateOnLoad()
 {
-	setWindowIcon(embed::getIconPixmap("controller"));
-	setWindowTitle(tr("Controller Rack"));
+	setWindowIcon( embed::getIconPixmap( "controller" ) );
+	setWindowTitle( tr( "Controller Rack" ) );
 
 	m_subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 
@@ -71,18 +64,17 @@ ControllerRackView::ControllerRackView() :
 	m_scrollArea->setPalette(QApplication::palette(m_scrollArea));
 	m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	m_scrollArea->setFrameStyle(QFrame::Plain);
-	m_scrollArea->setFrameShadow(QFrame::Plain);
 
 	auto scrollAreaWidget = new QWidget(m_scrollArea);
 	m_scrollAreaLayout = new QVBoxLayout( scrollAreaWidget );
 	m_scrollAreaLayout->addStretch();
 	m_scrollAreaLayout->setMargin(0);
 	m_scrollAreaLayout->setSpacing(0);
-	scrollAreaWidget->setLayout(m_scrollAreaLayout);
+	scrollAreaWidget->setLayout( m_scrollAreaLayout );
 
-	m_scrollArea->setWidget(scrollAreaWidget);
-	m_scrollArea->setWidgetResizable(true);
+	m_scrollArea->setWidget( scrollAreaWidget );
+	m_scrollArea->setWidgetResizable( true );
+
 
 	m_addButton = new QPushButton(m_subWin);
 	m_addButton->setText(tr("Add LFO"));
