@@ -23,16 +23,18 @@
  *
  */
 
-#include "PeakControllerEffectControlDialog.h"
+
+
 
 #include <QLayout>
 #include <QVBoxLayout>
 
+#include "PeakControllerEffectControlDialog.h"
+#include "PeakControllerEffectControls.h"
 #include "ControllerRackView.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
-#include "PeakControllerEffectControls.h"
 #include "embed.h"
 
 namespace lmms::gui
