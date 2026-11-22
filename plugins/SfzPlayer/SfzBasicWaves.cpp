@@ -29,7 +29,7 @@
 namespace lmms
 {
 
-const float SfzBasicWaves::generate(Shape shape, float sampleRate, int frame)
+float SfzBasicWaves::generate(Shape shape, float sampleRate, int frame)
 {
 	// By default, the basic waves are played at C4 (midi key 60). This isn't in the spec afaik, but it makes things simple since pitch_keycenter defaults to 60.
 	constexpr float baseFreq = 261.625565301f;
@@ -56,29 +56,29 @@ const float SfzBasicWaves::generate(Shape shape, float sampleRate, int frame)
 }
 
 
-const float SfzBasicWaves::sine(float t)
+float SfzBasicWaves::sine(float t)
 {
 	return sin(t * 2 * std::numbers::pi);
 }
 
-const float SfzBasicWaves::saw(float t)
+float SfzBasicWaves::saw(float t)
 {
 	return 2.0f * t - 1.0f;
 }
 
-const float SfzBasicWaves::square(float t)
+float SfzBasicWaves::square(float t)
 {
 	return t > 0.5 ? 1.0f : -1.0f;
 }
 
-const float SfzBasicWaves::triangle(float t)
+float SfzBasicWaves::triangle(float t)
 {
 	return t < 0.5f
 		? 4.0f * t - 1.0f
 		: -(4.0f * (t - 0.5f) - 1.0f);
 }
 
-const float SfzBasicWaves::noise(float t)
+float SfzBasicWaves::noise(float t)
 {
 	return fastRand(-1.0f, 1.0f);
 }
