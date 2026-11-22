@@ -360,7 +360,7 @@ void TrackContainerView::setTrackHeadWidth(int width)
 
 void TrackContainerView::setMaxTrackHeadWidth(int maxWidth)
 {
-	m_maxTrackHeadWidth = maxWidth;
+	m_maxTrackHeadWidth = std::max(maxWidth, MINIMUM_TRACK_WIDTH);
 	// Update width
 	setTrackHeadWidth(m_trackHeadWidth);
 }
