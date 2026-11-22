@@ -69,9 +69,9 @@ std::optional<int> SfzGlobalState::lastSwitchKeyPressedInRange(int lowKey, int h
 	std::optional<int> bestScore;
 	for (const auto& [key, counter] : m_lastPlayedSwitchKeys)
 	{
-		if (counter == std::nullopt) { continue; } // This key has not been played yet
+		if (!counter.has_value()) { continue; } // This key has not been played yet
 
-		if (bestScore == std::nullopt || counter > bestScore)
+		if (!bestScore.has_value() || counter > bestScore)
 		{
 			lastPlayedKey = key;
 			bestScore = counter;
