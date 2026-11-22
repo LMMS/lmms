@@ -53,7 +53,7 @@ public:
 	const QString& getFamilyName(const int family) const;
 	const QColor& getFamilyColor(const int family) const;
 
-	bool addFamily(const QString& familyName, const QColor& familyColor);
+	int addFamily(const QString& familyName, const QColor& familyColor);
 	bool setFamilyName(const int family, const QString& newName);
 	bool setFamilyColor(const int family, const QColor& newColor);
 
@@ -64,6 +64,8 @@ public:
 	int familiesCount() const;
 
 	int getCleanImportedFamily(const int oldFamily) const;
+
+	int lastFamilyId() const;
 
 	static QString classNodeName()
 	{
@@ -181,7 +183,7 @@ public:
 		return new MidiClip(*this);
 	}
 
-	NoteFamilyAlbum& noteFamilyAlbum();
+	NoteFamilyAlbum* noteFamilyAlbum();
 
 
 	using Model::dataChanged;
@@ -220,7 +222,7 @@ private:
 
 	friend class gui::MidiClipView;
 
-	NoteFamilyAlbum m_familyAlbum = {};
+	NoteFamilyAlbum* m_familyAlbum = new NoteFamilyAlbum();
 signals:
 	void destroyedMidiClip( lmms::MidiClip* );
 } ;

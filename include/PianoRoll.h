@@ -248,6 +248,8 @@ protected slots:
 	void constrainNoteLengths(bool constrainMax);
 
 	void changeSnapMode();
+	void changeNoteFamily();
+	void resetNoteFamilyModel();
 
 
 signals:
@@ -367,6 +369,7 @@ private:
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
+	ComboBoxModel m_familyModel;
 
 	static const std::vector<float> m_zoomLevels;
 	static const std::vector<float> m_zoomYLevels;
@@ -400,6 +403,7 @@ private:
 	Action m_action;
 	NoteEditMode m_noteEditMode;
 	GridMode m_gridMode;
+	int m_noteFamily = -1;
 
 	int m_selectStartTick;
 	int m_selectedTick;
@@ -500,6 +504,8 @@ private:
 	std::vector<NoteVector> m_selectedChords;
 	//! Computes which notes belong to which chords from the selection
 	void setupSelectedChords();
+
+	void addNoteFamily();
 
 	TimePos m_strumStartTime;
 	TimePos m_strumCurrentTime;
@@ -605,6 +611,7 @@ private slots:
 	void ghostClipSet( bool state );
 	void exportMidiClip();
 	void importMidiClip();
+	void addNoteFamily();
 
 private:
 	void clipRenamed();
@@ -617,6 +624,7 @@ private:
 	PianoRoll* m_editor;
 
 	QToolButton* m_fileToolsButton;
+	QToolButton* m_familyToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
@@ -625,6 +633,7 @@ private:
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
 	ComboBox* m_snapComboBox;
+	ComboBox* m_familyComboBox;
 	QPushButton * m_clearGhostButton;
 
 };

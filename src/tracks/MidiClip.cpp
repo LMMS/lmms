@@ -34,17 +34,13 @@
 #include "PatternStore.h"
 #include "PianoRoll.h"
 
-#include <iostream> // TODO Remove
-#include <QTextStream>
-
 
 
 namespace lmms
 {
 
 NoteFamilyAlbum::NoteFamilyAlbum()
-{
-}
+{}
 
 NoteFamilyAlbum::NoteFamilyAlbum(const NoteFamilyAlbum& album)
 {
@@ -77,9 +73,9 @@ const QColor& NoteFamilyAlbum::getFamilyColor(const int family) const
 	return familyExists(family) ? m_familyColors[family] : m_defaultColor;
 }
 
-bool NoteFamilyAlbum::addFamily(const QString& familyName, const QColor& familyColor)
+int NoteFamilyAlbum::addFamily(const QString& familyName, const QColor& familyColor)
 {
-	if (m_lastFamily == 63) return false;
+	if (m_lastFamily == 63) return -1;
 
 	m_familyNames.push_back(familyName);
 	m_familyColors.push_back(familyColor);
@@ -87,7 +83,7 @@ bool NoteFamilyAlbum::addFamily(const QString& familyName, const QColor& familyC
 	m_lastFamily++;
 	m_families |= (s_oneBit << m_lastFamily);
 
-	return true;
+	return m_lastFamily;
 }
 
 bool NoteFamilyAlbum::setFamilyName(const int family, const QString& newName)
@@ -134,6 +130,11 @@ int NoteFamilyAlbum::getCleanImportedFamily(const int oldFamily) const
 	return ptr - m_importingIndices.begin();
 }
 
+int NoteFamilyAlbum::lastFamilyId() const
+{
+	return m_lastFamily;
+}
+
 void NoteFamilyAlbum::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
 	if (m_lastFamily == -1) // No data to write
@@ -147,7 +148,7 @@ void NoteFamilyAlbum::saveSettings(QDomDocument& doc, QDomElement& parent)
 	{
 		if (x & s_oneBit) // If last (current) bit set
 		{
-			QDomElement el = doc.createElement("family-" + i);
+			QDomElement el = doc.createElement("family-data");
 			parent.appendChild(el);
 			el.setAttribute("familyName", m_familyNames[i]);
 			el.setAttribute("familyColor", m_familyColors[i].name(QColor::HexArgb));
@@ -614,7 +615,7 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 	midiClipElement.setAttribute("steps", m_steps);
 	midiClipElement.setAttribute("len", length());
 
-	m_familyAlbum.saveSettings(doc, midiClipElement);
+	m_familyAlbum->saveSettings(doc, midiClipElement);
 
 	// now save settings of all notes
 	for (auto& note : m_notes)
@@ -637,11 +638,6 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void MidiClip::loadSettings( const QDomElement & _this )
 {
-	QString s;
-	QTextStream str(&s);
-	_this.save(str, 0);
-	std::cout << s.toStdString() << std::endl;
-
 	m_clipType = static_cast<Type>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
@@ -660,8 +656,8 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		toggleMute();
 	}
 
-	m_familyAlbum = {};
-	m_familyAlbum.loadSettings(_this);
+	*m_familyAlbum = NoteFamilyAlbum();
+	m_familyAlbum->loadSettings(_this);
 
 	clearNotes();
 
@@ -741,7 +737,7 @@ void MidiClip::clear()
 
 
 
-NoteFamilyAlbum& MidiClip::noteFamilyAlbum()
+NoteFamilyAlbum* MidiClip::noteFamilyAlbum()
 {
 	return m_familyAlbum;
 }

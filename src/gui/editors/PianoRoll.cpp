@@ -73,6 +73,9 @@
 #include "TimeLineWidget.h"
 #include "FileDialog.h"
 
+#include <iostream> // TODO Remove
+#include "RenameDialog.h"
+
 
 namespace lmms
 {
@@ -442,6 +445,8 @@ PianoRoll::PianoRoll() :
 	changeSnapMode();
 	connect(&m_snapModel, SIGNAL(dataChanged()),
 		this, SLOT(changeSnapMode()));
+
+	resetNoteFamilyModel();
 
 	m_stepRecorder.initialize();
 
@@ -877,6 +882,21 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 		update();
 		emit currentMidiClipChanged();
 		return;
+	}
+
+	// Initialize families widget
+	{
+		resetNoteFamilyModel();
+
+		NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
+		for (int i = 0; i < album->lastFamilyId(); i++)
+		{
+			if (!album->familyExists(i))
+				continue;
+
+			m_familyModel.addItem(
+					tr(album->getFamilyName(i).toStdString().c_str())); // TODO Will break in case of fragmentation
+		}
 	}
 
 	// Scroll horizontally to the start of the clip, minus a bar for aesthetics.
@@ -1856,6 +1876,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					new_note.setPanning( m_lastNotePanning );
 					new_note.setVolume( m_lastNoteVolume );
 					created_new_note = m_midiClip->addNote( new_note );
+					
+					created_new_note->setFamily(m_noteFamily);
 
 					const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
 						.getChordByName( m_chordModel.currentText() );
@@ -2995,6 +3017,20 @@ void PianoRoll::setupSelectedChords()
 	m_selectedChords.push_back(currentChord);
 }
 
+void PianoRoll::addNoteFamily()
+{
+	QString s = "";
+	RenameDialog renameDlg(s);
+	renameDlg.exec();
+
+	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
+	int id = album->addFamily(s, QColor(255, 0, 0));
+	m_familyModel.addItem(tr(s.toStdString().c_str()));
+
+	m_noteFamily = id;
+	m_familyModel.setValue(id + 2); // TODO Protect against fragmentation
+}
+
 /*
  * Perform the Strum
  *
@@ -3793,10 +3829,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				// We've done and checked all, let's draw the note with
 				// the appropriate color
-				// TODO Remove this message : NOTECOLA
 				const auto regularColor = (note->family() == -1)
 					? m_noteColor
-					: m_midiClip->noteFamilyAlbum().getFamilyColor(note->family());
+					: m_midiClip->noteFamilyAlbum()->getFamilyColor(note->family());
 				const auto fillColor = note->type() == Note::Type::Regular ? regularColor : m_stepNoteColor;
 
 				drawNoteRect(
@@ -5179,6 +5214,24 @@ void PianoRoll::changeSnapMode()
 	m_gridMode = static_cast<GridMode>(m_snapModel.value());
 }
 
+void PianoRoll::changeNoteFamily()
+{
+	m_noteFamily = (m_familyModel.value() - 2);
+}
+
+void PianoRoll::resetNoteFamilyModel()
+{
+	disconnect(&m_familyModel, SIGNAL(dataChanged()), this, SLOT(changeNoteFamily()));
+
+	m_familyModel.clear();
+	m_familyModel.addItem(tr("Add family"));
+
+	m_familyModel.addItem(tr("No family"));
+	m_familyModel.setInitValue(1);
+	connect(&m_familyModel, SIGNAL(dataChanged()),
+		this, SLOT(changeNoteFamily()));
+}
+
 PianoRollWindow::PianoRollWindow() :
 	Editor(true, true),
 	m_editor(new PianoRoll())
@@ -5279,6 +5332,21 @@ PianoRollWindow::PianoRollWindow() :
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
+
+	// Note family controls
+
+	DropToolBar* familyActionsToolBar = addDropToolBarToTop(tr("Note families"));
+
+	m_familyToolsButton = new QToolButton(m_toolBar);
+	m_familyToolsButton->setIcon(embed::getIconPixmap("file"));
+	m_familyToolsButton->setPopupMode(QToolButton::InstantPopup);
+
+	auto addFamilyAction = new QAction(embed::getIconPixmap("file"), tr("Add Family"), m_familyToolsButton);
+
+	m_familyToolsButton->addAction(addFamilyAction);
+	familyActionsToolBar->addWidget(m_familyToolsButton);
+
+	connect(addFamilyAction, SIGNAL(triggered()), this, SLOT(addNoteFamily()));
 
 	// -- Note modifier tools
 	auto noteToolsButton = new QToolButton(m_toolBar);
@@ -5398,6 +5466,15 @@ PianoRollWindow::PianoRollWindow() :
 	m_snapComboBox->setFixedSize(96, ComboBox::DEFAULT_HEIGHT);
 	m_snapComboBox->setToolTip(tr("Snap mode"));
 
+	// setup family-stuff
+	auto familyLbl = new QLabel(m_toolBar);
+	familyLbl->setPixmap(embed::getIconPixmap("gridmode"));
+
+	m_familyComboBox = new ComboBox(m_toolBar);
+	m_familyComboBox->setModel(&m_editor->m_familyModel);
+	m_familyComboBox->setFixedSize(96, ComboBox::DEFAULT_HEIGHT);
+	m_familyComboBox->setToolTip(tr("Note family"));
+
 	// -- Clear ghost MIDI clip button
 	m_clearGhostButton = new QPushButton( m_toolBar );
 	m_clearGhostButton->setIcon( embed::getIconPixmap( "clear_ghost_note" ) );
@@ -5473,6 +5550,15 @@ PianoRollWindow::PianoRollWindow() :
 	snapWidget->setLayout(snapHbox);
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(snapWidget);
+
+	auto familyWidget = new QWidget();
+	auto familyHBox = new QHBoxLayout();
+	familyHBox->setContentsMargins(0, 0, 0, 0);
+	familyHBox->addWidget(familyLbl);
+	familyHBox->addWidget(m_familyComboBox);
+	familyWidget->setLayout(familyHBox);
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget(familyWidget);
 
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
@@ -5862,6 +5948,11 @@ void PianoRollWindow::importMidiClip()
 			tr("Imported clip %1!").arg(fullPath),
 			embed::getIconPixmap("project_import"), 4000);
 	}
+}
+
+void PianoRollWindow::addNoteFamily()
+{
+	m_editor->addNoteFamily();
 }
 
 

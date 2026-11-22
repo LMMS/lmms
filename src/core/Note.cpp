@@ -200,6 +200,7 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 	parent.setAttribute( "len", m_length );
 	parent.setAttribute( "pos", m_pos );
 	parent.setAttribute("type", static_cast<int>(m_type));
+	if (m_family != -1) { parent.setAttribute("fam", m_family); }
 
 	if( m_detuning && m_length )
 	{
@@ -221,6 +222,7 @@ void Note::loadSettings( const QDomElement & _this )
 	// Default m_type value is 0, which corresponds to RegularNote
 	static_assert(0 == static_cast<int>(Type::Regular));
 	m_type = static_cast<Type>(_this.attribute("type", "0").toInt());
+	if (_this.hasAttribute("fam")) { m_family = _this.attribute("fam").toInt(); }
 
 	if( _this.hasChildNodes() )
 	{
