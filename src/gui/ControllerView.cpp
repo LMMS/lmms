@@ -24,25 +24,25 @@
  *
  */
 
+#include "ControllerView.h"
 
+#include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPushButton>
-#include <QInputDialog>
-
-#include "ControllerView.h"
 
 #include "CaptionMenu.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
-#include "embed.h"
 #include "ControllerRackView.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
 #include "LmmsStyle.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "StringPairDrag.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -69,10 +69,12 @@ ControllerView::ControllerView(Controller* model, QWidget* parent)
 	controllerTypeLabel->setText(QString(getController()->type() == Controller::ControllerType::Lfo
 		? QString("LFO: ")
 		: QString("PEAK: ")));
+	controllerTypeLabel->setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 	controllerTypeLabel->move(3, 3);
 	controllerTypeLabel->show();
 
 	m_nameLabel = new QLabel(model->name(), this);
+	m_nameLabel->setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 	m_nameLabel->move(controllerTypeLabel->sizeHint().width() + 3, 3);
 
 	setFixedWidth(m_controllerDlg->width() + 2);
