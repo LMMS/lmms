@@ -33,6 +33,8 @@
 #include <QEvent>
 
 #include "Effect.h"
+#include <algorithm>
+
 #include "DeprecationHelper.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
@@ -335,7 +337,7 @@ void EffectRackView::moveDown( EffectView* view )
 	if( view != m_effectViews.last() )
 	{
 		// moving next effect up is the same
-		moveUp( *( std::find( m_effectViews.begin(), m_effectViews.end(), view ) + 1 ) );
+		moveUp(*std::next(std::ranges::find(m_effectViews, view)));
 	}
 }
 
@@ -345,7 +347,7 @@ void EffectRackView::moveDown( EffectView* view )
 void EffectRackView::deletePlugin( EffectView* view )
 {
 	Effect * e = view->effect();
-	m_effectViews.erase( std::find( m_effectViews.begin(), m_effectViews.end(), view ) );
+	m_effectViews.erase(std::ranges::find(m_effectViews, view));
 	delete view;
 	fxChain()->removeEffect( e );
 	e->deleteLater();
