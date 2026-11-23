@@ -132,18 +132,9 @@ void PeakControllerEffectControlDialog::showDialog()
 void PeakControllerEffectControlDialog::toggleView()
 {
 	auto* sw = getGUI()->getControllerRackView()->subWin();
-
-	if (!sw->isVisible())
-	{
-		sw->show();
-		sw->raise();
-		m_effectControls->setViewVisible(true);
-	}
-	else
-	{
-		sw->hide();
-		m_effectControls->setViewVisible(false);
-	}
+	sw->show();
+	sw->raise();
+	m_effectControls->setViewVisible(true);
 }
 
 } // namespace lmms::gui
