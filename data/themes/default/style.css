@@ -387,6 +387,139 @@ lmms--gui--TrackView > QWidget {
 	background-color: #3B424A;
 }
 
+QToolButton#add-automation-track{
+	image: url("resources:add_automation.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#add-pattern-track{
+	image: url("resources:add_pattern_track.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#add-sample-track{
+	image: url("resources:add_sample_track.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#draw-mode{
+	image: url("resources:edit_draw.svg");
+    width: 24;
+    height: 24;
+
+}
+
+QToolButton#select-mode{
+	image: url("resources:edit_select.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#knife-mode{
+	image: url("resources:edit_knife.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#set-proportional-snap{
+	image: url("resources:proportional_snap.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#playButton{
+	image: url("resources:play.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#pauseButton{
+	image: url("resources:pause.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#stopButton{
+	image: url("resources:stop.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#recordButton{
+	image: url("resources:record.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#recordAccompanyButton{
+	image: url("resources:record_accompany.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#stepRecordButton{
+	image: url("resources:record_step_off.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#stepRecordButtonOn{
+	image: url("resources:record_step_on.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#auto-scrolling-stepped{
+	image: url("resources:autoscroll_stepped_on.svg");
+    width: 24;
+    height: 24;
+}
+QToolButton#auto-scrolling-continuous{
+	image: url("resources:autoscroll_continuous_on.svg");
+    width: 24;
+    height: 24;
+}
+QToolButton#auto-scrolling-off{
+	image: url("resources:autoscroll_off.svg");
+    width: 24;
+    height: 24;
+}
+QToolButton#loop-points-on{
+	image: url("resources:loop_points_on.svg");
+    width: 24;
+    height: 24;
+}
+QToolButton#loop-points-off{
+	image: url("resources:loop_points_off.svg");
+    width: 24;
+    height: 24;
+}
+QToolButton#back-to-zero{
+	image: url("resources:back_to_zero.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#back-to-start{
+	image: url("resources:back_to_start.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#keep-stop-position{
+	image: url("resources:keep_stop_position.svg");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#back-to-zero{
+	image: url("resources:back_to_zero.svg");
+    width: 24;
+    height: 24;
+}
 
 QPushButton#btn {
 	color: #d1d8e4;

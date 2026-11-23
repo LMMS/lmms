@@ -938,14 +938,11 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
 
-	m_addPatternTrackAction = new QAction(embed::getIconPixmap("add_pattern_track"),
-									 tr("Add pattern-track"), this);
+	m_addPatternTrackAction = new QAction(embed::createEmptyPixmap(), tr("Add pattern-track"), this);
 
-	m_addSampleTrackAction = new QAction(embed::getIconPixmap("add_sample_track"),
-										 tr("Add sample-track"), this);
+	m_addSampleTrackAction = new QAction(embed::createEmptyPixmap(), tr("Add sample-track"), this);
 
-	m_addAutomationTrackAction = new QAction(embed::getIconPixmap("add_automation"),
-											 tr("Add automation-track"), this);
+	m_addAutomationTrackAction = new QAction(embed::createEmptyPixmap(), tr("Add automation-track"), this);
 
 	connect(m_addPatternTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addPatternTrack()));
 	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
@@ -955,14 +952,17 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	trackActionsToolBar->addAction( m_addSampleTrackAction );
 	trackActionsToolBar->addAction( m_addAutomationTrackAction );
 
+	trackActionsToolBar->widgetForAction(m_addPatternTrackAction)->setObjectName("add-pattern-track");
+	trackActionsToolBar->widgetForAction(m_addSampleTrackAction)->setObjectName("add-sample-track");
+	trackActionsToolBar->widgetForAction(m_addAutomationTrackAction)->setObjectName("add-automation-track");
 
 	// Edit actions
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
 
 	m_editModeGroup = new ActionGroup(this);
-	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
-	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split clips)"));
-	m_selectModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
+	m_drawModeAction = m_editModeGroup->addAction(embed::createEmptyPixmap(), tr("Draw mode"));
+	m_knifeModeAction = m_editModeGroup->addAction(embed::createEmptyPixmap(), tr("Knife mode (split clips)"));
+	m_selectModeAction = m_editModeGroup->addAction(embed::createEmptyPixmap(), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 
 	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
@@ -972,6 +972,10 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	editActionsToolBar->addAction( m_drawModeAction );
 	editActionsToolBar->addAction( m_knifeModeAction );
 	editActionsToolBar->addAction( m_selectModeAction );
+
+	editActionsToolBar->widgetForAction(m_drawModeAction)->setObjectName("draw-mode");
+	editActionsToolBar->widgetForAction(m_knifeModeAction)->setObjectName("knife-mode");
+	editActionsToolBar->widgetForAction(m_selectModeAction)->setObjectName("select-mode");
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
 	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
@@ -1014,7 +1018,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_snappingComboBox->setToolTip(tr("Clip snapping size"));
 	connect(m_editor->snappingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 
-	m_setProportionalSnapAction = new QAction(embed::getIconPixmap("proportional_snap"),
+	m_setProportionalSnapAction = new QAction(embed::createEmptyPixmap(),
 											 tr("Toggle proportional snap on/off"), this);
 	m_setProportionalSnapAction->setCheckable(true);
 	m_setProportionalSnapAction->setChecked(false);
@@ -1025,6 +1029,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	snapToolBar->addWidget( m_snappingComboBox );
 	snapToolBar->addSeparator();
 	snapToolBar->addAction( m_setProportionalSnapAction );
+	snapToolBar->widgetForAction(m_setProportionalSnapAction)->setObjectName("set-proportional-snap");
 
 	snapToolBar->addSeparator();
 	snapToolBar->addWidget( m_snapSizeLabel );

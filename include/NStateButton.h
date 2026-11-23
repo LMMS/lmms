@@ -41,7 +41,7 @@ class NStateButton : public ToolButton
 public:
 	NStateButton( QWidget * _parent );
 	~NStateButton() override;
-	void addState( const QPixmap & _pixmap, const QString & _tooltip = "" );
+	void addState( const QString & _pixmap, const QString & _tooltip = "" );
 
 	inline void setGeneralToolTip( const QString & _tooltip )
 	{
@@ -64,7 +64,7 @@ protected:
 	void mousePressEvent(QMouseEvent* me) override;
 
 private:
-	QVector<QPair<QPixmap, QString>> m_states;
+	QVector<QPair<QString, QString>> m_states;
 	QString m_generalToolTip;
 
 	int m_curState;
