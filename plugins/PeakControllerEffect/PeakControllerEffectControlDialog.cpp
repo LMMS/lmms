@@ -124,17 +124,18 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 
 void PeakControllerEffectControlDialog::showDialog()
 {
-	getGUI()->getControllerRackView()->show();
-	getGUI()->getControllerRackView()->subWin()->hide();
+	auto* controllerRack = getGUI()->getControllerRackView();
+	controllerRack->show();
+	controllerRack->subWin()->show();
+	controllerRack->subWin()->raise();
+	controllerRack->setFocus();
+	m_effectControls->setViewVisible(true);
 }
 
 
 void PeakControllerEffectControlDialog::toggleView()
 {
-	auto* sw = getGUI()->getControllerRackView()->subWin();
-	sw->show();
-	sw->raise();
-	m_effectControls->setViewVisible(true);
+	showDialog();
 }
 
 } // namespace lmms::gui
