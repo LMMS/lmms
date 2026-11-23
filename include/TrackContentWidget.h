@@ -153,9 +153,6 @@ public slots:
 	//! @param newPos The MIDI time to move to.
 	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
 
-	//! @brief Updates the background tile pixmap.
-	void updateBackground();
-
 protected:
 	enum class ContextMenuAction
 	{
@@ -216,8 +213,6 @@ private:
 
 	using clipViewVector = QVector<ClipView*>;
 	clipViewVector m_clipViews;
-
-	QPixmap m_background;
 
 	// qproperty fields
 	QBrush m_darkerColor;
