@@ -45,8 +45,7 @@ namespace lmms::gui
 
 PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	ClipView( _clip, _tv ),
-	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
-	m_paintPixmap()
+	m_patternClip(dynamic_cast<PatternClip*>(_clip))
 {
 	connect( _clip->getTrack(), SIGNAL(dataChanged()), 
 			this, SLOT(update()));
@@ -92,21 +91,6 @@ void PatternClipView::paintEvent(QPaintEvent*)
 {
 	QPainter painter( this );
 
-	if( !needsUpdate() )
-	{
-		painter.drawPixmap( 0, 0, m_paintPixmap );
-		return;
-	}
-
-	setNeedsUpdate( false );
-
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
-	{
-		m_paintPixmap = QPixmap(size());
-	}
-
-	QPainter p( &m_paintPixmap );
-
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c = getColorForDisplay( painter.background().color() );
 	
@@ -114,7 +98,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	lingrad.setColorAt( 1, c.lighter( 70 ) );
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
-	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+	painter.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	const int pixelsPerPattern = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex()) * pixelsPerBar();
 	int offset = static_cast<int>(m_patternClip->startTimeOffset() * (pixelsPerBar() / TimePos::ticksPerBar()))
@@ -125,11 +109,11 @@ void PatternClipView::paintEvent(QPaintEvent*)
 
 	if( gradient() )
 	{
-		p.fillRect( rect(), lingrad );
+		painter.fillRect( rect(), lingrad );
 	}
 	else
 	{
-		p.fillRect( rect(), c );
+		painter.fillRect( rect(), c );
 	}
 
 	// Draw notes
@@ -164,7 +148,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	const int horizontalNoteSpacing = pixelsPerBar() / TimePos::stepsPerBar() * m_noteHorizontalSpacing;
 
 	// This pixmap is a batching optimization which draws notes into one vertical strip for tiling patterns.
-	QPixmap midiPatternPixmap(pixelsPerPattern, m_paintPixmap.height());
+	QPixmap midiPatternPixmap(pixelsPerPattern, height());
 	midiPatternPixmap.fill(Qt::transparent);
 
 	QPainter pixPainter(&midiPatternPixmap);
@@ -200,53 +184,49 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	}
 	// Compare how long the longest clip view is compared to the underlying pattern. First +1 for ceiling, second +1 for possible previous bar.
 	const int maxPossibleRepetitions = getClip()->length() / longestLength + 1 + 1;
-	p.drawTiledPixmap(offset + horizontalNoteSpacing / 2 - pixelsPerPattern, 0, width() + (maxPossibleRepetitions - 1) * pixelsPerPattern, height(), midiPatternPixmap);
+	painter.drawTiledPixmap(offset + horizontalNoteSpacing / 2 - pixelsPerPattern, 0, width() + (maxPossibleRepetitions - 1) * pixelsPerPattern, height(), midiPatternPixmap);
 
 	// bar lines
 	const int lineSize = 3;
 
-	p.setPen( c.darker( 200 ) );
+	painter.setPen( c.darker( 200 ) );
 
 	if (pixelsPerPattern > 0)
 	{
 		for (int x = offset; x < width() - 2; x += pixelsPerPattern)
 		{
-			p.drawLine( x, BORDER_WIDTH, x, BORDER_WIDTH + lineSize );
-			p.drawLine( x, rect().bottom() - ( BORDER_WIDTH + lineSize ),
+			painter.drawLine( x, BORDER_WIDTH, x, BORDER_WIDTH + lineSize );
+			painter.drawLine( x, rect().bottom() - ( BORDER_WIDTH + lineSize ),
 			 	x, rect().bottom() - BORDER_WIDTH );
 		}
 	}
 
 	// clip name
-	paintTextLabel(m_patternClip->name(), p);
+	paintTextLabel(m_patternClip->name(), painter);
 
 	// inner border
-	p.setPen( c.lighter( 130 ) );
-	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+	painter.setPen( c.lighter( 130 ) );
+	painter.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
 		rect().bottom() - BORDER_WIDTH );	
 
 	// outer border
-	p.setPen( c.darker( 300 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+	painter.setPen( c.darker( 300 ) );
+	painter.drawRect( 0, 0, rect().right(), rect().bottom() );
 	
 	// draw the 'muted' pixmap only if the clip was manually muted
 	if (m_patternClip->isMuted())
 	{
 		const int spacing = BORDER_WIDTH;
 		const int size = 14;
-		p.drawPixmap( spacing, height() - ( size + spacing ),
+		painter.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 	
 	if (m_marker)
 	{
-		p.setPen(markerColor());
-		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+		painter.setPen(markerColor());
+		painter.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
-	
-	p.end();
-	
-	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
 

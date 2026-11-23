@@ -63,8 +63,6 @@ protected:
 
 private:
 	SampleClip * m_clip;
-	QPixmap m_paintPixmap;
-	long m_paintPixmapXPosition;
 } ;
 
 

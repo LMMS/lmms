@@ -86,8 +86,7 @@ ClipView::ClipView( Clip * clip,
 	m_textShadowColor( 0, 0, 0 ),
 	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
-	m_markerColor(0, 0, 0),
-	m_needsUpdate( true )
+	m_markerColor(0, 0, 0)
 {
 	if( s_textFloat == nullptr )
 	{
@@ -145,7 +144,7 @@ void ClipView::update()
 	{
 		updateLength();
 	}
-	m_needsUpdate = true;
+
 	selectableObject::update();
 }
 

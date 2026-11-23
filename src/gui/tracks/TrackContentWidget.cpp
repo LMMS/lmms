@@ -74,80 +74,14 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 
 	// Update background if snap size changes
 	connect(getGUI()->songEditor()->m_editor->snappingModel(), &Model::dataChanged,
-			this, &TrackContentWidget::updateBackground);
+			this, &TrackContentWidget::update);
 
 	// Also update background if proportional snap is enabled/disabled
 	connect(getGUI()->songEditor()->m_editor, &SongEditor::proportionalSnapChanged,
-			this, &TrackContentWidget::updateBackground);
+			this, &TrackContentWidget::update);
 
 	setStyle( QApplication::style() );
 
-	updateBackground();
-}
-
-
-
-
-void TrackContentWidget::updateBackground()
-{		
-	// use snapSize to determine number of lines to draw
-	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-
-	const TrackContainerView * tcv = m_trackView->trackContainerView();
-
-	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
-	int ppb = static_cast<int>( tcv->pixelsPerBar() );
-
-	// Coarse grid appears every bar (less frequently if quantization > 1 bar)
-	float coarseGridResolution = (snapSize >= 1) ? snapSize : 1;
-	// Fine grid appears within bars
-	float fineGridResolution = snapSize;
-	// Increase fine grid resolution (size between lines) if it results in less than	
-	// 4 pixels between each line to avoid cluttering
-	float pixelsBetweenLines = ppb * snapSize;
-	if (pixelsBetweenLines < MIN_PIXELS_BETWEEN_LINES) {
-		// Scale fineGridResolution so that there are enough pixels between lines
-		// scaleFactor should be a power of 2
-		int scaleFactor = 1 << static_cast<int>( std::ceil( std::log2( MIN_PIXELS_BETWEEN_LINES / pixelsBetweenLines ) ) );
-		fineGridResolution *= scaleFactor;
-	}
-
-	int w = ppb * BARS_PER_GROUP;
-	int h = height();
-	m_background = QPixmap( w * 2, height() );
-	QPainter pmp( &m_background );
-
-	pmp.fillRect( 0, 0, w, h, darkerColor() );
-	pmp.fillRect( w, 0, w , h, lighterColor() );
-
-	// draw lines
-	// draw fine grid
-	pmp.setPen( QPen( fineGridColor(), fineGridWidth() ) );
-	for (float x = 0; x < w * 2; x += ppb * fineGridResolution)
-	{
-		pmp.drawLine( QLineF( x, 0.0, x, h ) );
-	}
-
-	// draw coarse grid
-	pmp.setPen( QPen( coarseGridColor(), coarseGridWidth() ) );
-	for (float x = 0; x <= w * 2; x += ppb * coarseGridResolution)
-	{
-		pmp.drawLine( QLineF( x, 0.0, x, h ) );
-	}
-
-	pmp.setPen( QPen( embossColor(), embossWidth() ) );
-	for (float x = (coarseGridWidth() + embossOffset()); x < w * 2; x += ppb * coarseGridResolution)
-	{
-		pmp.drawLine( QLineF( x, 0.0, x, h ) );
-	}
-
-	// draw horizontal line
-	pmp.setPen( QPen( horizontalColor(), horizontalWidth() ) );
-	pmp.drawLine(0, h - (horizontalWidth() + 1) / 2, w * 2, h - (horizontalWidth() + 1) / 2);
-
-	pmp.end();
-
-	// Force redraw
 	update();
 }
 
@@ -230,14 +164,13 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 
 		const auto xPos = static_cast<int>((clip->startPosition() - begin) * ppb / TimePos::ticksPerBar());
 		clipView->move(xPos, clipView->y());
+		clipView->update();
 		if (!clipView->isVisible())
 		{
 			clipView->show();
 		}
 	}
 	setUpdatesEnabled(true);
-
-	updateBackground();
 }
 
 
@@ -538,16 +471,79 @@ void TrackContentWidget::mouseReleaseEvent( QMouseEvent * me )
 
 void TrackContentWidget::paintEvent( QPaintEvent * pe )
 {
-	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
-	const TrackContainerView * tcv = m_trackView->trackContainerView();
-	int ppb = static_cast<int>( tcv->pixelsPerBar() );
-	QPainter p( this );
 	// Don't draw background on Pattern Editor
-	if (m_trackView->trackContainerView() != getGUI()->patternEditor()->m_editor)
-	{
-		p.drawTiledPixmap(rect(), m_background, QPoint(
-				tcv->currentPosition().getTicks() * ppb / TimePos::ticksPerBar(), 0));
+	if (m_trackView->trackContainerView() == getGUI()->patternEditor()->m_editor) { return; }
+
+	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
+	const TrackContainerView* tcv = m_trackView->trackContainerView();
+
+	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
+	const int ppb = static_cast<int>(tcv->pixelsPerBar());
+
+	// use snapSize to determine number of lines to draw
+	const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+
+	// Coarse grid appears every bar (less frequently if quantization > 1 bar)
+	const float coarseGridResolution = (snapSize >= 1) ? snapSize : 1;
+
+	// Fine grid appears within bars
+	float fineGridResolution = snapSize;
+
+	// Increase fine grid resolution (size between lines) if it results in less than	
+	// 4 pixels between each line to avoid cluttering
+	const float pixelsBetweenLines = ppb * snapSize;
+
+	if (pixelsBetweenLines < MIN_PIXELS_BETWEEN_LINES) {
+		// Scale fineGridResolution so that there are enough pixels between lines
+		// scaleFactor should be a power of 2
+		const int scaleFactor
+			= 1 << static_cast<int>(std::ceil(std::log2(MIN_PIXELS_BETWEEN_LINES / pixelsBetweenLines)));
+		fineGridResolution *= scaleFactor;
 	}
+
+	const int w = ppb * BARS_PER_GROUP;
+	const int h = height();
+
+	auto background = QPixmap{w * 2, h};
+	auto pmp = QPainter{&background};
+
+	pmp.fillRect(0, 0, w, h, darkerColor());
+	pmp.fillRect(w, 0, w, h, lighterColor());
+
+	// draw lines
+	// draw fine grid
+	pmp.setPen(QPen(fineGridColor(), fineGridWidth()));
+	for (float x = 0; x < w * 2; x += ppb * fineGridResolution)
+	{
+		const auto line = QLineF(x, 0.0, x, h);
+		pmp.fillRect(line.x1(), line.y1(), 1, line.y2() - line.y1() + 1, pmp.pen().color());
+	}
+
+	// draw coarse grid
+	pmp.setPen(QPen(coarseGridColor(), coarseGridWidth()));
+	for (float x = 0; x <= w * 2; x += ppb * coarseGridResolution)
+	{
+		const auto line = QLineF(x, 0.0, x, h);
+		pmp.fillRect(line.x1(), line.y1(), 1, line.y2() - line.y1() + 1, pmp.pen().color());
+	}
+
+	pmp.setPen(QPen(embossColor(), embossWidth()));
+	for (float x = (coarseGridWidth() + embossOffset()); x < w * 2; x += ppb * coarseGridResolution)
+	{
+		const auto line = QLineF(x, 0.0, x, h);
+		pmp.fillRect(line.x1(), line.y1(), 1, line.y2() - line.y1() + 1, pmp.pen().color());
+	}
+
+	// draw horizontal line
+	pmp.setPen(QPen(horizontalColor(), horizontalWidth()));
+	const auto line = QLine(0, h - (horizontalWidth() + 1) / 2, w * 2, h - (horizontalWidth() + 1) / 2);
+	pmp.fillRect(line.x1(), line.y1(), line.x2() - line.x1() + 1, 1, pmp.pen().color());
+
+	pmp.end();
+
+	QPainter painter{this};
+	painter.drawTiledPixmap(
+		rect(), background, QPoint(tcv->currentPosition().getTicks() * ppb / TimePos::ticksPerBar(), 0));
 }
 
 
@@ -555,10 +551,8 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 
 void TrackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 {
-	// Update background
-	updateBackground();
-	// Force redraw
-	QWidget::resizeEvent( resizeEvent );
+	update();
+	QWidget::resizeEvent(resizeEvent);
 }
 
 

@@ -46,9 +46,7 @@ namespace lmms::gui
 
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
-	m_clip( _clip ),
-	m_paintPixmap(),
-	m_paintPixmapXPosition(0)
+	m_clip(_clip)
 {
 	// update UI and tooltip
 	updateSample();
@@ -206,29 +204,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 
 void SampleClipView::paintEvent( QPaintEvent * pe )
 {
-	QPainter painter( this );
-
-	if( !needsUpdate() )
-	{
-		painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
-		return;
-	}
-
-	setNeedsUpdate( false );
-
-	const auto trackViewWidth = getTrackView()->rect().width();
-
-	// Use the clip's height to avoid artifacts when rendering while something else is overlaying the clip.
-	const auto viewPortRect = QRect(0, 0, trackViewWidth * 2, rect().height());
-
-	m_paintPixmapXPosition = std::max(0, pe->rect().x() - trackViewWidth);
-
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != viewPortRect.size())
-	{
-		m_paintPixmap = QPixmap(viewPortRect.size());
-	}
-
-	QPainter p( &m_paintPixmap );
+	QPainter painter{this};
 
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
@@ -242,92 +218,86 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	lingrad.setColorAt( 0, c );
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
-	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+	painter.fillRect(pe->rect(), QColor(0, 0, 0));
 
 	if( gradient() )
 	{
-		p.fillRect( rect(), lingrad );
+		painter.fillRect( rect(), lingrad );
 	}
 	else
 	{
-		p.fillRect( rect(), c );
+		painter.fillRect( rect(), c );
 	}
 
 	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(painter.pen().brush().color()));
 
-	p.setPen(clipColor);
+	painter.setPen(clipColor);
 
 	if (muted)
 	{
-		QColor penColor = p.pen().brush().color();
+		QColor penColor = painter.pen().brush().color();
 		penColor.setHsv(penColor.hsvHue(), penColor.hsvSaturation() / 4, penColor.value());
-		p.setPen(penColor.darker(250));
+		painter.setPen(penColor.darker(250));
 	}
 	if (selected)
 	{
-		p.setPen(p.pen().brush().color().darker(150));
+		painter.setPen(painter.pen().brush().color().darker(150));
 	}
 
-	const int spacing = BORDER_WIDTH + 1;
-	const float ppb = fixedClips() ?
-			( parentWidget()->width() - 2 * BORDER_WIDTH )
-					/ (float) m_clip->length().getBar() :
-								pixelsPerBar();
-
-	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerBar = DefaultTicksPerBar * nom / den;
-	float offsetStart = m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
-	float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
-
-	const auto& sample = m_clip->m_sample;
-
-	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
-
-	if (sample.sampleSize() > 0)
+	if (m_clip->sampleThumbnailCache())
 	{
-		const auto param = SampleThumbnailRenderer::VisualizeParameters{
-			.cache = m_clip->sampleThumbnailCache(),
-			.rect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
-			.amplification = sample.amplification(),
-			.reversed = sample.reversed()
-		};
+		const int spacing = BORDER_WIDTH + 1;
+		const float ppb = fixedClips() ?
+				( parentWidget()->width() - 2 * BORDER_WIDTH )
+						/ (float) m_clip->length().getBar() :
+									pixelsPerBar();
 
-		SampleThumbnailRenderer::visualize(param, p);
+		const float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+		const float den = Engine::getSong()->getTimeSigModel().getDenominator();
+		const float ticksPerBar = DefaultTicksPerBar * nom / den;
+		const float offsetStart = m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
+		const float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
+
+		const auto& sample = m_clip->m_sample;
+
+		const auto param = SampleThumbnailRenderer::VisualizeParameters{
+			.rect = QRect(static_cast<int>(offsetStart), spacing, sampleLength, height() - spacing),
+			.viewport = pe->rect(),
+			.amplification = sample.amplification(),
+			.reversed = sample.reversed()};
+
+		SampleThumbnailRenderer::visualize(*m_clip->sampleThumbnailCache(), param, painter);
 	}
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
-	paintTextLabel(name, p);
+	paintTextLabel(name, painter);
 
 	// disable antialiasing for borders, since its not needed
-	p.setRenderHint( QPainter::Antialiasing, false );
+	painter.setRenderHint( QPainter::Antialiasing, false );
 
 	// inner border
-	p.setPen( c.lighter( 135 ) );
-	p.drawRect(
-		-m_paintPixmapXPosition + 1,
-		1,
-		rect().right() - BORDER_WIDTH,
-		rect().bottom() - BORDER_WIDTH );
+	painter.setPen( c.lighter( 135 ) );
+	painter.drawRect(1, 1, rect().right() - BORDER_WIDTH, rect().bottom() - BORDER_WIDTH);
 
 	// outer border
-	p.setPen( c.darker( 200 ) );
-	p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
+	painter.setPen( c.darker( 200 ) );
+	painter.drawRect(0, 0, rect().right(), rect().bottom());
 
 	// draw the 'muted' pixmap only if the clip was manually muted
 	if( m_clip->isMuted() )
 	{
 		const int spacing = BORDER_WIDTH;
 		const int size = 14;
-		p.drawPixmap( spacing, height() - ( size + spacing ),
+		painter.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
 	if ( m_marker )
 	{
-		p.setPen(markerColor());
-		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+		painter.setPen(markerColor());
+		painter.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
+
 	// recording sample tracks is not possible at the moment
 
 	/* if( m_clip->isRecord() )
@@ -342,10 +312,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
 	}*/
-
-	p.end();
-
-	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
 }
 
 

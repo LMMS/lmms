@@ -343,7 +343,7 @@ void TrackContainerView::setPixelsPerBar( int ppb )
 	// tell all TrackContentWidgets to update their background tile pixmap
 	for (const auto& trackView : m_trackViews)
 	{
-		trackView->getTrackContentWidget()->updateBackground();
+		trackView->getTrackContentWidget()->update();
 	}
 }
 

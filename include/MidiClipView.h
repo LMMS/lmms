@@ -100,7 +100,6 @@ private:
 	QPixmap m_stepBtnHighlight = embed::getIconPixmap("step_btn_highlight");
 
 	MidiClip* m_clip;
-	QPixmap m_paintPixmap;
 
 	QColor m_noteFillColor;
 	QColor m_noteBorderColor;

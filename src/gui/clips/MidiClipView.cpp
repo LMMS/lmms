@@ -53,7 +53,6 @@ constexpr int BeatStepButtonOffset = 4;
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),
 	m_clip( clip ),
-	m_paintPixmap(),
 	m_noteFillColor(255, 255, 255, 220),
 	m_noteBorderColor(255, 255, 255, 220),
 	m_mutedNoteFillColor(100, 100, 100, 220),
@@ -541,22 +540,7 @@ static int computeNoteRange(int minKey, int maxKey)
 
 void MidiClipView::paintEvent( QPaintEvent * )
 {
-	QPainter painter( this );
-
-	if( !needsUpdate() )
-	{
-		painter.drawPixmap( 0, 0, m_paintPixmap );
-		return;
-	}
-
-	setNeedsUpdate( false );
-
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
-	{
-		m_paintPixmap = QPixmap(size());
-	}
-
-	QPainter p( &m_paintPixmap );
+	QPainter painter{this};
 
 	QColor c;
 	bool const muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
@@ -579,15 +563,15 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( beatClip ? 1 : 0, c );
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
-	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+	painter.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	if( gradient() )
 	{
-		p.fillRect( rect(), lingrad );
+		painter.fillRect( rect(), lingrad );
 	}
 	else
 	{
-		p.fillRect( rect(), c );
+		painter.fillRect( rect(), c );
 	}
 
 	// Check whether we will paint a text box and compute its potential height
@@ -658,32 +642,32 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			if (n)
 			{
 				const int vol = n->getVolume();
-				p.drawPixmap(x, y, stepoffl);
-				p.drawPixmap(x, y, stepon0);
-				p.setOpacity(std::sqrt(vol / 200.0));
-				p.drawPixmap(x, y, stepon200);
-				p.setOpacity(1);
+				painter.drawPixmap(x, y, stepoffl);
+				painter.drawPixmap(x, y, stepon0);
+				painter.setOpacity(std::sqrt(vol / 200.0));
+				painter.drawPixmap(x, y, stepon200);
+				painter.setOpacity(1);
 			}
 			else if ((it / 4) % 2)
 			{
-				p.drawPixmap(x, y, stepoffl);
+				painter.drawPixmap(x, y, stepoffl);
 			}
 			else
 			{
-				p.drawPixmap(x, y, stepoff);
+				painter.drawPixmap(x, y, stepoff);
 			}
 			if (isAtPlayPos)
 			{
-				p.drawPixmap(x, y, stephighlight);
+				painter.drawPixmap(x, y, stephighlight);
 			}
 		} // end for loop
 
 		// draw a transparent rectangle over muted clips
 		if (muted)
 		{
-			p.setBrush(mutedBackgroundColor());
-			p.setOpacity(0.5);
-			p.drawRect(0, 0, width(), height());
+			painter.setBrush(mutedBackgroundColor());
+			painter.setOpacity(0.5);
+			painter.drawRect(0, 0, width(), height());
 		}
 	}
 	// Melody clip and Beat clip (on Song Editor) paint event
@@ -749,10 +733,10 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		int const notesBorder = 4; // Border for the notes towards the top and bottom in pixels
 
 		// The relevant painting code starts here
-		p.save();
+		painter.save();
 
-		p.translate(0., distanceToTop + notesBorder);
-		p.scale(width(), height() - distanceToTop - 2 * notesBorder);
+		painter.translate(0., distanceToTop + notesBorder);
+		painter.scale(width(), height() - distanceToTop - 2 * notesBorder);
 
 		// set colour based on mute status
 		QColor noteFillColor = muted ? getMutedNoteFillColor().lighter(200)
@@ -763,19 +747,19 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines)
 		{
-			p.setPen(noteFillColor);
+			painter.setPen(noteFillColor);
 		}
 		else
 		{
-			p.setPen(noteBorderColor);
-			p.setRenderHint(QPainter::Antialiasing);
+			painter.setPen(noteBorderColor);
+			painter.setRenderHint(QPainter::Antialiasing);
 		}
 
 		// Needed for Qt5 although the documentation for QPainter::setPen(QColor) as it's used above
 		// states that it should already set a width of 0.
-		QPen pen = p.pen();
+		QPen pen = painter.pen();
 		pen.setWidth(0);
-		p.setPen(pen);
+		painter.setPen(pen);
 
 		float const noteHeight = 1. / adjustedNoteRange;
 
@@ -794,30 +778,30 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			QRectF noteRectF( noteStartX, noteStartY, noteLength, noteHeight);
 			if (drawAsLines)
 			{
-				p.drawLine(QPointF(noteStartX, noteStartY + 0.5 * noteHeight),
+				painter.drawLine(QPointF(noteStartX, noteStartY + 0.5 * noteHeight),
 					   QPointF(noteStartX + noteLength, noteStartY + 0.5 * noteHeight));
 			}
 			else
 			{
-				p.fillRect( noteRectF, noteFillColor );
-				p.drawRect( noteRectF );
+				painter.fillRect( noteRectF, noteFillColor );
+				painter.drawRect( noteRectF );
 			}
 		}
 
-		p.restore();
+		painter.restore();
 	}
 
 	// bar lines
 	const int lineSize = 3;
-	p.setPen( c.darker( 200 ) );
+	painter.setPen( c.darker( 200 ) );
 
 	for(float t = (offset % TimePos::ticksPerBar()) * pixelsPerBar / TimePos::ticksPerBar(); t < m_clip->length(); t += pixelsPerBar)
 	{
-		p.drawLine( x_base + t - 1,
+		painter.drawLine( x_base + t - 1,
 				BORDER_WIDTH,
 				x_base + t - 1,
 				BORDER_WIDTH + lineSize );
-		p.drawLine( x_base + t - 1,
+		painter.drawLine( x_base + t - 1,
 				rect().bottom() - ( lineSize + BORDER_WIDTH ),
 				x_base + t - 1,
 				rect().bottom() - BORDER_WIDTH );
@@ -826,19 +810,19 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// clip name
 	if (drawTextBox)
 	{
-		paintTextLabel(m_clip->name(), p);
+		paintTextLabel(m_clip->name(), painter);
 	}
 
 	if( !( fixedClips() && beatClip ) )
 	{
 		// inner border
-		p.setPen( c.lighter( current ? 160 : 130 ) );
-		p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+		painter.setPen( c.lighter( current ? 160 : 130 ) );
+		painter.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
 			rect().bottom() - BORDER_WIDTH );
 
 		// outer border
-		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
-		p.drawRect( 0, 0, rect().right(), rect().bottom() );
+		painter.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
+		painter.drawRect( 0, 0, rect().right(), rect().bottom() );
 	}
 
 	// draw the 'muted' pixmap only if the clip was manually muted
@@ -846,17 +830,15 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	{
 		const int spacing = BORDER_WIDTH;
 		const int size = 14;
-		p.drawPixmap( spacing, height() - ( size + spacing ),
+		painter.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 	
 	if (m_marker)
 	{
-		p.setPen(markerColor());
-		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+		painter.setPen(markerColor());
+		painter.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
-
-	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
 

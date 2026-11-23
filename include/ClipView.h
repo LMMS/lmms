@@ -108,9 +108,6 @@ public:
 	void setGradient(const bool& b) { m_gradient = b; }
 	void setMarkerColor(const QColor& c) { m_markerColor = QColor(c); }
 
-	bool needsUpdate() const { return m_needsUpdate; }
-	void setNeedsUpdate(bool b) { m_needsUpdate = b; }
-
 	// Method to get a QVector of Clips to be affected by a context menu action
 	QVector<ClipView *> getClickedClips();
 
@@ -237,7 +234,6 @@ protected:
 
 	void resizeEvent( QResizeEvent * re ) override
 	{
-		m_needsUpdate = true;
 		selectableObject::resizeEvent( re );
 	}
 
@@ -315,7 +311,6 @@ private:
 	bool m_gradient;
 	QColor m_markerColor;
 
-	bool m_needsUpdate;
 	inline void setInitialPos( QPoint pos )
 	{
 		m_initialMousePos = pos;
