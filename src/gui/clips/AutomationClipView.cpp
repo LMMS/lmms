@@ -220,27 +220,9 @@ void AutomationClipView::mouseDoubleClickEvent( QMouseEvent * me )
 	openInAutomationEditor();
 }
 
-
-
-
-void AutomationClipView::paintEvent( QPaintEvent * )
+void AutomationClipView::paintEvent(QPaintEvent* pe)
 {
-	QPainter painter( this );
-
-	if( !needsUpdate() )
-	{
-		painter.drawPixmap( 0, 0, m_paintPixmap );
-		return;
-	}
-
-	setNeedsUpdate( false );
-
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
-	{
-		m_paintPixmap = QPixmap(size());
-	}
-
-	QPainter p( &m_paintPixmap );
+	QPainter painter{this};
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c = getColorForDisplay( painter.background().color() );
@@ -251,15 +233,15 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 0, c );
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
-	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+	painter.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	if( gradient() )
 	{
-		p.fillRect( rect(), lingrad );
+		painter.fillRect( rect(), lingrad );
 	}
 	else
 	{
-		p.fillRect( rect(), c );
+		painter.fillRect( rect(), c );
 	}
 
 	// pixels per bar
@@ -276,8 +258,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	const float ppTick  = ppb / TimePos::ticksPerBar();
 	const int offset =  m_clip->startTimeOffset() * ppTick;
 
-	p.translate( 0.0f, max * height() / y_scale - BORDER_WIDTH );
-	p.scale( 1.0f, -h );
+	painter.translate( 0.0f, max * height() / y_scale - BORDER_WIDTH );
+	painter.scale( 1.0f, -h );
 
 	QLinearGradient lin2grad( 0, min, 0, max );
 	QColor col;
@@ -288,7 +270,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	lin2grad.setColorAt( 0.5, col );
 	lin2grad.setColorAt( 0, col.darker( 150 ) );
 
-	p.setRenderHints( QPainter::Antialiasing, true );
+	painter.setRenderHints( QPainter::Antialiasing, true );
 	for( AutomationClip::timeMap::const_iterator it =
 						m_clip->getTimeMap().begin();
 					it != m_clip->getTimeMap().end(); ++it )
@@ -303,11 +285,11 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 			// We are drawing the space after the last node, so we use the outValue
 			if( gradient() )
 			{
-				p.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), lin2grad);
+				painter.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), lin2grad);
 			}
 			else
 			{
-				p.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), col);
+				painter.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), col);
 			}
 			break;
 		}
@@ -341,70 +323,66 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 		if( gradient() )
 		{
-			p.fillPath( path, lin2grad );
+			painter.fillPath( path, lin2grad );
 		}
 		else
 		{
-			p.fillPath( path, col );
+			painter.fillPath( path, col );
 		}
 		delete [] values;
 	}
 
-	p.setRenderHints( QPainter::Antialiasing, false );
-	p.resetTransform();
+	painter.setRenderHints( QPainter::Antialiasing, false );
+	painter.resetTransform();
 
 	// bar lines
 	const int lineSize = 3;
-	p.setPen( c.darker( 300 ) );
+	painter.setPen( c.darker( 300 ) );
 
-	for (bar_t b = 1; b < width() - BORDER_WIDTH; ++b)
+	for (bar_t b = 1; b < rect().width() - BORDER_WIDTH; ++b)
 	{
 		const int bx = BORDER_WIDTH + static_cast<int>(ppb * b) - 2;
 
 		//top line
-		p.drawLine(bx + offset, BORDER_WIDTH, bx + offset, BORDER_WIDTH + lineSize);
+		painter.drawLine(bx + offset, BORDER_WIDTH, bx + offset, BORDER_WIDTH + lineSize);
 
 		//bottom line
-		p.drawLine(bx + offset, rect().bottom() - (lineSize + BORDER_WIDTH), bx + offset, rect().bottom() - BORDER_WIDTH);
+		painter.drawLine(bx + offset, rect().bottom() - (lineSize + BORDER_WIDTH), bx + offset, rect().bottom() - BORDER_WIDTH);
 	}
 
 	// recording icon for when recording automation
 	if( m_clip->isRecording() )
 	{
 		static auto s_clipRec = embed::getIconPixmap("clip_rec");
-		p.drawPixmap(1, rect().bottom() - s_clipRec.height(), s_clipRec);
+		painter.drawPixmap(1, rect().bottom() - s_clipRec.height(), s_clipRec);
 	}
 
 	// clip name
-	paintTextLabel(m_clip->name(), p);
+	paintTextLabel(m_clip->name(), painter);
 
 	// inner border
-	p.setPen( c.lighter( current ? 160 : 130 ) );
-	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+	painter.setPen( c.lighter( current ? 160 : 130 ) );
+	painter.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
 		rect().bottom() - BORDER_WIDTH );
 
 	// outer border
-	p.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+	painter.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
+	painter.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the clip was manually muted
 	if( m_clip->isMuted() )
 	{
 		const int spacing = BORDER_WIDTH;
 		const int size = 14;
-		p.drawPixmap( spacing, height() - ( size + spacing ),
+		painter.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 	
 	if (m_marker)
 	{
-		p.setPen(markerColor());
-		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+		painter.setPen(markerColor());
+		painter.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
-
-	p.end();
-
-	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
 
