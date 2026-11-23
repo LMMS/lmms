@@ -220,7 +220,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	lingrad.setColorAt( 0, c );
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
-	painter.fillRect( rect(), QColor( 0, 0, 0 ) );
+	painter.fillRect(pe->rect(), QColor(0, 0, 0));
 
 	if( gradient() )
 	{
@@ -246,21 +246,22 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		painter.setPen(painter.pen().brush().color().darker(150));
 	}
 
-	const int spacing = BORDER_WIDTH + 1;
-	const float ppb = fixedClips() ?
-			( parentWidget()->width() - 2 * BORDER_WIDTH )
-					/ (float) m_clip->length().getBar() :
-								pixelsPerBar();
-
-	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerBar = DefaultTicksPerBar * nom / den;
-	float offsetStart = m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
-	float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
-
 	if (m_clip->sampleThumbnailCache())
 	{
+		const int spacing = BORDER_WIDTH + 1;
+		const float ppb = fixedClips() ?
+				( parentWidget()->width() - 2 * BORDER_WIDTH )
+						/ (float) m_clip->length().getBar() :
+									pixelsPerBar();
+
+		const float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+		const float den = Engine::getSong()->getTimeSigModel().getDenominator();
+		const float ticksPerBar = DefaultTicksPerBar * nom / den;
+		const float offsetStart = m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
+		const float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
+
 		const auto& sample = m_clip->m_sample;
+
 		const auto param = SampleThumbnailRenderer::VisualizeParameters{
 			.rect = QRect(static_cast<int>(offsetStart), spacing, sampleLength, height() - spacing),
 			.viewport = pe->rect(),
