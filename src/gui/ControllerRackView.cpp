@@ -103,7 +103,7 @@ ControllerRackView::ControllerRackView()
 
 
 
-void ControllerRackView::saveSettings(QDomDocument &, QDomElement & parent)
+void ControllerRackView::saveSettings(QDomDocument&, QDomElement& parent)
 {
 	parent.setAttribute(QString("controllerCount"), m_controllerViews.size());
 	for (auto i = 1; i <= m_controllerViews.size(); i++)
@@ -117,7 +117,7 @@ void ControllerRackView::saveSettings(QDomDocument &, QDomElement & parent)
 
 
 
-void ControllerRackView::loadSettings(const QDomElement & _this)
+void ControllerRackView::loadSettings(const QDomElement& _this)
 {
 	int controllerCount = _this.attribute(QString("controllerCount")).toInt();
 	for (auto i = 1; i <= controllerCount; i++)
@@ -219,11 +219,11 @@ void ControllerRackView::addController(Controller* controller)
 
 void ControllerRackView::removeController(Controller* removedController)
 {
-	for (auto &it : m_controllerViews)
+	for (auto& it : m_controllerViews)
 	{
 		if (it->getController() == removedController)
 		{
-			ControllerView * viewOfRemovedController = it;
+			ControllerView* viewOfRemovedController = it;
 			m_controllerViews.erase(std::find(m_controllerViews.begin(),
 						m_controllerViews.end(), viewOfRemovedController));
 
@@ -251,7 +251,7 @@ void ControllerRackView::addController()
 
 void ControllerRackView::collapsingAll()
 {
-	for (auto &it : m_controllerViews)
+	for (auto& it : m_controllerViews)
 	{
 		it->collapseController(true);
 	}
@@ -259,7 +259,7 @@ void ControllerRackView::collapsingAll()
 
 void ControllerRackView::expandAll()
 {
-	for (auto &it : m_controllerViews)
+	for (auto& it : m_controllerViews)
 	{
 		it->collapseController(false);
 	}
@@ -273,7 +273,7 @@ void ControllerRackView::onControllerCollapsed()
 }
 
 
-const QVector<ControllerView *> ControllerRackView::controllerViews() const
+const QVector<ControllerView*> ControllerRackView::controllerViews() const
 {
 	return m_controllerViews;
 }
@@ -283,7 +283,7 @@ const QVector<ControllerView *> ControllerRackView::controllerViews() const
 
 bool ControllerRackView::allCollapsed() const
 {
-	for (auto &it : m_controllerViews)
+	for (auto& it : m_controllerViews)
 	{
 		if (!it->isCollapsed())
 		{
@@ -298,7 +298,7 @@ bool ControllerRackView::allCollapsed() const
 
 bool ControllerRackView::allExpanded() const
 {
-	for (auto &it : m_controllerViews)
+	for (auto& it : m_controllerViews)
 	{
 		if (it->isCollapsed())
 		{
@@ -311,7 +311,7 @@ bool ControllerRackView::allExpanded() const
 
 
 
-QMdiSubWindow *ControllerRackView::subWin() const
+QMdiSubWindow* ControllerRackView::subWin() const
 {
 	return m_subWin;
 }

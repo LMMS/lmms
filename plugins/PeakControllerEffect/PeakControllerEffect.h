@@ -49,7 +49,7 @@ public:
 		return &m_peakControls;
 	}
 
-	gui::EffectControlDialog * dialog()
+	gui::EffectControlDialog* dialog()
 	{
 		return m_dialog;
 	}

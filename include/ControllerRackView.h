@@ -61,25 +61,25 @@ public:
 		return "ControllerRackView";
 	}
 
-	QMdiSubWindow *subWin() const;
+	QMdiSubWindow* subWin() const;
 
 	bool allExpanded() const;
 	bool allCollapsed() const;
 
 public slots:
-	void deleteController(ControllerView * _view);
+	void deleteController(ControllerView* view);
 	void addController(Controller* controller);
 	void removeController(Controller* controller);
 	void collapsingAll();
 	void expandAll();
 	void onControllerCollapsed();
 
-	const QVector<ControllerView *> controllerViews() const;
+	const QVector<ControllerView*> controllerViews() const;
 
 private slots:
 	void addController();
-	void moveUp(ControllerView * view);
-	void moveDown(ControllerView * view);
+	void moveUp(ControllerView* view);
+	void moveDown(ControllerView* view);
 
 private:
 	QVector<ControllerView *> m_controllerViews;
@@ -88,7 +88,7 @@ private:
 	QScrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollAreaLayout;
 	QPushButton * m_addButton;
-	QMdiSubWindow * m_subWin;
+	QMdiSubWindow* m_subWin;
 };
 
 } // namespace gui

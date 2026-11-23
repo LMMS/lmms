@@ -52,7 +52,7 @@ ControllerView::ControllerView(Controller* model, QWidget* parent)
 	: QFrame{parent}
 	, ModelView{model, this}
 	, m_controllerDlg{nullptr}
-    , m_titleBarHeight(24)
+    , m_titleBarHeight{24}
     , m_modelC(model)
 {
 	const QSize buttonsize(17, 17);
@@ -67,8 +67,8 @@ ControllerView::ControllerView(Controller* model, QWidget* parent)
 
 	controllerTypeLabel = new QLabel(this);
 	controllerTypeLabel->setText(QString(getController()->type() == Controller::ControllerType::Lfo
-										 ? QString("LFO: ")
-										 : QString("PEAK: ")));
+		? QString("LFO: ")
+		: QString("PEAK: ")));
 	controllerTypeLabel->move(3, 3);
 	controllerTypeLabel->show();
 

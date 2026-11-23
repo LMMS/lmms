@@ -1486,7 +1486,7 @@ void Song::moveControllerUp(Controller* c)
 		if (it != m_controllers.end())
 		{
 			auto index = std::distance(m_controllers.begin(), it);
-			std::swap(m_controllers[index],m_controllers[index-1]);
+			std::swap(m_controllers[index], m_controllers[index - 1]);
 			setModified();
 		}
 	}

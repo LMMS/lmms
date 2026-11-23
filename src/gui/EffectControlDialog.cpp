@@ -74,20 +74,19 @@ void EffectControlDialog::showDialog()
 
 void EffectControlDialog::toggleView()
 {
-	if (m_subWindow)
-		{
-			if (!m_subWindow->isVisible())
-			{
-				m_subWindow->show();
-				m_subWindow->raise();
-				m_effectControls->setViewVisible(true);
-			}
-			else
-			{
-				m_subWindow->hide();
-				m_effectControls->setViewVisible(false);
-			}
-		}
+	if (!m_subWindow) { return; }
+
+	if (!m_subWindow->isVisible())
+	{
+		m_subWindow->show();
+		m_subWindow->raise();
+		m_effectControls->setViewVisible(true);
+	}
+	else
+	{
+		m_subWindow->hide();
+		m_effectControls->setViewVisible(false);
+	}
 }
 
 void EffectControlDialog::closeEvent(QCloseEvent* _ce)
