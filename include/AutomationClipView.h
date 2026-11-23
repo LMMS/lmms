@@ -71,8 +71,6 @@ protected:
 
 private:
 	AutomationClip * m_clip;
-	QPixmap m_paintPixmap;
-	
 	QStaticText m_staticTextName;
 
 	//! @brief Preserves the auto points over different scale

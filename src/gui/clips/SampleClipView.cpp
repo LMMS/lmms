@@ -46,9 +46,7 @@ namespace lmms::gui
 
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
-	m_clip( _clip ),
-	m_paintPixmap(),
-	m_paintPixmapXPosition(0)
+	m_clip(_clip)
 {
 	// update UI and tooltip
 	updateSample();

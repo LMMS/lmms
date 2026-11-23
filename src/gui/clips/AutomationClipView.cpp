@@ -49,8 +49,7 @@ namespace lmms::gui
 AutomationClipView::AutomationClipView( AutomationClip * _clip,
 						TrackView * _parent ) :
 	ClipView( _clip, _parent ),
-	m_clip( _clip ),
-	m_paintPixmap()
+	m_clip( _clip )
 {
 	connect( m_clip, SIGNAL(dataChanged()),
 			this, SLOT(update()));
@@ -339,6 +338,7 @@ void AutomationClipView::paintEvent(QPaintEvent* pe)
 	const int lineSize = 3;
 	painter.setPen( c.darker( 300 ) );
 
+	// Revisit this: can you limit it to pe->rect().width()?
 	for (bar_t b = 1; b < rect().width() - BORDER_WIDTH; ++b)
 	{
 		const int bx = BORDER_WIDTH + static_cast<int>(ppb * b) - 2;
