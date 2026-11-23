@@ -146,6 +146,55 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 
 
 
+QDomElement Effect::savePresetState(QDomDocument& doc, QDomElement& parent)
+{
+	auto effectElement = saveState(doc, parent);
+	const auto pluginName = QString::fromUtf8(descriptor()->name);
+
+	// Match the effect node format used when saving a project.
+	effectElement.setAttribute("name", pluginName);
+
+	// Keep these for compatibility and for checking single-effect presets.
+	effectElement.setAttribute("pluginname", pluginName);
+	effectElement.setAttribute("displayname", displayName());
+
+	effectElement.appendChild(key().saveXML(doc));
+	return effectElement;
+}
+
+
+Effect* Effect::createFromPresetState(
+	const QDomElement& effectElement,
+	EffectChain* parent)
+{
+	auto pluginName = effectElement.attribute("name");
+	if (pluginName.isEmpty())
+	{
+		// Presets saved by the earlier implementation used pluginname.
+		pluginName = effectElement.attribute("pluginname");
+	}
+
+	if (pluginName.isEmpty())
+	{
+		return nullptr;
+	}
+
+	const auto keyElement = effectElement.firstChildElement("key");
+	EffectKey key(keyElement);
+
+	auto effect = instantiate(pluginName, parent, &key);
+	if (effect == nullptr || !effect->isOkay())
+	{
+		delete effect;
+		return nullptr;
+	}
+
+	effect->restoreState(effectElement);
+	return effect;
+}
+
+
+
 
 Effect* Effect::instantiate(const QString& pluginName,
 	Model* parent,

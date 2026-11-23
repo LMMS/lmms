@@ -144,7 +144,11 @@ public:
 		Model* parent,
 		Descriptor::SubPluginFeatures::Key* key);
 
+	QDomElement savePresetState(QDomDocument& doc, QDomElement& parent);
 
+	static Effect* createFromPresetState(
+		const QDomElement& effectElement,
+		EffectChain* parent);
 
 protected:
 	enum class ProcessStatus

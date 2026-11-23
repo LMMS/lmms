@@ -178,30 +178,11 @@ void EffectView::savePreset()
 			&& !sfd.selectedFiles().first().isEmpty())
 	{
 		DataFile dataFile(DataFile::Type::EffectSettings);
-		QDomElement& content(dataFile.content());
+		auto& content = dataFile.content();
 
-		// "displayname" is stored so we can check that we're applying the right preset to the right effect.
-		content.setAttribute("displayname", effect()->displayName());
+		effect()->savePresetState(dataFile, content);
 
-		// One of the necessary arguments to Effect::instantiate
-		content.setAttribute("pluginname", QString::fromUtf8(effect()->descriptor()->name));
-
-		// Save the effect key for LADSPA instantiation, also used for Effect::instantiate
-		content.appendChild(effect()->key().saveXML(dataFile));
-
-		// TODO:
-		// If guivisible for VST effects is set to 0, the LMMS GUI opens,
-		// but is drawn as empty, with no VST content drawn.
-		// This fixes it, at least for now.
-		QDomElement vstControls = content.firstChildElement("vsteffectcontrols");
-		if (!vstControls.isNull()) {
-			vstControls.setAttribute("guivisible", 1);
-		}
-
-		effect()->saveSettings(dataFile, content);
-
-		QString f = sfd.selectedFiles()[0];
-		dataFile.writeFile(f);
+		dataFile.writeFile(sfd.selectedFiles().first());
 	}
 }
 
@@ -232,7 +213,6 @@ void EffectView::loadPreset()
 		QString f = sfd.selectedFiles()[0];
 		DataFile dataFile(f);
 		const QDomElement content = dataFile.content();
-		const QString presetName = content.attribute("displayname");
 
 		if (content.isNull())
 		{
@@ -244,29 +224,38 @@ void EffectView::loadPreset()
 			return;
 		}
 
-		const bool isSingleEffectPreset =
-			!content.attribute("pluginname").isEmpty();
-		if (!isSingleEffectPreset)
+		auto effectElement = content.firstChildElement("effect");
+
+		// Single-effect presets store the settings directly in the root element
+		if (effectElement.isNull() && !content.attribute("pluginname").isEmpty())
+		{
+			effectElement = content;
+		}
+
+		if (effectElement.isNull())
 		{
 			TextFloat::displayMessage(
 				tr("Preset loading error"),
-				tr("This preset contains multiple effects. Load it into the effect rack instead."),
+				tr("Could not find an effect in the preset file."),
 				embed::getIconPixmap("error"));
 			return;
 		}
 
-		if (presetName.isEmpty()
-			|| presetName != effect()->displayName())
+		const auto presetName = effectElement.attribute("displayname");
+		const auto pluginName = effectElement.attribute(
+			"name", effectElement.attribute("pluginname"));
+
+		if ((!presetName.isEmpty() && presetName != effect()->displayName())
+			|| pluginName != QString::fromUtf8(effect()->descriptor()->name))
 		{
 			TextFloat::displayMessage(
-				"Preset loading error",
+				tr("Preset loading error"),
 				tr("Can't apply the preset file to this effect."),
-				embed::getIconPixmap("error")
-			);
+				embed::getIconPixmap("error"));
 			return;
 		}
 
-		effect()->loadSettings(content);
+		effect()->restoreState(effectElement);
 	}
 }
 

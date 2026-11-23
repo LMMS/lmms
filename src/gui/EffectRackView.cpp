@@ -174,90 +174,56 @@ void EffectRackView::addEffectFromPreset(const QString& filePath)
 		return;
 	}
 
-	QVector<Effect*> effects;
+	QVector<QDomElement> effectElements;
 
-	auto appendEffectFromElement = [&](const QDomElement& effectElement) -> bool
-	{
-		const QString pluginName = effectElement.attribute("pluginname");
-		const QDomElement keyElement = effectElement.firstChildElement("key");
-
-		if (pluginName.isEmpty() || keyElement.isNull())
-		{
-			return false;
-		}
-
-		EffectKey key(keyElement);
-		Effect* effect = Effect::instantiate(
-			pluginName,
-			fxChain(),
-			&key);
-
-		if (effect == nullptr || !effect->isOkay())
-		{
-			delete effect;
-			return false;
-		}
-
-		effect->loadSettings(effectElement);
-		effects.push_back(effect);
-		return true;
-	};
-
-	// Backward-compatible single-effect LFXP:
-	//
-	// <effectsettings pluginname="..." displayname="...">
-	//     ...
-	// </effectsettings>
 	if (!content.attribute("pluginname").isEmpty())
 	{
-		if (!appendEffectFromElement(content))
-		{
-			TextFloat::displayMessage(
-				tr("Preset loading error"),
-				tr("Could not instantiate the effect in the preset."),
-				embed::getIconPixmap("error"));
-			return;
-		}
+		// Legacy single-effect LFXP: the effect state is the root element.
+		effectElements.push_back(content);
 	}
 	else
 	{
-		// Multi-effect LFXP:
-		//
-		// <effectsettings numofeffects="N">
-		//     <effect>...</effect>
-		//     <effect>...</effect>
-		// </effectsettings>
-		const int expectedCount = content.attribute("numofeffects").toInt();
-		const QDomNodeList effectNodes = content.elementsByTagName("effect");
-
-		const int effectCount = expectedCount > 0
-			? qMin(expectedCount, effectNodes.count())
-			: effectNodes.count();
-
-		for (int i = 0; i < effectCount; ++i)
+		for (auto element = content.firstChildElement("effect");
+			!element.isNull();
+			element = element.nextSiblingElement("effect"))
 		{
-			if (!appendEffectFromElement(effectNodes.at(i).toElement()))
-			{
-				for (Effect* effect : effects)
-				{
-					delete effect;
-				}
-
-				TextFloat::displayMessage(
-					tr("Preset loading error"),
-					tr("Could not instantiate every effect in the preset."),
-					embed::getIconPixmap("error"));
-				return;
-			}
+			effectElements.push_back(element);
 		}
 	}
 
-	for (Effect* effect : effects)
+	if (effectElements.isEmpty())
+	{
+		TextFloat::displayMessage(
+			tr("Preset loading error"),
+			tr("Could not find any effects in the preset file."),
+			embed::getIconPixmap("error"));
+		return;
+	}
+
+	QVector<Effect*> effects;
+	for (const auto& effectElement : effectElements)
+	{
+		auto* effect = Effect::createFromPresetState(effectElement, fxChain());
+		if (effect == nullptr)
+		{
+			qDeleteAll(effects);
+			TextFloat::displayMessage(
+				tr("Preset loading error"),
+				tr("Could not instantiate every effect in the preset."),
+				embed::getIconPixmap("error"));
+			return;
+		}
+
+		effects.push_back(effect);
+	}
+
+	for (auto* effect : effects)
 	{
 		fxChain()->appendEffect(effect);
 	}
 
 	update();
+
 }
 
 void EffectRackView::clearEffects()
@@ -285,40 +251,19 @@ void EffectRackView::savePreset()
 	}
 
 	DataFile dataFile(DataFile::Type::EffectSettings);
-	QDomElement& content = dataFile.content();
+	auto& content = dataFile.content();
 
-	content.setAttribute("numofeffects",
+	content.setAttribute(
+		"numofeffects",
 		static_cast<int>(fxChain()->m_effects.size()));
 
-	for (Effect* effect : fxChain()->m_effects)
+	for (auto* effect : fxChain()->m_effects)
 	{
-		auto effectElement = dataFile.createElement("effect");
-
-		effectElement.setAttribute(
-			"pluginname",
-			QString::fromUtf8(effect->descriptor()->name));
-
-		effectElement.setAttribute(
-			"displayname",
-			effect->displayName());
-
-		// TODO:
-		// If guivisible for VST effects is set to 0, the LMMS GUI opens,
-		// but is drawn as empty, with no VST content drawn.
-		// This fixes it, at least for now.
-		QDomElement vstControls = effectElement.firstChildElement("vsteffectcontrols");
-		if (!vstControls.isNull()) {
-			vstControls.setAttribute("guivisible", 1);
-		}
-
-		effect->saveSettings(dataFile, effectElement);
-
-		effectElement.appendChild(effect->key().saveXML(dataFile));
-
-		content.appendChild(effectElement);
+		effect->savePresetState(dataFile, content);
 	}
 
 	dataFile.writeFile(sfd.selectedFiles().first());
+
 }
 
 void EffectRackView::loadPreset()
