@@ -243,7 +243,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 	}
 	setUpdatesEnabled(true);
 
-	updateBackground();
+	update();
 }
 
 
