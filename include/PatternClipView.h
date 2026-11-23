@@ -67,8 +67,6 @@ protected:
 
 private:
 	PatternClip* m_patternClip;
-	QPixmap m_paintPixmap;
-	
 	QStaticText m_staticTextName;
 
 	float m_emptyTrackHeightRatio {0.5f};
