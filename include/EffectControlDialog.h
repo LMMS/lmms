@@ -49,7 +49,6 @@ public:
 
 	virtual void showDialog();
 	virtual void toggleView();
-
 signals:
 	void closed();
 

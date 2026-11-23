@@ -113,15 +113,17 @@ void PeakControllerEffectControlDialog::showDialog()
 
 void PeakControllerEffectControlDialog::toggleView()
 {
-	if (!getGUI()->getControllerRackView()->subWin()->isVisible())
+	auto* sw = getGUI()->getControllerRackView()->subWin();
+
+	if (!sw->isVisible())
 	{
-		getGUI()->getControllerRackView()->subWin()->show();
-		getGUI()->getControllerRackView()->subWin()->raise();
+		sw->show();
+		sw->raise();
 		m_effectControls->setViewVisible(true);
 	}
 	else
 	{
-		getGUI()->getControllerRackView()->subWin()->hide();
+		sw->hide();
 		m_effectControls->setViewVisible(false);
 	}
 }
