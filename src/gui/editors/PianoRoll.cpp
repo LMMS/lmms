@@ -37,6 +37,7 @@
 #include <QLabel>
 #include <QMargins>
 #include <QMessageBox>
+#include <QMenu>
 #include <QPainter>
 #include <QPointer>
 #include <QPushButton>
@@ -444,6 +445,9 @@ PianoRoll::PianoRoll() :
 	changeSnapMode();
 	connect(&m_snapModel, SIGNAL(dataChanged()),
 		this, SLOT(changeSnapMode()));
+
+	m_setFamilyMenu = new QMenu("Set family");
+	m_removeFamilyMenu = new QMenu("Remove family...");
 
 	resetNoteFamilyModel();
 
@@ -1695,6 +1699,24 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		{
 			updateStrumPos(me, true, me->modifiers() & Qt::ShiftModifier);
 			m_strumEnabled = true;
+			update();
+		}
+		return;
+	}
+
+	if (m_editMode == EditMode::Paint && me->button() == Qt::LeftButton)
+	{
+		if (Note* note = noteUnderMouse(); note)
+		{
+			if (note->selected())
+			{
+				// Painting group of selected notes : Paint all notes in selection
+				for (Note *note : getSelectedNotes())
+				{
+					note->setFamily(m_noteFamily);
+				}
+			}
+			note->setFamily(m_noteFamily);
 			update();
 		}
 		return;
@@ -3017,46 +3039,9 @@ void PianoRoll::addNoteFamily()
 
 	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
 	int id = album->addFamily(s, color);
-	m_familyModel.addItem(tr(s.toStdString().c_str()));
+	registerNoteFamily(s, color, id);
 
-	m_noteFamily = id;
-	m_familyModel.setValue(id + 1);
-}
-
-void PianoRoll::deleteNoteFamily()
-{
-	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
-
-    QStringList items{};
-	for (int i = 0; i <= album->lastFamilyId(); i++)
-	{
-		items << (QString::number(i) + ". " + album->getFamilyName(i));
-	}
-
-    bool ok = false;
-    QString item = QInputDialog::getItem(this, tr("QInputDialog::getItem()"),
-                                         tr("Delete :"), items, 0, false, &ok);
-    if (!ok || item.isEmpty())
-		return;
-
-	int id = item.split(".").value(0).toInt();
-
-	int idShifted = album->deleteFamily(id);
-	loadFamilyModelFromClip();
-	m_noteFamily = -1;
-
-	// One family has been shifted to fill the gap : Set all notes to the correct family
-	for (Note *note : m_midiClip->notes())
-	{
-		if (note->family() == id)
-		{
-			note->setFamily(-1);
-		}
-		else if ((idShifted != -1) && (note->family() == idShifted))
-		{
-			note->setFamily(id);
-		}
-	}
+	setNoteFamily(id);
 }
 
 /*
@@ -3139,7 +3124,84 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 	m_midiClip->dataChanged();
 }
 
+void PianoRoll::registerNoteFamily(const QString& name, const QColor& color, int id)
+{
+	{
+		auto fam = new QAction(name, m_setFamilyMenu);
+		m_setFamilyMenu->addAction(fam);
+		connect(fam, &QAction::triggered, this, [this, id]() {
+				setNoteFamily(id);
+		});
+	}
+	if (id > -1) // Avoid "No family"
+	{
+		auto fam = new QAction(name, m_removeFamilyMenu);
+		m_removeFamilyMenu->addAction(fam);
+		connect(fam, &QAction::triggered, this, [this, id]() {
+				deleteNoteFamily(id);
+		});
+	}
+}
 
+void PianoRoll::setNoteFamily(int family)
+{
+	m_noteFamily = family;
+
+	auto icon = QPixmap(embed::getIconPixmap("edit_draw")); // TODO Icon
+
+	if (family != -1)
+	{
+		// auto icon = m_notePaintAction.icon();
+
+		QPainter painter(&icon);
+		painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+
+		QColor color = m_midiClip->noteFamilyAlbum()->getFamilyColor(family);
+		painter.setBrush(color);
+		painter.setPen(color);
+
+		painter.drawRect(icon.rect());
+	}
+	m_notePaintAction->setIcon(icon);
+}
+
+void PianoRoll::deleteNoteFamily(int family)
+{
+	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
+
+	int idShifted = album->deleteFamily(family);
+	m_noteFamily = -1;
+
+	// One family has been shifted to fill the gap : Set all notes to the correct family
+	for (Note *note : m_midiClip->notes())
+	{
+		if (note->family() == family)
+		{
+			note->setFamily(-1);
+		}
+		else if ((idShifted != -1) && (note->family() == idShifted))
+		{
+			note->setFamily(family);
+		}
+	}
+
+	{
+		QAction* act = m_setFamilyMenu->actions()[family + 1];
+		m_setFamilyMenu->removeAction(act);
+		act = m_setFamilyMenu->actions()[idShifted + 1];
+
+		disconnect(act, SIGNAL(triggered()), this, nullptr);
+		connect(act, &QAction::triggered, this, [this, family]() { setNoteFamily(family); });
+	}
+	{
+		auto act = m_removeFamilyMenu->actions()[family];
+		m_removeFamilyMenu->removeAction(act);
+		act = m_removeFamilyMenu->actions()[idShifted];
+
+		disconnect(act, SIGNAL(triggered()), this, nullptr);
+		connect(act, &QAction::triggered, this, [this, family]() { deleteNoteFamily(family); });
+	}
+}
 
 void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 {
@@ -4072,6 +4134,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				break;
 			case EditMode::Knife:
 				cursor = &m_toolKnife;
+				break;
+			case EditMode::Paint:
+				cursor = &m_toolPaint;
 				break;
 			case EditMode::Strum:
 				cursor = &m_toolStrum;
@@ -5244,21 +5309,11 @@ void PianoRoll::changeSnapMode()
 	m_gridMode = static_cast<GridMode>(m_snapModel.value());
 }
 
-void PianoRoll::changeNoteFamily()
-{
-	m_noteFamily = (m_familyModel.value() - 1);
-}
-
 void PianoRoll::resetNoteFamilyModel()
 {
-	disconnect(&m_familyModel, SIGNAL(dataChanged()), this, SLOT(changeNoteFamily()));
-
-	m_familyModel.clear();
-
-	m_familyModel.addItem(tr("No family"));
-	m_familyModel.setInitValue(0);
-	connect(&m_familyModel, SIGNAL(dataChanged()),
-		this, SLOT(changeNoteFamily()));
+	m_setFamilyMenu->clear();
+	m_removeFamilyMenu->clear();
+	registerNoteFamily("No family", QColor(), -1);
 }
 
 void PianoRoll::loadFamilyModelFromClip()
@@ -5268,8 +5323,7 @@ void PianoRoll::loadFamilyModelFromClip()
 	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
 	for (int i = 0; i <= album->lastFamilyId(); i++)
 	{
-		m_familyModel.addItem(
-				tr(album->getFamilyName(i).toStdString().c_str()));
+		registerNoteFamily(album->getFamilyName(i), album->getFamilyColor(i), i);
 	}
 }
 
@@ -5294,12 +5348,27 @@ PianoRollWindow::PianoRollWindow() :
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
 	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch Bend mode (Shift+T)" ) );
 
+	m_editor->m_notePaintAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Note paint mode (Shift+P)")); // TODO Icon
+
+	auto notePaintMenu = new QMenu("Note family management");
+
+	m_editor->m_notePaintAction->setMenu(notePaintMenu);
+
+	auto addFamilyAction = new QAction(embed::getIconPixmap("add"), tr("Add family..."), notePaintMenu); // TODO Icon
+
+	notePaintMenu->addMenu(m_editor->m_setFamilyMenu);
+	notePaintMenu->addAction(addFamilyAction);
+	notePaintMenu->addMenu(m_editor->m_removeFamilyMenu);
+
+	connect(addFamilyAction, SIGNAL(triggered()), this, SLOT(addNoteFamily()));
+
 	drawAction->setChecked( true );
 
 	drawAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_D ));
 	eraseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_E));
 	selectAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_S));
 	pitchBendAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_T));
+	m_editor->m_notePaintAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_P));
 
 	connect( editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
@@ -5325,6 +5394,7 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
 	notesActionsToolBar->addAction( pitchBendAction );
+	notesActionsToolBar->addAction(m_editor->m_notePaintAction);
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addWidget(quantizeButton);
 
@@ -5373,24 +5443,6 @@ PianoRollWindow::PianoRollWindow() :
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
-
-	// Note family controls
-
-	DropToolBar* familyActionsToolBar = addDropToolBarToTop(tr("Note families"));
-
-	m_familyToolsButton = new QToolButton(m_toolBar);
-	m_familyToolsButton->setIcon(embed::getIconPixmap("file"));
-	m_familyToolsButton->setPopupMode(QToolButton::InstantPopup);
-
-	auto addFamilyAction = new QAction(embed::getIconPixmap("file"), tr("Add family..."), m_familyToolsButton);
-	auto deleteFamilyAction = new QAction(embed::getIconPixmap("file"), tr("Delete family..."), m_familyToolsButton);
-
-	m_familyToolsButton->addAction(addFamilyAction);
-	m_familyToolsButton->addAction(deleteFamilyAction);
-	familyActionsToolBar->addWidget(m_familyToolsButton);
-
-	connect(addFamilyAction, SIGNAL(triggered()), this, SLOT(addNoteFamily()));
-	connect(deleteFamilyAction, SIGNAL(triggered()), this, SLOT(deleteNoteFamily()));
 
 	// -- Note modifier tools
 	auto noteToolsButton = new QToolButton(m_toolBar);
@@ -5511,13 +5563,14 @@ PianoRollWindow::PianoRollWindow() :
 	m_snapComboBox->setToolTip(tr("Snap mode"));
 
 	// setup family-stuff
+	/* TODO Remove
 	auto familyLbl = new QLabel(m_toolBar);
-	familyLbl->setPixmap(embed::getIconPixmap("gridmode"));
+	familyLbl->setPixmap(embed::getIconPixmap("colorize")); // TODO Icon
 
 	m_familyComboBox = new ComboBox(m_toolBar);
 	m_familyComboBox->setModel(&m_editor->m_familyModel);
 	m_familyComboBox->setFixedSize(96, ComboBox::DEFAULT_HEIGHT);
-	m_familyComboBox->setToolTip(tr("Note family"));
+	m_familyComboBox->setToolTip(tr("Note family"));*/
 
 	// -- Clear ghost MIDI clip button
 	m_clearGhostButton = new QPushButton( m_toolBar );
@@ -5595,6 +5648,7 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(snapWidget);
 
+	/* TODO Remove
 	auto familyWidget = new QWidget();
 	auto familyHBox = new QHBoxLayout();
 	familyHBox->setContentsMargins(0, 0, 0, 0);
@@ -5603,6 +5657,7 @@ PianoRollWindow::PianoRollWindow() :
 	familyWidget->setLayout(familyHBox);
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(familyWidget);
+	*/
 
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
@@ -5998,14 +6053,6 @@ void PianoRollWindow::addNoteFamily()
 {
 	m_editor->addNoteFamily();
 }
-
-void PianoRollWindow::deleteNoteFamily()
-{
-	m_editor->deleteNoteFamily();
-}
-
-
-
 
 void PianoRollWindow::focusInEvent( QFocusEvent * event )
 {

@@ -109,6 +109,7 @@ public:
 		Erase,
 		Select,
 		Detuning,
+		Paint,
 		Knife,
 		Strum
 	};
@@ -248,10 +249,9 @@ protected slots:
 	void constrainNoteLengths(bool constrainMax);
 
 	void changeSnapMode();
-	void changeNoteFamily();
+
 	void resetNoteFamilyModel();
 	void loadFamilyModelFromClip();
-
 
 signals:
 	void currentMidiClipChanged();
@@ -357,6 +357,7 @@ private:
 	QPixmap m_toolOpen = embed::getIconPixmap("automation");
 	QPixmap m_toolKnife = embed::getIconPixmap("edit_knife");
 	QPixmap m_toolStrum = embed::getIconPixmap("arp_free");
+	QPixmap m_toolPaint = embed::getIconPixmap("file"); // TODO Icon
 
 	static std::array<KeyType, 12> prKeyOrder;
 
@@ -370,7 +371,6 @@ private:
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
-	ComboBoxModel m_familyModel;
 
 	static const std::vector<float> m_zoomLevels;
 	static const std::vector<float> m_zoomYLevels;
@@ -507,7 +507,6 @@ private:
 	void setupSelectedChords();
 
 	void addNoteFamily();
-	void deleteNoteFamily();
 
 	TimePos m_strumStartTime;
 	TimePos m_strumCurrentTime;
@@ -518,6 +517,9 @@ private:
 	//! Handles updating all of the note positions when performing a strum
 	void updateStrumPos(QMouseEvent* me, bool initial, bool warp);
 
+	void registerNoteFamily(const QString& name, const QColor& color, int id);
+	void setNoteFamily(int family);
+	void deleteNoteFamily(int family);
 
 	friend class PianoRollWindow;
 
@@ -562,6 +564,11 @@ private:
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
 	QBrush m_blackKeyDisabledBackground;
+
+	QMenu* m_setFamilyMenu;
+	QMenu* m_removeFamilyMenu;
+
+	QAction* m_notePaintAction;
 } ;
 
 
@@ -614,7 +621,6 @@ private slots:
 	void exportMidiClip();
 	void importMidiClip();
 	void addNoteFamily();
-	void deleteNoteFamily();
 
 private:
 	void clipRenamed();
@@ -627,7 +633,6 @@ private:
 	PianoRoll* m_editor;
 
 	QToolButton* m_fileToolsButton;
-	QToolButton* m_familyToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
@@ -636,9 +641,7 @@ private:
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
 	ComboBox* m_snapComboBox;
-	ComboBox* m_familyComboBox;
 	QPushButton * m_clearGhostButton;
-
 };
 
 
