@@ -165,14 +165,13 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 
 		const auto xPos = static_cast<int>((clip->startPosition() - begin) * ppb / TimePos::ticksPerBar());
 		clipView->move(xPos, clipView->y());
+		clipView->update();
 		if (!clipView->isVisible())
 		{
 			clipView->show();
 		}
 	}
 	setUpdatesEnabled(true);
-
-	update();
 }
 
 
