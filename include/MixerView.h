@@ -83,7 +83,7 @@ public:
 	// delete all unused channels
 	void deleteUnusedChannels();
 
-	// move the channel to the left or right
+	// move the channel to the left or right, which unlinks it from its track
 	void moveChannelLeft(int index);
 	void moveChannelRight(int index);
 

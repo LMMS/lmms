@@ -191,7 +191,8 @@ public:
 	void deleteChannel(int index);
 
 	// add a new channel linked to the track and route the track to it.
-	// a linked channel follows the track's name and color and is deleted along with it
+	// a linked channel follows the track's name, color and position and is deleted along with it
+	// returns the index of the channel, which is placed in the order of its track
 	int createLinkedChannel(Track& track);
 
 	// link the channel the track is routed to, unless it is master or already linked
@@ -222,6 +223,12 @@ public:
 	// re-arrange channels
 	void moveChannelLeft(int index);
 	void moveChannelRight(int index);
+	void swapChannels(int first, int second);
+
+	// put linked channels in the order of their tracks, Pattern Editor tracks first.
+	// a channel out of order moves next to its neighbour and the channels it passes shift over,
+	// so unlinked channels keep their neighbours
+	void sortLinkedChannels();
 
 	// reset a channel's name, fx, sends, etc
 	void clearChannel(mix_ch_t channelIndex);
@@ -254,6 +261,7 @@ signals:
 
 private:
 	void updateTrackChannelRanges();
+	void moveChannel(int from, int to);
 
 	// the mixer channels in the mixer. index 0 is always master.
 	std::vector<MixerChannel*> m_mixerChannels;

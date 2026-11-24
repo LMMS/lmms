@@ -448,16 +448,29 @@ void MixerView::deleteUnusedChannels()
 
 void MixerView::moveChannelLeft(int index)
 {
+	// can't move master or first channel left
+	if (index <= 1 || index >= m_mixer->numChannels()) { return; }
+
+	// a channel moved by hand no longer follows its track
+	m_mixer->unlinkChannel(index);
 	m_mixer->moveChannelLeft(index);
 }
 
 void MixerView::swapChannelViews(int first, int second)
 {
-	const auto layoutIndex = chLayout->indexOf(m_mixerChannelViews[second]);
-	assert(layoutIndex >= 1);
+	if (first > second) { std::swap(first, second); }
 
-	chLayout->removeWidget(m_mixerChannelViews[second]);
-	chLayout->insertWidget(layoutIndex - 1, m_mixerChannelViews[second]);
+	const auto firstView = m_mixerChannelViews[first];
+	const auto secondView = m_mixerChannelViews[second];
+	const auto firstLayoutIndex = chLayout->indexOf(firstView);
+	const auto secondLayoutIndex = chLayout->indexOf(secondView);
+	assert(firstLayoutIndex >= 0 && firstLayoutIndex < secondLayoutIndex);
+
+	// remove the later view first so the earlier one keeps its layout index
+	chLayout->removeWidget(secondView);
+	chLayout->removeWidget(firstView);
+	chLayout->insertWidget(firstLayoutIndex, secondView);
+	chLayout->insertWidget(secondLayoutIndex, firstView);
 
 	m_mixerChannelViews[second]->setChannelIndex(first);
 	m_mixerChannelViews[first]->setChannelIndex(second);
@@ -468,7 +481,12 @@ void MixerView::swapChannelViews(int first, int second)
 
 void MixerView::moveChannelRight(int index)
 {
-	moveChannelLeft(index + 1);
+	// can't move master or last channel right
+	if (index <= 0 || index >= m_mixer->numChannels() - 1) { return; }
+
+	// a channel moved by hand no longer follows its track
+	m_mixer->unlinkChannel(index);
+	m_mixer->moveChannelRight(index);
 }
 
 

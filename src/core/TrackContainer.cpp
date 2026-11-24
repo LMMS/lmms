@@ -33,6 +33,8 @@
 
 #include "AutomationClip.h"
 #include "embed.h"
+#include "Engine.h"
+#include "Mixer.h"
 #include "TrackContainer.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
@@ -220,6 +222,8 @@ void TrackContainer::moveTrack(Track* track, int indexTo)
 {
 	m_tracks.erase(std::ranges::find(m_tracks, track));
 	m_tracks.insert(m_tracks.begin() + indexTo, track);
+
+	Engine::mixer()->sortLinkedChannels();
 
 	emit trackMoved();
 }

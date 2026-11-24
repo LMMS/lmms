@@ -457,8 +457,9 @@ int Mixer::createLinkedChannel(Track& track)
 	track.mixerChannelModel()->setValue(index);
 	linkChannel(track);
 	updateLinkedChannel(track);
+	sortLinkedChannels();
 
-	return index;
+	return track.mixerChannelModel()->value();
 }
 
 
@@ -507,6 +508,7 @@ void Mixer::linkChannel(int index)
 	const auto track = onlyTrackRoutedTo(index);
 	m_mixerChannels[index]->m_linkedTrack = track;
 	updateLinkedChannel(*track);
+	sortLinkedChannels();
 }
 
 
@@ -568,35 +570,7 @@ void Mixer::moveChannelLeft( int index )
 	{
 		return;
 	}
-	// channels to swap
-	int a = index - 1, b = index;
-
-	// check if m_lastSoloed is one of our swaps
-	if (m_lastSoloed == a) { m_lastSoloed = b; }
-	else if (m_lastSoloed == b) { m_lastSoloed = a; }
-
-	// go through every track and adjust for the channel index change
-	for (const auto model : trackMixerChannelModels())
-	{
-		const int val = model->value();
-		if (val == a)
-		{
-			model->setValue(b);
-		}
-		else if (val == b)
-		{
-			model->setValue(a);
-		}
-	}
-
-	// Swap positions in array
-	qSwap(m_mixerChannels[index], m_mixerChannels[index - 1]);
-
-	// Update m_channelIndex of both channels
-	m_mixerChannels[index]->setIndex(index);
-	m_mixerChannels[index - 1]->setIndex(index - 1);
-
-	emit channelsSwapped(index - 1, index);
+	swapChannels(index - 1, index);
 }
 
 
@@ -604,6 +578,115 @@ void Mixer::moveChannelLeft( int index )
 void Mixer::moveChannelRight( int index )
 {
 	moveChannelLeft( index + 1 );
+}
+
+
+
+void Mixer::swapChannels(int first, int second)
+{
+	assert(first > 0 && second > 0);
+	if (first == second) { return; }
+
+	{
+		// the audio thread must not see the channel list while it changes
+		const auto guard = Engine::audioEngine()->requestChangesGuard();
+
+		// check if m_lastSoloed is one of our swaps
+		if (m_lastSoloed == first) { m_lastSoloed = second; }
+		else if (m_lastSoloed == second) { m_lastSoloed = first; }
+
+		// go through every track and adjust for the channel index change
+		for (const auto model : trackMixerChannelModels())
+		{
+			const int val = model->value();
+			if (val == first)
+			{
+				model->setValue(second);
+			}
+			else if (val == second)
+			{
+				model->setValue(first);
+			}
+		}
+
+		std::swap(m_mixerChannels[first], m_mixerChannels[second]);
+		m_mixerChannels[first]->setIndex(first);
+		m_mixerChannels[second]->setIndex(second);
+	}
+
+	emit channelsSwapped(first, second);
+}
+
+
+
+void Mixer::sortLinkedChannels()
+{
+	// the linked channels in the order they should have
+	auto channels = std::vector<MixerChannel*>{};
+	for (const auto container : std::array<TrackContainer*, 2>{Engine::patternStore(), Engine::getSong()})
+	{
+		for (const auto track : container->tracks())
+		{
+			if (const auto channel = linkedChannel(*track)) { channels.push_back(channel); }
+		}
+	}
+
+	const auto count = channels.size();
+	if (count == 0) { return; }
+
+	// the longest run of channels that are already in order stays where it is
+	auto runLength = std::vector<std::size_t>(count, 1);
+	auto previous = std::vector<std::size_t>(count, count);
+	for (std::size_t i = 0; i < count; ++i)
+	{
+		for (std::size_t j = 0; j < i; ++j)
+		{
+			if (channels[j]->index() < channels[i]->index() && runLength[j] + 1 > runLength[i])
+			{
+				runLength[i] = runLength[j] + 1;
+				previous[i] = j;
+			}
+		}
+	}
+
+	std::size_t last = 0;
+	for (std::size_t i = 1; i < count; ++i)
+	{
+		if (runLength[i] >= runLength[last]) { last = i; }
+	}
+
+	auto placed = std::vector<bool>(count, false);
+	for (auto i = last; i < count; i = previous[i]) { placed[i] = true; }
+
+	// every other channel moves in front of the next placed channel, or else behind the previous one
+	for (std::size_t i = 0; i < count; ++i)
+	{
+		if (placed[i]) { continue; }
+
+		const int index = channels[i]->index();
+		const auto next = std::find(placed.begin() + i + 1, placed.end(), true);
+		if (next != placed.end())
+		{
+			const int nextIndex = channels[next - placed.begin()]->index();
+			moveChannel(index, index < nextIndex ? nextIndex - 1 : nextIndex);
+		}
+		else
+		{
+			auto j = i;
+			while (!placed[--j]) {}
+			const int previousIndex = channels[j]->index();
+			if (index < previousIndex) { moveChannel(index, previousIndex); }
+		}
+		placed[i] = true;
+	}
+}
+
+
+
+void Mixer::moveChannel(int from, int to)
+{
+	for (; from < to; ++from) { swapChannels(from, from + 1); }
+	for (; from > to; --from) { swapChannels(from - 1, from); }
 }
 
 

@@ -29,6 +29,7 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "Mixer.h"
+#include "PatternStore.h"
 #include "SampleTrack.h"
 #include "Song.h"
 
@@ -190,6 +191,37 @@ private slots:
 		const auto other = Track::create(Track::Type::Sample, Engine::getSong());
 		other->mixerChannelModel()->setValue(index);
 		QVERIFY(!mixer->canLinkChannel(index));
+	}
+
+	void testLinkedChannelsFollowTrackOrder()
+	{
+		using namespace lmms;
+		const auto mixer = Engine::mixer();
+		const auto song = Engine::getSong();
+
+		const auto channelOrder = [mixer] {
+			auto channels = std::vector<MixerChannel*>{};
+			for (int i = 1; i < mixer->numChannels(); ++i) { channels.push_back(mixer->mixerChannel(i)); }
+			return channels;
+		};
+
+		const auto first = Track::create(Track::Type::Sample, song);
+		const auto firstChannel = mixer->mixerChannel(mixer->createLinkedChannel(*first));
+		const auto second = Track::create(Track::Type::Sample, song);
+		const auto secondChannel = mixer->mixerChannel(mixer->createLinkedChannel(*second));
+		const auto unlinked = mixer->mixerChannel(mixer->createChannel());
+
+		// Pattern Editor channels come first, and the unlinked channel stays after the second one
+		const auto pattern = Track::create(Track::Type::Sample, Engine::patternStore());
+		const auto patternChannel = mixer->mixerChannel(mixer->createLinkedChannel(*pattern));
+		QVERIFY(channelOrder() == (std::vector{patternChannel, firstChannel, secondChannel, unlinked}));
+
+		const auto& tracks = song->tracks();
+		song->moveTrack(second, std::ranges::find(tracks, first) - tracks.begin());
+		QVERIFY(channelOrder() == (std::vector{patternChannel, secondChannel, firstChannel, unlinked}));
+
+		song->moveTrack(second, tracks.size() - 1);
+		QVERIFY(channelOrder() == (std::vector{patternChannel, firstChannel, secondChannel, unlinked}));
 	}
 
 	void testLinkIsSaved()
