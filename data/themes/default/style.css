@@ -436,7 +436,7 @@ QToolButton#playButton{
     height: 24;
 }
 
-QToolButton#pauseButton{
+QToolButton#playButton:checked{
 	image: url("resources:pause.svg");
     width: 24;
     height: 24;
@@ -466,7 +466,7 @@ QToolButton#stepRecordButton{
     height: 24;
 }
 
-QToolButton#stepRecordButtonOn{
+QToolButton#stepRecordButton:checked{
 	image: url("resources:record_step_on.svg");
     width: 24;
     height: 24;
@@ -757,7 +757,7 @@ QToolBar::separator {
 
 /* all tool buttons */
 
-QToolButton, QToolButton::menu-button {
+QToolButton, QToolButton::menu-button, QToolButton#playButton:checked, QToolButton#stepRecordButton:checked {
 	margin: 1px;
 	padding: 2px 2px 2px 2px;
 	border-top: 1px solid #778394;
@@ -768,7 +768,9 @@ QToolButton, QToolButton::menu-button {
 	color: #fff;
 }
 
-QToolButton:hover {
+QToolButton:hover, QToolButton#playButton:hover:checked, QToolButton#stepRecordButton:hover:checked{
+    border-left: none;
+    border-right: none;
 	border-top: 1px solid #909eb3;
 	border-bottom: 1px solid #1e2226;
 	border-radius: 2px;

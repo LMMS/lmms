@@ -5880,17 +5880,7 @@ void PianoRollWindow::stopStepRecording()
 
 void PianoRollWindow::updateStepRecordingIcon()
 {
-	if(m_editor->isStepRecording())
-	{
-		m_toggleStepRecordingButton->setObjectName("stepRecordButtonOn");
-	}
-	else
-	{
-		m_toggleStepRecordingButton->setObjectName("stepRecordButton");
-	}
-	m_toggleStepRecordingButton->style()->unpolish(m_toggleStepRecordingButton);
-	m_toggleStepRecordingButton->style()->polish(m_toggleStepRecordingButton);
-	m_toggleStepRecordingButton->update();
+	m_toggleStepRecordingAction->setChecked(m_editor->isStepRecording());
 }
 
 

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="20"
    height="20"
    viewBox="0 0 5.2916665 5.2916665"
    version="1.1"
    id="svg1626"
-   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
-   sodipodi:docname="back_to_zero.svg">
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   sodipodi:docname="back_to_zero.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs1620" />
   <sodipodi:namedview
@@ -24,23 +24,31 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="28"
-     inkscape:cx="10.374999"
-     inkscape:cy="7.1428326"
+     inkscape:cx="10.357143"
+     inkscape:cy="7.1428571"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="true"
      units="px"
-     inkscape:window-width="1440"
-     inkscape:window-height="837"
+     inkscape:window-width="1920"
+     inkscape:window-height="993"
      inkscape:window-x="0"
-     inkscape:window-y="35"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:document-rotation="0">
+     inkscape:document-rotation="0"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid2171"
        empspacing="20"
-       dotted="false" />
+       dotted="false"
+       originx="0"
+       originy="0"
+       spacingy="1"
+       spacingx="1"
+       units="px" />
   </sodipodi:namedview>
   <metadata
      id="metadata1623">
@@ -65,8 +73,8 @@
      inkscape:label="Icon">
     <path
        inkscape:connector-curvature="0"
-       style="display:inline;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.264583"
-       d="m 0.26458374,1.0583336 v 3.175 H 0.7937504 v -3.175 z M 2.910417,1.5875003 1.3229171,2.6458336 2.910417,3.7041669 Z m 2.1166667,0 -1.5875,1.0583333 1.5875,1.0583333 z"
+       style="display:inline;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.238125"
+       d="m 0.50270874,1.2170836 v 2.8575 h 0.47624999 v -2.8575 z m 2.38124996,0.47625 -1.4287499,0.9525 1.4287499,0.9525 z m 1.905,0 -1.42875,0.9525 1.42875,0.9525 z"
        id="path4895" />
   </g>
 </svg>

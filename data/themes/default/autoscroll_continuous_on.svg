@@ -72,24 +72,24 @@
      id="layer2"
      inkscape:label="Icon">
     <path
-       style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       d="M 0.53894266,2.1166669 H 2.9104163 V 1.0583336 l 1.8520833,1.5875 -1.8520833,1.5875 V 3.1750003 H 0.52916631 Z"
+       style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.214439"
+       d="M 0.93824302,2.2188696 H 2.8602725 V 1.3611128 L 4.361347,2.6477482 2.8602725,3.9343835 V 3.0766266 H 0.93031945 Z"
        id="rect4885"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccc" />
     <rect
-       style="fill:#ffffff;stroke-width:0.214013"
+       style="fill:#ffffff;stroke-width:0.270349"
        id="rect1"
-       width="0.18369643"
-       height="0.8220982"
-       x="2.7286093"
-       y="0.2315104" />
+       width="0.30022243"
+       height="0.80269498"
+       x="2.5615814"
+       y="0.55458832" />
     <rect
-       style="fill:#ffffff;stroke-width:0.214013"
+       style="fill:#ffffff;stroke-width:0.270349"
        id="rect1-6"
-       width="0.18369643"
-       height="0.8220982"
-       x="2.7233171"
-       y="4.2333331" />
+       width="0.30022243"
+       height="0.80269498"
+       x="2.5529325"
+       y="3.9343832" />
   </g>
 </svg>

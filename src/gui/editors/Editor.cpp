@@ -41,17 +41,7 @@ namespace lmms::gui
 void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
-	if (displayPauseIcon)
-	{
-		m_playButton->setObjectName("pauseButton");
-	}
-	else
-	{
-		m_playButton->setObjectName("playButton");
-	}
-	m_playButton->style()->unpolish(m_playButton);
-	m_playButton->style()->polish(m_playButton);
-	m_playButton->update();
+	m_playAction->setChecked(displayPauseIcon);
 }
 
 DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)
@@ -119,6 +109,8 @@ Editor::Editor(bool record, bool stepRecord) :
 	m_recordAction = new QAction(embed::createEmptyPixmap(), tr("Record"), this);
 	m_recordAccompanyAction = new QAction(embed::createEmptyPixmap(), tr("Record while playing"), this);
 	m_toggleStepRecordingAction = new QAction(embed::createEmptyPixmap(), tr("Toggle Step Recording"), this);
+	m_toggleStepRecordingAction->setCheckable(true);
+	m_toggleStepRecordingAction->setChecked(false);
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
@@ -140,7 +132,6 @@ Editor::Editor(bool record, bool stepRecord) :
 	if(stepRecord)
 	{
 		addButton(m_toggleStepRecordingAction, "stepRecordButton");
-		m_toggleStepRecordingButton = m_toolBar->widgetForAction(m_toggleStepRecordingAction);
 	}
 	addButton(m_stopAction, "stopButton");
 }

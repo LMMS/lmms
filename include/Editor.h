@@ -95,7 +95,6 @@ protected:
 	QAction* m_recordAccompanyAction;
 	QAction* m_toggleStepRecordingAction;
 	QAction* m_stopAction;
-	QWidget* m_toggleStepRecordingButton;
 	QWidget* m_playButton;
 };
 
