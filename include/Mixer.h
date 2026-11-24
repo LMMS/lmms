@@ -205,6 +205,11 @@ public:
 
 	void updateLinkedChannel(Track& track);
 
+	// set the channel's name, through its track if the channel is linked so both change
+	void setChannelName(int index, const QString& name);
+	// set the channel's color, through its track if the channel is linked so both change
+	void setChannelColor(int index, const std::optional<QColor>& color);
+
 	// delete all the mixer channels except master and remove all effects
 	void clear();
 

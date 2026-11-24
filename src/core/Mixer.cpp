@@ -485,6 +485,36 @@ void Mixer::updateLinkedChannel(Track& track)
 
 
 
+void Mixer::setChannelName(int index, const QString& name)
+{
+	// the track passes its new name on to the channel
+	if (const auto track = linkedTrack(index))
+	{
+		track->setName(name);
+		return;
+	}
+
+	m_mixerChannels[index]->m_name = name;
+	emit channelChanged(index);
+}
+
+
+
+void Mixer::setChannelColor(int index, const std::optional<QColor>& color)
+{
+	// the track passes its new color on to the channel
+	if (const auto track = linkedTrack(index))
+	{
+		track->setColor(color);
+		return;
+	}
+
+	m_mixerChannels[index]->setColor(color);
+	emit channelChanged(index);
+}
+
+
+
 void Mixer::moveChannelLeft( int index )
 {
 	// can't move master or first channel

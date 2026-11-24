@@ -300,21 +300,17 @@ void MixerChannelView::renameFinished()
 	const auto mc = mixerChannel();
 	if (!newName.isEmpty() && mc->m_name != newName)
 	{
-		// a renamed channel no longer follows its track
-		mc->m_linkedTrack.clear();
-		mc->m_name = newName;
+		Engine::mixer()->setChannelName(m_channelIndex, newName);
 		Engine::getSong()->setModified();
 	}
 
 	updateName();
-	update();
 }
 
 void MixerChannelView::resetColor()
 {
-	mixerChannel()->setColor(std::nullopt);
+	Engine::mixer()->setChannelColor(m_channelIndex, std::nullopt);
 	Engine::getSong()->setModified();
-	update();
 }
 
 void MixerChannelView::selectColor()
@@ -327,18 +323,16 @@ void MixerChannelView::selectColor()
 
 	if (!newColor.isValid()) { return; }
 
-	channel->setColor(newColor);
+	Engine::mixer()->setChannelColor(m_channelIndex, newColor);
 
 	Engine::getSong()->setModified();
-	update();
 }
 
 void MixerChannelView::randomizeColor()
 {
-	auto channel = mixerChannel();
-	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(48)]);
+	Engine::mixer()->setChannelColor(m_channelIndex,
+		ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(48)]);
 	Engine::getSong()->setModified();
-	update();
 }
 
 bool MixerChannelView::confirmRemoval(int index)

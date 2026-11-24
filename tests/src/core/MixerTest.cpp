@@ -134,6 +134,36 @@ private slots:
 		QCOMPARE(channel->m_name, QString{"Drums"});
 	}
 
+	void testLinkedChannelChangesTrack()
+	{
+		using namespace lmms;
+		const auto mixer = Engine::mixer();
+		const auto track = Track::create(Track::Type::Sample, Engine::getSong());
+		const int linked = mixer->createLinkedChannel(*track);
+		const int unlinked = mixer->createChannel();
+
+		mixer->setChannelName(linked, "Kick");
+		QCOMPARE(track->name(), QString{"Kick"});
+		QCOMPARE(mixer->mixerChannel(linked)->m_name, QString{"Kick"});
+		QCOMPARE(mixer->linkedTrack(linked), track);
+
+		mixer->setChannelName(unlinked, "Bus");
+		QCOMPARE(mixer->mixerChannel(unlinked)->m_name, QString{"Bus"});
+		QCOMPARE(track->name(), QString{"Kick"});
+
+		mixer->setChannelColor(linked, QColor{Qt::blue});
+		QCOMPARE(track->color(), QColor{Qt::blue});
+		QCOMPARE(mixer->mixerChannel(linked)->color(), QColor{Qt::blue});
+
+		mixer->setChannelColor(linked, std::nullopt);
+		QVERIFY(!track->color().has_value());
+		QVERIFY(!mixer->mixerChannel(linked)->color().has_value());
+
+		mixer->setChannelColor(unlinked, QColor{Qt::green});
+		QCOMPARE(mixer->mixerChannel(unlinked)->color(), QColor{Qt::green});
+		QVERIFY(!track->color().has_value());
+	}
+
 	void testLinkIsSaved()
 	{
 		using namespace lmms;
