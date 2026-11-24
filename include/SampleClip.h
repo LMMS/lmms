@@ -26,6 +26,7 @@
 #define LMMS_SAMPLE_CLIP_H
 
 #include <memory>
+
 #include "Clip.h"
 #include "Sample.h"
 
@@ -85,6 +86,9 @@ public:
 	void setIsPlaying(bool isPlaying);
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
 
+	QString getName() const;
+	const QString& getNameRef() const;
+
 	SampleClip* clone() override
 	{
 		return new SampleClip(*this);
@@ -107,7 +111,15 @@ private:
 	bool m_isPlaying;
 	int m_startFrameOffset;
 
+	QString m_name; //!< Display name
+	QString m_origName;
+	bool m_nameSet = false; //!< Whether m_name was set by the user
+
 	friend class gui::SampleClipView;
+
+	void resetName();
+	void setName(const QString& name);
+	void fileChanged(const QString& fileName);
 
 
 signals:
