@@ -76,13 +76,16 @@ SampleClip::SampleClip(Track* track)
 
 SampleClip::SampleClip(const SampleClip& orig) :
 	Clip(orig),
-	m_sample(std::move(orig.m_sample)),
+	m_sample(orig.m_sample),
+	m_sampleThumbnailCache(orig.m_sampleThumbnailCache),
 	m_isPlaying(orig.m_isPlaying),
 	m_startFrameOffset(orig.m_startFrameOffset)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
 	restoreJournallingState();
+
+	if (orig.m_nameSet) { setName(orig.getName()); }
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
@@ -154,6 +157,16 @@ void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 	Engine::getSong()->setModified();
 }
 
+QString SampleClip::getName() const
+{
+	return m_name;
+}
+
+const QString& SampleClip::getNameRef() const
+{
+	return m_name;
+}
+
 void SampleClip::setSampleFile(const QString& sf)
 {
 	if (sf.isEmpty())
@@ -181,6 +194,8 @@ void SampleClip::setSampleFile(const QString& sf)
 		m_sample = Sample{std::move(buffer)};
 		m_sampleThumbnailCache = std::move(thumbnailCache);
 		updateLength();
+
+		fileChanged(m_sample.sampleFile());
 	}
 
 	emit sampleChanged();
@@ -324,6 +339,11 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute("reversed", "true");
 	}
 	// TODO: start- and end-frame
+
+	if (m_nameSet) // Only if it's changed from the filename
+	{
+		_this.setAttribute("name", m_name);
+	}
 }
 
 
@@ -367,6 +387,11 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		m_sample.setReversed(true);
 		emit wasReversed(); // tell SampleClipView to update the view
 	}
+
+	if (_this.hasAttribute("name"))
+	{
+		setName(_this.attribute("name"));
+	}
 }
 
 
@@ -375,6 +400,33 @@ void SampleClip::loadSettings( const QDomElement & _this )
 gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 {
 	return new gui::SampleClipView( this, _tv );
+}
+
+
+
+void SampleClip::resetName()
+{
+	m_name = m_origName;
+	m_nameSet = false;
+}
+
+
+void SampleClip::setName(const QString& name)
+{
+	m_name = name;
+	m_nameSet = true;
+}
+
+
+
+void SampleClip::fileChanged(const QString& fileName)
+{
+	m_origName = PathUtil::cleanName(fileName);
+	if (!m_nameSet)
+	{
+		// If file changed but name already modified, keep old name. (Prefer user-set over filename)
+		m_name = m_origName;
+	}
 }
 
 

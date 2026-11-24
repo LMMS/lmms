@@ -35,6 +35,8 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 #include "ControllerView.h"
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"

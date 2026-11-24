@@ -204,7 +204,7 @@ void MidiWinMM::handleInputEvent( HMIDIIN hm, DWORD ev )
 	}
 
 	const MidiPortList & l = m_inputSubs[d];
-	for (MidiPortList::ConstIterator it = l.begin(); it != l.end(); ++it)
+	for (auto port : l)
 	{
 		switch (cmdtype)
 		{
@@ -214,11 +214,11 @@ void MidiWinMM::handleInputEvent( HMIDIIN hm, DWORD ev )
 			case MidiControlChange:
 			case MidiProgramChange:
 			case MidiChannelPressure:
-				(*it)->processInEvent(MidiEvent(cmdtype, chan, par1, par2 & 0xff, &hm));
+				port->processInEvent(MidiEvent(cmdtype, chan, par1, par2 & 0xff, &hm));
 				break;
 
 			case MidiPitchBend:
-				(*it)->processInEvent(MidiEvent(cmdtype, chan, par1 + par2 * 128, 0, &hm));
+				port->processInEvent(MidiEvent(cmdtype, chan, par1 + par2 * 128, 0, &hm));
 				break;
 
 			default:
