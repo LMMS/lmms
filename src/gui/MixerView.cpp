@@ -190,6 +190,13 @@ MixerView::MixerView(Mixer* mixer) :
 		m_mixerChannelViews[index]->updateName();
 		m_mixerChannelViews[index]->update();
 	});
+	connect(mixer, &Mixer::trackRoutingChanged, this, [this] {
+		for (const auto view : m_mixerChannelViews)
+		{
+			view->updateName();
+			view->update();
+		}
+	});
 
 	updateGeometry();
 

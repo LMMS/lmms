@@ -220,6 +220,14 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 	// outer border
 	painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
 	painter.drawRect(0, 0, width - outerBorderSize, height - outerBorderSize);
+
+	// mark channels that follow their track
+	if (Engine::mixer()->linkedTrack(m_channelIndex))
+	{
+		static constexpr auto linkMarkerHeight = 3;
+		painter.fillRect(innerBorderSize - 1, innerBorderSize - 1, width - 2 * (innerBorderSize - 1),
+			linkMarkerHeight, palette().color(QPalette::Highlight));
+	}
 }
 
 void MixerChannelView::mousePressEvent(QMouseEvent*)
@@ -252,7 +260,7 @@ void MixerChannelView::updateName()
 	if (m_inRename) { return; }
 
 	const auto& name = mixerChannel()->m_name;
-	setToolTip(name);
+	setToolTip(Engine::mixer()->linkedTrack(m_channelIndex) ? tr("%1 (follows its track)").arg(name) : name);
 	m_renameLineEdit->setText(elideName(name));
 }
 
@@ -295,11 +303,11 @@ void MixerChannelView::renameFinished()
 		// a renamed channel no longer follows its track
 		mc->m_linkedTrack.clear();
 		mc->m_name = newName;
-		m_renameLineEdit->setText(elideName(newName));
 		Engine::getSong()->setModified();
 	}
 
-	setToolTip(mc->m_name);
+	updateName();
+	update();
 }
 
 void MixerChannelView::resetColor()

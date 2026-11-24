@@ -129,6 +129,13 @@ Track* Track::instantiate(Type tt, TrackContainer* tc)
 		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
 	}
 
+	if (const auto model = t ? t->mixerChannelModel() : nullptr)
+	{
+		connect(model, &IntModel::dataChanged, t, [] {
+			if (const auto mixer = Engine::mixer()) { emit mixer->trackRoutingChanged(); }
+		});
+	}
+
 	tc->updateAfterTrackAdd();
 
 	Engine::audioEngine()->doneChangeInModel();

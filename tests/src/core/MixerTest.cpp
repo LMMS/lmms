@@ -115,7 +115,9 @@ private slots:
 		using namespace lmms;
 		const auto mixer = Engine::mixer();
 		const auto track = Track::create(Track::Type::Sample, Engine::getSong());
-		const auto channel = mixer->mixerChannel(mixer->createLinkedChannel(*track));
+		const int index = mixer->createLinkedChannel(*track);
+		const auto channel = mixer->mixerChannel(index);
+		QCOMPARE(mixer->linkedTrack(index), track);
 
 		track->setName("Drums");
 		track->setColor(QColor{Qt::red});
@@ -123,9 +125,12 @@ private slots:
 		QCOMPARE(channel->color(), QColor{Qt::red});
 
 		// routing the track elsewhere unlinks it
+		auto routingChanged = QSignalSpy{mixer, &Mixer::trackRoutingChanged};
 		track->mixerChannelModel()->setValue(0);
 		track->setName("Bass");
+		QCOMPARE(routingChanged.count(), 1);
 		QVERIFY(!mixer->linkedChannel(*track));
+		QVERIFY(!mixer->linkedTrack(index));
 		QCOMPARE(channel->m_name, QString{"Drums"});
 	}
 

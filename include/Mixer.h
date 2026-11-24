@@ -200,6 +200,9 @@ public:
 	// the channel the track is routed to, if it is linked to the track
 	MixerChannel* linkedChannel(Track& track);
 
+	// the track the channel is linked to, if that track is still routed to it
+	Track* linkedTrack(int index);
+
 	void updateLinkedChannel(Track& track);
 
 	// delete all the mixer channels except master and remove all effects
@@ -235,6 +238,8 @@ signals:
 	void channelRemoved(int index);
 	void channelsSwapped(int first, int second);
 	void channelChanged(int index);
+	// a track was routed to another channel, which may link or unlink channels
+	void trackRoutingChanged();
 
 private:
 	void updateTrackChannelRanges();

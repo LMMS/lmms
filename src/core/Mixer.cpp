@@ -465,6 +465,14 @@ MixerChannel* Mixer::linkedChannel(Track& track)
 
 
 
+Track* Mixer::linkedTrack(int index)
+{
+	const auto track = m_mixerChannels[index]->m_linkedTrack.data();
+	return track && linkedChannel(*track) ? track : nullptr;
+}
+
+
+
 void Mixer::updateLinkedChannel(Track& track)
 {
 	const auto channel = linkedChannel(track);
