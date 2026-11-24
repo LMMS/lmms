@@ -23,14 +23,15 @@
  *
  */
 
-
-#include "Song.h"
-#include "PresetPreviewPlayHandle.h"
-#include "PeakController.h"
 #include "PeakControllerEffect.h"
-#include "lmms_math.h"
 
+#include "ControllerRackView.h"
+#include "GuiApplication.h"
+#include "PeakController.h"
+#include "PresetPreviewPlayHandle.h"
+#include "Song.h"
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -72,6 +73,7 @@ PeakControllerEffect::PeakControllerEffect(
 	m_autoController(new PeakController(Engine::getSong(), this))
 {
 	m_dialog = m_peakControls.createView();
+	connect(&m_peakControls, &PeakControllerEffectControls::controlsClicked, this, &PeakControllerEffect::scrollAndFocusController);
 	if( !Engine::getSong()->isLoadingProject() && !PresetPreviewPlayHandle::isPreviewing() )
 	{
 		Engine::getSong()->addController( m_autoController );
@@ -90,6 +92,12 @@ PeakControllerEffect::~PeakControllerEffect()
 		PeakController::s_effects.erase(it);
 		Engine::getSong()->removeController(m_autoController);
 	}
+}
+
+
+void PeakControllerEffect::scrollAndFocusController()
+{
+	gui::getGUI()->getControllerRackView()->scrollAndFocus(m_autoController);
 }
 
 

@@ -59,6 +59,8 @@ public:
 		return new gui::PeakControllerEffectControlDialog( this );
 	}
 
+signals:
+	void controlsClicked();
 
 private:
 	PeakControllerEffect * m_effect;

@@ -26,23 +26,23 @@
 
 #include "ControllerRackView.h"
 
-#include <QApplication>
 #include <QAction>
+#include <QApplication>
+#include <QMdiSubWindow>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QMessageBox>
+#include <QScrollBar>
 #include <QVBoxLayout>
 
 #include "ControllerView.h"
 #include "DeprecationHelper.h"
-#include "embed.h"
-#include <QMdiSubWindow>
-
 #include "GuiApplication.h"
 #include "LfoController.h"
 #include "MainWindow.h"
 #include "Song.h"
 #include "SubWindow.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -215,6 +215,14 @@ void ControllerRackView::addController(Controller* controller)
 	}
 
 	update();
+
+	auto vBar = m_scrollArea->verticalScrollBar();
+	auto const connection = new QMetaObject::Connection;
+	*connection = connect(vBar, &QScrollBar::rangeChanged, [vBar, connection](int min, int max){
+		vBar->setValue(max);
+		disconnect(*connection);
+		delete connection;
+	});
 }
 
 void ControllerRackView::removeController(Controller* removedController)
@@ -310,6 +318,19 @@ bool ControllerRackView::allExpanded() const
 
 
 
+void ControllerRackView::scrollAndFocus(Controller* c) const
+{
+	for (auto& it : m_controllerViews)
+	{
+		if (it->getController() == c)
+		{
+			it->collapseController(false);
+			// If the controllerview was collapsed, this may scroll to just the header.
+			m_scrollArea->ensureWidgetVisible(it, 50, 200);
+			return;
+		}
+	}
+}
 
 QMdiSubWindow* ControllerRackView::subWin() const
 {

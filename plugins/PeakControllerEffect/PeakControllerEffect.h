@@ -76,6 +76,9 @@ public:
 
 	int m_effectId;
 
+public slots:
+	void scrollAndFocusController();
+
 private:
 	PeakControllerEffectControls m_peakControls;
 

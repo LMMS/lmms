@@ -65,6 +65,7 @@ public:
 
 	bool allExpanded() const;
 	bool allCollapsed() const;
+	void scrollAndFocus(Controller* c) const;
 
 public slots:
 	void deleteController(ControllerView* view);

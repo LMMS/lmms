@@ -31,6 +31,8 @@
 #include "AudioEngine.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
+#include "ControllerRackView.h"
+#include "GuiApplication.h"
 #include "LfoController.h"
 #include "MidiController.h"
 #include "PeakController.h"

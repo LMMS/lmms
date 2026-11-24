@@ -129,6 +129,7 @@ void PeakControllerEffectControlDialog::showDialog()
 	controllerRack->subWin()->show();
 	controllerRack->subWin()->raise();
 	controllerRack->setFocus();
+	emit dynamic_cast<PeakControllerEffectControls*>(m_effectControls)->controlsClicked();
 	m_effectControls->setViewVisible(true);
 }
 
