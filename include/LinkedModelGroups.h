@@ -81,19 +81,13 @@ public:
 	template<class Functor>
 	void foreach_model(const Functor& ftor)
 	{
-		for (auto itr = m_models.begin(); itr != m_models.end(); ++itr)
-		{
-			ftor(itr->first, itr->second);
-		}
+		for (auto& [name, info] : m_models) { ftor(name, info); }
 	}
 
 	template<class Functor>
 	void foreach_model(const Functor& ftor) const
 	{
-		for (auto itr = m_models.cbegin(); itr != m_models.cend(); ++itr)
-		{
-			ftor(itr->first, itr->second);
-		}
+		for (const auto& [name, info] : m_models) { ftor(name, info); }
 	}
 
 	std::size_t modelNum() const { return m_models.size(); }
