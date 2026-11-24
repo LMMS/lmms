@@ -22,9 +22,11 @@
  *
  */
 
+#include <QDomDocument>
 #include <QSignalSpy>
 #include <QtTest>
 
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Mixer.h"
 #include "SampleTrack.h"
@@ -91,6 +93,62 @@ private slots:
 		mixer->deleteChannel(index);
 		QCOMPARE(model->maxValue(), index - 1);
 		QCOMPARE(model->value(), 0);
+	}
+
+	void testAutoAssignSetting()
+	{
+		using namespace lmms;
+		const auto mixer = Engine::mixer();
+
+		ConfigManager::inst()->setValue("app", "autoassignmixerchannel", "1");
+		const auto assigned = Track::create(Track::Type::Sample, Engine::getSong());
+		ConfigManager::inst()->setValue("app", "autoassignmixerchannel", "0");
+		const auto unassigned = Track::create(Track::Type::Sample, Engine::getSong());
+
+		QVERIFY(mixer->linkedChannel(*assigned));
+		QCOMPARE(mixer->linkedChannel(*assigned)->m_name, assigned->name());
+		QCOMPARE(unassigned->mixerChannelModel()->value(), 0);
+	}
+
+	void testLinkedChannelFollowsTrack()
+	{
+		using namespace lmms;
+		const auto mixer = Engine::mixer();
+		const auto track = Track::create(Track::Type::Sample, Engine::getSong());
+		const auto channel = mixer->mixerChannel(mixer->createLinkedChannel(*track));
+
+		track->setName("Drums");
+		track->setColor(QColor{Qt::red});
+		QCOMPARE(channel->m_name, QString{"Drums"});
+		QCOMPARE(channel->color(), QColor{Qt::red});
+
+		// routing the track elsewhere unlinks it
+		track->mixerChannelModel()->setValue(0);
+		track->setName("Bass");
+		QVERIFY(!mixer->linkedChannel(*track));
+		QCOMPARE(channel->m_name, QString{"Drums"});
+	}
+
+	void testLinkIsSaved()
+	{
+		using namespace lmms;
+		const auto mixer = Engine::mixer();
+		const auto track = Track::create(Track::Type::Sample, Engine::getSong());
+		mixer->createLinkedChannel(*track);
+
+		auto doc = QDomDocument{};
+		auto parent = doc.createElement("test");
+		const auto element = track->saveState(doc, parent);
+		QCOMPARE(element.attribute("linkedmixerchannel"), QString{"1"});
+
+		// the channel stays linked to the original track
+		const auto clone = track->clone();
+		QVERIFY(!mixer->linkedChannel(*clone));
+		QVERIFY(mixer->linkedChannel(*track));
+
+		delete track;
+		const auto loaded = Track::create(element, Engine::getSong());
+		QVERIFY(mixer->linkedChannel(*loaded));
 	}
 };
 

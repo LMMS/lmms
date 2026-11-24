@@ -67,6 +67,8 @@ public:
 
 	void clear();
 
+	bool hasEffects() const { return !m_effects.empty(); }
+
 
 private:
 	using EffectList = std::vector<Effect*>;

@@ -39,6 +39,7 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "SampleTrack.h"
@@ -59,6 +60,13 @@ Track::Track(Type type, TrackContainer* tc)
 {	
 	m_trackContainer->addTrack( this );
 	m_height = -1;
+
+	const auto updateLinkedMixerChannel = [this] {
+		// the mixer doesn't exist yet when the song creates its first tracks
+		if (const auto mixer = Engine::mixer()) { mixer->updateLinkedChannel(*this); }
+	};
+	connect(this, &Track::nameChanged, this, updateLinkedMixerChannel);
+	connect(this, &Track::colorChanged, this, updateLinkedMixerChannel);
 }
 
 
@@ -81,7 +89,23 @@ Track::~Track()
 
 
 
-Track * Track::create( Type tt, TrackContainer * tc )
+Track* Track::create(Type tt, TrackContainer* tc)
+{
+	const auto track = instantiate(tt, tc);
+
+	const bool autoAssign = track && track->mixerChannelModel()
+		&& (tc == Engine::getSong() || tc == Engine::patternStore())
+		&& !Engine::getSong()->isLoadingProject()
+		&& ConfigManager::inst()->value("app", "autoassignmixerchannel", "0").toInt();
+	if (autoAssign) { Engine::mixer()->createLinkedChannel(*track); }
+
+	return track;
+}
+
+
+
+
+Track* Track::instantiate(Type tt, TrackContainer* tc)
 {
 	Engine::audioEngine()->requestChangeInModel();
 
@@ -119,7 +143,7 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 {
 	Engine::audioEngine()->requestChangeInModel();
 
-	Track * t = create(
+	Track * t = instantiate(
 		static_cast<Type>( element.attribute( "type" ).toInt() ),
 									tc );
 	if( t != nullptr )
@@ -169,6 +193,11 @@ void Track::saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode)
 	if (m_color.has_value())
 	{
 		element.setAttribute("color", m_color->name());
+	}
+
+	if (!presetMode && Engine::mixer()->linkedChannel(*this))
+	{
+		element.setAttribute("linkedmixerchannel", 1);
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
@@ -257,6 +286,11 @@ void Track::loadTrack(const QDomElement& element, bool presetMode)
 	if( storedHeight >= MINIMAL_TRACK_HEIGHT )
 	{
 		m_height = storedHeight;
+	}
+
+	if (element.attribute("linkedmixerchannel").toInt())
+	{
+		Engine::mixer()->linkChannel(*this);
 	}
 }
 

@@ -42,6 +42,8 @@
 #include "StringPairDrag.h"
 #include "TrackView.h"
 #include "GuiApplication.h"
+#include "Mixer.h"
+#include "MixerView.h"
 #include "PluginFactory.h"
 
 namespace lmms
@@ -289,12 +291,20 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	//m_tc->addJournalCheckPoint();
 
 	Track * t = _tv->getTrack();
+	const auto linkedChannel = Engine::mixer()->linkedChannel(*t);
 	removeTrackView( _tv );
 	delete _tv;
 
 	Engine::audioEngine()->requestChangeInModel();
 	delete t;
 	Engine::audioEngine()->doneChangeInModel();
+
+	// keep the linked channel if something else still sends to it or the user added effects to it
+	if (linkedChannel && !Engine::mixer()->isChannelInUse(linkedChannel->index())
+		&& !linkedChannel->m_fxChain.hasEffects())
+	{
+		getGUI()->mixerView()->deleteChannel(linkedChannel->index());
+	}
 }
 
 

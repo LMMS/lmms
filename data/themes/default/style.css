@@ -406,6 +406,12 @@ QPushButton#btn:checked {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 25%), stop:0.1 transparent, stop:0.9 rgba(0, 0, 0, 15%), stop:1 rgba(0, 0, 0, 35%));
 }
 
+/* mixer button that gives new tracks a new mixer channel */
+QPushButton#autoAssignChannelBtn:checked {
+	border: 1px solid #000;
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 25%), stop:0.1 transparent, stop:0.9 rgba(0, 0, 0, 15%), stop:1 rgba(0, 0, 0, 35%));
+}
+
 /* autoscroll, loop, stop behaviour toggle buttons */
 
 /* track background config */

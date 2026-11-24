@@ -30,6 +30,7 @@
 #include "AudioEngineWorkerThread.h"
 #include "Mixer.h"
 #include "Song.h"
+#include "Track.h"
 
 #include "MixHelpers.h"
 #include "PatternStore.h"
@@ -37,6 +38,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 
 namespace lmms
 {
@@ -423,6 +425,54 @@ void Mixer::deleteChannel( int index )
 
 	updateTrackChannelRanges();
 	emit channelRemoved(index);
+}
+
+
+
+int Mixer::createLinkedChannel(Track& track)
+{
+	assert(track.mixerChannelModel());
+
+	const int index = createChannel();
+	track.mixerChannelModel()->setValue(index);
+	linkChannel(track);
+	updateLinkedChannel(track);
+
+	return index;
+}
+
+
+
+void Mixer::linkChannel(Track& track)
+{
+	const auto model = track.mixerChannelModel();
+	if (!model || model->value() <= 0 || model->value() >= numChannels()) { return; }
+
+	const auto channel = m_mixerChannels[model->value()];
+	if (!channel->m_linkedTrack) { channel->m_linkedTrack = &track; }
+}
+
+
+
+MixerChannel* Mixer::linkedChannel(Track& track)
+{
+	const auto model = track.mixerChannelModel();
+	if (!model || model->value() >= numChannels()) { return nullptr; }
+
+	const auto channel = m_mixerChannels[model->value()];
+	return channel->m_linkedTrack == &track ? channel : nullptr;
+}
+
+
+
+void Mixer::updateLinkedChannel(Track& track)
+{
+	const auto channel = linkedChannel(track);
+	if (!channel) { return; }
+
+	channel->m_name = track.name();
+	channel->setColor(track.color());
+	emit channelChanged(channel->index());
 }
 
 

@@ -292,6 +292,8 @@ void MixerChannelView::renameFinished()
 	const auto mc = mixerChannel();
 	if (!newName.isEmpty() && mc->m_name != newName)
 	{
+		// a renamed channel no longer follows its track
+		mc->m_linkedTrack.clear();
 		mc->m_name = newName;
 		m_renameLineEdit->setText(elideName(newName));
 		Engine::getSong()->setModified();

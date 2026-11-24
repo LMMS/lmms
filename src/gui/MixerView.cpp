@@ -33,7 +33,9 @@
 #include <QKeyEvent>
 #include <QStackedLayout>
 #include <QStackedWidget>
+#include <QVBoxLayout>
 
+#include "ConfigManager.h"
 #include "EffectRackView.h"
 #include "Engine.h"
 #include "Fader.h"
@@ -145,7 +147,35 @@ MixerView::MixerView(Mixer* mixer) :
 	newChannelBtn->setFixedWidth(mixerChannelSize.width());
 	newChannelBtn->setFocusPolicy(Qt::NoFocus);
 	connect(newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
-	ml->addWidget(newChannelBtn, 0);
+
+	auto autoAssignIcon = QIcon{};
+	autoAssignIcon.addPixmap(embed::getIconPixmap("auto_link_inactive"), QIcon::Normal, QIcon::Off);
+	autoAssignIcon.addPixmap(embed::getIconPixmap("auto_link_active"), QIcon::Normal, QIcon::On);
+	auto autoAssignBtn = new QPushButton(autoAssignIcon, QString(), this);
+	autoAssignBtn->setObjectName("autoAssignChannelBtn");
+	autoAssignBtn->setCheckable(true);
+	autoAssignBtn->setIconSize(QSize{20, 20});
+	autoAssignBtn->setFixedSize(mixerChannelSize.width(), 34);
+	autoAssignBtn->setFocusPolicy(Qt::NoFocus);
+	const auto updateAutoAssignToolTip = [autoAssignBtn](bool checked) {
+		autoAssignBtn->setToolTip(checked
+			? tr("New tracks get a new mixer channel (on)")
+			: tr("New tracks get a new mixer channel (off)"));
+	};
+	connect(autoAssignBtn, &QPushButton::toggled, this, [updateAutoAssignToolTip](bool checked) {
+		ConfigManager::inst()->setValue("app", "autoassignmixerchannel", QString::number(checked));
+		updateAutoAssignToolTip(checked);
+	});
+	const bool autoAssign = ConfigManager::inst()->value("app", "autoassignmixerchannel", "0").toInt();
+	autoAssignBtn->setChecked(autoAssign);
+	updateAutoAssignToolTip(autoAssign);
+
+	auto newChannelLayout = new QVBoxLayout;
+	newChannelLayout->setContentsMargins(0, 0, 0, 0);
+	newChannelLayout->setSpacing(0);
+	newChannelLayout->addWidget(newChannelBtn, 1);
+	newChannelLayout->addWidget(autoAssignBtn);
+	ml->addLayout(newChannelLayout, 0);
 
 
 	// add the stacked layout for the effect racks of mixer channels
@@ -156,6 +186,10 @@ MixerView::MixerView(Mixer* mixer) :
 	connect(mixer, &Mixer::channelAdded, this, &MixerView::addChannelView);
 	connect(mixer, &Mixer::channelRemoved, this, &MixerView::removeChannelView);
 	connect(mixer, &Mixer::channelsSwapped, this, &MixerView::swapChannelViews);
+	connect(mixer, &Mixer::channelChanged, this, [this](int index) {
+		m_mixerChannelViews[index]->updateName();
+		m_mixerChannelViews[index]->update();
+	});
 
 	updateGeometry();
 

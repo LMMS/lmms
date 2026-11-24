@@ -34,12 +34,14 @@
 #include <atomic>
 #include <optional>
 #include <QColor>
+#include <QPointer>
 
 namespace lmms
 {
 
 
 class MixerRoute;
+class Track;
 using MixerRouteVector = std::vector<MixerRoute*>;
 
 class MixerChannel : public ThreadableJob
@@ -70,6 +72,8 @@ public:
 
 	// pointers to other channels that send to this one
 	MixerRouteVector m_receives;
+
+	QPointer<Track> m_linkedTrack;
 
 	int index() const { return m_channelIndex; }
 	void setIndex(int index) { m_channelIndex = index; }
@@ -186,6 +190,18 @@ public:
 	// delete a channel from the mixer.
 	void deleteChannel(int index);
 
+	// add a new channel linked to the track and route the track to it.
+	// a linked channel follows the track's name and color and is deleted along with it
+	int createLinkedChannel(Track& track);
+
+	// link the channel the track is routed to, unless it is master or already linked
+	void linkChannel(Track& track);
+
+	// the channel the track is routed to, if it is linked to the track
+	MixerChannel* linkedChannel(Track& track);
+
+	void updateLinkedChannel(Track& track);
+
 	// delete all the mixer channels except master and remove all effects
 	void clear();
 
@@ -218,6 +234,7 @@ signals:
 	void channelAdded(int index);
 	void channelRemoved(int index);
 	void channelsSwapped(int first, int second);
+	void channelChanged(int index);
 
 private:
 	void updateTrackChannelRanges();
