@@ -164,6 +164,34 @@ private slots:
 		QVERIFY(!track->color().has_value());
 	}
 
+	void testLinkAndUnlinkChannel()
+	{
+		using namespace lmms;
+		const auto mixer = Engine::mixer();
+		const auto track = Track::create(Track::Type::Sample, Engine::getSong());
+		track->setName("Pad");
+		const int index = mixer->createChannel();
+		QVERIFY(!mixer->canLinkChannel(0));
+		QVERIFY(!mixer->canLinkChannel(index));
+
+		track->mixerChannelModel()->setValue(index);
+		QVERIFY(mixer->canLinkChannel(index));
+		mixer->linkChannel(index);
+		QCOMPARE(mixer->linkedTrack(index), track);
+		QCOMPARE(mixer->mixerChannel(index)->m_name, QString{"Pad"});
+		QVERIFY(!mixer->canLinkChannel(index));
+
+		mixer->unlinkChannel(index);
+		QVERIFY(!mixer->linkedTrack(index));
+		track->setName("Lead");
+		QCOMPARE(mixer->mixerChannel(index)->m_name, QString{"Pad"});
+
+		// a channel shared by several tracks has no single track to follow
+		const auto other = Track::create(Track::Type::Sample, Engine::getSong());
+		other->mixerChannelModel()->setValue(index);
+		QVERIFY(!mixer->canLinkChannel(index));
+	}
+
 	void testLinkIsSaved()
 	{
 		using namespace lmms;

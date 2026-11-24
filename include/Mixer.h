@@ -203,6 +203,12 @@ public:
 	// the track the channel is linked to, if that track is still routed to it
 	Track* linkedTrack(int index);
 
+	// a channel can be linked if it isn't master or linked and exactly one track is routed to it
+	bool canLinkChannel(int index);
+	// link the channel to the track routed to it, taking the track's name and color
+	void linkChannel(int index);
+	void unlinkChannel(int index);
+
 	void updateLinkedChannel(Track& track);
 
 	// set the channel's name, through its track if the channel is linked so both change

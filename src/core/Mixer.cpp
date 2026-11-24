@@ -46,9 +46,10 @@ namespace lmms
 namespace
 {
 
-std::vector<IntModel*> trackMixerChannelModels()
+// the tracks that send their audio to a mixer channel
+std::vector<Track*> mixerTracks()
 {
-	auto models = std::vector<IntModel*>{};
+	auto tracks = std::vector<Track*>{};
 	for (const auto container : std::array<TrackContainer*, 2>{Engine::getSong(), Engine::patternStore()})
 	{
 		// the master channel is created before the pattern store
@@ -56,10 +57,29 @@ std::vector<IntModel*> trackMixerChannelModels()
 
 		for (const auto track : container->tracks())
 		{
-			if (const auto model = track->mixerChannelModel()) { models.push_back(model); }
+			if (track->mixerChannelModel()) { tracks.push_back(track); }
 		}
 	}
+	return tracks;
+}
+
+std::vector<IntModel*> trackMixerChannelModels()
+{
+	auto models = std::vector<IntModel*>{};
+	for (const auto track : mixerTracks()) { models.push_back(track->mixerChannelModel()); }
 	return models;
+}
+
+Track* onlyTrackRoutedTo(int index)
+{
+	Track* found = nullptr;
+	for (const auto track : mixerTracks())
+	{
+		if (track->mixerChannelModel()->value() != index) { continue; }
+		if (found) { return nullptr; }
+		found = track;
+	}
+	return found;
 }
 
 } // namespace
@@ -469,6 +489,32 @@ Track* Mixer::linkedTrack(int index)
 {
 	const auto track = m_mixerChannels[index]->m_linkedTrack.data();
 	return track && linkedChannel(*track) ? track : nullptr;
+}
+
+
+
+bool Mixer::canLinkChannel(int index)
+{
+	return index > 0 && !linkedTrack(index) && onlyTrackRoutedTo(index);
+}
+
+
+
+void Mixer::linkChannel(int index)
+{
+	if (!canLinkChannel(index)) { return; }
+
+	const auto track = onlyTrackRoutedTo(index);
+	m_mixerChannels[index]->m_linkedTrack = track;
+	updateLinkedChannel(*track);
+}
+
+
+
+void Mixer::unlinkChannel(int index)
+{
+	m_mixerChannels[index]->m_linkedTrack.clear();
+	emit channelChanged(index);
 }
 
 

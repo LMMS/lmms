@@ -172,6 +172,26 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 	}
 
 	contextMenu->addAction(tr("Rename &channel"), this, &MixerChannelView::renameChannel);
+
+	if (!isMasterChannel())
+	{
+		const auto mixer = Engine::mixer();
+		if (mixer->linkedTrack(m_channelIndex))
+		{
+			contextMenu->addAction(tr("Unlink from track"), this, [this, mixer] {
+				mixer->unlinkChannel(m_channelIndex);
+				Engine::getSong()->setModified();
+			});
+		}
+		else
+		{
+			const auto linkAction = contextMenu->addAction(tr("Link to track"), this, [this, mixer] {
+				mixer->linkChannel(m_channelIndex);
+				Engine::getSong()->setModified();
+			});
+			linkAction->setEnabled(mixer->canLinkChannel(m_channelIndex));
+		}
+	}
 	contextMenu->addSeparator();
 
 	if (!isMasterChannel()) // no remove-option in master
