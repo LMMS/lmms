@@ -391,7 +391,6 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	if (_this.hasAttribute("name"))
 	{
 		setName(_this.attribute("name"));
-		m_origName = m_name;
 	}
 }
 
