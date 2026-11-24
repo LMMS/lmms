@@ -20,6 +20,11 @@ enable_policy_if_exists(CMP0092) # MSVC warning flags are not in CMAKE_<LANG>_FL
 # Needed for ccache support with MSVC
 enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selected by an abstraction.
 
+# Stops our CI builds from breaking until we can fix our use of deprecated non-target directives.
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.5)
+	cmake_diagnostic(SET CMD_NON_TARGET_DIRECTIVE WARN)
+endif()
+
 PROJECT(lmms)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})

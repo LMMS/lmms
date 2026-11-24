@@ -5,6 +5,12 @@ ENDIF()
 INCLUDE(BuildPlugin)
 INCLUDE(ExternalProject)
 
+# CMake 4.5: ExternalProject_Add() sets CMAKE_INSTALL_PREFIX to <INSTALL_DIR>.
+# This doesn't affect the code below because we skip the install step anyway.
+IF(POLICY CMP0225)
+	CMAKE_POLICY(SET CMP0225 NEW)
+ENDIF()
+
 # These variables are not meant to be used normally, except packaging
 SET(REMOTE_VST_PLUGIN_FILEPATH_32 "32/RemoteVstPlugin32" CACHE STRING "Relative file path to RemoteVstPlugin32")
 SET(REMOTE_VST_PLUGIN_FILEPATH_64 "RemoteVstPlugin64" CACHE STRING "Relative file path to RemoteVstPlugin64")
