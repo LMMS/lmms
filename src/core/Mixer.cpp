@@ -282,17 +282,22 @@ Mixer::~Mixer()
 int Mixer::createChannel()
 {
 	const int index = m_mixerChannels.size();
-	// create new channel
-	m_mixerChannels.push_back( new MixerChannel( index, this ) );
-
-	// reset channel state
-	clearChannel( index );
-
-	// if there is a soloed channel, mute the new track
-	if (m_lastSoloed != -1 && m_mixerChannels[m_lastSoloed]->m_soloModel.value())
 	{
-		m_mixerChannels[index]->m_muteBeforeSolo = m_mixerChannels[index]->m_muteModel.value();
-		m_mixerChannels[index]->m_muteModel.setValue(true);
+		// the audio thread must not see the channel list while it grows
+		const auto guard = Engine::audioEngine()->requestChangesGuard();
+
+		// create new channel
+		m_mixerChannels.push_back( new MixerChannel( index, this ) );
+
+		// reset channel state
+		clearChannel( index );
+
+		// if there is a soloed channel, mute the new track
+		if (m_lastSoloed != -1 && m_mixerChannels[m_lastSoloed]->m_soloModel.value())
+		{
+			m_mixerChannels[index]->m_muteBeforeSolo = m_mixerChannels[index]->m_muteModel.value();
+			m_mixerChannels[index]->m_muteModel.setValue(true);
+		}
 	}
 
 	updateTrackChannelRanges();
