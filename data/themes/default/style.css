@@ -768,7 +768,7 @@ QToolButton, QToolButton::menu-button, QToolButton#playButton:checked, QToolButt
 	color: #fff;
 }
 
-QToolButton:hover, QToolButton#playButton:hover:checked, QToolButton#stepRecordButton:hover:checked{
+QToolButton:hover, QToolButton#playButton:hover:checked, QToolButton#stepRecordButton:hover:checked {
     border-left: none;
     border-right: none;
 	border-top: 1px solid #909eb3;
