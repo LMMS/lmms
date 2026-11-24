@@ -60,9 +60,9 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	);
 	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PatternEditor::updatePosition);
 	connect(this, &TrackContainerView::trackHeadWidthChanged, m_timeLine, [this](int width){ 
-	m_timeLine->setXOffset(width); 
-	updatePixelsPerBar();
-});
+		m_timeLine->setXOffset(width); 
+		updatePixelsPerBar();
+	});
 	static_cast<QVBoxLayout*>(layout())->insertWidget(0, m_timeLine);
 
 	connect(m_ps, &PatternStore::trackUpdated,
