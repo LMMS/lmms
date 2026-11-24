@@ -180,7 +180,7 @@ void EffectRackView::addEffectFromPreset(const QString& filePath)
 
 	if (!content.attribute("pluginname").isEmpty())
 	{
-		// Legacy single-effect LFXP: the effect state is the root element.
+		// Single-effect preset file - the effect state is the root element
 		effectElements.push_back(content);
 	}
 	else

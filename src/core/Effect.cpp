@@ -148,18 +148,37 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 
 QDomElement Effect::savePresetState(QDomDocument& doc, QDomElement& parent)
 {
-	auto effectElement = saveState(doc, parent);
+	QDomElement effectElement = saveState(doc, parent);
 	const auto pluginName = QString::fromUtf8(descriptor()->name);
 
-	// Match the effect node format used when saving a project.
+	// These attributes are added to ensure proper preset are applied to proper effects
 	effectElement.setAttribute("name", pluginName);
-
-	// Keep these for compatibility and for checking single-effect presets.
 	effectElement.setAttribute("pluginname", pluginName);
 	effectElement.setAttribute("displayname", displayName());
 
+	// Save guivisible as 1 so the GUI VSTs show when they load
+	// There's similar logic in restorePresetState if the user tries changing something
+	const auto vstControls = effectElement.elementsByTagName("vsteffectcontrols");
+	for (int i = 0; i < vstControls.size(); ++i)
+	{
+		vstControls.at(i).toElement().setAttribute("guivisible", 1);
+	}
+
 	effectElement.appendChild(key().saveXML(doc));
 	return effectElement;
+}
+
+
+void Effect::restorePresetState(const QDomElement& effectElement)
+{
+	auto state = effectElement;
+	const auto vstControls = effectElement.elementsByTagName("vsteffectcontrols");
+	for (int i = 0; i < vstControls.size(); ++i)
+	{
+		vstControls.at(i).toElement().setAttribute("guivisible", 1);
+	}
+
+	restoreState(state);
 }
 
 
@@ -189,7 +208,7 @@ Effect* Effect::createFromPresetState(
 		return nullptr;
 	}
 
-	effect->restoreState(effectElement);
+	effect->restorePresetState(effectElement);
 	return effect;
 }
 

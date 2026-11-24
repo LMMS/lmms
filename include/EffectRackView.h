@@ -78,7 +78,12 @@ protected:
 	void dropEvent(QDropEvent* event) override;
 
 private:
+
+	/**
+	 * Append an effect preset found on filePath to the chain in this effect rack
+	 */
 	void addEffectFromPreset(const QString& filePath);
+
 	void modelChanged() override;
 	QSize sizeHint() const override;
 	QSize minimumSizeHint() const override { return sizeHint(); }

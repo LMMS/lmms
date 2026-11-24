@@ -144,11 +144,25 @@ public:
 		Model* parent,
 		Descriptor::SubPluginFeatures::Key* key);
 
+	/**
+	 * Saves the state of the effect in preset format to the parent
+	 */
 	QDomElement savePresetState(QDomDocument& doc, QDomElement& parent);
 
-	static Effect* createFromPresetState(
-		const QDomElement& effectElement,
-		EffectChain* parent);
+	/**
+	 * A restoreState for presets
+	 * This only checks guivisible and sets it to 1
+	 * because otherwise VST GUIs don't draw
+	 */
+	void restorePresetState(const QDomElement& effectElement);
+
+	/**
+	 * Instantiate an Effect object based on the provided QDomElement
+	 * If it can be properly instantiated, apply the effect to the provided parent effect chain
+	 *
+	 * If it can't be instantiated, returns nullptr
+	 */
+	static Effect* createFromPresetState(const QDomElement& effectElement, EffectChain* parent);
 
 protected:
 	enum class ProcessStatus
