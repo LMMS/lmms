@@ -805,16 +805,12 @@ bool MainWindow::saveProjectAs()
 	}
 
 	// Don't write over file with suffix if no suffix is provided.
-	const auto suffix = ConfigManager::inst()->value("app", "nommpz").toInt() == 0 ? "mmpz" : "mmp";
-	sfd.setDefaultSuffix(suffix);
+	const auto mmpSuffix = ConfigManager::inst()->value("app", "nommpz").toInt() == 0 ? "mmpz" : "mmp";
+	sfd.setDefaultSuffix(mmpSuffix);
 
-	connect(&sfd, &VersionedSaveDialog::filterSelected, this, [&sfd](const QString& filter)
+	connect(&sfd, &VersionedSaveDialog::filterSelected, this, [&sfd, &mmpSuffix](const QString& filter)
 	{
-		if (sfd.selectedNameFilter().contains("(*.mmpz *.mmp)"))
-		{
-			const auto suffix = ConfigManager::inst()->value("app", "nommpz").toInt() == 0 ? "mmpz" : "mmp";
-			sfd.setDefaultSuffix(suffix);
-		}
+		if (sfd.selectedNameFilter().contains("(*.mmpz *.mmp)")) { sfd.setDefaultSuffix(mmpSuffix); }
 		else if (sfd.selectedNameFilter().contains("(*.mpt)")) { sfd.setDefaultSuffix("mpt"); }
 	});
 
@@ -1499,7 +1495,8 @@ void MainWindow::exportProject(bool multiExport)
 		efd.setWindowTitle(tr("Select file for project-export..."));
 		efd.setDefaultSuffix(ProjectRenderer::fileEncodeDevices[0].m_extension);
 
-		connect(&efd, &FileDialog::filterSelected, [&efd](const QString& filter) {
+		connect(&efd, &FileDialog::filterSelected, [&efd](const QString& filter)
+		{
 			for (const auto& device : ProjectRenderer::fileEncodeDevices)
 			{
 				if (QString::compare(device.m_description, filter) == 0)
