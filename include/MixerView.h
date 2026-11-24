@@ -78,7 +78,6 @@ public:
 	// display the send button and knob correctly
 	void updateMixerChannel(int index);
 
-	// notify the view that a mixer channel was deleted
 	void deleteChannel(int index);
 
 	// delete all unused channels
@@ -98,6 +97,9 @@ public slots:
 	int addNewChannel();
 
 private slots:
+	void addChannelView(int index);
+	void removeChannelView(int index);
+	void swapChannelViews(int first, int second);
 	void updateFaders();
 	// TODO This should be improved. Currently the solo and mute models are connected via
 	// the MixerChannelView's constructor with the MixerView. It would already be an improvement
@@ -122,8 +124,6 @@ private:
 	QStackedLayout* m_racksLayout;
 	QWidget* m_racksWidget;
 	Mixer* m_mixer;
-
-	void updateMaxChannelSelector();
 
 	friend class MixerChannelView;
 } ;

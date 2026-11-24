@@ -49,6 +49,9 @@ std::vector<IntModel*> trackMixerChannelModels()
 	auto models = std::vector<IntModel*>{};
 	for (const auto container : std::array<TrackContainer*, 2>{Engine::getSong(), Engine::patternStore()})
 	{
+		// the master channel is created before the pattern store
+		if (!container) { continue; }
+
 		for (const auto track : container->tracks())
 		{
 			if (const auto model = track->mixerChannelModel()) { models.push_back(model); }
@@ -292,6 +295,9 @@ int Mixer::createChannel()
 		m_mixerChannels[index]->m_muteModel.setValue(true);
 	}
 
+	updateTrackChannelRanges();
+	emit channelAdded(index);
+
 	return index;
 }
 
@@ -409,6 +415,9 @@ void Mixer::deleteChannel( int index )
 	}
 
 	Engine::audioEngine()->doneChangeInModel();
+
+	updateTrackChannelRanges();
+	emit channelRemoved(index);
 }
 
 
@@ -447,6 +456,8 @@ void Mixer::moveChannelLeft( int index )
 	// Update m_channelIndex of both channels
 	m_mixerChannels[index]->setIndex(index);
 	m_mixerChannels[index - 1]->setIndex(index - 1);
+
+	emit channelsSwapped(index - 1, index);
 }
 
 
@@ -856,6 +867,14 @@ void Mixer::validateChannelName( int index, int oldIndex )
 	if( m_mixerChannels[index]->m_name == tr( "Channel %1" ).arg( oldIndex ) )
 	{
 		m_mixerChannels[index]->m_name = tr( "Channel %1" ).arg( index );
+	}
+}
+
+void Mixer::updateTrackChannelRanges()
+{
+	for (const auto model : trackMixerChannelModels())
+	{
+		model->setRange(0, numChannels() - 1, 1);
 	}
 }
 

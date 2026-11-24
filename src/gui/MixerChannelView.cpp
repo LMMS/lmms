@@ -247,6 +247,15 @@ void MixerChannelView::keyPressEvent(QKeyEvent* ke)
 	}
 }
 
+void MixerChannelView::updateName()
+{
+	if (m_inRename) { return; }
+
+	const auto& name = mixerChannel()->m_name;
+	setToolTip(name);
+	m_renameLineEdit->setText(elideName(name));
+}
+
 void MixerChannelView::setChannelIndex(int index)
 {
 	m_channelNumberLcd->setValue(index);

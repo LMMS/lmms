@@ -153,6 +153,10 @@ MixerView::MixerView(Mixer* mixer) :
 
 	setCurrentMixerChannel(m_mixerChannelViews[0]);
 
+	connect(mixer, &Mixer::channelAdded, this, &MixerView::addChannelView);
+	connect(mixer, &Mixer::channelRemoved, this, &MixerView::removeChannelView);
+	connect(mixer, &Mixer::channelsSwapped, this, &MixerView::swapChannelViews);
+
 	updateGeometry();
 
 	auto* mainWindow = getGUI()->mainWindow();
@@ -177,20 +181,18 @@ MixerView::MixerView(Mixer* mixer) :
 
 int MixerView::addNewChannel()
 {
-	// add new mixer channel and redraw the form.
-	Mixer * mix = getMixer();
+	return getMixer()->createChannel();
+}
 
-	int newChannelIndex = mix->createChannel();
-	m_mixerChannelViews.push_back(new MixerChannelView(m_channelAreaWidget, this, newChannelIndex));
-	connectToSoloAndMute(newChannelIndex);
-	chLayout->addWidget(m_mixerChannelViews[newChannelIndex]);
-	m_racksLayout->addWidget(m_mixerChannelViews[newChannelIndex]->m_effectRackView);
 
-	updateMixerChannel(newChannelIndex);
+void MixerView::addChannelView(int index)
+{
+	m_mixerChannelViews.push_back(new MixerChannelView(m_channelAreaWidget, this, index));
+	connectToSoloAndMute(index);
+	chLayout->addWidget(m_mixerChannelViews[index]);
+	m_racksLayout->addWidget(m_mixerChannelViews[index]->m_effectRackView);
 
-	updateMaxChannelSelector();
-
-	return newChannelIndex;
+	updateMixerChannel(index);
 }
 
 
@@ -228,27 +230,6 @@ void MixerView::refreshDisplay()
 	for (int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{
 		updateMixerChannel(i);
-	}
-
-	updateMaxChannelSelector();
-}
-
-
-// update the and max. channel number for every instrument
-void MixerView::updateMaxChannelSelector()
-{
-	const TrackContainer::TrackList& songTracks = Engine::getSong()->tracks();
-	const TrackContainer::TrackList& patternStoreTracks = Engine::patternStore()->tracks();
-
-	for (const auto& trackList : {songTracks, patternStoreTracks})
-	{
-		for (const auto& track : trackList)
-		{
-			if (const auto model = track->mixerChannelModel())
-			{
-				model->setRange(0, m_mixerChannelViews.size() - 1, 1);
-			}
-		}
 	}
 }
 
@@ -333,7 +314,7 @@ void MixerView::updateMixerChannel(int index)
 
 	const auto currentIndex = m_currentMixerChannel->channelIndex();
 	const auto thisLine = m_mixerChannelViews[index];
-	thisLine->setToolTip(getMixer()->mixerChannel(index)->m_name);
+	thisLine->updateName();
 
 	const auto sendModelCurrentToThis = mixer->channelSendModel(currentIndex, index);
 	if (sendModelCurrentToThis == nullptr)
@@ -374,9 +355,6 @@ void MixerView::deleteChannel(int index)
 	// Disconnect from the solo/mute models of the channel we are about to delete
 	disconnectFromSoloAndMute(index);
 
-	// remember selected line
-	int selLine = m_currentMixerChannel->channelIndex();
-
 	Mixer* mixer = getMixer();
 	// in case the deleted channel is soloed or the remaining
 	// channels will be left in a muted state
@@ -384,6 +362,12 @@ void MixerView::deleteChannel(int index)
 
 	// delete the real channel
 	mixer->deleteChannel(index);
+}
+
+void MixerView::removeChannelView(int index)
+{
+	// remember selected line
+	int selLine = m_currentMixerChannel->channelIndex();
 
 	chLayout->removeWidget(m_mixerChannelViews[index]);
 	m_racksLayout->removeWidget(m_mixerChannelViews[index]);
@@ -405,8 +389,6 @@ void MixerView::deleteChannel(int index)
 		selLine = m_mixerChannelViews.size() - 1;
 	}
 	setCurrentMixerChannel(selLine);
-
-	updateMaxChannelSelector();
 }
 
 void MixerView::deleteUnusedChannels()
@@ -425,20 +407,20 @@ void MixerView::deleteUnusedChannels()
 
 void MixerView::moveChannelLeft(int index)
 {
-	// can't move master or first channel left or last channel right
-	if (index <= 1 || index >= m_mixerChannelViews.size()) { return; }
-
 	m_mixer->moveChannelLeft(index);
+}
 
-	const auto layoutIndex = chLayout->indexOf(m_mixerChannelViews[index]);
+void MixerView::swapChannelViews(int first, int second)
+{
+	const auto layoutIndex = chLayout->indexOf(m_mixerChannelViews[second]);
 	assert(layoutIndex >= 1);
 
-	chLayout->removeWidget(m_mixerChannelViews[index]);
-	chLayout->insertWidget(layoutIndex - 1, m_mixerChannelViews[index]);
+	chLayout->removeWidget(m_mixerChannelViews[second]);
+	chLayout->insertWidget(layoutIndex - 1, m_mixerChannelViews[second]);
 
-	m_mixerChannelViews[index]->setChannelIndex(index - 1);
-	m_mixerChannelViews[index - 1]->setChannelIndex(index);
-	std::swap(m_mixerChannelViews[index - 1], m_mixerChannelViews[index]);
+	m_mixerChannelViews[second]->setChannelIndex(first);
+	m_mixerChannelViews[first]->setChannelIndex(second);
+	std::swap(m_mixerChannelViews[first], m_mixerChannelViews[second]);
 }
 
 

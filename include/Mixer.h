@@ -214,7 +214,14 @@ public:
 
 	MixerRouteVector m_mixerRoutes;
 
+signals:
+	void channelAdded(int index);
+	void channelRemoved(int index);
+	void channelsSwapped(int first, int second);
+
 private:
+	void updateTrackChannelRanges();
+
 	// the mixer channels in the mixer. index 0 is always master.
 	std::vector<MixerChannel*> m_mixerChannels;
 

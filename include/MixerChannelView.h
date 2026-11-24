@@ -64,6 +64,7 @@ public:
 	void keyPressEvent(QKeyEvent* ke) override;
 
 	void reset();
+	void updateName();
 
 	int channelIndex() const { return m_channelIndex; }
 	void setChannelIndex(int index);
