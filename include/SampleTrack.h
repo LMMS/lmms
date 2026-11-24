@@ -57,7 +57,7 @@ public:
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
-	inline IntModel * mixerChannelModel()
+	IntModel * mixerChannelModel() override
 	{
 		return &m_mixerChannelModel;
 	}

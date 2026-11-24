@@ -39,12 +39,10 @@
 #include "Fader.h"
 #include "GuiApplication.h"
 #include "Knob.h"
-#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "MixerChannelView.h"
 #include "PatternStore.h"
-#include "SampleTrack.h"
 #include "SendButtonIndicator.h"
 #include "Song.h"
 #include "SubWindow.h"
@@ -246,17 +244,9 @@ void MixerView::updateMaxChannelSelector()
 	{
 		for (const auto& track : trackList)
 		{
-			if (track->type() == Track::Type::Instrument)
+			if (const auto model = track->mixerChannelModel())
 			{
-				auto inst = (InstrumentTrack*)track;
-				inst->mixerChannelModel()->setRange(0,
-					m_mixerChannelViews.size()-1,1);
-			}
-			else if (track->type() == Track::Type::Sample)
-			{
-				auto strk = (SampleTrack*)track;
-				strk->mixerChannelModel()->setRange(0,
-					m_mixerChannelViews.size()-1,1);
+				model->setRange(0, m_mixerChannelViews.size() - 1, 1);
 			}
 		}
 	}

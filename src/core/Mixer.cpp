@@ -31,16 +31,33 @@
 #include "Mixer.h"
 #include "Song.h"
 
-#include "InstrumentTrack.h"
 #include "MixHelpers.h"
 #include "PatternStore.h"
-#include "SampleTrack.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 #include <algorithm>
+#include <array>
 
 namespace lmms
 {
+
+namespace
+{
+
+std::vector<IntModel*> trackMixerChannelModels()
+{
+	auto models = std::vector<IntModel*>{};
+	for (const auto container : std::array<TrackContainer*, 2>{Engine::getSong(), Engine::patternStore()})
+	{
+		for (const auto track : container->tracks())
+		{
+			if (const auto model = track->mixerChannelModel()) { models.push_back(model); }
+		}
+	}
+	return models;
+}
+
+} // namespace
 
 
 MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
@@ -335,47 +352,20 @@ void Mixer::deleteChannel( int index )
 	// channel deletion is performed between mixer rounds
 	Engine::audioEngine()->requestChangeInModel();
 
-	// go through every instrument and adjust for the channel index change
-	TrackContainer::TrackList tracks;
-
-	auto& songTracks = Engine::getSong()->tracks();
-	auto& patternStoreTracks = Engine::patternStore()->tracks();
-	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
-	tracks.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
-
-	for( Track* t : tracks )
+	// go through every track and adjust for the channel index change
+	for (const auto model : trackMixerChannelModels())
 	{
-		if( t->type() == Track::Type::Instrument )
+		const int val = model->value();
+		if (val == index)
 		{
-			auto inst = dynamic_cast<InstrumentTrack*>(t);
-			int val = inst->mixerChannelModel()->value(0);
-			if( val == index )
-			{
-				// we are deleting this track's channel send
-				// send to master
-				inst->mixerChannelModel()->setValue(0);
-			}
-			else if( val > index )
-			{
-				// subtract 1 to make up for the missing channel
-				inst->mixerChannelModel()->setValue(val-1);
-			}
+			// we are deleting this track's channel send
+			// send to master
+			model->setValue(0);
 		}
-		else if( t->type() == Track::Type::Sample )
+		else if (val > index)
 		{
-			auto strk = dynamic_cast<SampleTrack*>(t);
-			int val = strk->mixerChannelModel()->value(0);
-			if( val == index )
-			{
-				// we are deleting this track's channel send
-				// send to master
-				strk->mixerChannelModel()->setValue(0);
-			}
-			else if( val > index )
-			{
-				// subtract 1 to make up for the missing channel
-				strk->mixerChannelModel()->setValue(val-1);
-			}
+			// subtract 1 to make up for the missing channel
+			model->setValue(val - 1);
 		}
 	}
 
@@ -437,40 +427,17 @@ void Mixer::moveChannelLeft( int index )
 	if (m_lastSoloed == a) { m_lastSoloed = b; }
 	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
-	// go through every instrument and adjust for the channel index change
-	const TrackContainer::TrackList& songTrackList = Engine::getSong()->tracks();
-	const TrackContainer::TrackList& patternTrackList = Engine::patternStore()->tracks();
-
-	for (const auto& trackList : {songTrackList, patternTrackList})
+	// go through every track and adjust for the channel index change
+	for (const auto model : trackMixerChannelModels())
 	{
-		for (const auto& track : trackList)
+		const int val = model->value();
+		if (val == a)
 		{
-			if (track->type() == Track::Type::Instrument)
-			{
-				auto inst = (InstrumentTrack*)track;
-				int val = inst->mixerChannelModel()->value(0);
-				if( val == a )
-				{
-					inst->mixerChannelModel()->setValue(b);
-				}
-				else if( val == b )
-				{
-					inst->mixerChannelModel()->setValue(a);
-				}
-			}
-			else if (track->type() == Track::Type::Sample)
-			{
-				auto strk = (SampleTrack*)track;
-				int val = strk->mixerChannelModel()->value(0);
-				if( val == a )
-				{
-					strk->mixerChannelModel()->setValue(b);
-				}
-				else if( val == b )
-				{
-					strk->mixerChannelModel()->setValue(a);
-				}
-			}
+			model->setValue(b);
+		}
+		else if (val == b)
+		{
+			model->setValue(a);
 		}
 	}
 
@@ -901,34 +868,7 @@ bool Mixer::isChannelInUse(int index)
 	}
 
 	// check if the destination mixer channel on any instrument or sample track is the index mixer channel
-	TrackContainer::TrackList tracks;
-
-	auto& songTracks = Engine::getSong()->tracks();
-	auto& patternStoreTracks = Engine::patternStore()->tracks();
-	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
-	tracks.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
-
-	for (const auto t : tracks)
-	{
-		if (t->type() == Track::Type::Instrument)
-		{
-			auto inst = dynamic_cast<InstrumentTrack*>(t);
-			if (inst->mixerChannelModel()->value() == index)
-			{
-				return true;
-			}
-		}
-		else if (t->type() == Track::Type::Sample)
-		{
-			auto strack = dynamic_cast<SampleTrack*>(t);
-			if (strack->mixerChannelModel()->value() == index)
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
+	return std::ranges::any_of(trackMixerChannelModels(), [index](const auto model) { return model->value() == index; });
 }
 
 

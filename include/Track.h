@@ -127,6 +127,9 @@ public:
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
+	// the mixer channel this track sends its audio to, if it has one
+	virtual IntModel* mixerChannelModel() { return nullptr; }
+
 	// Saving and loading of presets which do not necessarily contain all the track information
 	void savePreset(QDomDocument & doc, QDomElement & element);
 	void loadPreset(const QDomElement & element);
