@@ -30,8 +30,8 @@
 
 #include "AudioEngine.h"
 #include "Hardware.h"
+#include "LmmsCommonMacros.h"
 #include "ThreadableJob.h"
-
 
 namespace lmms
 {
@@ -156,7 +156,7 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 
 
 
-void AudioEngineWorkerThread::run()
+void AudioEngineWorkerThread::run() noexcept LMMS_NONBLOCKING
 {
 	disableDenormals();
 

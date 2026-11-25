@@ -27,16 +27,15 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <cstdlib>
 #include <QFormLayout>
 #include <QLineEdit>
+#include <cstdlib>
 
-#include "endian_handling.h"
-#include "LcdSpinBox.h"
 #include "AudioEngine.h"
-
 #include "ConfigManager.h"
-
+#include "LcdSpinBox.h"
+#include "LmmsCommonMacros.h"
+#include "endian_handling.h"
 
 namespace lmms
 {
@@ -128,7 +127,7 @@ void AudioSndio::stopProcessingImpl()
 	stopProcessingThread( this );
 }
 
-void AudioSndio::run()
+void AudioSndio::run() noexcept LMMS_NONBLOCKING
 {
 	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
 	const auto samplesPerAudioBuffer = framesPerAudioBuffer * channels();

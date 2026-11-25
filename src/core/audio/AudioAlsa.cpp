@@ -27,9 +27,10 @@
 
 #ifdef LMMS_HAVE_ALSA
 
-#include "endian_handling.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "LmmsCommonMacros.h"
+#include "endian_handling.h"
 
 namespace lmms
 {
@@ -220,7 +221,7 @@ void AudioAlsa::stopProcessingImpl()
 	stopProcessingThread( this );
 }
 
-void AudioAlsa::run()
+void AudioAlsa::run() noexcept LMMS_NONBLOCKING
 {
 	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
 	auto buf = std::vector<float>(framesPerAudioBuffer * channels());
