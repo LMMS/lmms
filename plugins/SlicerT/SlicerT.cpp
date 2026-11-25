@@ -382,6 +382,10 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		auto buffer = SampleBuffer::fromBase64(sampleData);
 		m_originalSample = Sample{std::move(buffer)};
+	}
+
+	if (!m_originalSample.buffer().empty())
+	{
 		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_originalSample.buffer());
 	}
 
