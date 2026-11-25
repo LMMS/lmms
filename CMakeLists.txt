@@ -823,7 +823,7 @@ add_sanitizer(realtime "Clang" WANT_RTSAN STATUS_RTSAN)
 if(WANT_RTSAN)
 	set(LMMS_NONBLOCKING "[[clang::nonblocking]]")
 else()
-	set(LMMS_NONBLOCKING "[[]]")
+	set(LMMS_NONBLOCKING "")
 endif()
 
 # Add warning and error flags
