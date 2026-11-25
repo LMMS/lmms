@@ -31,16 +31,16 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
-#include <QToolButton>
 #include <QStringList>
+#include <QToolButton>
+#include <cstdio>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "GuiApplication.h"
+#include "LmmsCommonMacros.h"
 #include "MainWindow.h"
 #include "MidiJack.h"
-
-#include <cstdio>
 
 namespace lmms {
 namespace {

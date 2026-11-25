@@ -22,17 +22,19 @@
  *
  */
 
-#include <QFormLayout>
-#include <QLineEdit>
 
 #include "AudioPulseAudio.h"
 
 #ifdef LMMS_HAVE_PULSEAUDIO
 
-#include "ConfigManager.h"
-#include "LcdSpinBox.h"
+#include <QFormLayout>
+#include <QLineEdit>
+
 #include "AudioEngine.h"
+#include "ConfigManager.h"
 #include "Engine.h"
+#include "LcdSpinBox.h"
+#include "LmmsCommonMacros.h"
 
 namespace lmms
 {

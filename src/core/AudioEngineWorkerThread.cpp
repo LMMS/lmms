@@ -30,8 +30,8 @@
 
 #include "AudioEngine.h"
 #include "Hardware.h"
+#include "LmmsCommonMacros.h"
 #include "ThreadableJob.h"
-
 
 namespace lmms
 {

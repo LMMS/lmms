@@ -23,16 +23,17 @@
  */
 
 #include "AudioSdl.h"
-#include "LmmsTypes.h"
 
 #ifdef LMMS_HAVE_SDL
 
-#include <QFormLayout>
 #include <QComboBox>
+#include <QFormLayout>
 #include <SDL.h>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "LmmsCommonMacros.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

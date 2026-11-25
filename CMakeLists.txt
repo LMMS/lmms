@@ -813,18 +813,11 @@ endfunction()
 add_sanitizer(address "GNU|Clang|MSVC" WANT_ASAN STATUS_ASAN)
 add_sanitizer(thread "GNU|Clang" WANT_TSAN STATUS_TSAN)
 add_sanitizer(memory "Clang" WANT_MSAN STATUS_MSAN -fno-omit-frame-pointer)
+add_sanitizer(realtime "Clang" WANT_RTSAN STATUS_RTSAN)
 
 # UBSan does not link with vptr enabled due to a problem with references from PeakControllerEffect
 # not being found by PeakController
 add_sanitizer(undefined "GNU|Clang" WANT_UBSAN STATUS_UBSAN -fno-sanitize=vptr)
-
-add_sanitizer(realtime "Clang" WANT_RTSAN STATUS_RTSAN)
-
-if(WANT_RTSAN)
-	set(LMMS_NONBLOCKING "[[clang::nonblocking]]")
-else()
-	set(LMMS_NONBLOCKING "")
-endif()
 
 # Add warning and error flags
 include(ErrorFlags)

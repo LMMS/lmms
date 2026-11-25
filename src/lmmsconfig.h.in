@@ -51,5 +51,3 @@
 #cmakedefine LMMS_HAVE_FCNTL_H
 #cmakedefine LMMS_HAVE_SYS_IOCTL_H
 #cmakedefine LMMS_HAVE_PROCESS_H
-
-#define LMMS_NONBLOCKING @LMMS_NONBLOCKING@
