@@ -82,7 +82,7 @@ public:
 		return m_sampleRate;
 	}
 
-	inline fpp_t bufferSize() const
+	inline f_cnt_t bufferSize() const
 	{
 		return m_bufferSize;
 	}
@@ -135,7 +135,7 @@ private:
 	int m_outputCount;
 
 	sample_rate_t m_sampleRate;
-	fpp_t m_bufferSize;
+	f_cnt_t m_bufferSize;
 } ;
 
 #ifndef LMMS_BUILD_WIN32

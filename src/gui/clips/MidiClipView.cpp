@@ -288,23 +288,13 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 	track->saveJournallingState(false);
 
 	// Find the earliest position of all the selected ClipVs
-	const auto earliestClipV = std::min_element(clipvs.constBegin(), clipvs.constEnd(),
-		[](ClipView* a, ClipView* b)
-		{
-			return a->getClip()->startPosition() <
-				b->getClip()->startPosition();
-		}
-	);
+	const auto earliestClipV = std::ranges::min_element(clipvs, {},
+		[](ClipView* c) { return c->getClip()->startPosition(); });
 	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
 
 	// Find the latest position of all the selected ClipVs
-	const auto latestClipV = std::max_element(clipvs.constBegin(), clipvs.constEnd(),
-	[](ClipView* a, ClipView* b)
-	{
-		return a->getClip()->endPosition() <
-			b->getClip()->endPosition();
-	}
-	);
+	const auto latestClipV = std::ranges::max_element(clipvs, {},
+		[](ClipView* c) { return c->getClip()->endPosition(); });
 	const TimePos latestPos = (*latestClipV)->getClip()->endPosition();
 
 
@@ -374,9 +364,8 @@ void MidiClipView::clearNotesOutOfBounds()
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
 
-	auto newClip = new MidiClip(static_cast<InstrumentTrack*>(m_clip->getTrack()));
-	newClip->setAutoResize(m_clip->getAutoResize());
-	newClip->movePosition(m_clip->startPosition());
+	auto newClip = m_clip->clone();
+	newClip->clearNotes();
 
 	TimePos startBound = -m_clip->startTimeOffset();
 	TimePos endBound = m_clip->length() - m_clip->startTimeOffset();
@@ -394,6 +383,7 @@ void MidiClipView::clearNotesOutOfBounds()
 			newClip->addNote(newNote, false);
 		}
 	}
+	newClip->setStartTimeOffset(0);
 	newClip->changeLength(m_clip->length());
 	newClip->updateLength();
 
@@ -602,8 +592,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	// Check whether we will paint a text box and compute its potential height
 	// This is needed so we can paint the notes underneath it.
-	bool const drawName = !m_clip->name().isEmpty();
-	bool const drawTextBox = !beatClip && drawName;
+	bool const drawTextBox = !m_clip->name().isEmpty();
 
 	// TODO Warning! This might cause problems if ClipView::paintTextLabel changes
 	int textBoxHeight = 0;

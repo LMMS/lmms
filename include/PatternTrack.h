@@ -50,7 +50,7 @@ public:
 	PatternTrack(TrackContainer* tc);
 	~PatternTrack() override;
 
-	bool play( const TimePos & _start, const fpp_t _frames,
+	bool play( const TimePos & _start, const f_cnt_t _frames,
 
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	gui::TrackView * createView( gui::TrackContainerView* tcv ) override;

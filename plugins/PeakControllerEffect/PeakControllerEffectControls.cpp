@@ -29,6 +29,7 @@
 #include "PeakControllerEffectControls.h"
 #include "PeakControllerEffect.h"
 #include "Song.h"
+#include "lmms_math.h"
 
 namespace lmms
 {
@@ -81,7 +82,7 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	else
 	{
 		// TODO: Fix possible collision
-		m_effect->m_effectId = rand();
+		m_effect->m_effectId = fastRand();
 	}
 }
 

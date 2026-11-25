@@ -69,11 +69,9 @@ public:
 
 	Sample() = default;
 
-	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other) noexcept;
-	explicit Sample(const QString& audioFile);
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
 	auto operator=(const Sample&) -> Sample&;
@@ -89,8 +87,10 @@ public:
 
 	auto toBase64() const -> QString { return m_buffer->toBase64(); }
 
+	auto buffer() const -> const SampleBuffer& { return *m_buffer; }
+	auto shareBuffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
+
 	auto data() const -> const SampleFrame* { return m_buffer->data(); }
-	auto buffer() const -> std::shared_ptr<const SampleBuffer> { return m_buffer; }
 	auto startFrame() const -> int { return m_startFrame.load(std::memory_order_relaxed); }
 	auto endFrame() const -> int { return m_endFrame.load(std::memory_order_relaxed); }
 	auto loopStartFrame() const -> int { return m_loopStartFrame.load(std::memory_order_relaxed); }

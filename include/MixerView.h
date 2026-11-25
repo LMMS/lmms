@@ -44,8 +44,11 @@ namespace lmms
 
 namespace lmms::gui
 {
-class LMMS_EXPORT MixerView : public QWidget, public ModelView,
-					public SerializingObjectHook
+
+class LMMS_EXPORT MixerView
+	: public QWidget
+	, public ModelView
+	, public SerializingObjectHook
 {
 	Q_OBJECT
 public:
@@ -83,7 +86,6 @@ public:
 
 	// move the channel to the left or right
 	void moveChannelLeft(int index);
-	void moveChannelLeft(int index, int focusIndex);
 	void moveChannelRight(int index);
 
 	void renameChannel(int index);
@@ -94,9 +96,6 @@ public:
 
 public slots:
 	int addNewChannel();
-
-protected:
-	void closeEvent(QCloseEvent* ce) override;
 
 private slots:
 	void updateFaders();

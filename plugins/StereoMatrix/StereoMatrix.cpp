@@ -64,9 +64,9 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-Effect::ProcessStatus StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus StereoMatrixEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{	
 		const float d = dryLevel();
 		const float w = wetLevel();

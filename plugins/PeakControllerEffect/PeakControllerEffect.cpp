@@ -66,7 +66,7 @@ PeakControllerEffect::PeakControllerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &peakcontrollereffect_plugin_descriptor, _parent, _key ),
-	m_effectId( rand() ),
+	m_effectId(fastRand()),
 	m_peakControls( this ),
 	m_lastSample( 0 ),
 	m_autoController( nullptr )
@@ -93,7 +93,7 @@ PeakControllerEffect::~PeakControllerEffect()
 }
 
 
-Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	PeakControllerEffectControls & c = m_peakControls;
 

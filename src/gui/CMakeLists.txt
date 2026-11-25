@@ -35,9 +35,8 @@ SET(LMMS_SRCS
 	gui/PluginBrowser.cpp
 	gui/ProjectNotes.cpp
 	gui/RowTableView.cpp
-	gui/SampleLoader.cpp
 	gui/SampleTrackWindow.cpp
-	gui/SampleThumbnail.cpp
+	gui/SampleThumbnailRenderer.cpp
 	gui/SendButtonIndicator.cpp
 	gui/SideBar.cpp
 	gui/SideBarWidget.cpp
@@ -105,7 +104,6 @@ SET(LMMS_SRCS
 	gui/widgets/CPULoadWidget.cpp
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp
-	gui/widgets/CustomTextKnob.cpp
 	gui/widgets/Draggable.cpp
 	gui/widgets/Fader.cpp
 	gui/widgets/FloatModelEditorBase.cpp

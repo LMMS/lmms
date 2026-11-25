@@ -102,7 +102,7 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 }
 
 
-void NesObject::renderOutput( SampleFrame* buf, fpp_t frames )
+void NesObject::renderOutput( SampleFrame* buf, f_cnt_t frames )
 {
 	////////////////////////////////
 	//	                          //
@@ -546,7 +546,7 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 
 void NesInstrument::playNote( NotePlayHandle * n, SampleFrame* workingBuffer )
 {
-	const fpp_t frames = n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	
 	if (!n->m_pluginData)

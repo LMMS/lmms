@@ -44,6 +44,7 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	setPalette( pal );
 
 	auto knobLayout = new QHBoxLayout(this);
+	knobLayout->setSizeConstraint(QLayout::SetFixedSize);
 
 	auto inputGainKnob = new Knob(KnobType::Bright26, tr("Input"), this);
 	inputGainKnob->setModel( &controls->m_inputGainModel );

@@ -118,14 +118,17 @@ Song::Song() :
 	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
 	for (auto& keymap : m_keymaps) {keymap = std::make_shared<Keymap>();}
 
-	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for other objects (sample tracks, LFOs, etc) to use.
-	for (auto& timeline : m_timelines)
+	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for
+	// other objects (sample tracks, LFOs, etc) to use.
+	for (auto i = std::size_t{0}; i < static_cast<std::size_t>(PlayMode::Count); ++i)
 	{
-		connect(&timeline, &Timeline::positionJumped, this, [this](){
-			// Only emit the signal when the song is actually playing
+		const auto onPositionJumped = [this, playMode = static_cast<PlayMode>(i)] {
+			// Only emit the signal when the song is actually playing and the active timeline jumps
 			// This prevents LFOs from changing phase when the user drags the timeline while paused
-			if (isPlaying()) { emit playbackPositionJumped(); }
-		}, Qt::DirectConnection);
+			if (m_playing && m_playMode == playMode) { emit playbackPositionJumped(); }
+		};
+
+		connect(&m_timelines[i], &Timeline::positionJumped, this, onPositionJumped);
 	}
 
 	// Inform VST plugins if the user moved the play head
@@ -348,8 +351,13 @@ void Song::processNextBuffer()
 	m_vstSyncController.setPlaybackJumped(false);
 }
 
+void Song::removeOldAutomatedValue(AutomatableModel* am)
+{
+	// Get rid of object inside Song.m_oldAutomatedValues #8571
+	m_oldAutomatedValues.remove(am);
+}
 
-void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp_t)
+void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_cnt_t)
 {
 	AutomatedValueMap values;
 
@@ -412,7 +420,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 	{
 		AutomatableModel * am = it.key();
-		if (am->controllerConnection() && !values.contains(am))
+		if (!values.contains(am))
 		{
 			am->setUseControllerValue(true);
 		}
@@ -422,13 +430,18 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	// Apply values
 	for (auto it = values.begin(); it != values.end(); it++)
 	{
-		if (! recordedModels.contains(it.key()))
+		AutomatableModel* model = it.key();
+		bool isRecording = recordedModels.contains(model);
+		model->setUseControllerValue(isRecording);
+
+		if (!isRecording)
 		{
-			it.key()->setAutomatedValue(it.value());
-		}
-		else if (!it.key()->useControllerValue())
-		{
-			it.key()->setUseControllerValue(true);
+			/* TODO
+			 * Remove scaleValue() from here when automation editor's
+			 * Y axis can be set to logarithmic, and automation clips store
+			 * the actual values, and not the invertedScaledValue.
+			 */
+			model->setValue(model->scaledValue(it.value()), true);
 		}
 	}
 }
@@ -1160,9 +1173,8 @@ void Song::loadProject( const QString & fileName )
 	ControllerConnection::finalizeConnections();
 
 	// Remove dummy controllers that was added for correct connections
-	m_controllers.erase(std::remove_if(m_controllers.begin(), m_controllers.end(),
-		[](Controller* c){return c->type() == Controller::ControllerType::Dummy;}),
-		m_controllers.end());
+	std::erase_if(m_controllers,
+		[](Controller* c){return c->type() == Controller::ControllerType::Dummy;});
 
 	// resolve all IDs so that autoModels are automated
 	AutomationClip::resolveAllIDs();
@@ -1208,6 +1220,13 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 {
 	using gui::getGUI;
 
+	// ensure property order in file is consistent across saves
+#if QT_VERSION < QT_VERSION_CHECK(6, 6, 0)
+	qSetGlobalQHashSeed(0);
+#else
+	QHashSeed::setDeterministicGlobalSeed();
+#endif
+
 	DataFile dataFile( DataFile::Type::SongProject );
 	m_savingProject = true;
 
@@ -1235,7 +1254,16 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 
 	m_savingProject = false;
 
-	return dataFile.writeFile(filename, withResources);
+	bool writeStatus = dataFile.writeFile(filename, withResources);
+
+	// revert to a randomized global seed for Qt
+#if QT_VERSION < QT_VERSION_CHECK(6, 6, 0)
+	qSetGlobalQHashSeed(-1);
+#else
+	QHashSeed::resetRandomGlobalSeed();
+#endif
+
+	return writeStatus;
 }
 
 
@@ -1371,7 +1399,7 @@ void Song::restoreKeymapStates(const QDomElement &element)
 }
 
 
-void Song::exportProjectMidi(QString const & exportFileName) const
+void Song::exportProjectMidi(const std::filesystem::path& filePath) const
 {
 	// instantiate midi export plugin
 	TrackContainer::TrackList const & tracks = this->tracks();
@@ -1380,7 +1408,7 @@ void Song::exportProjectMidi(QString const & exportFileName) const
 	ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", nullptr, nullptr));
 	if (exf)
 	{
-		exf->tryExport(tracks, patternStoreTracks, getTempo(), m_masterPitchModel.value(), exportFileName);
+		exf->tryExport(tracks, patternStoreTracks, getTempo(), m_masterPitchModel.value(), filePath);
 	}
 	else
 	{
@@ -1418,7 +1446,7 @@ void Song::setProjectFileName(QString const & projectFileName)
 
 void Song::addController( Controller * controller )
 {
-	bool containsController = std::find(m_controllers.begin(), m_controllers.end(), controller) != m_controllers.end();
+	const bool containsController = std::ranges::find(m_controllers, controller) != m_controllers.end();
 	if (controller && !containsController)
 	{
 		m_controllers.push_back(controller);
@@ -1433,7 +1461,7 @@ void Song::addController( Controller * controller )
 
 void Song::removeController( Controller * controller )
 {
-	auto it = std::find(m_controllers.begin(), m_controllers.end(), controller);
+	auto it = std::ranges::find(m_controllers, controller);
 	if (it != m_controllers.end())
 	{
 		m_controllers.erase(it);

@@ -57,8 +57,8 @@ protected:
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 
-	void closeEvent(QCloseEvent * event) override;
-	void keyPressEvent(QKeyEvent *ke) override;
+	void keyPressEvent(QKeyEvent* ke) override;
+
 public slots:
 	//! Called by pressing the space key. Plays or stops.
 	void togglePlayStop();
@@ -80,11 +80,11 @@ private:
 signals:
 
 protected:
-	/// \brief	Constructor.
-	///
-	/// \param	record	If set true, the editor's toolbar will contain record
-	///					buttons in addition to the play and stop buttons.
-	Editor(bool record = false, bool record_step = false);
+	//! @param record If set true, the editor's toolbar will contain
+	//! record buttons in addition to the play and stop buttons.
+	//! @param stepRecord If set true, the editor's toolbar will also
+	//! contain a step record button.
+	Editor(bool record = false, bool stepRecord = false);
 	~Editor() override = default;
 
 

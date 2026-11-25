@@ -125,10 +125,10 @@ void LadspaEffect::changeSampleRate()
 
 
 
-Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	m_pluginMutex.lock();
-	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
+	if (!isProcessingAudio())
 	{
 		m_pluginMutex.unlock();
 		return ProcessStatus::Sleep;
@@ -145,7 +145,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 			switch( pp->rate )
 			{
 				case BufferRate::ChannelIn:
-					for (fpp_t frame = 0; frame < frames; ++frame)
+					for (f_cnt_t frame = 0; frame < frames; ++frame)
 					{
 						pp->buffer[frame] = buf[frame][channel];
 					}
@@ -165,7 +165,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 						// This only supports control rate ports, so the audio rates are
 						// treated as though they were control rate by setting the
 						// port buffer to all the same value.
-						for (fpp_t frame = 0; frame < frames; ++frame)
+						for (f_cnt_t frame = 0; frame < frames; ++frame)
 						{
 							pp->buffer[frame] = pp->value;
 						}
@@ -215,7 +215,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 				case BufferRate::ControlRateInput:
 					break;
 				case BufferRate::ChannelOut:
-					for (fpp_t frame = 0; frame < frames; ++frame)
+					for (f_cnt_t frame = 0; frame < frames; ++frame)
 					{
 						buf[frame][channel] = d * buf[frame][channel] + w * pp->buffer[frame];
 					}

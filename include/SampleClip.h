@@ -26,6 +26,7 @@
 #define LMMS_SAMPLE_CLIP_H
 
 #include <memory>
+
 #include "Clip.h"
 #include "Sample.h"
 
@@ -33,6 +34,7 @@ namespace lmms
 {
 
 class SampleBuffer;
+class SampleThumbnailCache;
 
 namespace gui
 {
@@ -54,6 +56,8 @@ public:
 	SampleClip& operator=( const SampleClip& that ) = delete;
 
 	void changeLength( const TimePos & _length ) override;
+	void updateLength() override;
+
 	const QString& sampleFile() const;
 	bool hasSampleFileLoaded(const QString & filename) const;
 
@@ -69,15 +73,21 @@ public:
 		return m_sample;
 	}
 
+	const SampleThumbnailCache* sampleThumbnailCache() const { return m_sampleThumbnailCache.get(); }
+
 	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
+	void setStartTimeOffset(const TimePos& startTimeOffset) override;
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
+
+	QString getName() const;
+	const QString& getNameRef() const;
 
 	SampleClip* clone() override
 	{
@@ -86,20 +96,30 @@ public:
 
 public slots:
 	void setSampleFile(const QString& sf);
-	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackClips();
+	void tempoChanged();
 
 protected:
 	SampleClip( const SampleClip& orig );
 
 private:
 	Sample m_sample;
+	std::shared_ptr<const SampleThumbnailCache> m_sampleThumbnailCache;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
+	int m_startFrameOffset;
+
+	QString m_name; //!< Display name
+	QString m_origName;
+	bool m_nameSet = false; //!< Whether m_name was set by the user
 
 	friend class gui::SampleClipView;
+
+	void resetName();
+	void setName(const QString& name);
+	void fileChanged(const QString& fileName);
 
 
 signals:

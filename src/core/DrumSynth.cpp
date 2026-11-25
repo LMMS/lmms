@@ -190,7 +190,11 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 	const char* key, const char* def, char* buffer, std::size_t size,
 	QString file)
 {
-	const auto maxlen = std::max(std::size_t{1}, size) - 1; // TODO C++26: Use std::sub_sat(size, 1)
+	// buffer is intended to be null-terminated. size of 0 can't fit
+	// anything, size of 1 can only fit the null terminator. Neither
+	// should ever happen
+	assert(size > 1);
+	std::size_t len = 0;
 	stringstream is;
 	bool inSection = false;
 	std::array<char, 200> line = {};
@@ -201,11 +205,6 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 	f.open(QIODevice::ReadOnly);
 	QByteArray dat = f.readAll().constData();
 	is.str(string(dat.constData(), dat.size()));
-
-	// If buffer[0] isn't overwritten after reading file, default value
-	// `def` will be used.
-	std::memset(buffer, '\0', size);
-
 	while (is.good())
 	{
 		if (!inSection)
@@ -221,28 +220,38 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 		{
 			is.getline(line.data(), line.size());
 			if (line[0] == '[') { break; }
-
 			char* k = std::strtok(line.data(), " \t=");
 			char* b = std::strtok(nullptr, "\n\r\0");
 			if (k && !strcasecmp(k, key))
 			{
 				if (b)
 				{
-					// Trim trailing whitespace
-					k = &b[std::strlen(b)];
-					while (k >= b && (*k == ' ' || *k == '\t')) { --k; }
-					k[1] = '\0'; // k == b - 1 when string is empty or all whitespace
-					std::strncpy(buffer, b, maxlen);
+					k = &b[strlen(b) - 1];
+					while (k >= b && (*k == ' ' || *k == '\t')) { --k; } // Trim trailing whitespace
+					// k == b - 1 when string is empty or all whitespace
+					len = std::clamp<ptrdiff_t>(1 + k - b, 0, size - 1);
+					std::memcpy(buffer, b, len);
+					buffer[len] = '\0';
+				}
+				else
+				{
+					len = 0;
+					buffer[0] = '\0';
 				}
 				break;
 			}
 		}
 	}
-
-	// Use default value `def` if value is missing
-	if (!buffer[0]) { std::strncpy(buffer, def, maxlen); }
-	// Since nothing ever copies past `maxlen`, buffer must be null-terminated
-	const auto len = std::strlen(buffer);
+	// Use default value if missing
+	if (!len)
+	{
+		len = std::strlen(def);
+		// Passing in a default value larger than the output buffer is
+		// a logic error at the callsite and should never happen
+		assert(len < size);
+		std::memcpy(buffer, def, len);
+		buffer[len] = '\0';
+	}
 	return len;
 }
 
@@ -294,8 +303,6 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	long Length, tpos = 0, tplus, totmp, t, i, j;
 	float x[3] = {0.f, 0.f, 0.f};
 	float MasterTune;
-	constexpr float randmax = 1.f / static_cast<float>(RAND_MAX);
-	constexpr float randmax2 = 2.f / static_cast<float>(RAND_MAX);
 	int MainFilter, HighPass;
 
 	long NON, NT, TON, DiON, TDroop = 0, DStep;
@@ -366,7 +373,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	timestretch *= Fs / 44100.f;
 
 	DGain = 1.0f; // leave this here!
-	DGain = fastPow10f(0.05 * GetPrivateProfileFloat(sec, "Level", 0, dsfile));
+	DGain = fastPow10f(0.05f * GetPrivateProfileFloat(sec, "Level", 0, dsfile));
 
 	MasterTune = GetPrivateProfileFloat(sec, "Tuning", 0.0, dsfile);
 	MasterTune = std::pow(1.0594631f, MasterTune + mem_tune);
@@ -398,9 +405,6 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 		c = std::abs(static_cast<float>(NT)) / 100.f;
 		g = NL;
 	}
-
-	// if(GetPrivateProfileInt(sec,"FixedSeq",0,dsfile)!=0)
-	// srand(1); //fixed random sequence
 
 	// read tone parameters
 	std::strcpy(sec, "Tone");
@@ -520,7 +524,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 		DAtten = DGain * static_cast<short>(LoudestEnv());
 		clippoint = DAtten > 32700 ? 32700 : static_cast<short>(DAtten);
 		DAtten = std::exp2(2.0 * GetPrivateProfileInt(sec, "Bits", 0, dsfile));
-		DGain = DAtten * DGain * fastPow10f(0.05 * GetPrivateProfileInt(sec, "Clipping", 0, dsfile));
+		DGain = DAtten * DGain * fastPow10f(0.05f * GetPrivateProfileInt(sec, "Clipping", 0, dsfile));
 	}
 
 	// prepare envelopes
@@ -596,7 +600,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				x[2] = x[1];
 				x[1] = x[0];
-				x[0] = (randmax2 * static_cast<float>(rand())) - 1.f;
+				x[0] = fastRandInc(-1.f, 1.f);
 				TT = a * x[0] + b * x[1] + c * x[2] + d * TT;
 				DF[t - tpos] = TT * g * envData[2][ENV];
 			}
@@ -671,7 +675,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				if ((t % BFStep) == 0)
 				{
-					BdF = randmax * static_cast<float>(rand()) - 0.5f;
+					BdF = fastRandInc(-0.5f, 0.5f);
 				}
 				BPhi = BPhi + BF + BQ * BdF;
 				botmp = t - tpos;
@@ -697,7 +701,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				}
 				if ((t % BFStep2) == 0)
 				{
-					BdF2 = randmax * static_cast<float>(rand()) - 0.5f;
+					BdF2 = fastRandInc(-0.5f, 0.5f);
 				}
 				BPhi2 = BPhi2 + BF2 + BQ2 * BdF2;
 				botmp = t - tpos;

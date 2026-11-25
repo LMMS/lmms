@@ -121,8 +121,6 @@ bool InstrumentTrack::keyRangeImport() const
 }
 
 
-/** \brief Check if there is a valid mapping for the given key and it is within defined of range.
- */
 bool InstrumentTrack::isKeyMapped(int key) const
 {
 	if (key < firstKey() || key > lastKey()) {return false;}
@@ -135,9 +133,6 @@ bool InstrumentTrack::isKeyMapped(int key) const
 }
 
 
-/** \brief Return first mapped key, based on currently selected keymap or user selection.
- *	\return Number ranging from 0 to NumKeys -1
- */
 int InstrumentTrack::firstKey() const
 {
 	if (keyRangeImport())
@@ -151,9 +146,6 @@ int InstrumentTrack::firstKey() const
 }
 
 
-/** \brief Return last mapped key, based on currently selected keymap or user selection.
- *	\return Number ranging from 0 to NumKeys -1
- */
 int InstrumentTrack::lastKey() const
 {
 	if (keyRangeImport())
@@ -167,9 +159,6 @@ int InstrumentTrack::lastKey() const
 }
 
 
-/** \brief Return base key number, based on currently selected keymap or user selection.
- *	\return Number ranging from 0 to NumKeys -1
- */
 int InstrumentTrack::baseNote() const
 {
 	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
@@ -185,9 +174,6 @@ int InstrumentTrack::baseNote() const
 }
 
 
-/** \brief Return frequency assigned to the base key, based on currently selected keymap.
- *	\return Frequency in Hz
- */
 float InstrumentTrack::baseFreq() const
 {
 	if (m_microtuner.enabled())
@@ -205,9 +191,12 @@ float InstrumentTrack::baseFreq() const
 InstrumentTrack::~InstrumentTrack()
 {
 	// De-assign midi device
-	if (m_hasAutoMidiDev)
+	if (s_autoAssignedTrack == this)
 	{
-		autoAssignMidiDevice(false);
+		if (m_hasAutoMidiDev)
+		{
+			autoAssignMidiDevice(false);
+		}
 		s_autoAssignedTrack = nullptr;
 	}
 
@@ -221,7 +210,7 @@ InstrumentTrack::~InstrumentTrack()
 
 
 
-void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
+void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const f_cnt_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
 	if( isMuted() || ( Engine::getSong()->playMode() != Song::PlayMode::MidiClip &&
@@ -248,10 +237,6 @@ void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, 
 	{
 		m_silentBuffersProcessed = false;
 	}
-
-	// if effects "went to sleep" because there was no input, wake them up
-	// now
-	m_audioBusHandle.effects()->startRunning();
 
 	// get volume knob data
 	static const float DefaultVolumeRatio = 1.0f / DefaultVolume;
@@ -588,7 +573,7 @@ void InstrumentTrack::playNote( NotePlayHandle* n, SampleFrame* workingBuffer )
 		// Calling processAudioBuffer with a nullptr leads to crashes. Hence the check.
 		if (n->usesBuffer())
 		{
-			const fpp_t frames = n->framesLeftForCurrentPeriod();
+			const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 			const f_cnt_t offset = n->noteOffset();
 			processAudioBuffer(workingBuffer, frames + offset, n);
 		}
@@ -698,7 +683,7 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 
 
 
-bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
+bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 							const f_cnt_t _offset, int _clip_num )
 {
 	if( ! m_instrument || ! tryLock() )
@@ -1076,10 +1061,6 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 
 InstrumentTrack *InstrumentTrack::s_autoAssignedTrack = nullptr;
 
-/*! \brief Automatically assign a midi controller to this track, based on the midiautoassign setting
- *
- *  \param assign set to true to connect the midi device, set to false to disconnect
- */
 void InstrumentTrack::autoAssignMidiDevice(bool assign)
 {
 	if (assign)
@@ -1095,6 +1076,7 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 	if ( Engine::audioEngine()->midiClient()->isRaw() && device != "none" )
 	{
 		m_midiPort.setReadable( assign );
+		m_hasAutoMidiDev = assign;
 		return;
 	}
 

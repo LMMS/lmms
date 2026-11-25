@@ -82,10 +82,11 @@ endfunction()
 # 		[INCLUDE_HINTS hints...]       # Locations to look for headers
 #		[DEPENDS dependencies...]      # Dependencies of the target - added to INTERFACE_LINK_LIBRARIES, and will fail if not found
 #		[PREFIX <prefix>]              # The prefix for result variables - defaults to the package name
+#		[HEADER_ONLY]                  # If present, no library file is required - only headers are used
 # 	)
 function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TARGET_NAME)
 	# Parse remaining arguments
-	set(_options "")
+	set(_options "HEADER_ONLY")
 	set(_one_value_args "PKG_CONFIG" "PREFIX")
 	set(_multi_value_args "LIBRARY_NAMES" "LIBRARY_HINTS" "INCLUDE_NAMES" "INCLUDE_HINTS" "DEPENDS")
 	cmake_parse_arguments(PARSE_ARGV 2 _fpcmwf "${_options}" "${_one_value_args}" "${_multi_value_args}")
@@ -112,6 +113,7 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 		# Check whether the dependencies exist
 		foreach(_dependency IN LISTS _fpcmwf_DEPENDS)
 			if(NOT TARGET "${_dependency}")
+				message(DEBUG "Dependency '${_dependency}' of '${_fpcmwf_PACKAGE_NAME}' is not a target")
 				return()
 			endif()
 		endforeach()
@@ -128,7 +130,8 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			endif()
 		endif()
 
-		# Find the library and headers using the results from pkg-config as a guide
+		# Find the library and headers using the results from pkg-config (if any) as a guide
+		# This is a final attempt in case find_package() and pkg-config failed to provide this info
 		find_library("${_library_var}"
 			NAMES ${_fpcmwf_LIBRARY_NAMES}
 			HINTS ${${_pkg_config_prefix}_LIBRARY_DIRS} ${_fpcmwf_LIBRARY_HINTS}
@@ -139,14 +142,46 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			HINTS ${${_pkg_config_prefix}_INCLUDE_DIRS} ${_fpcmwf_INCLUDE_HINTS}
 		)
 
-		# Create an imported target if we succeeded in finding the package
-		if(${_library_var} AND ${_include_var})
-			add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
-			set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
-				IMPORTED_LOCATION "${${_library_var}}"
-				INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
-				INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
-			)
+		# Check if we succeeded in finding the package
+		set(_is_valid_package FALSE)
+		if(${_fpcmwf_HEADER_ONLY})
+			if(${_include_var})
+				set(_is_valid_package TRUE)
+			endif()
+		else()
+			if(${_library_var} AND ${_include_var})
+				set(_is_valid_package TRUE)
+			endif()
+		endif()
+
+		if(_is_valid_package)
+			# Create an imported target for the package
+			if(${_library_var})
+				add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
+				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
+					IMPORTED_LOCATION "${${_library_var}}"
+					INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
+					INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
+				)
+			else()
+				add_library("${_fpcmwf_TARGET_NAME}" INTERFACE IMPORTED)
+				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
+					INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
+					INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
+				)
+			endif()
+
+			if(DEFINED ${_pkg_config_prefix}_LDFLAGS_OTHER)
+				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
+					INTERFACE_LINK_OPTIONS "${${_pkg_config_prefix}_LDFLAGS_OTHER}"
+				)
+			endif()
+
+			if(DEFINED ${_pkg_config_prefix}_CFLAGS_OTHER)
+				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
+					INTERFACE_COMPILE_OPTIONS "${${_pkg_config_prefix}_CFLAGS_OTHER}"
+				)
+			endif()
 		endif()
 
 		mark_as_advanced("${_library_var}" "${_include_var}")
@@ -158,7 +193,10 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 	else()
 		unset("${_version_var}" PARENT_SCOPE)
 	endif()
-	set("${_library_var}" "${${_library_var}}" PARENT_SCOPE)
+
+	if(NOT ${_fpcmwf_HEADER_ONLY})
+		set("${_library_var}" "${${_library_var}}" PARENT_SCOPE)
+	endif()
 	set("${_include_var}" "${${_include_var}}" PARENT_SCOPE)
 endfunction()
 

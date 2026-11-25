@@ -50,13 +50,13 @@ public:
 	auto ticks() const -> tick_t { return m_pos.getTicks(); }
 
 	//! Forcefully sets the current ticks, resets the frame offset, and sets the elapsed seconds based on the global position (ignoring potential mid-song tempo changes)
-	//! This function will emit the `positionJumped` signal to allow other widgets to update accordingly
-	void setTicks(tick_t ticks)
+	//! Unless `jumped` is passed as false, this function will emit the `positionJumped` signal to allow other widgets to update accordingly.
+	void setTicks(tick_t ticks, bool jumped = true)
 	{
 		m_pos.setTicks(ticks);
 		m_frameOffset = 0;
 		m_elapsedSeconds = ticks * Engine::framesPerTick() / Engine::audioEngine()->outputSampleRate();
-		emit positionJumped();
+		if (jumped) { emit positionJumped(); }
 		emit positionChanged();
 	}
 
@@ -68,8 +68,8 @@ public:
 		emit positionChanged();
 	}
 
-	auto frameOffset() const -> f_cnt_t { return m_frameOffset; }
-	void setFrameOffset(const f_cnt_t frame) { m_frameOffset = frame; }
+	auto frameOffset() const -> float { return m_frameOffset; }
+	void setFrameOffset(const float frame) { m_frameOffset = frame; }
 
 	auto loopBegin() const -> TimePos { return m_loopBegin; }
 	auto loopEnd() const -> TimePos { return m_loopEnd; }
@@ -106,7 +106,7 @@ private:
 	bool m_loopEnabled = false;
 	TimePos m_pos = TimePos{0};
 
-	f_cnt_t m_frameOffset = 0;
+	float m_frameOffset = 0;
 
 	double m_elapsedSeconds = 0;
 

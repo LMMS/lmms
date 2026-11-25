@@ -98,10 +98,10 @@ inline float BitcrushEffect::depthCrush( float in )
 
 inline float BitcrushEffect::noise( float amt )
 {
-	return fastRand(-amt, +amt);
+	return fastRandInc(-amt, +amt);
 }
 
-Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	// update values
 	if( m_needsUpdate || m_controls.m_rateEnabled.isValueChanged() )

@@ -108,7 +108,7 @@ public:
 		return &m_controls;
 	}
 
-	ProcessStatus processImpl(SampleFrame*, const fpp_t) override
+	ProcessStatus processImpl(SampleFrame*, const f_cnt_t) override
 	{
 		return ProcessStatus::Sleep;
 	}

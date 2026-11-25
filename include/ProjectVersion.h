@@ -29,6 +29,7 @@
 #include <QString>
 #include <QStringList>
 
+#include <compare>
 #include <limits>
 
 namespace lmms
@@ -56,7 +57,11 @@ public:
 	CompareType getCompareType() const { return m_compareType; }
 	ProjectVersion setCompareType(CompareType compareType) { m_compareType = compareType; return * this; }
 
+	//! @param a A version to compare
+	//! @param b A version to compare
+	//! @param c Determines the number of identifiers to check when comparing
 	static int compare(const ProjectVersion& a, const ProjectVersion& b, CompareType c);
+
 	static int compare(ProjectVersion v1, ProjectVersion v2);
 
 private:
@@ -71,12 +76,14 @@ private:
 /*
  * ProjectVersion v. ProjectVersion
  */
-inline bool operator<(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) < 0; }
-inline bool operator>(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) > 0; }
-inline bool operator<=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) <= 0; }
-inline bool operator>=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) >= 0; }
-inline bool operator==(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) == 0; }
-inline bool operator!=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) != 0; }
+inline std::strong_ordering operator<=>(const ProjectVersion& v1, const ProjectVersion& v2)
+{
+	return ProjectVersion::compare(v1, v2) <=> 0;
+}
+inline bool operator==(const ProjectVersion& v1, const ProjectVersion& v2)
+{
+	return ProjectVersion::compare(v1, v2) == 0;
+}
 
 
 } // namespace lmms

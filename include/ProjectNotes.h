@@ -58,7 +58,6 @@ public:
 
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
 	void setupActions();
 
 

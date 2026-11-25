@@ -97,7 +97,7 @@ void MidiClip::resizeToFirstTrack()
 			if (track != m_instrumentTrack)
 			{
 				const auto& instrumentTrackClips = m_instrumentTrack->getClips();
-				const auto currentClipIt = std::find(instrumentTrackClips.begin(), instrumentTrackClips.end(), this);
+				const auto currentClipIt = std::ranges::find(instrumentTrackClips, this);
 				unsigned int currentClip = currentClipIt != instrumentTrackClips.end() ?
 					std::distance(instrumentTrackClips.begin(), currentClipIt) : -1;
 				m_steps = static_cast<MidiClip*>(track->getClip(currentClip))->m_steps;
@@ -112,12 +112,13 @@ void MidiClip::resizeToFirstTrack()
 
 void MidiClip::init()
 {
-	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
-				this, SLOT(changeTimeSignature()));
-	saveJournallingState( false );
-
-	updateLength();
-	restoreJournallingState();
+	connect(Engine::getSong(), &Song::timeSignatureChanged, this, &MidiClip::changeTimeSignature);
+	if (getTrack()->trackContainer() != Engine::patternStore())
+	{
+		saveJournallingState(false);
+		updateLength();
+		restoreJournallingState();
+	}
 }
 
 
@@ -128,7 +129,7 @@ void MidiClip::updateLength()
 	// If the clip hasn't already been manually resized, automatically resize it.
 	if (getAutoResize())
 	{
-		if (m_clipType == Type::BeatClip)
+		if (m_instrumentTrack->trackContainer()->type() == TrackContainer::Type::Pattern)
 		{
 			changeLength(beatClipLength());
 			updatePatternTrack();
@@ -185,7 +186,7 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 	}
 
 	instrumentTrack()->lock();
-	m_notes.insert(std::upper_bound(m_notes.begin(), m_notes.end(), new_note, Note::lessThan), new_note);
+	m_notes.insert(std::ranges::upper_bound(m_notes, new_note, Note::lessThan), new_note);
 	instrumentTrack()->unlock();
 
 	checkType();
@@ -217,7 +218,7 @@ NoteVector::const_iterator MidiClip::removeNote(Note* note)
 {
 	instrumentTrack()->lock();
 
-	auto it = std::find(m_notes.begin(), m_notes.end(), note);
+	auto it = std::ranges::find(m_notes, note);
 	if (it != m_notes.end())
 	{
 		delete *it;
@@ -253,7 +254,7 @@ Note * MidiClip::noteAtStep(int step)
 void MidiClip::rearrangeAllNotes()
 {
 	// sort notes by start time
-	std::sort(m_notes.begin(), m_notes.end(), Note::lessThan);
+	std::ranges::sort(m_notes, Note::lessThan);
 }
 
 
@@ -313,8 +314,8 @@ void MidiClip::reverseNotes(const NoteVector& notes)
 	addJournalCheckPoint();
 
 	// Find the very first start position and the very last end position of all the notes.
-	TimePos firstPos = (*std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); }))->pos();
-	TimePos lastPos = (*std::max_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return n1->endPos() < n2->endPos(); }))->endPos();
+	TimePos firstPos = (*std::ranges::min_element(notes, Note::lessThan))->pos();
+	TimePos lastPos = (*std::ranges::max_element(notes, {}, [](const Note* n) { return n->endPos(); }))->endPos();
 
 	for (auto note : notes)
 	{
@@ -417,7 +418,7 @@ void MidiClip::setType( Type _new_clip_type )
 void MidiClip::checkType()
 {
 	// If all notes are StepNotes, we have a BeatClip
-	const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
+	const auto beatClip = std::ranges::all_of(m_notes, [](auto note) { return note->type() == Note::Type::Step; });
 
 	setType(beatClip ? Type::BeatClip : Type::MelodyClip);
 }

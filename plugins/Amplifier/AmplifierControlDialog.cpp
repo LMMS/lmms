@@ -46,10 +46,11 @@ AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
 	
 	auto makeKnob = [this](const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume)
 	{
-		Knob* newKnob = new Knob(KnobType::Bright26, label, this);
+		Knob* newKnob = isVolume
+			? new VolumeKnob(KnobType::Bright26, label, this)
+			: new Knob(KnobType::Bright26, label, this);
 		newKnob->setModel(model);
 		newKnob->setHintText(hintText, unit);
-		newKnob->setVolumeKnob(isVolume);
 		return newKnob;
 	};
 
@@ -57,6 +58,7 @@ AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
 	gridLayout->addWidget(makeKnob(tr("PAN"), tr("Panning:"), "%", &controls->m_panModel, false), 0, 1, Qt::AlignHCenter);
 	gridLayout->addWidget(makeKnob(tr("LEFT"), tr("Left gain:"), "%", &controls->m_leftModel, true), 1, 0, Qt::AlignHCenter);
 	gridLayout->addWidget(makeKnob(tr("RIGHT"), tr("Right gain:"), "%", &controls->m_rightModel, true), 1, 1, Qt::AlignHCenter);
+	gridLayout->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 } // namespace lmms::gui

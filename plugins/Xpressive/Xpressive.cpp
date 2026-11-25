@@ -227,7 +227,7 @@ void Xpressive::playNote(NotePlayHandle* nph, SampleFrame* working_buffer) {
 	}
 
 	auto ps = static_cast<ExprSynth*>(nph->m_pluginData);
-	const fpp_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 
 	ps->renderOutput(frames, working_buffer + offset);

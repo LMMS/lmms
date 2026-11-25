@@ -31,9 +31,9 @@
 
 #include "ComboBox.h"
 #include "DataFile.h"
+#include "FileDialog.h"
 #include "FontHelper.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -114,8 +114,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 	m_stutterButton->setToolTip(
 		tr("Continue sample playback across notes"));
 
-	m_ampKnob = new Knob(KnobType::Bright26, this);
-	m_ampKnob->setVolumeKnob(true);
+	m_ampKnob = new VolumeKnob(KnobType::Bright26, this);
 	m_ampKnob->move(5, 108);
 	m_ampKnob->setHintText(tr("Amplify:"), "%");
 
@@ -257,7 +256,7 @@ void AudioFileProcessorView::sampleUpdated()
 
 void AudioFileProcessorView::openAudioFile()
 {
-	QString af = SampleLoader::openAudioFile();
+	QString af = FileDialog::openAudioFile();
 	if (af.isEmpty()) { return; }
 
 	castModel<AudioFileProcessor>()->setAudioFile(af);

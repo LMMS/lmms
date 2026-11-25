@@ -313,7 +313,7 @@ Audio::Audio(std::size_t bufferSize, bool isSidechain)
 
 
 void Audio::copyBuffersFromCore(const SampleFrame* lmmsBuf,
-	unsigned channel, fpp_t frames)
+	unsigned channel, f_cnt_t frames)
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
 	{
@@ -325,7 +325,7 @@ void Audio::copyBuffersFromCore(const SampleFrame* lmmsBuf,
 
 
 void Audio::averageWithBuffersFromCore(const SampleFrame* lmmsBuf,
-	unsigned channel, fpp_t frames)
+	unsigned channel, f_cnt_t frames)
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
 	{
@@ -337,7 +337,7 @@ void Audio::averageWithBuffersFromCore(const SampleFrame* lmmsBuf,
 
 
 void Audio::copyBuffersToCore(SampleFrame* lmmsBuf,
-	unsigned channel, fpp_t frames) const
+	unsigned channel, f_cnt_t frames) const
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
 	{

@@ -33,6 +33,7 @@
 #include <lv2/worker/worker.h>
 #include <QDebug>
 #include <QtGlobal>
+#include <algorithm>
 
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
@@ -257,7 +258,7 @@ void Lv2Proc::copyModelsFromCore()
 			ffm.m_scalePointMap = &cv.m_scalePointMap;
 			cv.m_connectedModel->accept(ffm);
 			// dirty fix, needs better interpolation
-			std::fill(cv.m_buffer.begin(), cv.m_buffer.end(), ffm.m_res);
+			std::ranges::fill(cv.m_buffer, ffm.m_res);
 		}
 		void visit(Lv2Ports::AtomSeq& atomPort) override
 		{
@@ -326,7 +327,7 @@ void Lv2Proc::copyModelsToCore()
 
 void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
 									unsigned firstChan, unsigned num,
-									fpp_t frames)
+									f_cnt_t frames)
 {
 	inPorts().m_left->copyBuffersFromCore(buf, firstChan, frames);
 	if (num > 1)
@@ -351,7 +352,7 @@ void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
 
 void Lv2Proc::copyBuffersToCore(SampleFrame* buf,
 								unsigned firstChan, unsigned num,
-								fpp_t frames) const
+								f_cnt_t frames) const
 {
 	outPorts().m_left->copyBuffersToCore(buf, firstChan + 0, frames);
 	if (num > 1)
@@ -368,7 +369,7 @@ void Lv2Proc::copyBuffersToCore(SampleFrame* buf,
 
 
 
-void Lv2Proc::run(fpp_t frames)
+void Lv2Proc::run(f_cnt_t frames)
 {
 	if (m_worker)
 	{
@@ -444,12 +445,23 @@ void Lv2Proc::initPlugin()
 
 	if (m_instance)
 	{
-		const auto iface = static_cast<const LV2_Worker_Interface*>(
-			lilv_instance_get_extension_data(m_instance, LV2_WORKER__interface));
-		if (iface)
+		if (m_worker)
 		{
-			m_worker->setHandle(lilv_instance_get_handle(m_instance));
-			m_worker->setInterface(iface);
+			const auto iface = static_cast<const LV2_Worker_Interface*>(
+				lilv_instance_get_extension_data(m_instance, LV2_WORKER__interface));
+			if (iface)
+			{
+				m_worker->setHandle(lilv_instance_get_handle(m_instance));
+				m_worker->setInterface(iface);
+			}
+			else
+			{
+				qWarning() << "Plugin" << qStringFromPluginNode(m_plugin, lilv_plugin_get_name)
+					<< "(URI:"
+					<< lilv_node_as_uri(lilv_plugin_get_uri(m_plugin))
+					<< ") announces Lv2 Worker extension data in TTL metadata, but does not provide it."
+					<< "Will continue without the extension.";
+			}
 		}
 		for (std::size_t portNum = 0; portNum < m_ports.size(); ++portNum)
 		{

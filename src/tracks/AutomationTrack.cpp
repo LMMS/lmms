@@ -39,7 +39,7 @@ AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	setName( tr( "Automation track" ) );
 }
 
-bool AutomationTrack::play( const TimePos & time_start, const fpp_t _frames,
+bool AutomationTrack::play( const TimePos & time_start, const f_cnt_t _frames,
 							const f_cnt_t _frame_base, int _clip_num )
 {
 	return false;

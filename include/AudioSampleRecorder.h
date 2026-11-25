@@ -48,9 +48,9 @@ public:
 	std::shared_ptr<const SampleBuffer> createSampleBuffer();
 
 private:
-	void writeBuffer(const SampleFrame* _ab, const fpp_t _frames) override;
+	void writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames);
 
-	using BufferList = QList<QPair<SampleFrame*, fpp_t>>;
+	using BufferList = QList<QPair<SampleFrame*, f_cnt_t>>;
 	BufferList m_buffers;
 
 } ;

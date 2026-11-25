@@ -31,7 +31,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
+#include "SampleCache.h"
 #include "SlicerTView.h"
 #include "Song.h"
 #include "embed.h"
@@ -81,7 +81,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 	if (m_originalSample.sampleSize() <= 1) { return; }
 
 	int noteIndex = handle->key() - m_parentTrack->baseNote();
-	const fpp_t frames = handle->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
 	const float pitchRatio = 1 / std::exp2(m_parentTrack->pitchModel()->value() / 1200);
@@ -307,7 +307,18 @@ std::vector<Note> SlicerT::getMidi()
 
 void SlicerT::updateFile(QString file)
 {
-	if (auto buffer = gui::SampleLoader::createBufferFromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
+	const auto path = PathUtil::stringToPath(file);
+
+	// TODO: Return an error value back to the caller (via std::expected or our own polyfill)
+	auto buffer = SampleCache::instance().fetchBuffer(path);
+	if (!buffer) { return; }
+
+	// TODO: Return an error value back to the caller (via std::expected or our own polyfill)
+	auto thumbnailCache = SampleCache::instance().fetchThumbnailCache(path);
+	if (!thumbnailCache) { return; }
+
+	m_originalSample = Sample{std::move(buffer)};
+	m_sampleThumbnailCache = std::move(thumbnailCache);
 
 	findBPM();
 	findSlices();
@@ -337,7 +348,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
 	for (auto i = std::size_t{0}; i < m_slicePoints.size(); i++)
 	{
-		element.setAttribute(tr("slice_%1").arg(i), m_slicePoints[i]);
+		element.setAttribute(QString("slice_%1").arg(i), m_slicePoints[i]);
 	}
 
 	m_fadeOutFrames.saveSettings(document, element, "fadeOut");
@@ -352,8 +363,14 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			auto buffer = gui::SampleLoader::createBufferFromFile(srcFile);
-			m_originalSample = Sample(std::move(buffer));
+			if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(srcFile)))
+			{
+				m_originalSample = Sample{std::move(buffer)};
+			}
+			else
+			{
+				Engine::getSong()->collectError(tr("Failed to load sample: %1").arg(srcFile));
+			}
 		}
 		else
 		{
@@ -363,8 +380,9 @@ void SlicerT::loadSettings(const QDomElement& element)
 	}
 	else if (auto sampleData = element.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		auto buffer = gui::SampleLoader::createBufferFromBase64(sampleData);
-		m_originalSample = Sample(std::move(buffer));
+		auto buffer = SampleBuffer::fromBase64(sampleData);
+		m_originalSample = Sample{std::move(buffer)};
+		m_sampleThumbnailCache = std::make_shared<const SampleThumbnailCache>(m_originalSample.buffer());
 	}
 
 	if (!element.attribute("totalSlices").isEmpty())
@@ -373,7 +391,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 		m_slicePoints = {};
 		for (int i = 0; i < totalSlices; i++)
 		{
-			m_slicePoints.push_back(element.attribute(tr("slice_%1").arg(i)).toFloat());
+			m_slicePoints.push_back(element.attribute(QString("slice_%1").arg(i)).toFloat());
 		}
 	}
 

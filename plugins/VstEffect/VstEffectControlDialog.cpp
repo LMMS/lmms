@@ -199,13 +199,14 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		l->addItem( new QSpacerItem( newSize - 20, 30, QSizePolicy::Fixed,
 						QSizePolicy::Fixed ), 1, 0 );
 		l->addWidget( resize, 2, 0, 1, 1, Qt::AlignCenter );
-		if (m_pluginWidget) {
-			l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
-		}
 		l->setRowStretch( 5, 1 );
 		l->setColumnStretch( 1, 1 );
 
 		auto tb = new QToolBar(this);
+		if (m_pluginWidget) {
+			l->addWidget(m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter);
+		}
+
 		tb->resize( newSize , 32 );
 		tb->addWidget(space0);
 		tb->addWidget( m_rolLPresetButton );

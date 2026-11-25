@@ -26,24 +26,6 @@
 
 namespace lmms {
 
-Sample::Sample(const QString& audioFile)
-	: m_buffer(std::make_shared<SampleBuffer>(audioFile))
-	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
-	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
-{
-}
-
-Sample::Sample(const QByteArray& base64, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(base64, sampleRate))
-	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
-	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
-{
-}
-
 Sample::Sample(const SampleFrame* data, size_t numFrames, int sampleRate)
 	: m_buffer(std::make_shared<SampleBuffer>(data, numFrames, sampleRate))
 	, m_startFrame(0)
@@ -116,6 +98,8 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
+	if (!m_buffer || m_buffer->empty()) { return false; }
+
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
 
 	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();

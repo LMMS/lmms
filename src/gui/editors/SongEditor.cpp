@@ -34,6 +34,8 @@
 #include <QSlider>
 #include <QTimeLine>
 
+#include <algorithm>
+
 #include "ActionGroup.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"
@@ -246,6 +248,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel->setParent(this);
 	m_zoomingModel->setJournalling(false);
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
+	m_zoomingModel->setInitValue(ConfigManager::inst()->value("ui","songeditorzoom",QString::number(calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR))).toInt());
 
 
 	// Set up snapping model
@@ -265,13 +268,17 @@ SongEditor::SongEditor( Song * song ) :
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
 	}
-	m_snappingModel->setInitValue( m_snappingModel->findText( "1/4 Bar" ) );
+	m_snappingModel->setInitValue(ConfigManager::inst()->value("ui", "songeditorsnap", QString::number(m_snappingModel->findText( "1/4 Bar" ))).toInt());
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 }
 
-
+SongEditor::~SongEditor()
+{
+	ConfigManager::inst()->setValue("ui", "songeditorzoom", QString::number(m_zoomingModel->value()));
+	ConfigManager::inst()->setValue("ui", "songeditorsnap", QString::number(m_snappingModel->value()));
+}
 
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
@@ -287,7 +294,6 @@ void SongEditor::loadSettings( const QDomElement& element )
 
 
 
-/*! \brief Return grid size as number of bars */
 float SongEditor::getSnapSize() const
 {
 	float snapSize = SNAP_SIZES[m_snappingModel->value()];
@@ -297,10 +303,8 @@ float SongEditor::getSnapSize() const
 	{
 		// Finds the closest available snap size
 		const float optimalSize = snapSize * DEFAULT_PIXELS_PER_BAR / pixelsPerBar();
-		return *std::min_element(PROPORTIONAL_SNAP_SIZES.begin(), PROPORTIONAL_SNAP_SIZES.end(), [optimalSize](float a, float b)
-		{
-			return std::abs(a - optimalSize) < std::abs(b - optimalSize);
-		});
+		return *std::ranges::min_element(PROPORTIONAL_SNAP_SIZES, {},
+			[optimalSize](float v) { return std::abs(v - optimalSize); });
 	}
 
 	return snapSize;
@@ -476,6 +480,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		if( t >= 0 )
 		{
 			m_song->setPlayPos( t, Song::PlayMode::Song );
+			if (!m_song->isPlaying()) { m_song->setPlayPos(t, Song::PlayMode::None); }
 		}
 	}
 	else if( ke->key() == Qt::Key_Right )
@@ -484,11 +489,13 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		if( t < MaxSongLength )
 		{
 			m_song->setPlayPos( t, Song::PlayMode::Song );
+			if (!m_song->isPlaying()) { m_song->setPlayPos(t, Song::PlayMode::None); }
 		}
 	}
 	else if( ke->key() == Qt::Key_Home )
 	{
 		m_song->setPlayPos( 0, Song::PlayMode::Song );
+		if (!m_song->isPlaying()) { m_song->setPlayPos(0, Song::PlayMode::None); }
 	}
 	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
@@ -566,21 +573,6 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		return;
 	}
 	we->accept();
-}
-
-
-
-void SongEditor::closeEvent( QCloseEvent * ce )
-{
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	ce->ignore();
 }
 
 
@@ -819,7 +811,6 @@ void SongEditor::updatePositionLine()
 
 
 
-//! Convert zoom slider's value to bar width in pixels
 int SongEditor::calculatePixelsPerBar() const
 {
 	// What we need to raise 2 by to get MIN_PIXELS_PER_BAR and MAX_PIXELS_PER_BAR
@@ -836,7 +827,6 @@ int SongEditor::calculatePixelsPerBar() const
 
 
 
-//! Convert bar width in pixels to zoom slider value
 int SongEditor::calculateZoomSliderValue(int pixelsPerBar) const
 {
 	// What we need to raise 2 by to get MIN_PIXELS_PER_BAR and MAX_PIXELS_PER_BAR
@@ -907,8 +897,7 @@ int SongEditor::trackIndexFromSelectionPoint(int yPos)
 
 int SongEditor::indexOfTrackView(const TrackView *tv)
 {
-	return static_cast<int>(std::distance(trackViews().begin(),
-										  std::find(trackViews().begin(), trackViews().end(), tv)));
+	return static_cast<int>(std::distance(trackViews().begin(), std::ranges::find(trackViews(), tv)));
 }
 
 

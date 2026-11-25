@@ -25,9 +25,10 @@
 #ifndef LMMS_MIXER_H
 #define LMMS_MIXER_H
 
-#include "Model.h"
+#include "AudioBuffer.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
+#include "Model.h"
 #include "ThreadableJob.h"
 
 #include <atomic>
@@ -43,56 +44,54 @@ using MixerRouteVector = std::vector<MixerRoute*>;
 
 class MixerChannel : public ThreadableJob
 {
-	public:
-		MixerChannel( int idx, Model * _parent );
-		virtual ~MixerChannel();
+public:
+	MixerChannel(int idx, Model* _parent);
+	virtual ~MixerChannel();
 
-		EffectChain m_fxChain;
+	EffectChain m_fxChain;
 
-		// set to true when input fed from mixToChannel or child channel
-		bool m_hasInput;
-		// set to true if any effect in the channel is enabled and running
-		bool m_stillRunning;
+	// set to true if any effect in the channel is enabled and running
+	bool m_stillRunning;
 
-		float m_peakLeft;
-		float m_peakRight;
-		SampleFrame* m_buffer;
-		bool m_muteBeforeSolo;
-		BoolModel m_muteModel;
-		BoolModel m_soloModel;
-		FloatModel m_volumeModel;
-		QString m_name;
-		QMutex m_lock;
-		bool m_queued; // are we queued up for rendering yet?
-		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
+	float m_peakLeft;
+	float m_peakRight;
+	AudioBuffer m_buffer;
+	bool m_muteBeforeSolo;
+	BoolModel m_muteModel;
+	BoolModel m_soloModel;
+	FloatModel m_volumeModel;
+	QString m_name;
+	QMutex m_lock;
+	bool m_queued; // are we queued up for rendering yet?
+	bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
 
-		// pointers to other channels that this one sends to
-		MixerRouteVector m_sends;
+	// pointers to other channels that this one sends to
+	MixerRouteVector m_sends;
 
-		// pointers to other channels that send to this one
-		MixerRouteVector m_receives;
+	// pointers to other channels that send to this one
+	MixerRouteVector m_receives;
 
-		int index() const { return m_channelIndex; }
-		void setIndex(int index) { m_channelIndex = index; }
+	int index() const { return m_channelIndex; }
+	void setIndex(int index) { m_channelIndex = index; }
 
-		bool isMaster() { return m_channelIndex == 0; }
+	bool isMaster() { return m_channelIndex == 0; }
 
-		bool requiresProcessing() const override { return true; }
-		void unmuteForSolo();
-		void unmuteSenderForSolo();
-		void unmuteReceiverForSolo();
+	bool requiresProcessing() const override { return true; }
+	void unmuteForSolo();
+	void unmuteSenderForSolo();
+	void unmuteReceiverForSolo();
 
-		auto color() const -> const std::optional<QColor>& { return m_color; }
-		void setColor(const std::optional<QColor>& color) { m_color = color; }
+	auto color() const -> const std::optional<QColor>& { return m_color; }
+	void setColor(const std::optional<QColor>& color) { m_color = color; }
 
-		std::atomic_size_t m_dependenciesMet;
-		void incrementDeps();
-		void processed();
-		
-	private:
-		void doProcessing() override;
-		int m_channelIndex;
-		std::optional<QColor> m_color;
+	std::atomic_size_t m_dependenciesMet;
+	void incrementDeps();
+	void processed();
+
+private:
+	void doProcessing() override;
+	int m_channelIndex;
+	std::optional<QColor> m_color;
 };
 
 class MixerRoute : public QObject
@@ -143,7 +142,7 @@ public:
 	Mixer();
 	~Mixer() override;
 
-	void mixToChannel( const SampleFrame* _buf, mix_ch_t _ch );
+	void mixToChannel(const AudioBuffer& buffer, mix_ch_t dest);
 
 	void prepareMasterMix();
 	void masterMix( SampleFrame* _buf );
