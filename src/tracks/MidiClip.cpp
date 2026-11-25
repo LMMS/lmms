@@ -76,7 +76,7 @@ const QColor& NoteFamilyAlbum::getFamilyColor(const int family) const
 int NoteFamilyAlbum::addFamily(const QString& familyName, const QColor& familyColor)
 {
 	m_lastFamily++;
-	if (m_lastFamily < m_familyNames.size())
+	if (m_lastFamily < static_cast<int>(m_familyNames.size()))
 	{
 		m_familyNames[m_lastFamily] = familyName;
 		m_familyColors[m_lastFamily] = familyColor;
