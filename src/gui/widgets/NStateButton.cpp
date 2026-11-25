@@ -53,7 +53,7 @@ NStateButton::~NStateButton()
 
 
 
-void NStateButton::addState( const QString & _pm, const QString & _tooltip )
+void NStateButton::addState(const QString& _pm, const QString& _tooltip)
 {
 	m_states.push_back( qMakePair( _pm, _tooltip ) );
 	// first inserted pixmap?

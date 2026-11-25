@@ -387,7 +387,7 @@ lmms--gui--TrackView > QWidget {
 	background-color: #3B424A;
 }
 
-QToolButton#add-automation-track{
+QToolButton#add-automation-track {
 	image: url("resources:add_automation.svg");
     width: 24;
     height: 24;
@@ -515,11 +515,6 @@ QToolButton#keep-stop-position{
     height: 24;
 }
 
-QToolButton#back-to-zero{
-	image: url("resources:back_to_zero.svg");
-    width: 24;
-    height: 24;
-}
 
 QPushButton#btn {
 	color: #d1d8e4;

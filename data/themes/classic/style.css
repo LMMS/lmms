@@ -349,7 +349,7 @@ lmms--gui--TrackContainerView QFrame{
 lmms--gui--TrackView > QWidget {
 	background-color: #5b6571;
 }
-QToolButton#add-automation-track{
+QToolButton#add-automation-track {
 	image: url("resources:add_automation.png");
     width: 24;
     height: 24;
@@ -465,12 +465,6 @@ QToolButton#back-to-start{
 
 QToolButton#keep-stop-position{
 	image: url("resources:keep_stop_position.svg");
-    width: 24;
-    height: 24;
-}
-
-QToolButton#back-to-zero{
-	image: url("resources:back_to_zero.svg");
     width: 24;
     height: 24;
 }
