@@ -1663,7 +1663,7 @@ void AutomationEditor::play()
 			Engine::getSong()->playMidiClip(getGUI()->pianoRoll()->currentMidiClip());
 			Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setTicks(m_detuningNoteOffset);
 		}
-		else if (Engine::getSong()->isStopped() == false)
+		else if (!Engine::getSong()->isStopped())
 		{
 			Engine::getSong()->togglePause();
 		}
@@ -1680,7 +1680,7 @@ void AutomationEditor::play()
 	}
 	else
 	{
-		if (Engine::getSong()->isStopped() == true)
+		if (Engine::getSong()->isStopped())
 		{
 			Engine::getSong()->playSong();
 			Engine::getSong()->getTimeline(Song::PlayMode::Song).setTicks(m_clip->startPosition() - m_clip->startTimeOffset() + m_timeLine->timeline()->pos());
@@ -1787,7 +1787,7 @@ void AutomationEditor::setTension()
 
 
 
-void AutomationEditor::autoScroll( const TimePos & t )
+void AutomationEditor::autoScroll(const TimePos& t)
 {
 	const int w = width() - VALUES_WIDTH;
 	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Disabled)
@@ -1822,7 +1822,7 @@ void AutomationEditor::updatePosition()
 void AutomationEditor::updatePositionAccompany()
 {
 	if (!validClip()) { return; }
-	Song * s = Engine::getSong();
+	Song* s = Engine::getSong();
 
 	if (!m_clip->getTrack())
 	{

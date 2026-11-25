@@ -78,7 +78,7 @@ void TimeLineWidget::setXOffset(const int x)
 	m_xOffset = x;
 }
 
-void TimeLineWidget::addToolButtons(QToolBar * _tool_bar, bool addAutoScrolling, bool addLoopPoints, bool addStopBehavior)
+void TimeLineWidget::addToolButtons(QToolBar* _tool_bar, bool addAutoScrolling, bool addLoopPoints, bool addStopBehavior)
 {
 	if (addAutoScrolling)
 	{
@@ -109,7 +109,7 @@ void TimeLineWidget::addToolButtons(QToolBar * _tool_bar, bool addAutoScrolling,
 	{
 		auto behaviourAtStop = new NStateButton(_tool_bar);
 		behaviourAtStop->addState(embed::getIconPixmap("back_to_zero"), tr("After stopping go back to beginning"));
-		behaviourAtStop->addState(embed::getIconPixmap( "back_to_start" ), tr("After stopping go back to position at which playing was started"));
+		behaviourAtStop->addState(embed::getIconPixmap("back_to_start"), tr("After stopping go back to position at which playing was started"));
 		behaviourAtStop->addState(embed::getIconPixmap("keep_stop_position"), tr("After stopping keep position"));
 		connect(behaviourAtStop, &NStateButton::changedState, m_timeline,
 			[timeline = m_timeline](int value) {

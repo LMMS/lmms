@@ -759,7 +759,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
-void SongEditor::autoScroll(const TimePos & t)
+void SongEditor::autoScroll(const TimePos& t)
 {
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const bool smoothScroll = ConfigManager::inst()->value("ui", "smoothscroll").toInt();

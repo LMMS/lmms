@@ -244,7 +244,7 @@ private:
 
 	void adjustLeftRightScoll(int value);
 
-	void autoScroll(const TimePos & t);
+	void autoScroll(const TimePos& t);
 
 	TimePos m_currentPosition;
 

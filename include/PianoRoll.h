@@ -304,7 +304,7 @@ private:
 	PianoRoll( const PianoRoll & );
 	~PianoRoll() override = default;
 
-	void autoScroll(const TimePos & t);
+	void autoScroll(const TimePos& t);
 
 	TimePos newNoteLen() const;
 
