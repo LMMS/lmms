@@ -110,12 +110,6 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 
 
 
-/**
- * @brief SubWindow::paintEvent
- * 
- *  This draws our new title bar with custom colors
- *  and draws a window icon on the left upper corner.
- */
 void SubWindow::paintEvent( QPaintEvent * )
 {
 	// Don't paint any of the other stuff if the sub window is maximized
@@ -148,12 +142,6 @@ void SubWindow::paintEvent( QPaintEvent * )
 
 
 
-/**
- * @brief SubWindow::changeEvent
- * 
- * Triggers if the window title changes and calls adjustTitleBar().
- * @param event
- */
 void SubWindow::changeEvent( QEvent *event )
 {
 	QMdiSubWindow::changeEvent( event );
@@ -169,8 +157,18 @@ void SubWindow::changeEvent( QEvent *event )
 
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached() || visible) { widget()->setVisible(visible); }
-	if (!isDetached()) { QMdiSubWindow::setVisible(visible); }
+	if (isDetached() || visible)
+	{
+		// When detached, top-level window is the child widget itself. (This is janky and is best changed at some point.)
+		// For that reason we forward show/hide to the child widget, and don't touch the hidden attached window frame.
+		widget()->setVisible(visible);
+	}
+	if (!isDetached())
+	{
+		// When attached, visibility of the actual window is controlled by SubWindow.
+		// Nevertheless, the subwindow contents still need to be visible, which is addressed above.
+		QMdiSubWindow::setVisible(visible);
+	}
 }
 
 
@@ -221,16 +219,6 @@ void SubWindow::setDetached(bool on)
 
 
 
-/**
- * @brief SubWindow::elideText
- * 
- *  Stores the given text into the given label.
- *  Shorts the text if it's too big for the labels width
- *  and adds three dots (...)
- * 
- * @param label - holds a pointer to the QLabel
- * @param text  - the text which will be stored (and if needed broken down) into the QLabel.
- */
 void SubWindow::elideText( QLabel *label, QString text )
 {
 	QFontMetrics metrix( label->font() );
@@ -410,15 +398,6 @@ void SubWindow::updateTitleBar()
 }
 
 
-/**
- * @brief SubWindow::moveEvent
- * 
- *  overrides the QMdiSubWindow::moveEvent() for saving the position
- *  of the subwindow into m_trackedNormalGeom. This position
- *  will be saved with the project because of an Qt bug which doesn't
- *  save the right position. look at: https://bugreports.qt.io/browse/QTBUG-256
- * @param event
- */
 void SubWindow::moveEvent( QMoveEvent * event )
 {
 	QMdiSubWindow::moveEvent( event );
@@ -433,14 +412,6 @@ void SubWindow::moveEvent( QMoveEvent * event )
 
 
 
-/**
- * @brief SubWindow::adjustTitleBar
- * 
- *  Our title bar needs buttons for maximize/restore and close in the right upper corner.
- *  We check if the subwindow is maximizable and put the buttons on the right positions.
- *  At next we calculate the width of the title label and call elideText() for adding
- *  the window title to m_windowTitle (which is a QLabel)
- */
 void SubWindow::adjustTitleBar()
 {
 	// Don't show the title or any button if the sub window is maximized. Otherwise they
@@ -552,20 +523,6 @@ void SubWindow::focusChanged( QMdiSubWindow *subWindow )
 
 
 
-/**
- * @brief SubWindow::resizeEvent
- * 
- *  At first we give the event to QMdiSubWindow::resizeEvent() which handles
- *  the event on its behavior.
- *
- *  On every resize event we have to adjust our title label.
- * 
- *  At last we store the current size into m_trackedNormalGeom. This size
- *  will be saved with the project because of an Qt bug which doesn't
- *  save the right size. look at: https://bugreports.qt.io/browse/QTBUG-256
- * 
- * @param event
- */
 void SubWindow::resizeEvent( QResizeEvent * event )
 {
 	// When the parent QMdiArea gets resized, maximized subwindows also gets resized, if any.
@@ -585,15 +542,6 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 
 
 
-/**
- * @brief SubWindow::eventFilter
- *
- * Override of QMdiSubWindow's event filter.
- * This is not how regular eventFilters work, it is never installed explicitly.
- * Instead, it is installed by Qt and conveniently installs itself
- * onto the child widget. Despite relying on internal implementation details,
- * as of writing this it seems to be the best way to do so as soon as the widget is set.
- */
 bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 {
 	if (obj != static_cast<QObject*>(widget()))
@@ -603,10 +551,6 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 
 	switch (event->type())
 	{
-		case QEvent::WindowStateChange:
-			event->accept();
-			return true;
-
 		case QEvent::Close:
 			if (isDetached())
 			{
@@ -634,6 +578,14 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 			{
 				hide();
 			}
+			return QMdiSubWindow::eventFilter(obj, event);
+			
+		case QEvent::Hide:
+			layout()->setSizeConstraint(QLayout::SetNoConstraint);
+			return QMdiSubWindow::eventFilter(obj, event);
+
+		case QEvent::Show:
+			layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 			return QMdiSubWindow::eventFilter(obj, event);
 
 		default:

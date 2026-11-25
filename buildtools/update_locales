@@ -28,7 +28,7 @@ function validate() {
     printf "\e[32m.\e[0m"
   done
   echo ""
-  if [[ "x${ERR_LANG}" != "x" ]]; then
+  if [[ "${ERR_LANG}" != "" ]]; then
     aberr "The following files failed the validation: "
     echo -e "${ERR_LANG}"
   fi

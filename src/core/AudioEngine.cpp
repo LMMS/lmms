@@ -40,10 +40,8 @@
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
 #include "AudioJack.h"
-#include "AudioOss.h"
 #include "AudioSndio.h"
 #include "AudioPortAudio.h"
-#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -52,7 +50,6 @@
 #include "MidiAlsaRaw.h"
 #include "MidiAlsaSeq.h"
 #include "MidiJack.h"
-#include "MidiOss.h"
 #include "MidiSndio.h"
 #include "MidiWinMM.h"
 #include "MidiApple.h"
@@ -70,11 +67,12 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine(bool renderOnly)
 	: m_renderOnly(renderOnly)
 	, m_framesPerAudioBuffer(std::clamp(
-		  static_cast<f_cnt_t>(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toULongLong()),
-		  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
+		static_cast<f_cnt_t>(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer",
+		QString::number(DEFAULT_BUFFER_SIZE)).toUInt()),
+		MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
 	, m_framesPerPeriod(std::min(m_framesPerAudioBuffer, DEFAULT_BUFFER_SIZE))
 	, m_baseSampleRate(
-		  std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front()))
+		std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front()))
 	, m_inputBufferRead(0)
 	, m_inputBufferWrite(1)
 	, m_outputBufferRead(nullptr)
@@ -89,6 +87,7 @@ AudioEngine::AudioEngine(bool renderOnly)
 	, m_audioDevStartFailed(false)
 	, m_profiler()
 	, m_clearSignal(false)
+	, m_sanitizationEnabled(ConfigManager::inst()->value("audioengine", "sanitizemix", "1").toInt())
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -602,14 +601,6 @@ bool AudioEngine::isAudioDevNameValid(QString name)
 	}
 #endif
 
-
-#ifdef LMMS_HAVE_OSS
-	if (name == AudioOss::name())
-	{
-		return true;
-	}
-#endif
-
 #ifdef LMMS_HAVE_SNDIO
 	if (name == AudioSndio::name())
 	{
@@ -632,13 +623,6 @@ bool AudioEngine::isAudioDevNameValid(QString name)
 	}
 #endif
 
-
-#ifdef LMMS_HAVE_SOUNDIO
-	if (name == AudioSoundIo::name())
-	{
-		return true;
-	}
-#endif
 
 	if (name == AudioDummy::name())
 	{
@@ -664,13 +648,6 @@ bool AudioEngine::isMidiDevNameValid(QString name)
 	}
 #endif
 
-#ifdef LMMS_HAVE_OSS
-	if (name == MidiOss::name())
-	{
-		return true;
-	}
-#endif
-
 #ifdef LMMS_HAVE_SNDIO
 	if (name == MidiSndio::name())
 	{
@@ -678,7 +655,7 @@ bool AudioEngine::isMidiDevNameValid(QString name)
 	}
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#ifdef LMMS_HAVE_WINMM
 	if (name == MidiWinMM::name())
 	{
 		return true;
@@ -753,20 +730,6 @@ AudioDevice * AudioEngine::tryAudioDevices()
 	}
 #endif
 
-
-#ifdef LMMS_HAVE_OSS
-	if( dev_name == AudioOss::name() || dev_name == "" )
-	{
-		dev = new AudioOss( success_ful, this );
-		if( success_ful )
-		{
-			m_audioDevName = AudioOss::name();
-			return dev;
-		}
-		delete dev;
-	}
-#endif
-
 #ifdef LMMS_HAVE_SNDIO
 	if( dev_name == AudioSndio::name() || dev_name == "" )
 	{
@@ -802,20 +765,6 @@ AudioDevice * AudioEngine::tryAudioDevices()
 		if( success_ful )
 		{
 			m_audioDevName = AudioPortAudio::name();
-			return dev;
-		}
-		delete dev;
-	}
-#endif
-
-
-#ifdef LMMS_HAVE_SOUNDIO
-	if( dev_name == AudioSoundIo::name() || dev_name == "" )
-	{
-		dev = new AudioSoundIo( success_ful, this );
-		if( success_ful )
-		{
-			m_audioDevName = AudioSoundIo::name();
 			return dev;
 		}
 		delete dev;
@@ -893,19 +842,6 @@ MidiClient * AudioEngine::tryMidiClients()
 	}
 #endif
 
-#ifdef LMMS_HAVE_OSS
-	if( client_name == MidiOss::name() || client_name == "" )
-	{
-		auto moss = new MidiOss;
-		if( moss->isRunning() )
-		{
-			m_midiClientName = MidiOss::name();
-			return moss;
-		}
-		delete moss;
-	}
-#endif
-
 #ifdef LMMS_HAVE_SNDIO
 	if( client_name == MidiSndio::name() || client_name == "" )
 	{
@@ -919,7 +855,7 @@ MidiClient * AudioEngine::tryMidiClients()
 	}
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#ifdef LMMS_HAVE_WINMM
 	if( client_name == MidiWinMM::name() || client_name == "" )
 	{
 		MidiWinMM * mwmm = new MidiWinMM;

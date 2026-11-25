@@ -22,9 +22,8 @@
  *
  */
 
-#include <QDomElement>
-
 #include "JournallingObject.h"
+
 #include "AutomatableModel.h"
 #include "ProjectJournal.h"
 #include "Engine.h"
@@ -82,6 +81,28 @@ QDomElement JournallingObject::saveState( QDomDocument & _doc,
 	} else {
 		return QDomElement();
 	}
+}
+
+void JournallingObject::replaceJournalIDs(QDomElement current)
+{
+	const auto projectJournal = Engine::projectJournal();
+	if (current.hasAttribute("id"))
+	{
+		current.setAttribute("id", projectJournal->generateId());
+	}
+	for (int i=0;i<current.childNodes().count();i++) {
+		auto child = current.childNodes().at(i);
+		if (!child.isElement()) {
+			continue;
+		}
+		replaceJournalIDs(child.toElement());
+	}
+}
+
+void JournallingObject::cloneState( QDomDocument & _doc, QDomElement & _parent )
+{
+	saveState(_doc,_parent);
+	replaceJournalIDs(_parent);
 }
 
 
