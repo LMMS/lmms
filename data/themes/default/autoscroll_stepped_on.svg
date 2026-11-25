@@ -24,7 +24,7 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="28"
-     inkscape:cx="11.892857"
+     inkscape:cx="11.875"
      inkscape:cy="8.8928571"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
@@ -81,7 +81,14 @@
        id="rect1"
        width="0.30022243"
        height="4.2044806"
-       x="2.0988472"
+       x="0.29455054"
+       y="0.54359293" />
+    <rect
+       style="fill:#ffffff;stroke-width:0.618736"
+       id="rect1-6"
+       width="0.30022243"
+       height="4.2044806"
+       x="4.6968937"
        y="0.54359293" />
   </g>
 </svg>
