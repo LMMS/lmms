@@ -113,7 +113,7 @@ static void stream_state_callback(pa_stream* s, void* userdata) noexcept LMMS_NO
 
 
 /* This is called whenever the context status changes */
-static void context_state_callback(pa_context *c, void *userdata) noexcept LMMS_NONBLOCKING
+static void context_state_callback(pa_context* c, void* userdata) noexcept LMMS_NONBLOCKING
 {
 	auto _this = static_cast<AudioPulseAudio*>(userdata);
 	switch( pa_context_get_state( c ) )
