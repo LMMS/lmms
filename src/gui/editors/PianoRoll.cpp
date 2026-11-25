@@ -354,6 +354,10 @@ PianoRoll::PianoRoll() :
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
 					std::make_unique<PixmapLoader>( "edit_draw" ) );
+
+	m_noteLenModel.addItem(tr("Draw (Shift+Click)"),
+					std::make_unique<PixmapLoader>("edit_draw"));
+
 	const auto pixmaps = std::array<std::string, 11>{"whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
@@ -1848,9 +1852,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					TimePos note_pos( pos_ticks - ( quantization() / 2 ) );
 
 					bool drawingNote = false;
-					if (me->modifiers() & Qt::ShiftModifier)
+					if ((me->modifiers() & Qt::ShiftModifier) || (newNoteLen() == -1))
 					{
-						// Shift held : Draw note instead of placing
+						// Draw note instead of placing
 						drawingNote = true;
 					}
 
@@ -5073,6 +5077,10 @@ TimePos PianoRoll::newNoteLen() const
 	if( m_noteLenModel.value() == 0 )
 	{
 		return m_lenOfNewNotes;
+	}
+	else if (m_noteLenModel.value() == 1)
+	{
+		return -1;
 	}
 
 	QString text = m_noteLenModel.currentText();
