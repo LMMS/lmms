@@ -109,8 +109,7 @@ Song::Song() :
 
 	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
 			this, SLOT(masterVolumeChanged()), Qt::DirectConnection );
-	connect( &m_masterPitchModel, SIGNAL(dataChanged()),
-			this, SLOT(setModified()));
+	connect(&m_masterPitchModel, &IntModel::dataChanged, this, &Song::setModified);
 
 	qRegisterMetaType<lmms::Note>( "lmms::Note" );
 	setType( Type::Song );
