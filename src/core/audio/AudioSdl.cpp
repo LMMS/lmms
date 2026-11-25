@@ -23,16 +23,17 @@
  */
 
 #include "AudioSdl.h"
-#include "LmmsTypes.h"
 
 #ifdef LMMS_HAVE_SDL
 
-#include <QFormLayout>
 #include <QComboBox>
+#include <QFormLayout>
 #include <SDL.h>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "LmmsCommonMacros.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -152,7 +153,7 @@ void AudioSdl::stopProcessingImpl()
 	}
 }
 
-void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
+void AudioSdl::sdlAudioCallback(void* _udata, Uint8* _buf, int _len) noexcept LMMS_NONBLOCKING
 {
 	auto _this = static_cast<AudioSdl*>(_udata);
 
@@ -174,7 +175,8 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 	audioEngine()->renderNextBuffer({reinterpret_cast<float*>(_buf), channels(), frameCount});
 }
 
-void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
+void AudioSdl::sdlInputAudioCallback(void* _udata, Uint8* _buf, int _len) noexcept LMMS_NONBLOCKING
+{
 	auto _this = static_cast<AudioSdl*>(_udata);
 
 	_this->sdlInputAudioCallback( _buf, _len );

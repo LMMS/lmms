@@ -31,6 +31,15 @@ namespace lmms
 #define LMMS_STRINGIFY(s) LMMS_STR(s) // a macro used to stringify the plugin name
 #define LMMS_STR(PN) #PN
 
+#if defined(__clang__)
+    #if defined(__has_feature) && __has_feature(realtime_sanitizer)
+        #define LMMS_NONBLOCKING [[clang::nonblocking]]
+    #else
+        #define LMMS_NONBLOCKING
+    #endif
+#else
+    #define LMMS_NONBLOCKING
+#endif
 } // namespace lmms
 
 #endif // LMMS_COMMON_MACROS_H
