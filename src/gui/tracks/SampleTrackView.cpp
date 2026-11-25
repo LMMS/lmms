@@ -67,7 +67,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->setVisible(trackContainerView()->trackHeadWidth() >= COMPACT_TRACK_WIDTH);
-	connect(trackContainerView(), &TrackContainerView::trackHeadWidthChanged, this, [this](int width){
+	connect(trackContainerView(), &TrackContainerView::trackHeadWidthChanged, this, [this](int width) {
 		m_mixerChannelNumber->setVisible(trackContainerView()->trackHeadWidth() >= COMPACT_TRACK_WIDTH);
 	});
 

@@ -140,14 +140,32 @@ public:
 	void removeTrackView( TrackView * _tv );
 	// -------------------------------------------------------
 
-	//! Returns the width of the track settings/label/channel/volume/panning area to the left of the track content
-	//! This is essentially a sum of both the TrackOperationsWidget width and the Track settings widget width.
+	/**
+	 * @brief Get the width of the track's header, which is the area to the left of the track's timeline content.
+	 * 
+	 * This is essentially a sum of both the TrackOperationsWidget width and the track's settings widget width.
+	 * 
+	 * @return int The width of the track header in pixels.
+	 */
 	int trackHeadWidth() const { return m_trackHeadWidth; }
+
+	/**
+	 * @brief Set the width of the track's header
+	 * 
+	 * @param width The width of the track header in pixels
+	 * @see trackHeadWidth()
+	 */
 	void setTrackHeadWidth(int width);
 
-	//! This function only exists because the pattern editor cannot yet handle scrolling, so the track head cannot
-	//! extend too far or it will cause the clips to have 0 width.
-	//! Once proper scrolling and zooming is implemented, this can be removed.
+	/**
+	 * @brief Set the maximum width of the track header
+	 *
+	 * @note This maximum bound on the width only exists because the pattern editor cannot yet handle scrolling,
+	 * so the track header cannot be extended too far or it will cause clips to have 0 width. Once proper scrolling and
+	 * zooming is implemented, this can be removed.
+	 *
+	 * @param maxWidth
+	 */
 	void setMaxTrackHeadWidth(int maxWidth);
 
 	void clearAllTracks();
