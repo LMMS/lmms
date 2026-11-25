@@ -33,6 +33,7 @@
 #include <lv2/worker/worker.h>
 #include <QDebug>
 #include <QtGlobal>
+#include <algorithm>
 
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
@@ -257,7 +258,7 @@ void Lv2Proc::copyModelsFromCore()
 			ffm.m_scalePointMap = &cv.m_scalePointMap;
 			cv.m_connectedModel->accept(ffm);
 			// dirty fix, needs better interpolation
-			std::fill(cv.m_buffer.begin(), cv.m_buffer.end(), ffm.m_res);
+			std::ranges::fill(cv.m_buffer, ffm.m_res);
 		}
 		void visit(Lv2Ports::AtomSeq& atomPort) override
 		{

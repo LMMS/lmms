@@ -31,16 +31,16 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
-#include <QToolButton>
 #include <QStringList>
+#include <QToolButton>
+#include <cstdio>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "GuiApplication.h"
+#include "LmmsCommonMacros.h"
 #include "MainWindow.h"
 #include "MidiJack.h"
-
-#include <cstdio>
 
 namespace lmms {
 namespace {
@@ -346,7 +346,7 @@ void AudioJack::unregisterPort(AudioBusHandle* port)
 		{
 			if (m_portMap[port].ports[ch] != nullptr) { jack_port_unregister(m_client, m_portMap[port].ports[ch]); }
 		}
-		m_portMap.erase(m_portMap.find(port));
+		m_portMap.remove(port);
 	}
 #else
 	(void)port;
@@ -436,7 +436,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 
 
 
-int AudioJack::staticProcessCallback(jack_nframes_t nframes, void* udata)
+int AudioJack::staticProcessCallback(jack_nframes_t nframes, void* udata) noexcept LMMS_NONBLOCKING
 {
 	return static_cast<AudioJack*>(udata)->processCallback(nframes);
 }
@@ -444,7 +444,7 @@ int AudioJack::staticProcessCallback(jack_nframes_t nframes, void* udata)
 
 
 
-void AudioJack::shutdownCallback(void* udata)
+void AudioJack::shutdownCallback(void* udata) noexcept LMMS_NONBLOCKING
 {
 	auto thisClass = static_cast<AudioJack*>(udata);
 	thisClass->m_client = nullptr;

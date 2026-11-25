@@ -133,16 +133,15 @@ public:
 
 	static bool pluginIsUnstable(const char* pluginUri)
 	{
-		return unstablePlugins.find(pluginUri) != unstablePlugins.end();
+		return unstablePlugins.contains(pluginUri);
 	}
 	static bool pluginIsOnlyUsefulWithUi(const char* pluginUri)
 	{
-		return pluginsOnlyUsefulWithUi.find(pluginUri) != pluginsOnlyUsefulWithUi.end();
+		return pluginsOnlyUsefulWithUi.contains(pluginUri);
 	}
 	static bool pluginIsUnstableWithBuffersizeLessEqual32(const char* pluginUri)
 	{
-		return unstablePluginsBuffersizeLessEqual32.find(pluginUri) !=
-			unstablePluginsBuffersizeLessEqual32.end();
+		return unstablePluginsBuffersizeLessEqual32.contains(pluginUri);
 	}
 
 	//! Whether the user generally wants a UI (and we generally support that)

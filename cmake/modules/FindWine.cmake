@@ -1,3 +1,9 @@
+# CMake 4.4: Preserve backslashes in calls to _findwine_find_flags. Can be removed together with
+# the double backslashes in the regexes once we drop support for CMake <4.4
+if(POLICY CMP0219)
+	cmake_policy(SET CMP0219 OLD)
+endif()
+
 # - Try to find the wine libraries
 # Once done this will define
 #
