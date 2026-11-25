@@ -250,7 +250,7 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 		// a logic error at the callsite and should never happen
 		assert(len < size);
 		std::memcpy(buffer, def, len);
-		buffer[len] = '\0'
+		buffer[len] = '\0';
 	}
 	return len;
 }
