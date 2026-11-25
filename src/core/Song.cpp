@@ -109,7 +109,6 @@ Song::Song() :
 
 	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
 			this, SLOT(masterVolumeChanged()), Qt::DirectConnection );
-	connect(&m_masterPitchModel, &IntModel::dataChanged, this, &Song::setModified);
 
 	qRegisterMetaType<lmms::Note>( "lmms::Note" );
 	setType( Type::Song );
@@ -148,7 +147,6 @@ Song::~Song()
 
 void Song::masterVolumeChanged()
 {
-	setModified();
 	Engine::audioEngine()->setMasterGain( m_masterVolumeModel.value() / 100.0f );
 }
 
@@ -157,7 +155,6 @@ void Song::masterVolumeChanged()
 
 void Song::setTempo()
 {
-	setModified();
 	Engine::audioEngine()->requestChangeInModel();
 	const auto tempo = (bpm_t)m_tempoModel.value();
 	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
@@ -185,7 +182,6 @@ void Song::setTempo()
 
 void Song::setTimeSignature()
 {
-	setModified();
 	TimePos::setTicksPerBar( ticksPerBar() );
 	emit timeSignatureChanged( m_oldTicksPerBar, ticksPerBar() );
 	emit dataChanged();
