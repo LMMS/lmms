@@ -315,7 +315,7 @@ void AudioEngine::renderStageMix()
 
 
 
-std::span<const SampleFrame> AudioEngine::renderNextPeriod() 
+std::span<const SampleFrame> AudioEngine::renderNextPeriod()
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
