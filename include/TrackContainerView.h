@@ -140,6 +140,34 @@ public:
 	void removeTrackView( TrackView * _tv );
 	// -------------------------------------------------------
 
+	/**
+	 * @brief Get the width of the track's header, which is the area to the left of the track's timeline content.
+	 * 
+	 * This is essentially a sum of both the TrackOperationsWidget width and the track's settings widget width.
+	 * 
+	 * @return int The width of the track header in pixels.
+	 */
+	int trackHeadWidth() const { return m_trackHeadWidth; }
+
+	/**
+	 * @brief Set the width of the track's header
+	 * 
+	 * @param width The width of the track header in pixels
+	 * @see trackHeadWidth()
+	 */
+	void setTrackHeadWidth(int width);
+
+	/**
+	 * @brief Set the maximum width of the track header
+	 *
+	 * @note This maximum bound on the width only exists because the pattern editor cannot yet handle scrolling,
+	 * so the track header cannot be extended too far or it will cause clips to have 0 width. Once proper scrolling and
+	 * zooming is implemented, this can be removed.
+	 *
+	 * @param maxWidth
+	 */
+	void setMaxTrackHeadWidth(int maxWidth);
+
 	void clearAllTracks();
 
 	QString nodeName() const override
@@ -196,11 +224,17 @@ private:
 
 	float m_ppb;
 
+	int m_trackHeadWidth;
+
+	// TODO: This variable can be removed once the Pattern Editor supports scrolling.
+	int m_maxTrackHeadWidth = -1;
+
 	RubberBand * m_rubberBand;
 
 signals:
 	void positionChanged( const lmms::TimePos & _pos );
 	void tracksRealigned();
+	void trackHeadWidthChanged(int width);
 
 
 } ;
