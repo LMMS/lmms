@@ -22,6 +22,7 @@
  *
  */
 
+#include <QFileIconProvider>
 #include <QFileSystemModel>
 #include <QList>
 #include <QUrl>
@@ -40,6 +41,18 @@
 
 namespace lmms::gui
 {
+
+// Definitions after FileDialog functions
+class LMMSFileIconProvider : public QFileIconProvider
+{
+public:
+	LMMSFileIconProvider();
+	
+	QIcon icon(const QFileInfo& info) const;
+
+private:
+	QIcon m_directoryIcon;
+};
 
 
 FileDialog::FileDialog( QWidget *parent, const QString &caption,

@@ -26,24 +26,11 @@
 #define LMMS_GUI_FILE_DIALOG_H
 
 #include <QFileDialog>
-#include <QFileIconProvider>
-#include <QSortFilterProxyModel>
 
 #include "lmms_export.h"
 
 namespace lmms::gui
 {
-
-class LMMSFileIconProvider : public QFileIconProvider
-{
-public:
-	LMMSFileIconProvider();
-
-	QIcon icon(const QFileInfo& info) const;
-
-private:
-	QIcon m_directoryIcon;
-};
 
 class LMMS_EXPORT FileDialog : public QFileDialog
 {
