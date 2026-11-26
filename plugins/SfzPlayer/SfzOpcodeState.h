@@ -40,9 +40,9 @@ public:
 
 	//! Given an opcode assignment such as `lokey=45`, passing "m_lokey" and "45" to this function
 	//! will take those values and figure out if "lokey" is a valid opcode, and whether "45" is a valid value for it.
-	//! If so, it will set the internal member variable corresponding to it, and return true.
-	//! If it was unsucessful, it will print an error message and return false.
-	bool setOpcodeByStrings(const QString& name, const QString& value);
+	//! If so, it will set the internal member variable corresponding to it.
+	//! If it was unsucessful, it will print an error message.
+	void setOpcodeByStrings(const QString& name, const QString& value);
 
 
 	/***********************************************************************/

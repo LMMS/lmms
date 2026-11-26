@@ -42,7 +42,7 @@ constexpr const int NumMidiCCs = 128;
 /* Helper Functions */
 
 //! Helper function for converting strings like "A5" or "B#2" into integers representing keys on the midi keyboard.
-int stringToKeyNum(QString keyString, bool* successful);
+int stringToKeyNum(QString keyString);
 //! Helper function for converting integers like 24 or 45 representing midi keys back into strings representing the key and octave on the keyboard (essentially the inverse of `stringToKeyNum`)
 QString keyNumToString(int keyNum);
 //! Helper function for taking an opcode name such as "set_cc45" and extracting the number "45" from it.
@@ -58,7 +58,8 @@ int ccNumberFromOpcode(const QString& opcode);
 struct BaseOpcode
 {
 	//! Given a string like "pitch_keytrack=1200" which has been split into name/value as "pitch_keytrack", "1200", this function updates the internal value if the name matches.
-	virtual void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) = 0;
+	//! If `opcodeName` does matches the internal opcode name or any of its aliases, it returns true, otherwise false.
+	virtual bool parseFromString(const QString& opcodeName, const QString& opcodeValue) = 0;
 };
 //! A base struct for all opcodes, with the name(s) and the value
 template<typename T>
@@ -79,7 +80,7 @@ struct Opcode : BaseOpcode
 	// Comparing the opcode to std::nullopt had issues, since the compiler did not want to do two implicit conversions(?) so here the comparision is expressly defined.
 	bool operator==(std::nullopt_t other) const { return m_value == std::nullopt; }
 
-	void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) override;
+	bool parseFromString(const QString& opcodeName, const QString& opcodeValue) override;
 };
 
 //! Float/decimal opcodes (such as amplitude, panning, etc)
@@ -122,7 +123,7 @@ struct ModulatableOpcode : FloatOpcode
 	}
 	//! Helper function for parsing these kinds of opcodes, where you have both `opcode` and `opcode_onccN` where N is the midi cc number, so
 	// that the code isn't duplicated for every modulatable parameter.
-	void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) override;
+	bool parseFromString(const QString& opcodeName, const QString& opcodeValue) override;
 	//! Helper function to update the cached CC modulation amount every time a midi Control Change trigger occurs
 	void updateCachedModulation(const std::array<int, NumMidiCCs>& ccValues);
 };
@@ -189,7 +190,8 @@ struct EnvelopeOpcodes
 		depth.updateCachedModulation(ccValues);
 	}
 	//! Helper function for parsing all these envelope generator opcodes
-	void parseEnvelopeGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful);
+	//! Returns true if `opcode` matched any of the names of the opcodes, otherwise false if none matched.
+	bool parseEnvelopeGeneratorOpcode(const QString& opcode, const QString& value);
 };
 
 // Simple SFZ1 LFO Opcodes, for amplfo, pitchlfo, and fillfo
@@ -216,7 +218,8 @@ struct LfoOpcodes
 		depth.updateCachedModulation(ccValues);
 	}
 	//! Helper function for parsing these lfo generator opcodes
-	void parseLfoGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful);
+	//! Returns true if `opcode` matched any of the names of the opcodes, otherwise false if none matched.
+	bool parseLfoGeneratorOpcode(const QString& opcode, const QString& value);
 };
 
 
@@ -233,7 +236,7 @@ enum class TriggerType
 	//Legato, // TODO To be implemented
 	//ReleaseKey // TODO To be implemented
 };
-template<> void Opcode<TriggerType>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful);
+template<> bool Opcode<TriggerType>::parseFromString(const QString& opcodeName, const QString& opcodeValue);
 
 
 
@@ -244,7 +247,7 @@ enum class LoopMode
 	//LoopContinuous, // To be implemented
 	//LoopSustain
 };
-template<> void Opcode<LoopMode>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful);
+template<> bool Opcode<LoopMode>::parseFromString(const QString& opcodeName, const QString& opcodeValue);
 
 
 
@@ -257,7 +260,7 @@ enum class FilterType
 	Bandpass2Pole,
 	Bandstop2Pole
 };
-template<> void Opcode<FilterType>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful);
+template<> bool Opcode<FilterType>::parseFromString(const QString& opcodeName, const QString& opcodeValue);
 
 
 

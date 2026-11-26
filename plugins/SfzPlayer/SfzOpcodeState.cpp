@@ -50,7 +50,7 @@ SfzOpcodeState::SfzOpcodeState()
 
 
 
-bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& value)
+void SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& value)
 {
 	// These lists hold pointers to all of the opcodes to make them easier to iterate over
 	std::vector<BaseOpcode*> opcodeList = {
@@ -111,69 +111,67 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		&m_pitchlfo
 	};
 
-	bool parsed = false;
-	bool successful = true;
+	// Keep track if the opcode matched any of the known opcode names. If none were able to recognize it, an error will be printed at the end.
+	bool opcodeNameMatched = false;
 
 	for (auto* opcode : opcodeList)
 	{
-		//if (parsed) { break; } // Do not break even if the opcode has already been parsed, since some opcodes like "key" are effectively aliases for multiple opcodes (lokey, hikey, and pitch_keytrack)
-		opcode->parseFromString(name, value, &parsed, &successful);
+		// Note: some opcodes like "key" are effectively aliases for multiple opcodes (lokey, hikey, and pitch_keytrack)
+		// so we have to loop over all of them, not stop when we find the first one which matches
+		opcodeNameMatched |= opcode->parseFromString(name, value);
 	}
 	for (auto* envelopeGenerator : envelopeGeneratorList)
 	{
-		envelopeGenerator->parseEnvelopeGeneratorOpcode(name, value, &parsed, &successful);
+		opcodeNameMatched |= envelopeGenerator->parseEnvelopeGeneratorOpcode(name, value);
 	}
 	for (auto* lfoGenerator : lfoGeneratorList)
 	{
-		lfoGenerator->parseLfoGeneratorOpcode(name, value, &parsed, &successful);
+		opcodeNameMatched |= lfoGenerator->parseLfoGeneratorOpcode(name, value);
 	}
 
 
 	// A few of the per-CC opcodes are handled separately here for now, just to make the code simpler
+	bool successful = false;
 	if (name.startsWith("locc"))
 	{
-		int ccNumber = ccNumberFromOpcode(name); // TODO have some kind of error handling for invalid cc numbers
+		opcodeNameMatched = true;
+		int ccNumber = ccNumberFromOpcode(name);
 		m_locc.at(ccNumber) = value.toInt(&successful);
-		parsed = true;
+		if (!successful) { qDebug() << "[SFZ Parser] Unable to parse value of opcode:" << QString("%1=%2").arg(name, value); }
 	}
 	else if (name.startsWith("hicc"))
 	{
+		opcodeNameMatched = true;
 		int ccNumber = ccNumberFromOpcode(name);
 		m_hicc.at(ccNumber) = value.toInt(&successful);
-		parsed = true;
+		if (!successful) { qDebug() << "[SFZ Parser] Unable to parse value of opcode:" << QString("%1=%2").arg(name, value); }
 	}
 	else if (name.startsWith("set_cc"))
 	{
+		opcodeNameMatched = true;
 		int ccNumber = ccNumberFromOpcode(name);
 		m_set_cc.at(ccNumber) = value.toInt(&successful);
-		parsed = true;
+		if (!successful) { qDebug() << "[SFZ Parser] Unable to parse value of opcode:" << QString("%1=%2").arg(name, value); }
 	}
 	else if (name.startsWith("set_hdcc"))
 	{
+		opcodeNameMatched = true;
 		int ccNumber = ccNumberFromOpcode(name);
 		m_set_cc.at(ccNumber) = value.toFloat(&successful) * 127;
-		parsed = true;
+		if (!successful) { qDebug() << "[SFZ Parser] Unable to parse value of opcode:" << QString("%1=%2").arg(name, value); }
 	}
 	else if (name.startsWith("label_cc"))
 	{
+		opcodeNameMatched = true;
 		int ccNumber = ccNumberFromOpcode(name);
 		m_label_cc.at(ccNumber) = value;
-		parsed = true;
-		successful = true;
 	}
 
-
-	if (!successful)
+	// Print an error/warning message if none of the implemented opcodes matched the opcode name. This means it probably hasn't been implemented yet.
+	if (!opcodeNameMatched)
 	{
-		qDebug() << "[SFZ Parser] Unable to convert value from string:" << name << "=" << value;
-		return false;
+		qDebug() << "[SFZ Parser] Unrecognized opcode:" << QString("%1=%2").arg(name, value);
 	}
-	else if (!parsed)
-	{
-		qDebug() << "[SFZ Parser] Unknown opcode:" << name;
-		return false;
-	}
-	return true;
 }
 
 

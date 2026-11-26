@@ -32,31 +32,34 @@ namespace lmms
 {
 
 template<>
-void FloatOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
+bool FloatOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue)
 {
 	// Check if the name matches one of this opcode's aliases
-	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
-	m_value = opcodeValue.toFloat(successful);
-	*parsed = true;
+	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return false; }
+	bool successful = false;
+	m_value = opcodeValue.toFloat(&successful);
+	if (!successful) { qDebug() << "[SFZ Parser] Unable to parse float opcode:" << QString("%1=%2").arg(opcodeName, opcodeValue); }
+	return true; // Return true if the opcode name was recognized; the value may not have been parsed, but the opcode is not unknown.
 }
 
 template<>
-void KeyOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
+bool KeyOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue)
 {
-	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
-	m_value = opcodeValue.toInt(successful);
+	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return false; }
+	bool successful = false;
+	m_value = opcodeValue.toInt(&successful);
 	// Integer opcodes can also define keys, which can be specified either by a key number or by a string like e4 or c#5
-	if (!*successful) { m_value = stringToKeyNum(opcodeValue, successful); }
-	*parsed = true;
+	if (!successful) { m_value = stringToKeyNum(opcodeValue); }
+	if (!successful && m_value == -1) { qDebug() << "[SFZ Parser] Unable to parse int opcode:" << QString("%1=%2").arg(opcodeName, opcodeValue); }
+	return true;
 }
 
 template<>
-void StringOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
+bool StringOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue)
 {
-	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
+	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return false; }
 	m_value = opcodeValue;
-	*parsed = true;
-	*successful = true;
+	return true;
 }
 
 // Modulatable Opcodes are a type of float opcode which can be adjusted based on different midi CC knob values
@@ -65,33 +68,39 @@ void StringOpcode::parseFromString(const QString& opcodeName, const QString& opc
 // or opcodename_cc123=modulation_amount
 // or opcodenamecc123=modulation_amount
 // which will make the value be increased proportional to modulation_amount when the midi CC knob 123 is turned up
-void ModulatableOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
+bool ModulatableOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue)
 {
+	bool opcodeNameMatched = false;
 	for (QString alias : m_opcodeNames)
 	{
+		bool successful = false;
 		if (opcodeName == alias)
 		{
-			m_value = opcodeValue.toFloat(successful);
-			*parsed = true;
+			m_value = opcodeValue.toFloat(&successful);
+			if (!successful) { qDebug() << "[SFZ Parser] Unable to parse modulatable float opcode:" << QString("%1=%2").arg(opcodeName, opcodeValue); }
+			opcodeNameMatched = true;
 		}
 		else if (opcodeName.startsWith(alias + "_oncc") || opcodeName.startsWith(alias + "_cc") || opcodeName.startsWith(alias + "cc"))
 		{
-			value_oncc.at(ccNumberFromOpcode(opcodeName)) = opcodeValue.toFloat(successful);
-			*parsed = true;
+			value_oncc.at(ccNumberFromOpcode(opcodeName)) = opcodeValue.toFloat(&successful);
+			if (!successful) { qDebug() << "[SFZ Parser] Unable to parse modulatable float opcode cc modulation:" << QString("%1=%2").arg(opcodeName, opcodeValue); }
+			opcodeNameMatched = true;
 		}
 		else if (opcodeName.startsWith(alias + "_curvecc"))
 		{
-			value_curvecc.at(ccNumberFromOpcode(opcodeName)) = opcodeValue.toInt(successful);
-			*parsed = true;
+			value_curvecc.at(ccNumberFromOpcode(opcodeName)) = opcodeValue.toInt(&successful);
+			if (!successful) { qDebug() << "[SFZ Parser] Unable to parse modulatable float opcode cc curve:" << QString("%1=%2").arg(opcodeName, opcodeValue); }
+			opcodeNameMatched = true;
 		}
 		else if (opcodeName.startsWith(alias + "_mod"))
 		{
-			*parsed = true;
 			if (opcodeValue == "add") { modulationType = ModulationType::Add; }
 			else if (opcodeValue == "mult") { modulationType = ModulationType::Mult; }
-			else { qDebug() << "[SFZ Parser] Warning: Unknown Modulation Type:" << opcodeValue; *successful = false; }
+			else { qDebug() << "[SFZ Parser] Warning: Unknown Modulation Type:" << opcodeValue; }
+			opcodeNameMatched = true;
 		}
 	}
+	return opcodeNameMatched; // Retrun true since the opcode was recognized (the value may not have been parsed, but the name is known)
 }
 
 
@@ -153,36 +162,39 @@ void ModulatableOpcode::updateCachedModulation(const std::array<int, NumMidiCCs>
 
 
 // Envelope Generator Opcodes
-void EnvelopeOpcodes::parseEnvelopeGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful)
+bool EnvelopeOpcodes::parseEnvelopeGeneratorOpcode(const QString& opcode, const QString& value)
 {
 	// Pass the opcode name/value to all of the bundled opcodes.
-	// If it matches one of them, that's great. If not, they will return and nothing will happen.
-	// TODO is this error handling with "successful" correct?
-	delay.parseFromString(opcode, value, parsed, successful);
-	attack.parseFromString(opcode, value, parsed, successful);
-	hold.parseFromString(opcode, value, parsed, successful);
-	decay.parseFromString(opcode, value, parsed, successful);
-	sustain.parseFromString(opcode, value, parsed, successful);
-	release.parseFromString(opcode, value, parsed, successful);
-	depth.parseFromString(opcode, value, parsed, successful);
+	// If it matches one of them, that's great. If not, they will return false and nothing will happen.
+	bool opcodeNameMatched = false;
+	opcodeNameMatched |= delay.parseFromString(opcode, value);
+	opcodeNameMatched |= attack.parseFromString(opcode, value);
+	opcodeNameMatched |= hold.parseFromString(opcode, value);
+	opcodeNameMatched |= decay.parseFromString(opcode, value);
+	opcodeNameMatched |= sustain.parseFromString(opcode, value);
+	opcodeNameMatched |= release.parseFromString(opcode, value);
+	opcodeNameMatched |= depth.parseFromString(opcode, value);
 
-	vel2delay.parseFromString(opcode, value, parsed, successful);
-	vel2attack.parseFromString(opcode, value, parsed, successful);
-	vel2hold.parseFromString(opcode, value, parsed, successful);
-	vel2decay.parseFromString(opcode, value, parsed, successful);
-	vel2sustain.parseFromString(opcode, value, parsed, successful);
-	vel2release.parseFromString(opcode, value, parsed, successful);
-	vel2depth.parseFromString(opcode, value, parsed, successful);
+	opcodeNameMatched |= vel2delay.parseFromString(opcode, value);
+	opcodeNameMatched |= vel2attack.parseFromString(opcode, value);
+	opcodeNameMatched |= vel2hold.parseFromString(opcode, value);
+	opcodeNameMatched |= vel2decay.parseFromString(opcode, value);
+	opcodeNameMatched |= vel2sustain.parseFromString(opcode, value);
+	opcodeNameMatched |= vel2release.parseFromString(opcode, value);
+	opcodeNameMatched |= vel2depth.parseFromString(opcode, value);
+	return opcodeNameMatched;
 }
 
 
 // LFO Opcodes
-void LfoOpcodes::parseLfoGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful)
+bool LfoOpcodes::parseLfoGeneratorOpcode(const QString& opcode, const QString& value)
 {
-	delay.parseFromString(opcode, value, parsed, successful);
-	fade.parseFromString(opcode, value, parsed, successful);
-	freq.parseFromString(opcode, value, parsed, successful);
-	depth.parseFromString(opcode, value, parsed, successful);
+	bool opcodeNameMatched = false;
+	opcodeNameMatched |= delay.parseFromString(opcode, value);
+	opcodeNameMatched |= fade.parseFromString(opcode, value);
+	opcodeNameMatched |= freq.parseFromString(opcode, value);
+	opcodeNameMatched |= depth.parseFromString(opcode, value);
+	return opcodeNameMatched;
 }
 
 
@@ -192,10 +204,9 @@ void LfoOpcodes::parseLfoGeneratorOpcode(const QString& opcode, const QString& v
 //
 
 template<>
-void Opcode<TriggerType>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
+bool Opcode<TriggerType>::parseFromString(const QString& opcodeName, const QString& opcodeValue)
 {
-	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
-	*parsed = true;
+	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return false; }
 
 	if (opcodeValue == "attack") { m_value = TriggerType::Attack; }
 	else if (opcodeValue == "release") { m_value = TriggerType::Release; }
@@ -204,18 +215,16 @@ void Opcode<TriggerType>::parseFromString(const QString& opcodeName, const QStri
 	//else if (opcodeValue == "release_key") { m_value = TriggerType::ReleaseKey; } // TODO To be implemented
 	else
 	{
-		qDebug() << "[SFZ Parser] Unknown trigger:" << opcodeValue;
-		return;
+		qDebug() << "[SFZ Parser] Unknown trigger:" << QString("%1=%2").arg(opcodeName, opcodeValue);
 	}
-	*successful = true;
+	return true;
 }
 
 
 template<>
-void Opcode<LoopMode>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
+bool Opcode<LoopMode>::parseFromString(const QString& opcodeName, const QString& opcodeValue)
 {
-	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
-	*parsed = true;
+	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return false; }
 
 	if (opcodeValue == "no_loop") { m_value = LoopMode::NoLoop; }
 	else if (opcodeValue == "one_shot") { m_value = LoopMode::OneShot; }
@@ -223,18 +232,16 @@ void Opcode<LoopMode>::parseFromString(const QString& opcodeName, const QString&
 	//else if (opcodeValue == "loop_sustain") { m_value = LoopMode::LoopSustain; }
 	else
 	{
-		qDebug() << "[SFZ Parser] Unknown loop_mode:" << opcodeValue;
-		return;
+		qDebug() << "[SFZ Parser] Unknown loop_mode:" << QString("%1=%2").arg(opcodeName, opcodeValue);
 	}
-	*successful = true;
+	return true;
 }
 
 
 template<>
-void Opcode<FilterType>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
+bool Opcode<FilterType>::parseFromString(const QString& opcodeName, const QString& opcodeValue)
 {
-	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
-	*parsed = true;
+	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return false; }
 
 	if (opcodeValue == "lpf_1p") { m_value = FilterType::Lowpass1Pole; }
 	else if (opcodeValue == "lpf_2p") { m_value = FilterType::Lowpass2Pole; }
@@ -244,10 +251,9 @@ void Opcode<FilterType>::parseFromString(const QString& opcodeName, const QStrin
 	else if (opcodeValue == "brf_2p") { m_value = FilterType::Bandstop2Pole; }
 	else
 	{
-		qDebug() << "[SFZ Parser] Unknown filter type:" << opcodeValue;
-		return;
+		qDebug() << "[SFZ Parser] Unknown filter type:" << QString("%1=%2").arg(opcodeName, opcodeValue);
 	}
-	*successful = true;
+	return true;
 }
 
 
@@ -277,14 +283,16 @@ int ccNumberFromOpcode(const QString& opcode)
 }
 
 
-int stringToKeyNum(QString keyString, bool* successful)
+int stringToKeyNum(QString keyString)
 {
 	keyString = keyString.toLower();
 	// Match for a number at the end (potentially including a "-" at the start)
 	QRegularExpression octaveRE("(-)?\\d+$");
 	QRegularExpressionMatch octaveMatch = octaveRE.match(keyString);
 	if (!octaveMatch.hasMatch()) { qDebug() << "[SFZ Parser] Unable to parse octave from key string:" << keyString; return -1; }
-	int octave = octaveMatch.captured(0).toInt(successful);
+	bool successfulToInt = false;
+	int octave = octaveMatch.captured(0).toInt(&successfulToInt);
+	if (!successfulToInt) { qDebug() << "[SFZ Parser] Unable to convert octave to integer from key string:" << keyString; return -1; }
 	// Match for the letters at the start (including #)
 	QRegularExpression keyRE("^[a-zA-Z#]+");
 	QRegularExpressionMatch keyMatch = keyRE.match(keyString);
@@ -307,11 +315,9 @@ int stringToKeyNum(QString keyString, bool* successful)
 	else if (key == "b") { keyOffset = 11; }
 	else
 	{
-		*successful = false;
-		qDebug() << "[SFZ Parser] Unable to parse key string, Invalid key:" << keyString;
+		qDebug() << "[SFZ Parser] Unable to parse key string, invalid key:" << keyString;
 		return -1;
 	}
-	*successful = true;
 	// For some reason, C1 is midi key 24, so eveything is offset by 24
 	return 24 + keyOffset + 12 * (octave - 1);
 }

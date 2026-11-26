@@ -78,7 +78,9 @@ std::optional<int> SfzGlobalState::lastSwitchKeyPressedInRange(int lowKey, int h
 		}
 	}
 	// If no keys in the region have been played yet, return the default key
-	return lastPlayedKey.value_or(defaultKey);
+	// We can't return lastPlayedKey.value_or(defaultKey) here because defaultKey is also a std::optional, which may itself be std::nullopt
+	if (lastPlayedKey == std::nullopt) { return defaultKey; }
+	else { return lastPlayedKey; }
 }
 
 void SfzGlobalState::updateNphFreq(const int key, const float freq)
