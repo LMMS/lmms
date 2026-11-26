@@ -203,15 +203,13 @@ QString FileDialog::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
-LMMSIconProvider::LMMSIconProvider() : QFileIconProvider()
+LMMSIconProvider::LMMSIconProvider() : QFileIconProvider(),
+	m_directoryIcon(embed::getIconPixmap("folder"))
 {}
 
 QIcon LMMSIconProvider::icon(const QFileInfo& info) const
 {
-	if (info.isDir())
-	{
-		return embed::getIconPixmap("folder");
-	}
+	if (info.isDir()) { return m_directoryIcon; }
 	FileItem fileItem = FileItem(info.fileName(), info.dir().path());
 	return fileItem.icon(0);
 }

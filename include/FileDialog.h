@@ -42,6 +42,7 @@ public:
 	QIcon icon(const QFileInfo& info) const;
 
 private:
+	QIcon m_directoryIcon;
 };
 
 class LMMSFileFilterProxyModel : public QSortFilterProxyModel
