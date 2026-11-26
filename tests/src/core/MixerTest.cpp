@@ -111,6 +111,46 @@ private slots:
 		QCOMPARE(unassigned->mixerChannelModel()->value(), 0);
 	}
 
+	void testAutoAssignNewProject()
+	{
+		using namespace lmms;
+		const auto mixer = Engine::mixer();
+		const auto song = Engine::getSong();
+
+		auto dir = QTemporaryDir{};
+		const auto templ = dir.filePath("template.mpt");
+		auto file = QFile{templ};
+		QVERIFY(file.open(QIODevice::WriteOnly));
+		file.write(R"(<?xml version="1.0"?>
+<lmms-project version="1.0" type="song">
+  <head bpm="140"/>
+  <song>
+    <trackcontainer type="song">
+      <track type="2" name="Unrouted"><sampletrack mixch="0"/></track>
+      <track type="2" name="Routed"><sampletrack mixch="1"/></track>
+    </trackcontainer>
+    <mixer>
+      <mixerchannel num="0" name="Master"/>
+      <mixerchannel num="1" name="Shared"/>
+    </mixer>
+  </song>
+</lmms-project>
+)");
+		file.close();
+
+		ConfigManager::inst()->setValue("app", "autoassignmixerchannel", "1");
+		song->createNewProjectFromTemplate(templ);
+		ConfigManager::inst()->setValue("app", "autoassignmixerchannel", "0");
+
+		// only the track on master gets a linked channel
+		const auto& tracks = song->tracks();
+		QCOMPARE(tracks.size(), std::size_t{2});
+		QVERIFY(mixer->linkedChannel(*tracks[0]));
+		QVERIFY(!mixer->linkedChannel(*tracks[1]));
+		QCOMPARE(mixer->mixerChannel(tracks[1]->mixerChannelModel()->value())->m_name, QString{"Shared"});
+		QVERIFY(!song->isModified());
+	}
+
 	void testLinkedChannelFollowsTrack()
 	{
 		using namespace lmms;
