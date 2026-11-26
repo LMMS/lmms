@@ -52,6 +52,8 @@ class LMMS_EXPORT SubWindow : public QMdiSubWindow
 	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
+	Q_PROPERTY( QBrush backgroundColor MEMBER m_backgroundColor )
+	Q_PROPERTY( qreal topRadius MEMBER m_topRadius )
 
 public:
 	SubWindow( QWidget *parent = nullptr, Qt::WindowFlags windowFlags = QFlag(0) );
@@ -132,6 +134,8 @@ private:
 	QBrush m_activeColor;
 	QColor m_textShadowColor;
 	QColor m_borderColor;
+	QBrush m_backgroundColor;
+	qreal m_topRadius;
 	QPoint m_position;
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
