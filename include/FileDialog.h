@@ -34,29 +34,15 @@
 namespace lmms::gui
 {
 
-class LMMSIconProvider : public QFileIconProvider
+class LMMSFileIconProvider : public QFileIconProvider
 {
 public:
-	LMMSIconProvider();
+	LMMSFileIconProvider();
 
 	QIcon icon(const QFileInfo& info) const;
 
 private:
 	QIcon m_directoryIcon;
-};
-
-class LMMSFileFilterProxyModel : public QSortFilterProxyModel
-{
-	Q_OBJECT
-public:
-	LMMSFileFilterProxyModel();
-
-	~LMMSFileFilterProxyModel();
-
-	LMMSIconProvider* provider;
-
-private:
-	virtual bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
 };
 
 class LMMS_EXPORT FileDialog : public QFileDialog
@@ -79,9 +65,6 @@ public:
 	static QString openAudioFile(const QString& previousFile = "");
 	static QString openWaveformFile(const QString& previousFile = "");
 	void clearSelection();
-
-private:
-	LMMSFileFilterProxyModel* m_proxyModel;
 };
 
 
