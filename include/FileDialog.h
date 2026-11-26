@@ -26,12 +26,37 @@
 #define LMMS_GUI_FILE_DIALOG_H
 
 #include <QFileDialog>
+#include <QFileIconProvider>
+#include <QSortFilterProxyModel>
 
 #include "lmms_export.h"
 
 namespace lmms::gui
 {
 
+class LMMSIconProvider : public QFileIconProvider
+{
+public:
+	LMMSIconProvider();
+
+	QIcon icon(const QFileInfo& info) const;
+
+private:
+};
+
+class LMMSFileFilterProxyModel : public QSortFilterProxyModel
+{
+	Q_OBJECT
+public:
+	LMMSFileFilterProxyModel();
+
+	~LMMSFileFilterProxyModel();
+
+	LMMSIconProvider* provider;
+
+private:
+	virtual bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
+};
 
 class LMMS_EXPORT FileDialog : public QFileDialog
 {
@@ -53,6 +78,9 @@ public:
 	static QString openAudioFile(const QString& previousFile = "");
 	static QString openWaveformFile(const QString& previousFile = "");
 	void clearSelection();
+
+private:
+	LMMSFileFilterProxyModel* m_proxyModel;
 };
 
 

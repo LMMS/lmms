@@ -22,6 +22,7 @@
  *
  */
 
+#include <QFileSystemModel>
 #include <QList>
 #include <QUrl>
 #include <QListView>
@@ -32,6 +33,9 @@
 #include "ConfigManager.h"
 #include "PathUtil.h"
 #include "SampleDecoder.h"
+#include "FileBrowser.h"
+#include "embed.h"
+
 #include "FileDialog.h"
 
 namespace lmms::gui
@@ -44,6 +48,9 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 {
 	setOption( QFileDialog::DontUseCustomDirectoryIcons );
 	setOption( QFileDialog::DontUseNativeDialog );
+
+	m_proxyModel = new LMMSFileFilterProxyModel();
+	setProxyModel(m_proxyModel);
 
 #ifdef LMMS_BUILD_LINUX
 	QList<QUrl> urls;
@@ -196,5 +203,36 @@ QString FileDialog::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
+LMMSIconProvider::LMMSIconProvider() : QFileIconProvider()
+{}
+
+QIcon LMMSIconProvider::icon(const QFileInfo& info) const
+{
+	if (info.isDir())
+	{
+		return embed::getIconPixmap("folder");
+	}
+	FileItem fileItem = FileItem(info.fileName(), info.dir().path());
+	return fileItem.icon(0);
+}
+
+LMMSFileFilterProxyModel::LMMSFileFilterProxyModel()
+{
+	provider = new LMMSIconProvider();
+}
+
+LMMSFileFilterProxyModel::~LMMSFileFilterProxyModel()
+{
+	delete provider;
+}
+
+bool LMMSFileFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
+{
+	QFileSystemModel* fileModel = qobject_cast<QFileSystemModel*>(sourceModel());
+	fileModel->setIconProvider(provider);
+	return true;
+	// Uncomment below to execute default implementation
+	// return QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
+}
 
 } // namespace lmms::gui
