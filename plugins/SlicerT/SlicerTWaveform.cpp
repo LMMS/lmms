@@ -114,6 +114,7 @@ void SlicerTWaveform::drawSeekerWaveform()
 {
 	m_seekerWaveform.fill(s_emptyColor);
 	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
+	if (!m_slicerTParent->m_sampleThumbnailCache) { return; }
 	QPainter brush(&m_seekerWaveform);
 	brush.setPen(s_waveformColor);
 
@@ -174,6 +175,7 @@ void SlicerTWaveform::drawEditorWaveform()
 {
 	m_editorWaveform.fill(s_emptyColor);
 	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
+	if (!m_slicerTParent->m_sampleThumbnailCache) { return; }
 
 	QPainter brush(&m_editorWaveform);
 	size_t startFrame = m_seekerStart * m_slicerTParent->m_originalSample.sampleSize();
