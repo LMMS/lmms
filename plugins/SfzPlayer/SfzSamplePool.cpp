@@ -88,7 +88,8 @@ const std::shared_ptr<SfzSampleBuffer> SfzSamplePool::loadSample(const QString& 
 
 void SfzSamplePool::clearExpiredWeakPtrs()
 {
-	std::erase_if(m_samplePool, [](const auto& entry){
+	std::erase_if(m_samplePool, [](const auto& entry)
+	{
 		const auto& [key, value] = entry;
 		return value.expired();
 	});

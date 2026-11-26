@@ -279,7 +279,7 @@ void ConfigManager::setSF2File(const QString & sf2File)
 
 
 
-void ConfigManager::setSFZDir(const QString & sfzDir)
+void ConfigManager::setSFZDir(const QString& sfzDir)
 {
 	m_sfzDir = sfzDir;
 }

@@ -149,10 +149,7 @@ public:
 		return m_sf2File;
 	}
 
-	const QString & sfzDir() const
-	{
-		return m_sfzDir;
-	}
+	const QString& sfzDir() const { return m_sfzDir; }
 #endif
 
 #ifdef LMMS_HAVE_STK
@@ -183,10 +180,7 @@ public:
 		return workingDir() + SF2_PATH;
 	}
 
-	QString userSfzDir() const
-	{
-		return workingDir() + SFZ_PATH;
-	}
+	QString userSfzDir() const { return workingDir() + SFZ_PATH; }
 
 	QString userGigDir() const
 	{
@@ -270,7 +264,7 @@ public:
 	void setLADSPADir(const QString & ladspaDir);
 	void setSF2Dir(const QString & sf2Dir);
 	void setSF2File(const QString & sf2File);
-	void setSFZDir(const QString & sfzDir);
+	void setSFZDir(const QString& sfzDir);
 	void setSTKDir(const QString & stkDir);
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);

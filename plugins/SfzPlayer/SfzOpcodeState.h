@@ -153,9 +153,9 @@ public:
 	//
 	// Misc Volume
 	//
-	// Gain is the same as volume. Some opcodes use the word volume, some use gain, both are decibals
+	// Gain is the same as volume. Some opcodes use the word volume, some use gain, both are decibels
 	// It seems that "gain" by itself isn't a real opcode, but gain_ccN and gain_onccN are... just to make the logic eaiser, I have gain as a normal alias.
-	ModulatableOpcode m_volume {{"volume", "gain", "group_volume"}, 0.0f}; // In decibals
+	ModulatableOpcode m_volume {{"volume", "gain", "group_volume"}, 0.0f}; // In decibels
 	ModulatableOpcode m_pan {"pan", 0.0f};
 
 	//
