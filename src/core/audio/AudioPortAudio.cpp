@@ -23,6 +23,7 @@
  *
  */
 
+#include <algorithm>
 #include <iostream>
 
 #include "lmmsconfig.h"
@@ -90,6 +91,16 @@ int maxChannels(const PaDeviceInfo* info, Direction direction)
 	return 0;
 }
 
+PaHostApiIndex findBackendIndex(const QString& name)
+{
+	for (auto i = 0, backendCount = Pa_GetHostApiCount(); i < backendCount; ++i)
+	{
+		if (Pa_GetHostApiInfo(i)->name == name) { return i; }
+	}
+
+	return paHostApiNotFound;
+}
+
 } // namespace
 
 namespace lmms {
@@ -105,7 +116,14 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	}
 
 	const auto backend = ConfigManager::inst()->value(tag(), backendAttribute());
-	
+	const auto backendIndex = findBackendIndex(backend);
+	if (backendIndex < 0)
+	{
+		std::cerr << "PortAudio backend not found: " << backend.toStdString() << '\n';
+		successful = false;
+		return;
+	}
+
 	const auto inputDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(Direction::Input));
 	const auto inputDeviceChannels = ConfigManager::inst()->value(tag(), channelsAttribute(Direction::Input)).toInt();
 
@@ -118,17 +136,32 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	for (auto i = 0; i < numDevices && (inputDeviceIndex == paNoDevice || outputDeviceIndex == paNoDevice); ++i)
 	{
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
-		const auto hostApiInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
-		if (deviceInfo->name == inputDeviceName && hostApiInfo->name == backend) { inputDeviceIndex = i; }
-		if (deviceInfo->name == outputDeviceName && hostApiInfo->name == backend) { outputDeviceIndex = i; }
+		if (deviceInfo->hostApi != backendIndex) { continue; }
+		if (deviceInfo->name == inputDeviceName) { inputDeviceIndex = i; }
+		if (deviceInfo->name == outputDeviceName) { outputDeviceIndex = i; }
 	}
+
+	if (outputDeviceIndex == paNoDevice)
+	{
+		// The saved output device may be disconnected. Fall back to the backend's default one.
+		outputDeviceIndex = Pa_GetHostApiInfo(backendIndex)->defaultOutputDevice;
+	}
+
+	if (outputDeviceIndex == paNoDevice)
+	{
+		std::cerr << "No output device found for PortAudio backend " << backend.toStdString() << '\n';
+		successful = false;
+		return;
+	}
+
+	const auto outputChannels
+		= std::min(outputDeviceChannels, Pa_GetDeviceInfo(outputDeviceIndex)->maxOutputChannels);
 
 	const auto sampleRate = engine->baseSampleRate();
 	const auto framesPerBuffer = engine->framesPerPeriod();
 	const auto inputLatency
 		= inputDeviceIndex == paNoDevice ? 0. : Pa_GetDeviceInfo(inputDeviceIndex)->defaultLowInputLatency;
-	const auto outputLatency
-		= outputDeviceIndex == paNoDevice ? 0. : Pa_GetDeviceInfo(outputDeviceIndex)->defaultLowOutputLatency;
+	const auto outputLatency = Pa_GetDeviceInfo(outputDeviceIndex)->defaultLowOutputLatency;
 
 	const auto inputParameters = PaStreamParameters {
 		.device = inputDeviceIndex,
@@ -140,15 +173,14 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	
 	const auto outputParameters = PaStreamParameters {
 		.device = outputDeviceIndex,
-		.channelCount = outputDeviceChannels,
+		.channelCount = outputChannels,
 		.sampleFormat = paFloat32,
 		.suggestedLatency = outputLatency,
 		.hostApiSpecificStreamInfo = nullptr
 	};
 
 	const auto inputParametersPtr = inputDeviceIndex == paNoDevice ? nullptr : &inputParameters; 
-	const auto outputParametersPtr = outputDeviceIndex == paNoDevice ? nullptr : &outputParameters;
-	auto err = Pa_IsFormatSupported(inputParametersPtr, outputParametersPtr, sampleRate);
+	auto err = Pa_IsFormatSupported(inputParametersPtr, &outputParameters, sampleRate);
 
 	if (err != paFormatIsSupported)
 	{
@@ -157,7 +189,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		return;
 	}
 
-	err = Pa_OpenStream(&m_paStream, inputParametersPtr, outputParametersPtr, sampleRate, framesPerBuffer, paNoFlag,
+	err = Pa_OpenStream(&m_paStream, inputParametersPtr, &outputParameters, sampleRate, framesPerBuffer, paNoFlag,
 		&AudioPortAudio::processCallback, this);
 	
 	if (err != paNoError)
@@ -169,7 +201,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 
 	successful = true;
 	setSampleRate(sampleRate);
-	setChannels(outputDeviceChannels);
+	setChannels(outputChannels);
 }
 
 AudioPortAudio::~AudioPortAudio()
