@@ -155,7 +155,7 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 			if (!preloadSamples && !region->sample())
 			{
 				setStatusInfo(QString("Loading sample %1").arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
-				bool successfulLoadSample = region->initializeSample(QFileInfo(m_sfzFilePath).absoluteDir());
+				bool successfulLoadSample = region->initializeSample(QFileInfo(PathUtil::toAbsolute(m_sfzFilePath)).absoluteDir());
 				if (successfulLoadSample)
 				{
 					setStatusInfo(QString("Loaded sample %1").arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
@@ -291,7 +291,7 @@ void SfzPlayer::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 	// Setup a map for keeping track of which switch keys may be pressed. This is more efficient than having array with 128 element, since that takes much longer to loop over, and most keys are not switch keys
 	m_sfzGlobalState.initializeSwitchKeysMap(m_controlsConfig);
 
-	m_sfzFilePath = filePath;
+	m_sfzFilePath = PathUtil::toShortestRelative(filePath);
 
 	// Hand off the vector of regions to SfzRegionManager, which will sort them out to optimize trigger selection
 	// Don't immediately set m_regionManager, since the audio thread may still be accessing it; instead set the temporary object
@@ -316,7 +316,7 @@ void SfzPlayer::preloadAllSamples()
 void SfzPlayer::sampleLoadingThreadFunction()
 {
 	// The samples are stored with relative paths with respect to the sfz file, so first find the parent directory:
-	QDir parentDirectory = QFileInfo(m_sfzFilePath).absoluteDir();
+	QDir parentDirectory = QFileInfo(PathUtil::toAbsolute(m_sfzFilePath)).absoluteDir();
 
 	int i = 0; // Count the number of regions
 	int samplesLoaded = 0; // Count the number of samples which were loaded via LMMS's SampleCache

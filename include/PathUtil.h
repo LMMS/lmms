@@ -35,7 +35,7 @@
 namespace lmms::PathUtil
 {
 	enum class Base { Absolute, ProjectDir, FactoryProjects, FactorySample, UserSample, UserVST, Preset,
-		FactoryPresets, UserLADSPA, DefaultLADSPA, UserSoundfont, DefaultSoundfont, UserGIG, DefaultGIG,
+		FactoryPresets, UserLADSPA, DefaultLADSPA, UserSoundfont, DefaultSoundfont, UserSFZ, DefaultSFZ, UserGIG, DefaultGIG,
 		LocalDir };
 
 	//! Return the directory associated with a given base as a QString

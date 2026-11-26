@@ -36,7 +36,7 @@
 namespace lmms::PathUtil
 {
 	auto relativeBases = std::array{ Base::ProjectDir, Base::FactoryProjects, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
-		Base::FactoryPresets, Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
+		Base::FactoryPresets, Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserSFZ, Base::UserGIG, Base::DefaultGIG,
 		Base::LocalDir };
 
 	QString baseLocation(const Base base, bool* error /* = nullptr*/)
@@ -70,6 +70,8 @@ namespace lmms::PathUtil
 			case Base::DefaultLADSPA    : loc = ConfigManager::inst()->userLadspaDir(); break;
 			case Base::UserSoundfont    : loc = ConfigManager::inst()->sf2Dir(); break;
 			case Base::DefaultSoundfont : loc = ConfigManager::inst()->userSf2Dir(); break;
+			case Base::UserSFZ          : loc = ConfigManager::inst()->sfzDir(); break;
+			case Base::DefaultSFZ       : loc = ConfigManager::inst()->userSfzDir(); break;
 			case Base::UserGIG          : loc = ConfigManager::inst()->gigDir(); break;
 			case Base::DefaultGIG       : loc = ConfigManager::inst()->userGigDir(); break;
 			case Base::LocalDir:
@@ -116,6 +118,8 @@ namespace lmms::PathUtil
 			case Base::DefaultLADSPA    : return QStringLiteral("defaultladspa:");
 			case Base::UserSoundfont    : return QStringLiteral("usersoundfont:");
 			case Base::DefaultSoundfont : return QStringLiteral("defaultsoundfont:");
+			case Base::UserSFZ          : return QStringLiteral("usersfz:");
+			case Base::DefaultSFZ       : return QStringLiteral("defaultsfz:");
 			case Base::UserGIG          : return QStringLiteral("usergig:");
 			case Base::DefaultGIG       : return QStringLiteral("defaultgig:");
 			case Base::LocalDir         : return QStringLiteral("local:");

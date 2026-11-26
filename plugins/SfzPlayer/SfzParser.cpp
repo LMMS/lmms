@@ -24,6 +24,7 @@
 
 #include "SfzParser.h"
 #include "SfzOpcodeState.h"
+#include "PathUtil.h"
 #include <QStringList>
 #include <QRegularExpression>
 #include <QDebug>
@@ -38,8 +39,8 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 	outputRegions.clear();
 
 	// Open the .sfz file
-	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
-	QFile file(filePath);
+	QDir parentDirectory = QFileInfo(PathUtil::toAbsolute(filePath)).absoluteDir();
+	QFile file(PathUtil::toAbsolute(filePath));
 
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
