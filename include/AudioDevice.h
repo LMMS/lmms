@@ -78,13 +78,13 @@ protected:
 	//! @param[in] src The origin audio buffer
 	//! @param[out] dst The destination audio buffer. As there is no @ref int_sample_t equivalent of @ref SampleFrame,
 	//! this span must be exactly twice the length of @p src, as a @ref SampleFrame contains two @ref sample_t.
-	void toInt16leInterleaved(std::span<const SampleFrame>&& src, std::span<int_sample_t>&& dst);
+	void toInt16leInterleaved(std::span<const SampleFrame> src, std::span<int_sample_t> dst);
 
 	//! @brief Converts a @ref sample_t audio buffer to a @ref int_sample_t buffer.
 	//!
 	//! @param[in] src The origin audio buffer
 	//! @param[out] dst The destination audio buffer.
-	void toInt16(std::span<const sample_t>&& src, std::span<int_sample_t>&& dst);
+	void toInt16(std::span<const sample_t> src, std::span<int_sample_t> dst);
 
 	ch_cnt_t channels() const { return m_channels; }
 

@@ -90,7 +90,7 @@ void AudioDevice::renamePort(AudioBusHandle*)
 {
 }
 
-void AudioDevice::toInt16leInterleaved(std::span<const SampleFrame>&& src, std::span<int_sample_t>&& dst)
+void AudioDevice::toInt16leInterleaved(std::span<const SampleFrame> src, std::span<int_sample_t> dst)
 {
 	// FIXME: SampleFrame is hardcoded stereo (DEFAULT_CHANNELS) so this function cannot fully respect
 	// AudioDevice::m_channels.
@@ -117,7 +117,7 @@ void AudioDevice::toInt16leInterleaved(std::span<const SampleFrame>&& src, std::
 	}
 }
 
-void AudioDevice::toInt16(std::span<const sample_t>&& src, std::span<int_sample_t>&& dst)
+void AudioDevice::toInt16(std::span<const sample_t> src, std::span<int_sample_t> dst)
 {
 	assert(dst.size() == src.size());
 	for (f_cnt_t f = 0; f < src.size(); ++f)
