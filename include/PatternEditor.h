@@ -56,6 +56,8 @@ public:
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
 
+	//! Minimum width which the beat clips in the Pattern Editor can be resized to by changing the width of the track header.
+	//! This is needed because the Pattern Editor does not currently support scrolling or zooming, so if the track header were made too wide, the size of the clips could approach zero.
 	static constexpr int MinPatternWidthPixels = 384;
 
 public slots:
