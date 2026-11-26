@@ -45,6 +45,8 @@ public:
 
 	void modelChanged() override;
 
+signals:
+	void manualChange();
 
 private:
 	LcdSpinBox * m_numerator;

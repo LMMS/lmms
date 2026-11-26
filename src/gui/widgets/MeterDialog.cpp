@@ -93,6 +93,9 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	vlayout->addSpacing( 2 );
 	vlayout->addWidget( den );
 	vlayout->addStretch();
+
+	connect(m_numerator, &LcdSpinBox::manualChange, this, &MeterDialog::manualChange);
+	connect(m_denominator, &LcdSpinBox::manualChange, this, &MeterDialog::manualChange);
 }
 
 
