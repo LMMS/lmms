@@ -41,7 +41,6 @@
 #include "LedCheckBox.h"
 #include "PixmapButton.h"
 #include "SfzPlayer.h"
-#include "SfzSamplePool.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "embed.h"
@@ -171,11 +170,9 @@ void SfzPlayerView::periodicUpdate()
 	if (m_instrument->m_regionManager != nullptr)
 	{
 		m_generalInfoLabel->setText(
-			QString("File: %1\nRegions: %2\nSamples (across all instances): %3 (%4 MB)")
+			QString("File: %1\nRegions: %2")
 				.arg(QFileInfo(m_instrument->m_sfzFilePath).fileName())
 				.arg(m_instrument->m_regionManager->allRegions().size())
-				.arg(SfzSamplePool::instance()->sampleCount())
-				.arg(QString::number(SfzSamplePool::instance()->sampleMemoryUsage() / 1000000.0f, 'g', 4))
 		);
 	}
 }

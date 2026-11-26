@@ -28,6 +28,7 @@
 
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "interpolation.h"
 #include "lmms_math.h"
 #include "MicroTimer.h"
 
@@ -202,6 +203,29 @@ float SfzRegionPlayState::lfoGenerator(const f_cnt_t delay, const f_cnt_t fade, 
 
 
 
+// Helper function for hermite interpolation of the sample buffer data
+float SfzRegionPlayState::interpolatedSample(const float index, const size_t channel) const
+{
+	if (index < 0 || index >= m_sampleObject->size()) { return 0.0f; }
+
+	const f_cnt_t indexFloor = static_cast<f_cnt_t>(index);
+
+	float frac = index - indexFloor;
+
+	f_cnt_t i0 = indexFloor == 0 ? 0 : indexFloor - 1;
+	f_cnt_t i1 = indexFloor;
+	f_cnt_t i2 = std::min(indexFloor + 1, m_sampleObject->size() - 1);
+	f_cnt_t i3 = std::min(indexFloor + 2, m_sampleObject->size() - 1);
+
+	float v0 = m_sampleObject->data()[i0][channel];
+	float v1 = m_sampleObject->data()[i1][channel];
+	float v2 = m_sampleObject->data()[i2][channel];
+	float v3 = m_sampleObject->data()[i3][channel];
+
+	return hermiteInterpolate(v0, v1, v2, v3, frac);
+}
+
+
 
 
 bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
@@ -293,8 +317,8 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 		float sampleRightValue = 0.0f;
 		if (m_sampleObject != nullptr) // TODO: should this check be outside of the loop?
 		{
-			sampleLeftValue = m_sampleObject->at(m_sampleFrame, 0);
-			sampleRightValue = m_sampleObject->at(m_sampleFrame, 1);
+			sampleLeftValue = interpolatedSample(m_sampleFrame, 0);
+			sampleRightValue = interpolatedSample(m_sampleFrame, 1);
 		}
 		else
 		{

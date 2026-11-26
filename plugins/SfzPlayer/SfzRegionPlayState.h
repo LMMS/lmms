@@ -30,9 +30,9 @@
 #include "SfzTrigger.h"
 #include "SfzGlobalState.h"
 #include "SfzOpcodeState.h"
-#include "SfzSampleBuffer.h"
 
 #include "BasicFilters.h"
+#include "SampleBuffer.h"
 
 #include <memory>
 
@@ -71,6 +71,9 @@ public:
 	//! Helper function for calculating the lfo value at the current frame
 	float lfoGenerator(const f_cnt_t delay, const f_cnt_t fade, const float freq) const;
 
+	//! Helper function for doing a hermite interpolation of the sample data using the nearest four data points.
+	//! This allows the sample to be played at higher or lower speeds (pitch bending, etc) by allowing floating point indices, which is more clean than rounding simply rounding the index to the nearest frame.
+	float interpolatedSample(const float index, const size_t channel) const;
 
 private:
 	//! Stores whether this object still represents a sound which exists.
@@ -113,7 +116,7 @@ private:
 	const SfzGlobalState* m_globalState = nullptr;
 
 	//! The sample object of the parent region
-	const SfzSampleBuffer* m_sampleObject = nullptr;
+	const SampleBuffer* m_sampleObject = nullptr;
 };
 
 

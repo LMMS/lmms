@@ -22,10 +22,6 @@ build_plugin(sfzplayer
 	SfzControlsConfig.h
 	SfzTrigger.cpp
 	SfzTrigger.h
-	SfzSampleBuffer.cpp
-	SfzSampleBuffer.h
-	SfzSamplePool.cpp
-	SfzSamplePool.h
 	SfzBasicWaves.cpp
 	SfzBasicWaves.h
 	MOCFILES
@@ -40,8 +36,6 @@ build_plugin(sfzplayer
 	SfzGlobalState.h
 	SfzControlsConfig.h
 	SfzTrigger.h
-	SfzSampleBuffer.h
-	SfzSamplePool.h
 	SfzBasicWaves.h
 	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.svg"
 )
