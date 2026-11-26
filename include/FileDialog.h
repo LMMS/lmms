@@ -32,6 +32,7 @@
 namespace lmms::gui
 {
 
+
 class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
