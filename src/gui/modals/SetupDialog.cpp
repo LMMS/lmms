@@ -112,6 +112,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "trackdeletionwarning", "1").toInt()),
 	m_mixerChannelDeletionWarning(ConfigManager::inst()->value(
 			"ui", "mixerchanneldeletionwarning", "1").toInt()),
+	m_autoAssignMixerChannel(ConfigManager::inst()->value(
+			"app", "autoassignmixerchannel", "0").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
@@ -256,6 +258,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
 	addCheckBox(tr("Show warning when deleting a mixer channel that is in use"), guiGroupBox, guiGroupLayout,
 		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
+	addCheckBox(tr("Assign new tracks to a new mixer channel"), guiGroupBox, guiGroupLayout,
+		m_autoAssignMixerChannel, SLOT(toggleAutoAssignMixerChannel(bool)), false);
 
 	m_detachBehaviorComboBox = new QComboBox{guiGroupBox};
 
@@ -985,6 +989,8 @@ void SetupDialog::accept()
 					QString::number(m_trackDeletionWarning));
 	ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning",
 					QString::number(m_mixerChannelDeletionWarning));
+	ConfigManager::inst()->setValue("app", "autoassignmixerchannel",
+					QString::number(m_autoAssignMixerChannel));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
@@ -1111,6 +1117,11 @@ void SetupDialog::toggleTrackDeletionWarning(bool enabled)
 void SetupDialog::toggleMixerChannelDeletionWarning(bool enabled)
 {
 	m_mixerChannelDeletionWarning = enabled;
+}
+
+void SetupDialog::toggleAutoAssignMixerChannel(bool enabled)
+{
+	m_autoAssignMixerChannel = enabled;
 }
 
 

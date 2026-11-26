@@ -169,6 +169,10 @@ MixerView::MixerView(Mixer* mixer) :
 	const bool autoAssign = ConfigManager::inst()->value("app", "autoassignmixerchannel", "0").toInt();
 	autoAssignBtn->setChecked(autoAssign);
 	updateAutoAssignToolTip(autoAssign);
+	connect(ConfigManager::inst(), &ConfigManager::valueChanged, autoAssignBtn,
+		[autoAssignBtn](const QString& cls, const QString& attribute, const QString& value) {
+			if (cls == "app" && attribute == "autoassignmixerchannel") { autoAssignBtn->setChecked(value.toInt()); }
+		});
 
 	auto newChannelLayout = new QVBoxLayout;
 	newChannelLayout->setContentsMargins(0, 0, 0, 0);
