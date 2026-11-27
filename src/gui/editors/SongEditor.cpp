@@ -140,6 +140,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
 	m_tempoSpinBox->setLabel( tr( "TEMPO" ) );
 	m_tempoSpinBox->setToolTip(tr("Tempo in BPM"));
+	connect(m_tempoSpinBox, &LcdSpinBox::manualChange, m_song, qOverload<>(&Song::setModified));
 
 	int tempoSpinBoxCol = getGUI()->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
@@ -149,6 +150,8 @@ SongEditor::SongEditor( Song * song ) :
 
 	m_timeSigDisplay = new MeterDialog( this, true );
 	m_timeSigDisplay->setModel( &m_song->m_timeSigModel );
+	connect(m_timeSigDisplay, &MeterDialog::manualChange, m_song, qOverload<>(&Song::setModified));
+
 	getGUI()->mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
 
 	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
@@ -174,6 +177,7 @@ SongEditor::SongEditor( Song * song ) :
 			SLOT(updateMasterVolumeFloat(int)));
 	connect( m_masterVolumeSlider, SIGNAL(sliderReleased()), this,
 			SLOT(hideMasterVolumeFloat()));
+	connect(m_masterVolumeSlider, &QSlider::sliderMoved, m_song, qOverload<>(&Song::setModified));
 
 	m_mvsStatus = new TextFloat;
 	m_mvsStatus->setTitle(tr("Master volume"));
@@ -205,6 +209,7 @@ SongEditor::SongEditor( Song * song ) :
 			SLOT(updateMasterPitchFloat(int)));
 	connect( m_masterPitchSlider, SIGNAL(sliderReleased()), this,
 			SLOT(hideMasterPitchFloat()));
+	connect(m_masterPitchSlider, &QSlider::sliderMoved, m_song, qOverload<>(&Song::setModified));
 
 	m_mpsStatus = new TextFloat;
 	m_mpsStatus->setTitle( tr( "Global transposition" ) );
