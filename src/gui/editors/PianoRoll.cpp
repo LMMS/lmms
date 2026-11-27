@@ -5812,7 +5812,7 @@ void PianoRollWindow::exportMidiClip()
 void PianoRollWindow::importMidiClip()
 {
 	// Overwrite confirmation.
-	if (!m_editor->m_midiClip->empty() &&
+	if (!m_editor->m_midiClip->isEmpty() &&
 		QMessageBox::warning(
 			nullptr,
 			tr("Import clip."),
