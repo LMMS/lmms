@@ -207,9 +207,14 @@ public:
 		return m_workingDir + "recover.mmp";
 	}
 
-	inline const QStringList & recentlyOpenedProjects() const
+	inline const QStringList& recentlyOpenedProjects() const
 	{
 		return m_recentlyOpenedProjects;
+	}
+
+	inline const QStringList& recentlyOpenedDirectories() const
+	{
+		return m_recentlyOpenedDirectories;
 	}
 
 	const QStringList& favoriteItems() { return m_favoriteItems; }
@@ -238,7 +243,8 @@ public:
 	// Returns true if the working dir (e.g. ~/lmms) exists on disk.
 	bool hasWorkingDir() const;
 
-	void addRecentlyOpenedProject(const QString & _file);
+	void addRecentlyOpenedProject(const QString& file);
+	void addRecentlyOpenedDirectory(const QString& dir);
 
 	void addFavoriteItem(const QString& item);
 	void removeFavoriteItem(const QString& item);
@@ -304,6 +310,7 @@ private:
 	QString m_version;
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
+	QStringList m_recentlyOpenedDirectories;
 	QStringList m_favoriteItems;
 
 	using stringPairVector = std::vector<QPair<QString, QString>>;
