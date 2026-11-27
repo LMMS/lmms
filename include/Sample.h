@@ -46,7 +46,7 @@ public:
 	class LMMS_EXPORT PlaybackState
 	{
 	public:
-		PlaybackState(AudioResampler::Mode interpolationMode = AudioResampler::Mode::Linear, int frameIndex = 0)
+		PlaybackState(int interpolationMode = SRC_LINEAR, int frameIndex = 0)
 			: m_resampler(interpolationMode)
 			, m_frameIndex(frameIndex)
 		{
@@ -59,9 +59,7 @@ public:
 		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
-		AudioResampler m_resampler;
-		std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_buffer;
-		std::span<SampleFrame> m_bufferView;
+		AudioResampler<2> m_resampler;
 		int m_frameIndex = 0;
 		bool m_backwards = false;
 		friend class Sample;

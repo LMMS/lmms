@@ -134,7 +134,7 @@ struct Sf2PluginData
 
 Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument(_instrument_track, &sf2player_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
-	m_resampler(AudioResampler::Mode::Linear),
+	m_resampler(SRC_LINEAR),
 	m_synth(nullptr),
 	m_font( nullptr ),
 	m_fontId( 0 ),
@@ -574,7 +574,6 @@ void Sf2Instrument::reloadSynth()
 	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate", &tempRate );
 
 	m_internalSampleRate = static_cast<int>( tempRate );
-	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
 
 	if( m_font )
 	{
@@ -858,34 +857,12 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
-	if (m_internalSampleRate == Engine::audioEngine()->outputSampleRate()) {
-		fluid_synth_write_float(m_synth, frames, buf, 0, 2, buf, 1, 2);
-		return;
-	}
-
-	// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work with
-	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
-	while (frames > 0)
-	{
-		if (m_bufferView.empty())
-		{
-			fluid_synth_write_float(m_synth, m_buffer.size(), m_buffer.data(), 0, 2, m_buffer.data(), 1, 2);
-			m_bufferView = m_buffer;
-		}
-
-		const auto [inputFramesUsed, outputFramesGenerated]
-			= m_resampler.process({&m_bufferView.data()[0][0], 2, m_bufferView.size()}, {&buf[0][0], 2, frames});
-
-		if (inputFramesUsed == 0 && outputFramesGenerated == 0)
-		{
-			std::fill_n(buf, frames, SampleFrame{});
-			break;
-		}
-
-		m_bufferView = m_bufferView.subspan(inputFramesUsed);
-		buf += outputFramesGenerated;
-		frames -= outputFramesGenerated;
-	}
+	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
+	m_resampler.setOutputBuffer({buf, frames});
+	m_resampler.processUntilDone([&](auto output) {
+		fluid_synth_write_float(m_synth, output.frames(), output.data(), 0, 2, output.data(), 1, 2);
+		return output.frames();
+	});
 }
 
 

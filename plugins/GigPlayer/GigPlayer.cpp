@@ -442,48 +442,28 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
 
+			std::array<SampleFrame, MAXIMUM_BUFFER_SIZE> outputBuffer;
+
 			sample.m_resampler.setRatio(freq_factor);
+			sample.m_resampler.setOutputBuffer({outputBuffer.data(), frames});
+			sample.m_resampler.processUntilDone([&](InterleavedBufferView<float, 2> output) {
+				loadSample(sample, output.asSampleFrames().data(), output.frames());
 
-			// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work
-			// with audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
-			auto framesMixed = f_cnt_t{0};
-			while (framesMixed < frames)
+				for (auto* frame : output.framesView())
+				{
+					const auto value = copy.value();
+					frame[0] *= value;
+					frame[1] *= value;
+				}
+
+				sample.pos += output.frames();
+				sample.adsr.inc(output.frames());
+				return output.frames();
+			});
+
+			for (f_cnt_t i = 0; i < frames; ++i)
 			{
-				if (sample.m_sourceBufferView.empty())
-				{
-					loadSample(sample, sample.m_sourceBuffer.data(), sample.m_sourceBuffer.size());
-
-					for (auto& frame : sample.m_sourceBuffer)
-					{
-						frame *= copy.value();
-					}
-
-					sample.pos += sample.m_sourceBuffer.size();
-					sample.adsr.inc(sample.m_sourceBuffer.size());
-					sample.m_sourceBufferView = sample.m_sourceBuffer;
-				}
-
-				if (sample.m_mixBufferView.empty()) { sample.m_mixBufferView = sample.m_mixBuffer; }
-
-				const auto [inputFramesUsed, outputFramesGenerated] = sample.m_resampler.process(
-					{&sample.m_sourceBufferView.data()[0][0], 2, sample.m_sourceBufferView.size()},
-					{&sample.m_mixBufferView.data()[0][0], 2, sample.m_mixBufferView.size()});
-
-				if (inputFramesUsed == 0 && outputFramesGenerated == 0)
-				{
-					std::fill_n(&_working_buffer[framesMixed], frames - framesMixed, SampleFrame{});
-					break;
-				}
-
-				const auto framesToMix = std::min(outputFramesGenerated, frames - framesMixed);
-				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
-				{
-					_working_buffer[framesMixed + i] += sample.m_mixBufferView[i];
-				}
-
-				sample.m_sourceBufferView = sample.m_sourceBufferView.subspan(inputFramesUsed);
-				sample.m_mixBufferView = sample.m_mixBufferView.subspan(framesToMix);
-				framesMixed += framesToMix;
+				_working_buffer[i] += outputBuffer[i];
 			}
 		}
 	}
@@ -763,7 +743,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 					attenuation *= pDimRegion->SampleAttenuation;
 				}
 
-				gignote.samples.emplace_back(pSample, pDimRegion, attenuation, AudioResampler::Mode::Linear, gignote.frequency);
+				gignote.samples.emplace_back(pSample, pDimRegion, attenuation, SRC_LINEAR, gignote.frequency);
 			}
 		}
 
@@ -1085,8 +1065,8 @@ void GigInstrumentView::showPatchDialog()
 
 
 // Store information related to playing a sample from the GIG file
-GigSample::GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation,
-	AudioResampler::Mode interpolation, float desiredFreq)
+GigSample::GigSample(
+	gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation, int interpolation, float desiredFreq)
 	: sample(pSample)
 	, region(pDimRegion)
 	, attenuation(attenuation)
@@ -1119,7 +1099,7 @@ GigSample::GigSample(const GigSample& g)
 	, attenuation(g.attenuation)
 	, adsr(g.adsr)
 	, pos(g.pos)
-	, m_resampler(AudioResampler::Mode::Linear, DEFAULT_CHANNELS)
+	, m_resampler(SRC_LINEAR)
 	, sampleFreq(g.sampleFreq)
 	, freqFactor(g.freqFactor)
 {

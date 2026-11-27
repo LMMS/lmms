@@ -101,36 +101,16 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	if (!m_buffer || m_buffer->empty()) { return false; }
 
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
+	state->m_resampler.setOutputBuffer(InterleavedBufferView<float, 2>{dst, numFrames});
 
-	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
+	const auto sampleRateRatio
+		= static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
 	const auto freqRatio = frequency() / DefaultBaseFreq;
 	state->m_resampler.setRatio(sampleRateRatio * freqRatio * ratio);
 
-	// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work with
-	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
-	while (numFrames > 0)
-	{
-		if (state->m_bufferView.empty())
-		{
-			const auto rendered = render(state->m_buffer.data(), state->m_buffer.size(), state, loop);
-			state->m_bufferView = {state->m_buffer.data(), rendered};
-		}
- 
-		const auto [inputFramesUsed, outputFramesGenerated] = state->m_resampler.process(
-			{&state->m_bufferView.data()[0][0], 2, state->m_bufferView.size()}, {&dst[0][0], 2, numFrames});
-
-		if (inputFramesUsed == 0 && outputFramesGenerated == 0)
-		{
-			std::fill_n(dst, numFrames, SampleFrame{});
-			break;
-		}
-
-		state->m_bufferView = state->m_bufferView.subspan(inputFramesUsed);
-		dst += outputFramesGenerated;
-		numFrames -= outputFramesGenerated;
-	}
-
-	return numFrames < Engine::audioEngine()->framesPerPeriod();
+	return state->m_resampler.processUntilDone([this, &state, &loop](auto output) {
+		return render(output.asSampleFrames().data(), output.frames(), state, loop);
+	}) > 0;
 }
 
 f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loop loop) const

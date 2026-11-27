@@ -131,18 +131,19 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 			m_nextPlayStartPoint = m_sample.startFrame();
 			m_nextPlayBackwards = false;
 		}
+
 		// set interpolation mode for libsamplerate
-		auto interpolationMode = AudioResampler::Mode::Linear;
-		switch( m_interpolationModel.value() )
+		auto interpolationMode = SRC_LINEAR;
+		switch (m_interpolationModel.value())
 		{
 			case 0:
-				interpolationMode = AudioResampler::Mode::ZOH;
+				interpolationMode = SRC_ZERO_ORDER_HOLD;
 				break;
 			case 1:
-				interpolationMode = AudioResampler::Mode::Linear;
+				interpolationMode = SRC_LINEAR;
 				break;
 			case 2:
-				interpolationMode = AudioResampler::Mode::SincMedium;
+				interpolationMode = SRC_SINC_MEDIUM_QUALITY;
 				break;
 		}
 

@@ -407,7 +407,7 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 	auto hdata = new handle_data;
 	hdata->tuned = m_tunedModel.value();
 	hdata->sample = sample ? sample : std::make_shared<Sample>();
-	hdata->state = new Sample::PlaybackState(AudioResampler::Mode::Linear);
+	hdata->state = new Sample::PlaybackState(SRC_LINEAR);
 
 	_n->m_pluginData = hdata;
 }

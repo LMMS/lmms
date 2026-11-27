@@ -25,102 +25,191 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
-#include <memory>
+#ifdef LMMS_DEBUG
+#include <iostream>
+#endif
+
+#include <samplerate.h>
+
 #include "AudioBufferView.h"
+#include "AudioEngine.h"
 #include "lmms_export.h"
 
 namespace lmms {
 
-/**
- * @class AudioResampler
- * @brief A utility class for resampling interleaved audio buffers using various resampling algorithms.
- *
- * This class provides support for zero-order hold, linear, and several levels of sinc-based resampling.
- */
+template <ch_cnt_t Channels>
 class LMMS_EXPORT AudioResampler
 {
 public:
 	/**
-	 * @enum Mode
-	 * @brief Defines the resampling method to use.
+	 * @brief Construct a resampler with the given @a converter.
+	 * @param converter The kind of converter (SRC_LINER, SRC_SINC_MEDIUM, etc)
 	 */
-	enum class Mode
+	explicit AudioResampler(int converter)
+		: m_state{src_new(converter, Channels, &m_error)}
 	{
-		ZOH,		 //!< Zero Order Hold (nearest-neighbor) interpolation.
-		Linear,		 //!< Linear interpolation.
-		SincFastest, //!< Fastest sinc-based resampling.
-		SincMedium,	 //!< Medium quality sinc-based resampling.
-		SincBest	 //!< Highest quality sinc-based resampling.
-	};
+		if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
+	}
 
 	/**
-	 * @struct Result
-	 * @brief Result of a resampling operation.
+	 * @brief Deletes the internal state for the resampler and destroys the object.
 	 */
-	struct Result
+	~AudioResampler() { src_delete(m_state); }
+
+	/**
+	 * @brief Process audio through the resampler.
+	 * If an error occurs, the function returns 0.
+	 *
+	 * @return f_cnt_t The number of output frames generated.
+	 */
+	auto process() -> f_cnt_t
 	{
-		f_cnt_t inputFramesUsed;	   //!< The number of input frames used during processing.
-		f_cnt_t outputFramesGenerated; //!< The number of output frames generated during processing.
-	};
+		if (const auto error = src_process(m_state, &m_data))
+		{
+#ifdef LMMS_DEBUG
+			std::cerr << "[AudioResampler::process]: " << src_strerror(error) << '\n';
+#endif
+			return 0;
+		}
+
+		m_data.data_in += m_data.input_frames_used * Channels;
+		m_data.input_frames -= m_data.input_frames_used;
+
+		m_data.data_out += m_data.output_frames_gen * Channels;
+		m_data.output_frames -= m_data.output_frames_gen;
+
+		return m_data.output_frames_gen;
+	}
 
 	/**
-	 * @brief Constructs an `AudioResampler` instance.
-	 * @param mode The resampling mode to use.
-	 * @param channels Number of audio channels. Defaults to `2` (stereo).
-	 */
-	AudioResampler(Mode mode, ch_cnt_t channels = 2);
-
-	/**
-	 * @brief Process a block of interleaved audio input from `input` and resample it into `output`.
+	 * @brief Input callback variant of process()
 	 *
-	 * @param input The interleaved audio input.
-	 * @param output The interleaved audio output.
+	 * @tparam InputCallback The input callback used to refill the resampler with input data.
+	 * @see process()
 	 *
-	 * @throws `std::invalid_argument` if a channel mismatch has been detected.
-	 * @throws `std::runtime_error` if the resampling process has failed.
-	 *
-	 * @remark This utility class does not cache the input and output buffers, making it stateless. In other words,
-	 * `input` is directly resampled into the `output`.
-	 *
-	 * @returns the result of the resampling process. See @ref Result for more details.
+	 * @return f_cnt_t The number of output frames generated.
 	 */
-	[[nodiscard]] auto process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output) -> Result;
+	template <typename InputCallback>
+		requires(std::is_invocable_r_v<f_cnt_t, InputCallback, InterleavedBufferView<float, Channels>>)
+	auto process(InputCallback&& callback) -> f_cnt_t
+	{
+		if (!m_data.end_of_input && m_data.input_frames == 0)
+		{
+			const auto view = InterleavedBufferView<float, Channels>{m_buffer.data(), m_buffer.size() / Channels};
+			const auto frames = callback(view);
+			m_data.data_in = view.data();
+			m_data.input_frames = frames;
+		}
+
+		return process();
+	}
 
 	/**
-	 * @brief Resets the internal resampler state.
-	 * Useful when working with unreleated pieces of audio.
+	 * @brief Input callback variant of processUntilDone()
+	 *
+	 * @tparam InputCallback The input callback used to refill the resampler with input data.
+	 * @see processUntilDone()
 	 */
-	void reset();
+	template <typename InputCallback>
+		requires(std::is_invocable_r_v<f_cnt_t, InputCallback, InterleavedBufferView<float, Channels>>)
+	auto processUntilDone(InputCallback&& callback) -> f_cnt_t
+	{
+		auto outputFrames = 0;
+
+		do
+		{
+			outputFrames += process(std::forward<InputCallback>(callback));
+		} while (!done());
+
+		return outputFrames;
+	}
 
 	/**
-	 * @brief Sets the resampling ratio to `ratio`.
-	 * @param ratio Output sample rate divided by input sample rate.
+	 * @brief Processes audio through the resampler until it is done.
+	 *
+	 * @returns The total number of output frames generated.
+	 * @see done()
 	 */
-	void setRatio(double ratio) { m_ratio = ratio; }
+	auto processUntilDone() -> f_cnt_t
+	{
+		auto outputFrames = 0;
+
+		do
+		{
+			outputFrames += process();
+		} while (!done());
+
+		return outputFrames;
+	}
 
 	/**
-	 * @brief Sets the resampling ratio to `output / input`.
-	 * @param input Input sample rate.
-	 * @param output Output sample rate.
+	 * @brief Checks if the resampler is done.
+	 * This is based on if the last call to process() has used up and outputted any data.
+	 *
+	 * @returns true if the resampler has not used up and outputted any data.
+	 * @returns false otherwise.
 	 */
-	void setRatio(sample_rate_t input, sample_rate_t output) { m_ratio = static_cast<double>(output) / input; }
+	bool done() const { return m_data.input_frames_used == 0 && m_data.output_frames_gen == 0; }
 
-	//! @returns the resampling ratio.
-	auto ratio() const -> double { return m_ratio; }
+	/**
+	 * @brief Resets the internal state of the resampler. Should be used when working on separate, unrelated pieces of
+	 * audio.
+	 */
+	void reset()
+	{
+		if (const auto error = src_reset(m_state))
+		{
+#ifdef LMMS_DEBUG
+			std::cerr << "[AudioResampler::reset]: " << src_strerror(error) << '\n';
+#endif
+		}
+	}
 
-	//! @returns the number of channels expected by the resampler.
-	auto channels() const -> ch_cnt_t { return m_channels; }
+	/**
+	 * @brief Sets the input buffer for the resampler.
+	 * If @a final is set to @c true, future calls to this function will be ignored.
+	 *
+	 * @param input The input buffer.
+	 * @param final @c true if @a input is the last input buffer to be processed by the resampler, @c false otherwise.
+	 */
+	void setInputBuffer(InterleavedBufferView<const float, Channels> input, bool final = true)
+	{
+		if (m_data.end_of_input) { return; }
 
-	//! @returns the interpolation mode used by this resampler.
-	auto mode() const -> Mode { return m_mode; }
+		assert(m_data.input_frames == 0 && "input still available, risk of dropped input data");
+		m_data.data_in = input.data();
+		m_data.input_frames = input.frames();
+		m_data.end_of_input = final;
+	}
+
+	/**
+	 * @brief Sets the output buffer for the resampler.
+	 * @param output The output buffer.
+	 */
+	void setOutputBuffer(InterleavedBufferView<float, Channels> output)
+	{
+		m_data.data_out = output.data();
+		m_data.output_frames = output.frames();
+	}
+
+	/**
+	 * @brief Sets the resampling ratio to @a ratio.
+	 * @param ratio The resampling ratio.
+	 */
+	void setRatio(double ratio) { m_data.src_ratio = ratio; }
+
+	/**
+	 * @brief Set the resampling ratio to @a output / @a input.
+	 * @param input The input sample rate.
+	 * @param output The output sample rate.
+	 */
+	void setRatio(sample_rate_t input, sample_rate_t output) { m_data.src_ratio = static_cast<double>(output) / input; }
 
 private:
-	struct LMMS_EXPORT StateDeleter { void operator()(void* state); };
-	std::unique_ptr<void, StateDeleter> m_state;
-	Mode m_mode;
-	ch_cnt_t m_channels = 0;
-	double m_ratio = 1.0;
-	int m_error = 0;
+	SRC_STATE* m_state{};
+	SRC_DATA m_data{};
+	std::array<float, DEFAULT_BUFFER_SIZE * Channels> m_buffer;
+	int m_error{};
 };
 
 } // namespace lmms

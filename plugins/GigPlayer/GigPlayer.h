@@ -149,8 +149,8 @@ public:
 class GigSample
 {
 public:
-	GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation,
-		AudioResampler::Mode interpolation, float desiredFreq);
+	GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation, int interpolation,
+		float desiredFreq);
 	~GigSample() = default;
 
 	// Needed when initially creating in QList
@@ -171,11 +171,7 @@ public:
 	bool pitchtrack;
 
 	// Used to convert sample rates
-	AudioResampler m_resampler;
-	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_sourceBuffer;
-	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_mixBuffer;
-	std::span<SampleFrame> m_sourceBufferView;
-	std::span<SampleFrame> m_mixBufferView;
+	AudioResampler<2> m_resampler;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;
