@@ -1,6 +1,7 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
 
+	core/AssetMap.cpp
 	core/AudioBuffer.cpp
 	core/AudioBusHandle.cpp
 	core/AudioEngine.cpp
