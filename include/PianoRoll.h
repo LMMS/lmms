@@ -595,6 +595,7 @@ public:
 
 	QSize sizeHint() const override;
 	bool hasFocus() const;
+	bool hasValidMidiClip();
 
 signals:
 	void currentMidiClipChanged();
