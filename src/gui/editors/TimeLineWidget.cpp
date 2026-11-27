@@ -83,31 +83,31 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {
 	auto autoScroll = new NStateButton(_tool_bar);
 	autoScroll->setGeneralToolTip(tr("Auto scrolling"));
-	autoScroll->addState(embed::getIconPixmap("autoscroll_stepped_on"), tr("Stepped auto scrolling"));
-	autoScroll->addState(embed::getIconPixmap("autoscroll_continuous_on"), tr("Continuous auto scrolling"));
-	autoScroll->addState(embed::getIconPixmap("autoscroll_off"), tr("Auto scrolling disabled"));
+	autoScroll->addState("auto-scrolling-stepped", tr("Stepped auto scrolling"));
+	autoScroll->addState("auto-scrolling-continuous", tr("Continuous auto scrolling"));
+	autoScroll->addState("auto-scrolling-off", tr("Auto scrolling disabled"));
 	autoScroll->changeState(static_cast<int>(m_autoScroll));
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
 
 	auto loopPoints = new NStateButton(_tool_bar);
 	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
-	loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
-	loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
+	loopPoints->addState("loop-points-off");
+	loopPoints->addState("loop-points-on");
 	connect(loopPoints, &NStateButton::changedState, m_timeline, &Timeline::setLoopEnabled);
 	connect(m_timeline, &Timeline::loopEnabledChanged, loopPoints, &NStateButton::changeState);
 	connect(m_timeline, &Timeline::loopEnabledChanged, this, static_cast<void (QWidget::*)()>(&QWidget::update));
 	loopPoints->changeState(static_cast<int>(m_timeline->loopEnabled()));
 
 	auto behaviourAtStop = new NStateButton(_tool_bar);
-	behaviourAtStop->addState( embed::getIconPixmap( "back_to_zero" ),
+	behaviourAtStop->addState("back-to-zero",
 					tr( "After stopping go back to beginning" )
 									);
-	behaviourAtStop->addState( embed::getIconPixmap( "back_to_start" ),
+	behaviourAtStop->addState("back-to-start",
 					tr( "After stopping go back to "
 						"position at which playing was "
 						"started" ) );
-	behaviourAtStop->addState( embed::getIconPixmap( "keep_stop_position" ),
+	behaviourAtStop->addState("keep-stop-position",
 					tr( "After stopping keep position" ) );
 	connect(behaviourAtStop, &NStateButton::changedState, m_timeline,
 		[timeline = m_timeline](int value) {
@@ -212,15 +212,15 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	}
 
 	const QPixmap& marker = !m_isRecording ? m_posMarkerPixmap : m_recordingPosMarkerPixmap;
-
+	auto dims = embed::logicalSize(marker);
 	// Only draw the position marker if the position line is in view
-	if (m_isPlayheadVisible && markerX(m_timeline->pos()) >= m_xOffset && markerX(m_timeline->pos()) < width() - marker.width() / 2)
+	if (m_isPlayheadVisible && markerX(m_timeline->pos()) >= m_xOffset && markerX(m_timeline->pos()) < width() - dims.width() / 2)
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
 		p.setOpacity(0.6);
-		p.drawPixmap(markerX(m_timeline->pos()) - (marker.width() / 2),
-			height() - marker.height(), marker);
+		p.drawPixmap(markerX(m_timeline->pos()) - (dims.width() / 2),
+			height() - dims.height(), marker);
 	}
 }
 

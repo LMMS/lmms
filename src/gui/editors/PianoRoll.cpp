@@ -5871,14 +5871,7 @@ void PianoRollWindow::stopStepRecording()
 
 void PianoRollWindow::updateStepRecordingIcon()
 {
-	if(m_editor->isStepRecording())
-	{
-		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_on"));
-	}
-	else
-	{
-		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_off"));
-	}
+	m_toggleStepRecordingAction->setChecked(m_editor->isStepRecording());
 }
 
 

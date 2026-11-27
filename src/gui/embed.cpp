@@ -141,4 +141,11 @@ auto getText(std::string_view name) -> QString
 	return QString::fromUtf8(data);
 }
 
+auto createEmptyPixmap() -> QPixmap
+{
+	QPixmap emptyPixmap(1, 1);
+	emptyPixmap.fill(Qt::transparent);
+	return emptyPixmap;
+}
+
 } // namespace lmms::embed

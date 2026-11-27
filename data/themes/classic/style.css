@@ -349,6 +349,146 @@ lmms--gui--TrackContainerView QFrame{
 lmms--gui--TrackView > QWidget {
 	background-color: #5b6571;
 }
+QToolButton#add-automation-track {
+	image: url("resources:add_automation.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#add-pattern-track {
+	image: url("resources:add_pattern_track.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#add-sample-track {
+	image: url("resources:add_sample_track.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#draw-mode {
+	image: url("resources:edit_draw.png");
+    width: 16;
+    height: 16;
+    padding: 6;
+	border-left: 1px solid #00000000;
+	border-right: 1px solid #00000000;
+
+}
+
+QToolButton#select-mode {
+	image: url("resources:edit_select.png");
+    width: 16;
+    height: 16;
+    padding: 6;
+	border-left: 1px solid #00000000;
+	border-right: 1px solid #00000000;
+}
+
+QToolButton#knife-mode {
+	image: url("resources:edit_knife.png");
+    width: 16;
+    height: 16;
+    padding: 6;
+	border-left: 1px solid #00000000;
+	border-right: 1px solid #00000000;
+}
+
+QToolButton#draw-mode:checked,
+QToolButton#knife-mode:checked,
+QToolButton#select-mode:checked {
+	border-top: 1px solid #1b1f22;
+	border-bottom: 1px solid #4a515e;
+	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3,
+					stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
+    padding: 6px;
+	color: black;
+}
+
+QToolButton#set-proportional-snap {
+	image: url("resources:proportional_snap.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#playButton:checked {
+	image: url("resources:pause.png");
+}
+
+QToolButton#stopButton {
+	image: url("resources:stop.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#recordButton {
+	image: url("resources:record.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#recordAccompanyButton {
+	image: url("resources:record_accompany.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#stepRecordButton {
+	image: url("resources:record_step_off.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#stepRecordButton:checked {
+	image: url("resources:record_step_on.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#auto-scrolling-stepped {
+	image: url("resources:autoscroll_stepped_on.png");
+    width: 24;
+    height: 24;
+}
+QToolButton#auto-scrolling-continuous {
+	image: url("resources:autoscroll_continuous_on.png");
+    width: 24;
+    height: 24;
+}
+QToolButton#auto-scrolling-off {
+	image: url("resources:autoscroll_off.png");
+    width: 24;
+    height: 24;
+}
+QToolButton#loop-points-on {
+	image: url("resources:loop_points_on.png");
+    width: 24;
+    height: 24;
+}
+QToolButton#loop-points-off {
+	image: url("resources:loop_points_off.png");
+    width: 24;
+    height: 24;
+}
+QToolButton#back-to-zero {
+	image: url("resources:back_to_zero.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#back-to-start {
+	image: url("resources:back_to_start.png");
+    width: 24;
+    height: 24;
+}
+
+QToolButton#keep-stop-position {
+	image: url("resources:keep_stop_position.png");
+    width: 24;
+    height: 24;
+}
+
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
@@ -594,6 +734,7 @@ QToolBar::separator {
 /* separate corner rounding for play and stop buttons! */
 
 QToolButton#playButton {
+	image: url("resources:play.png");
 	border-top-left-radius: 10px 10px;
 	border-bottom-left-radius: 10px 10px;
 }
@@ -607,7 +748,7 @@ QToolButton#stopButton {
 
 /* all tool buttons */
 
-QToolButton, QToolButton::menu-button {
+QToolButton, QToolButton::menu-button, QToolButton#playButton:checked, QToolButton#stepRecordButton:checked {
 	padding: 1px 1px 1px 1px;
 	border-radius: 5px;
 	border: 1px solid rgba(63, 63, 63, 128);
@@ -616,7 +757,7 @@ QToolButton, QToolButton::menu-button {
 	color: black;
 }
 
-QToolButton:hover {
+QToolButton:hover, QToolButton#playButton:hover:checked, QToolButton#stepRecordButton:hover:checked {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #c0cdd3, stop:1 #71797d);
 	color: white;
 }

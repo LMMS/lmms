@@ -29,6 +29,7 @@
 
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
+#include "LmmsStyle.h"
 #include "MainWindow.h"
 #include "Song.h"
 #include "embed.h"
@@ -40,10 +41,7 @@ namespace lmms::gui
 void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
-	if (displayPauseIcon)
-		m_playAction->setIcon(embed::getIconPixmap("pause"));
-	else
-		m_playAction->setIcon(embed::getIconPixmap("play"));
+	m_playAction->setChecked(displayPauseIcon);
 }
 
 DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)
@@ -105,12 +103,14 @@ Editor::Editor(bool record, bool stepRecord) :
 	};
 
 	// Set up play and record actions
-	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
-	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
+	m_playAction = new QAction(embed::createEmptyPixmap(), tr("Play (Space)"), this);
+	m_stopAction = new QAction(embed::createEmptyPixmap(), tr("Stop (Space)"), this);
 
-	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
-	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
-	m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
+	m_recordAction = new QAction(embed::createEmptyPixmap(), tr("Record"), this);
+	m_recordAccompanyAction = new QAction(embed::createEmptyPixmap(), tr("Record while playing"), this);
+	m_toggleStepRecordingAction = new QAction(embed::createEmptyPixmap(), tr("Toggle Step Recording"), this);
+	m_toggleStepRecordingAction->setCheckable(true);
+	m_toggleStepRecordingAction->setChecked(false);
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
@@ -122,6 +122,8 @@ Editor::Editor(bool record, bool stepRecord) :
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
+	m_playButton = m_toolBar->widgetForAction(m_playAction);
+
 	if (record)
 	{
 		addButton(m_recordAction, "recordButton");

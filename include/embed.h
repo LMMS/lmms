@@ -55,6 +55,9 @@ auto LMMS_EXPORT getIconPixmap(
 
 auto LMMS_EXPORT getText(std::string_view name) -> QString;
 
+//! @brief Some Qt features like QToolBar want an icon, but we want to defer it to a stylesheet. Feed them this.
+auto LMMS_EXPORT createEmptyPixmap() -> QPixmap;
+
 //! @brief Temporary shim for QPixmap::deviceIndependentSize.
 //! @param pixmap The pixmap to get the size of.
 //! @return The device-independent size of the pixmap.

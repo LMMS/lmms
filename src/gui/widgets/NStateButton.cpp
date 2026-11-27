@@ -21,12 +21,12 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
-
-#include <QMouseEvent>
 
 #include "NStateButton.h"
 
+#include <QMouseEvent>
+
+#include "LmmsStyle.h"
 
 namespace lmms::gui
 {
@@ -53,7 +53,7 @@ NStateButton::~NStateButton()
 
 
 
-void NStateButton::addState( const QPixmap & _pm, const QString & _tooltip )
+void NStateButton::addState(const QString& _pm, const QString& _tooltip)
 {
 	m_states.push_back( qMakePair( _pm, _tooltip ) );
 	// first inserted pixmap?
@@ -73,9 +73,12 @@ void NStateButton::changeState(int state)
 	{
 		m_curState = state;
 
-		const auto& [icon, tooltip] = m_states[m_curState];
+		const auto& [objName, tooltip] = m_states[m_curState];
 		setToolTip(tooltip.isEmpty() ? m_generalToolTip : tooltip);
-		setIcon(icon);
+		setObjectName(objName);
+		style()->unpolish(this);
+		style()->polish(this);
+		update();
 
 		emit changedState(m_curState);
 	}
