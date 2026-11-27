@@ -5173,8 +5173,9 @@ PianoRollWindow::PianoRollWindow() :
 	setCentralWidget( m_editor );
 
 	m_playAction->setToolTip(tr( "Play/pause current clip (Space)" ) );
-	m_recordAction->setToolTip(tr( "Record notes from MIDI-device/channel-piano" ) );
-	m_recordAccompanyAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano while playing song or pattern track" ) );
+	m_recordAction->setToolTip(tr("Record notes from MIDI-device/channel-piano (Ctrl+Space)"));
+	m_recordAccompanyAction->setToolTip(
+		tr("Record notes from MIDI-device/channel-piano while playing song or pattern track (Ctrl+Shift+Space)"));
 	m_toggleStepRecordingAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano, one step at the time" ) );
 	m_stopAction->setToolTip( tr( "Stop playing of current clip (Space)" ) );
 
@@ -5193,6 +5194,9 @@ PianoRollWindow::PianoRollWindow() :
 	eraseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_E));
 	selectAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_S));
 	pitchBendAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_T));
+
+	m_recordAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_Space));
+	m_recordAccompanyAction->setShortcut(keySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Space));
 
 	connect( editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
