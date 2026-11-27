@@ -212,15 +212,16 @@ float SfzRegionPlayState::interpolatedSample(const float index, const size_t cha
 
 	float frac = index - indexFloor;
 
-	f_cnt_t i0 = indexFloor == 0 ? 0 : indexFloor - 1;
+	f_cnt_t i0 = indexFloor - 1;
 	f_cnt_t i1 = indexFloor;
-	f_cnt_t i2 = std::min(indexFloor + 1, m_sampleObject->size() - 1);
-	f_cnt_t i3 = std::min(indexFloor + 2, m_sampleObject->size() - 1);
+	f_cnt_t i2 = indexFloor + 1;
+	f_cnt_t i3 = indexFloor + 2;
 
-	float v0 = m_sampleObject->data()[i0][channel];
+	// If any of the indices are outside of the sample data range, have their values be zero.
+	float v0 = i0 < 0 ? 0 : m_sampleObject->data()[i0][channel];
 	float v1 = m_sampleObject->data()[i1][channel];
-	float v2 = m_sampleObject->data()[i2][channel];
-	float v3 = m_sampleObject->data()[i3][channel];
+	float v2 = i2 > m_sampleObject->size() - 1 ? 0 : m_sampleObject->data()[i2][channel];
+	float v3 = i3 > m_sampleObject->size() - 1 ? 0 : m_sampleObject->data()[i3][channel];
 
 	return hermiteInterpolate(v0, v1, v2, v3, frac);
 }
