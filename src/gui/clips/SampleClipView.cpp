@@ -354,16 +354,15 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
 
-	if (sample.sampleSize() > 0)
+	if (m_clip->sampleThumbnailCache())
 	{
 		const auto param = SampleThumbnailRenderer::VisualizeParameters{
-			.cache = m_clip->sampleThumbnailCache(),
 			.rect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
 			.amplification = sample.amplification(),
 			.reversed = sample.reversed()
 		};
 
-		SampleThumbnailRenderer::visualize(param, p);
+		SampleThumbnailRenderer::visualize(p, *m_clip->sampleThumbnailCache(), param);
 	}
 
 	if (!m_inRename) // Otherwise replaced by renaming QLineEdit
