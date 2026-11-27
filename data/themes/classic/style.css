@@ -472,6 +472,22 @@ QPushButton#btn-solo:checked {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5aa8d9, stop:0.1 #2696d1, stop:0.9 #2696d1, stop:1 #16638c);
 }
 
+QPushButton#btn-close {
+	image: url("resources:close.svg");
+}
+
+QPushButton#btn-maximize {
+	image: url("resources:maximize.svg");
+}
+
+QPushButton#btn-restore {
+	image: url("resources:restore.svg");
+}
+
+QPushButton#btn-detach {
+	image: url("resources:detach.svg");
+}
+
 /* actually has no effect yet so disabled */
 /*trackWidget {
 /*	border-bottom: 1px solid rgb(0, 0, 0);*//*
@@ -835,10 +851,15 @@ lmms--gui--PatternClipView {
 
 /* Subwindows in MDI-Area */
 lmms--gui--SubWindow {
+    /* Qt renders its own pixellated header. This can't be easily disabled.
+        Hide it by making it invisible via style. */
+    background-color: #00000000;
 	color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4b525c, stop:1 #31363d);
 	qproperty-activeColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #33383e, stop:1 #1a1c20);
+    qproperty-backgroundColor: #31363d;
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-borderColor: rgb( 0, 0, 0 );
+	qproperty-topRadius: 10;
 }
 
 /* Subwindow title text */
@@ -862,6 +883,8 @@ lmms--gui--SubWindow > QPushButton:hover{
 	border-color: rgba( 0, 0, 0, 20% );
 	border-style: solid;
 	border-radius: 2px;
+    /* Adding a border shrinks the icon. By padding -1, the icon can expand back to its unhovered size. */
+    padding: -1px;
 }
 
 /* Instrument */
