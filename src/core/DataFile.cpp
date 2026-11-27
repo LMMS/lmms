@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <cmath>
 #include <map>
+#include <ranges>
 
 #include <QDebug>
 #include <QFile>
@@ -87,7 +88,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
 	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
 	&DataFile::findProblematicLadspaPlugins,
-	&DataFile::upgrade_noHiddenAutomationTracks
+	&DataFile::upgrade_noHiddenAutomationTracks,
+	&DataFile::upgrade_patternStepsFromNotes
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1674,6 +1676,44 @@ void DataFile::upgrade_noHiddenAutomationTracks()
 
 		// Remove the track object just in case
 		globalAutomationTrack.parentNode().removeChild(globalAutomationTrack);
+	}
+}
+
+void DataFile::upgrade_patternStepsFromNotes()
+{
+	// Older versions sized MIDI clips in the pattern editor by their notes as well as their steps.
+	// Now only steps count. Add steps to cover notes that would otherwise be cut off.
+	const int numerator = m_head.attribute("timesig_numerator", "4").toInt();
+	const int denominator = std::max(1, m_head.attribute("timesig_denominator", "4").toInt());
+	const int ticksPerBar = std::max(1, DefaultTicksPerBar * numerator / denominator);
+	const int stepsPerBar = std::max(1, ticksPerBar / DefaultBeatsPerBar);
+
+	const auto patternTracks = elementsByTagName("patterntrack");
+	for (const int i : std::views::iota(0, patternTracks.size()))
+	{
+		const auto clips = patternTracks.item(i).toElement().elementsByTagName("midiclip");
+		for (const int j : std::views::iota(0, clips.size()))
+		{
+			auto clip = clips.item(j).toElement();
+			if (!clip.attribute("autoresize", "1").toInt()) { continue; }
+
+			int lastNoteEnd = 0;
+			for (auto note = clip.firstChildElement("note"); !note.isNull(); note = note.nextSiblingElement("note"))
+			{
+				const auto type = static_cast<Note::Type>(note.attribute("type").toInt());
+				const int length = note.attribute("len").toInt();
+				if (type == Note::Type::Regular && length > 0)
+				{
+					lastNoteEnd = std::max(lastNoteEnd, note.attribute("pos").toInt() + length);
+				}
+			}
+
+			const int bars = (lastNoteEnd + ticksPerBar - 1) / ticksPerBar;
+			if (const int steps = bars * stepsPerBar; steps > clip.attribute("steps").toInt())
+			{
+				clip.setAttribute("steps", steps);
+			}
+		}
 	}
 }
 
