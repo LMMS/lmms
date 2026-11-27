@@ -127,9 +127,9 @@ void SubWindow::paintEvent( QPaintEvent * )
 	p.fillPath(path, isActive ? activeColor() : p.pen().brush());
 
 	//Border
-	p.fillRect(0, m_titleBarHeight, width(), height()-m_titleBarHeight, borderColor());
+	p.fillRect(0, m_titleBarHeight, width(), height() - m_titleBarHeight, borderColor());
 	//Main window body below the titlebar
-	p.fillRect(1, m_titleBarHeight, width()-2, height()-m_titleBarHeight-1, m_backgroundColor);
+	p.fillRect(1, m_titleBarHeight, width() - 2, height() - m_titleBarHeight - 1, m_backgroundColor);
 
 	// window icon
 	if( widget() )
