@@ -30,13 +30,22 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <QEvent>
 
+#include "Effect.h"
 #include <algorithm>
 
 #include "DeprecationHelper.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
+#include "StringPairDrag.h"
 #include "GroupBox.h"
+#include "TextFloat.h"
+#include "FileDialog.h"
+#include "ConfigManager.h"
+#include "DataFile.h"
+#include "CaptionMenu.h"
+#include "embed.h"
 
 
 namespace lmms::gui
@@ -65,14 +74,47 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	effectsLayout->addWidget( m_scrollArea );
 
+	auto rowLayout = new QHBoxLayout;
+	QSize smallIconSize(14, 14);
+
 	auto addButton = new QPushButton;
 	addButton->setText( tr( "Add effect" ) );
 	addButton->setFocusPolicy(Qt::NoFocus);
 
-	effectsLayout->addWidget( addButton );
+	auto clearButton = new QPushButton;
+	clearButton->setIcon(embed::getIconPixmap("discard"));
+	clearButton->setFocusPolicy(Qt::NoFocus);
+	clearButton->setIconSize(smallIconSize);
+	clearButton->setFixedSize(18, 18);
+	clearButton->setToolTip(tr("Clear the effects from the effect chain"));
 
-	connect( addButton, SIGNAL(clicked()), this, SLOT(addEffect()));
+	auto savePresetButton = new QPushButton;
+	savePresetButton->setIcon(embed::getIconPixmap("project_save"));
+	savePresetButton->setFocusPolicy(Qt::NoFocus);
+	savePresetButton->setIconSize(smallIconSize);
+	savePresetButton->setFixedSize(18, 18);
+	savePresetButton->setToolTip(tr("Save the effects as a preset file"));
 
+	auto loadPresetButton = new QPushButton;
+	loadPresetButton->setIcon(embed::getIconPixmap("project_export"));
+	loadPresetButton->setFocusPolicy(Qt::NoFocus);
+	loadPresetButton->setIconSize(smallIconSize);
+	loadPresetButton->setFixedSize(18, 18);
+	loadPresetButton->setToolTip(tr("Append effects from a preset file"));
+
+	rowLayout->addWidget(addButton, 85);
+	rowLayout->addWidget(clearButton, 5);
+	rowLayout->addWidget(savePresetButton, 5);
+	rowLayout->addWidget(loadPresetButton, 5);
+
+	effectsLayout->addLayout(rowLayout);
+
+	connect(addButton, &QPushButton::clicked, this, &EffectRackView::addEffect);
+	connect(clearButton, &QPushButton::clicked, this, &EffectRackView::clearEffects);
+	connect(savePresetButton, &QPushButton::clicked, this, &EffectRackView::savePreset);
+	connect(loadPresetButton, &QPushButton::clicked, this, &EffectRackView::loadPreset);
+
+	setAcceptDrops(true);
 
 	m_lastY = 0;
 
@@ -84,6 +126,166 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 EffectRackView::~EffectRackView()
 {
 	clearViews();
+}
+
+
+
+
+void EffectRackView::dragEnterEvent(QDragEnterEvent* event)
+{
+	const QString type = StringPairDrag::decodeKey(event);
+
+	if (type == "effectpresetfile")
+	{
+		event->acceptProposedAction();
+	}
+	else
+	{
+		event->ignore();
+	}
+}
+
+void EffectRackView::dropEvent(QDropEvent* event)
+{
+	const QString type = StringPairDrag::decodeKey(event);
+
+	if (type == "effectpresetfile")
+	{
+		addEffectFromPreset(StringPairDrag::decodeValue(event));
+		event->acceptProposedAction();
+	}
+	else
+	{
+		event->ignore();
+	}
+}
+
+
+
+void EffectRackView::addEffectFromPreset(const QString& filePath)
+{
+	DataFile dataFile(filePath);
+	const QDomElement content = dataFile.content();
+
+	if (content.isNull())
+	{
+		TextFloat::displayMessage(
+			tr("Preset loading error"),
+			tr("Could not read the preset file."),
+			embed::getIconPixmap("error"));
+		return;
+	}
+
+	QVector<QDomElement> effectElements;
+
+	if (!content.attribute("pluginname").isEmpty())
+	{
+		// Single-effect preset file - the effect state is the root element
+		effectElements.push_back(content);
+	}
+	else
+	{
+		for (auto element = content.firstChildElement("effect");
+			!element.isNull();
+			element = element.nextSiblingElement("effect"))
+		{
+			effectElements.push_back(element);
+		}
+	}
+
+	if (effectElements.isEmpty())
+	{
+		TextFloat::displayMessage(
+			tr("Preset loading error"),
+			tr("Could not find any effects in the preset file."),
+			embed::getIconPixmap("error"));
+		return;
+	}
+
+	QVector<Effect*> effects;
+	for (const auto& effectElement : effectElements)
+	{
+		auto* effect = Effect::createFromPresetState(effectElement, fxChain());
+		if (effect == nullptr)
+		{
+			qDeleteAll(effects);
+			TextFloat::displayMessage(
+				tr("Preset loading error"),
+				tr("Could not instantiate every effect in the preset."),
+				embed::getIconPixmap("error"));
+			return;
+		}
+
+		effects.push_back(effect);
+	}
+
+	for (auto* effect : effects)
+	{
+		fxChain()->appendEffect(effect);
+	}
+
+	update();
+
+}
+
+void EffectRackView::clearEffects()
+{
+	this->fxChain()->clear();
+}
+
+void EffectRackView::savePreset()
+{
+	FileDialog sfd(this, tr("Save preset"), "",
+		tr("LMMS FX Preset (*.lfxp)"));
+
+	const QString workingDir = ConfigManager::inst()->userPresetsDir();
+
+	sfd.setAcceptMode(FileDialog::AcceptSave);
+	sfd.setDirectory(workingDir);
+	sfd.setFileMode(FileDialog::AnyFile);
+	sfd.setDefaultSuffix("lfxp");
+
+	if (sfd.exec() != QDialog::Accepted
+		|| sfd.selectedFiles().isEmpty()
+		|| sfd.selectedFiles().first().isEmpty())
+	{
+		return;
+	}
+
+	DataFile dataFile(DataFile::Type::EffectSettings);
+	auto& content = dataFile.content();
+
+	content.setAttribute(
+		"numofeffects",
+		static_cast<int>(fxChain()->m_effects.size()));
+
+	for (auto* effect : fxChain()->m_effects)
+	{
+		effect->savePresetState(dataFile, content);
+	}
+
+	dataFile.writeFile(sfd.selectedFiles().first());
+
+}
+
+void EffectRackView::loadPreset()
+{
+	FileDialog sfd(this, tr("Load preset"), "",
+		tr("LMMS FX Preset (*.lfxp)"));
+
+	const QString workingDir = ConfigManager::inst()->userPresetsDir();
+
+	sfd.setAcceptMode(FileDialog::AcceptOpen);
+	sfd.setDirectory(workingDir);
+	sfd.setFileMode(FileDialog::ExistingFile);
+	sfd.setDefaultSuffix("lfxp");
+
+	if (sfd.exec() == QDialog::Accepted
+		&& !sfd.selectedFiles().isEmpty()
+		&& !sfd.selectedFiles().first().isEmpty())
+	{
+		addEffectFromPreset(sfd.selectedFiles().first());
+	}
 }
 
 
@@ -105,14 +307,14 @@ void EffectRackView::clearViews()
 
 void EffectRackView::moveUp( EffectView* view )
 {
-	fxChain()->moveUp( view->effect() );
-	if( view != m_effectViews.first() )
+	fxChain()->moveUp(view->effect());
+	if (view != m_effectViews.first())
 	{
 		int i = 0;
-		for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
-					it != m_effectViews.end(); it++, i++ )
+		for (auto it = m_effectViews.begin();
+			it != m_effectViews.end(); it++, i++)
 		{
-			if( *it == view )
+			if (*it == view)
 			{
 				break;
 			}
@@ -211,8 +413,7 @@ void EffectRackView::update()
 	const int EffectViewMargin = 3;
 	m_lastY = EffectViewMargin;
 
-	for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
-					it != m_effectViews.end(); i++ )
+	for (auto it = m_effectViews.begin(); it != m_effectViews.end(); i++)
 	{
 		if( i < view_map.size() && view_map[i] == false )
 		{

@@ -38,10 +38,9 @@ namespace lmms
 {
 
 
-Effect::Effect( const Plugin::Descriptor * _desc,
-			Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Plugin( _desc, _parent, _key ),
+Effect::Effect(const Plugin::Descriptor* desc, Model* parent,
+	const Descriptor::SubPluginFeatures::Key* key)
+	: Plugin(desc, parent, key),
 	m_parent( nullptr ),
 	m_okay( true ),
 	m_noRun( false ),
@@ -58,24 +57,24 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	connect(&m_enabledModel, &BoolModel::dataChanged, [this] { onEnabledChanged(); });
 }
 
-void Effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Effect::saveSettings(QDomDocument& doc, QDomElement& thisElement)
 {
-	m_enabledModel.saveSettings( _doc, _this, "on" );
-	m_wetDryModel.saveSettings( _doc, _this, "wet" );
-	m_autoQuitModel.saveSettings( _doc, _this, "autoquit" );
-	controls()->saveState( _doc, _this );
+	m_enabledModel.saveSettings(doc, thisElement, "on");
+	m_wetDryModel.saveSettings(doc, thisElement, "wet");
+	m_autoQuitModel.saveSettings(doc, thisElement, "autoquit");
+	controls()->saveState(doc, thisElement);
 }
 
 
 
 
-void Effect::loadSettings( const QDomElement & _this )
+void Effect::loadSettings(const QDomElement& thisElement)
 {
-	m_enabledModel.loadSettings( _this, "on" );
-	m_wetDryModel.loadSettings( _this, "wet" );
-	m_autoQuitModel.loadSettings( _this, "autoquit" );
+	m_enabledModel.loadSettings(thisElement, "on");
+	m_wetDryModel.loadSettings(thisElement, "wet");
+	m_autoQuitModel.loadSettings(thisElement, "autoquit");
 
-	QDomNode node = _this.firstChild();
+	QDomNode node = thisElement.firstChild();
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -147,18 +146,86 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 
 
 
-
-Effect * Effect::instantiate( const QString& pluginName,
-				Model * _parent,
-				Descriptor::SubPluginFeatures::Key * _key )
+QDomElement Effect::savePresetState(QDomDocument& doc, QDomElement& parent)
 {
-	Plugin * p = Plugin::instantiateWithKey( pluginName, _parent, _key );
+	QDomElement effectElement = saveState(doc, parent);
+	const auto pluginName = QString::fromUtf8(descriptor()->name);
+
+	// These attributes are added to ensure proper preset are applied to proper effects
+	effectElement.setAttribute("name", pluginName);
+	effectElement.setAttribute("pluginname", pluginName);
+	effectElement.setAttribute("displayname", displayName());
+
+	// Save guivisible as 1 so the GUI VSTs show when they load
+	// There's similar logic in restorePresetState if the user tries changing something
+	const auto vstControls = effectElement.elementsByTagName("vsteffectcontrols");
+	for (int i = 0; i < vstControls.size(); ++i)
+	{
+		vstControls.at(i).toElement().setAttribute("guivisible", 1);
+	}
+
+	effectElement.appendChild(key().saveXML(doc));
+	return effectElement;
+}
+
+
+void Effect::restorePresetState(const QDomElement& effectElement)
+{
+	auto state = effectElement;
+	const auto vstControls = effectElement.elementsByTagName("vsteffectcontrols");
+	for (int i = 0; i < vstControls.size(); ++i)
+	{
+		vstControls.at(i).toElement().setAttribute("guivisible", 1);
+	}
+
+	restoreState(state);
+}
+
+
+Effect* Effect::createFromPresetState(
+	const QDomElement& effectElement,
+	EffectChain* parent)
+{
+	auto pluginName = effectElement.attribute("name");
+	if (pluginName.isEmpty())
+	{
+		// Presets saved by the earlier implementation used pluginname.
+		pluginName = effectElement.attribute("pluginname");
+	}
+
+	if (pluginName.isEmpty())
+	{
+		return nullptr;
+	}
+
+	const auto keyElement = effectElement.firstChildElement("key");
+	EffectKey key(keyElement);
+
+	auto effect = instantiate(pluginName, parent, &key);
+	if (effect == nullptr || !effect->isOkay())
+	{
+		delete effect;
+		return nullptr;
+	}
+
+	effect->restorePresetState(effectElement);
+	return effect;
+}
+
+
+
+
+Effect* Effect::instantiate(const QString& pluginName,
+	Model* parent,
+	Descriptor::SubPluginFeatures::Key* key)
+{
+	Plugin* p = Plugin::instantiateWithKey(pluginName, parent, key);
 	// check whether instantiated plugin is an effect
-	if( dynamic_cast<Effect *>( p ) != nullptr )
+	if (dynamic_cast<Effect*>(p) != nullptr)
 	{
 		// everything ok, so return pointer
 		auto effect = dynamic_cast<Effect*>(p);
-		effect->m_parent = dynamic_cast<EffectChain *>(_parent);
+		effect->m_parent = dynamic_cast<EffectChain*>(parent);
 		return effect;
 	}
 
@@ -167,7 +234,6 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 	return nullptr;
 }
-
 
 
 
