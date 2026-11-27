@@ -941,6 +941,8 @@ lmms--gui--SubWindow > QPushButton:hover{
 	border-color: rgba( 0, 0, 0, 20% );
 	border-style: solid;
 	border-radius: 2px;
+    /* Adding a border shrinks the icon. By padding -1, the icon can expand back to its unhovered size. */
+    padding: -1px;
 }
 
 /* Instrument */
