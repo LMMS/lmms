@@ -91,7 +91,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		btn->setMaximumHeight( 24 );
 		m_togglePluginButton = btn;
 
-		m_managePluginButton = new PixmapButton( this, "" );
+		m_managePluginButton = new PixmapButton(this);
 		m_managePluginButton->setCheckable( false );
 		m_managePluginButton->setCursor( Qt::PointingHandCursor );
 		m_managePluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -107,7 +107,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_managePluginButton->setMinimumHeight( 21 );
 		m_managePluginButton->setMaximumHeight( 21 );
 
-		m_openPresetButton = new PixmapButton( this, "" );
+		m_openPresetButton = new PixmapButton(this);
 		m_openPresetButton->setCheckable( false );
 		m_openPresetButton->setCursor( Qt::PointingHandCursor );
 		m_openPresetButton->setActiveGraphic( embed::getIconPixmap(
@@ -165,7 +165,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		_ctl->m_selPresetButton->setMinimumHeight( 16 );
 		_ctl->m_selPresetButton->setMaximumHeight( 16 );
 
-		m_savePresetButton = new PixmapButton( this, "" );
+		m_savePresetButton = new PixmapButton(this);
 		m_savePresetButton->setCheckable( false );
 		m_savePresetButton->setCursor( Qt::PointingHandCursor );
 		m_savePresetButton->setActiveGraphic( embed::getIconPixmap(
