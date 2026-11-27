@@ -54,9 +54,11 @@ SampleThumbnailCache::SampleThumbnailCache(const SampleBuffer& buffer)
 	}
 }
 
-auto SampleThumbnailCache::nearestThumbnailForWidth(f_cnt_t width) const -> const Thumbnail&
+auto SampleThumbnailCache::nearestThumbnailForWidth(f_cnt_t width) const -> const Thumbnail*
 {
 	assert(1 <= width && width <= m_sampleCount && "invalid width");
+
+	if (m_thumbnails.empty()) { return nullptr; }
 
 	// The thumbnails are in descending order, starting from the largest width to the smallest
 	// We want to find the last element that is still greater than the requested width
@@ -66,10 +68,10 @@ auto SampleThumbnailCache::nearestThumbnailForWidth(f_cnt_t width) const -> cons
 		[](const Thumbnail& thumbnail, f_cnt_t width) { return thumbnail.width() > width; });
 
 	// Check if the one we found is equal before moving back
-	if (it != m_thumbnails.end() && it->width() == width) { return *it; }
+	if (it != m_thumbnails.end() && it->width() == width) { return &*it; }
 
 	// Move back by one to get the nearest larger thumbnail
-	return *std::prev(it);
+	return &*std::prev(it);
 }
 
 auto SampleThumbnailCache::Thumbnail::compress(f_cnt_t outputWidth) const -> Thumbnail

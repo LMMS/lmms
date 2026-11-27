@@ -53,9 +53,16 @@ void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter
 	const auto yScale = parameters.rect.height() / 2 * parameters.amplification;
 	const auto yCenter = parameters.rect.center().y();
 
+	// Draw a line in the middle representing silence if a thumbnail cannot be found
+	if (!nearestThumbnail)
+	{
+		painter.drawLine(parameters.rect.x(), yCenter, parameters.rect.width(), yCenter);
+		return;
+	}
+
 	// Calculate how far along we should be in the thumbnail based on where we begin and end in the sample
-	const auto nearestThumbnailStart = parameters.sampleStart * nearestThumbnail.width();
-	const auto nearestThumbnailEnd = parameters.sampleEnd * nearestThumbnail.width();
+	const auto nearestThumbnailStart = parameters.sampleStart * nearestThumbnail->width();
+	const auto nearestThumbnailEnd = parameters.sampleEnd * nearestThumbnail->width();
 	const auto nearestThumbnailRange = nearestThumbnailEnd - nearestThumbnailStart;
 
 	painter.save();
@@ -67,9 +74,9 @@ void SampleThumbnailRenderer::visualize(VisualizeParameters parameters, QPainter
 		const auto peakEnd = nearestThumbnailStart + ((out + 1) / parameters.rect.width()) * nearestThumbnailRange;
 
 		const auto peak = parameters.reversed
-			? std::accumulate(nearestThumbnail.rbegin() + peakStart, nearestThumbnail.rbegin() + peakEnd,
+			? std::accumulate(nearestThumbnail->rbegin() + peakStart, nearestThumbnail->rbegin() + peakEnd,
 				  SampleThumbnailCache::Thumbnail::Peak{})
-			: std::accumulate(nearestThumbnail.begin() + peakStart, nearestThumbnail.begin() + peakEnd,
+			: std::accumulate(nearestThumbnail->begin() + peakStart, nearestThumbnail->begin() + peakEnd,
 				  SampleThumbnailCache::Thumbnail::Peak{});
 
 		const auto yMin = yCenter - peak.min * yScale;
