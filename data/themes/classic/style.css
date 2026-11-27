@@ -852,7 +852,7 @@ lmms--gui--PatternClipView {
 /* Subwindows in MDI-Area */
 lmms--gui--SubWindow {
     /* Qt renders its own pixellated header. This can't be easily disabled.
-        Hide it by making it invisible via style. '*/
+        Hide it by making it invisible via style. */
     background-color: #00000000;
 	color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4b525c, stop:1 #31363d);
 	qproperty-activeColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #33383e, stop:1 #1a1c20);
