@@ -51,6 +51,16 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="copyVersionButton">
+         <property name="toolTip">
+          <string>Copy version information to the clipboard</string>
+         </property>
+         <property name="text">
+          <string>Copy version info</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
