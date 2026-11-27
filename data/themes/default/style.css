@@ -410,23 +410,29 @@ QToolButton#add-sample-track{
 
 QToolButton#draw-mode{
 	image: url("resources:edit_draw.svg");
-    width: 20;
-    height: 20;
-    padding: 4;
+    width: 16;
+    height: 16;
+    padding: 6;
+	border-left: 1px solid #00000000;
+	border-right: 1px solid #00000000;
 }
 
 QToolButton#select-mode{
 	image: url("resources:edit_select.svg");
-    width: 20;
-    height: 20;
-    padding: 4;
+    width: 16;
+    height: 16;
+    padding: 6;
+	border-left: 1px solid #00000000;
+	border-right: 1px solid #00000000;
 }
 
 QToolButton#knife-mode{
 	image: url("resources:edit_knife.svg");
-    width: 20;
-    height: 20;
-    padding: 4;
+    width: 16;
+    height: 16;
+    padding: 6;
+	border-left: 1px solid #00000000;
+	border-right: 1px solid #00000000;
 }
 
 QToolButton#draw-mode:hover:checked,
@@ -435,7 +441,7 @@ QToolButton#select-mode:hover:checked {
 	border: 2px solid #343840;
 	border-radius: 2px;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #292d33, stop:1 #22262c);
-    padding: 2px;
+    padding: 5px;
 }
 
 QToolButton#draw-mode:checked,
@@ -445,7 +451,7 @@ QToolButton#select-mode:checked {
 	border-bottom: 1px solid #4a515e;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1b1f22, stop:1 #13161a);
 	background-image: url("resources:shadow_p.png");
-    padding: 3px;
+    padding: 6px;
 }
 
 QToolButton#set-proportional-snap{
