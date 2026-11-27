@@ -147,8 +147,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	};
 
 	const auto inputParametersPtr = inputDeviceIndex == paNoDevice ? nullptr : &inputParameters; 
-	const auto outputParametersPtr = outputDeviceIndex == paNoDevice ? nullptr : &outputParameters;
-	auto err = Pa_IsFormatSupported(inputParametersPtr, outputParametersPtr, sampleRate);
+	auto err = Pa_IsFormatSupported(inputParametersPtr, &outputParameters, sampleRate);
 
 	if (err != paFormatIsSupported)
 	{
@@ -157,7 +156,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		return;
 	}
 
-	err = Pa_OpenStream(&m_paStream, inputParametersPtr, outputParametersPtr, sampleRate, framesPerBuffer, paNoFlag,
+	err = Pa_OpenStream(&m_paStream, inputParametersPtr, &outputParameters, sampleRate, framesPerBuffer, paNoFlag,
 		&AudioPortAudio::processCallback, this);
 	
 	if (err != paNoError)
