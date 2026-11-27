@@ -394,21 +394,21 @@ QToolButton#add-automation-track {
     padding: 4;
 }
 
-QToolButton#add-pattern-track{
+QToolButton#add-pattern-track {
 	image: url("resources:add_pattern_track.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
 
-QToolButton#add-sample-track{
+QToolButton#add-sample-track {
 	image: url("resources:add_sample_track.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
 
-QToolButton#draw-mode{
+QToolButton#draw-mode {
 	image: url("resources:edit_draw.svg");
     width: 16;
     height: 16;
@@ -417,7 +417,7 @@ QToolButton#draw-mode{
 	border-right: 1px solid #00000000;
 }
 
-QToolButton#select-mode{
+QToolButton#select-mode {
 	image: url("resources:edit_select.svg");
     width: 16;
     height: 16;
@@ -426,7 +426,7 @@ QToolButton#select-mode{
 	border-right: 1px solid #00000000;
 }
 
-QToolButton#knife-mode{
+QToolButton#knife-mode {
 	image: url("resources:edit_knife.svg");
     width: 16;
     height: 16;
@@ -454,20 +454,20 @@ QToolButton#select-mode:checked {
     padding: 6px;
 }
 
-QToolButton#set-proportional-snap{
+QToolButton#set-proportional-snap {
 	image: url("resources:proportional_snap.svg");
     width: 24;
     height: 24;
 }
 
-QToolButton#playButton{
+QToolButton#playButton {
 	image: url("resources:play.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
 
-QToolButton#playButton:checked{
+QToolButton#playButton:checked {
 	image: url("resources:pause.svg");
     width: 20;
     height: 20;
@@ -480,35 +480,35 @@ QToolButton#playButton:checked{
 	color: #fff;
 }
 
-QToolButton#stopButton{
+QToolButton#stopButton {
 	image: url("resources:stop.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
 
-QToolButton#recordButton{
+QToolButton#recordButton {
 	image: url("resources:record.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
 
-QToolButton#recordAccompanyButton{
+QToolButton#recordAccompanyButton {
 	image: url("resources:record_accompany.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
 
-QToolButton#stepRecordButton{
+QToolButton#stepRecordButton {
 	image: url("resources:record_step_off.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
 
-QToolButton#stepRecordButton:checked{
+QToolButton#stepRecordButton:checked {
 	image: url("resources:record_step_on.svg");
     width: 20;
     height: 20;
@@ -521,51 +521,51 @@ QToolButton#stepRecordButton:checked{
 	color: #fff;
 }
 
-QToolButton#auto-scrolling-stepped{
+QToolButton#auto-scrolling-stepped {
 	image: url("resources:autoscroll_stepped_on.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
-QToolButton#auto-scrolling-continuous{
+QToolButton#auto-scrolling-continuous {
 	image: url("resources:autoscroll_continuous_on.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
-QToolButton#auto-scrolling-off{
+QToolButton#auto-scrolling-off {
 	image: url("resources:autoscroll_off.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
-QToolButton#loop-points-on{
+QToolButton#loop-points-on {
 	image: url("resources:loop_points_on.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
-QToolButton#loop-points-off{
+QToolButton#loop-points-off {
 	image: url("resources:loop_points_off.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
-QToolButton#back-to-zero{
+QToolButton#back-to-zero {
 	image: url("resources:back_to_zero.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
 
-QToolButton#back-to-start{
+QToolButton#back-to-start {
 	image: url("resources:back_to_start.svg");
     width: 20;
     height: 20;
     padding: 4;
 }
 
-QToolButton#keep-stop-position{
+QToolButton#keep-stop-position {
 	image: url("resources:keep_stop_position.svg");
     width: 20;
     height: 20;
