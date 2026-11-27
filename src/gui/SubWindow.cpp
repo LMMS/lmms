@@ -28,6 +28,8 @@
 
 #include "SubWindow.h"
 
+#include <algorithm>
+
 #include <QGraphicsDropShadowEffect>
 #include <QGuiApplication>
 #include <QLabel>
@@ -41,7 +43,6 @@
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
 #include <QWindow>
-#include <algorithm>
 
 #include "ConfigManager.h"
 #include "embed.h"
@@ -60,13 +61,6 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
 	m_trackedNormalGeom = normalGeometry();
-
-	// inits the colors
-	m_activeColor = Qt::SolidPattern;
-	m_textShadowColor = Qt::black;
-	m_borderColor = Qt::black;
-	m_backgroundColor = Qt::black;
-	m_topRadius = 0;
 
 	// close, maximize, restore, and detach buttons
 	auto createButton = [this](const QString& buttonName, const QString& tooltip) -> QPushButton* {
