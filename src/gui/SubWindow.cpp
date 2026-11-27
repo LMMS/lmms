@@ -38,6 +38,7 @@
 #include <QMetaMethod>
 #include <QMoveEvent>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPushButton>
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
@@ -61,14 +62,10 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 	// this should always work, since QMdiSubWindows will not start as maximized
 	m_trackedNormalGeom = normalGeometry();
 
-	// inits the colors
-	m_activeColor = Qt::SolidPattern;
-	m_textShadowColor = Qt::black;
-	m_borderColor = Qt::black;
-
 	// close, maximize, restore, and detach buttons
-	auto createButton = [this](std::string_view iconName, const QString& tooltip) -> QPushButton* {
-		auto button = new QPushButton{embed::getIconPixmap(iconName), QString{}, this};
+	auto createButton = [this](const QString& buttonName, const QString& tooltip) -> QPushButton* {
+		auto button = new QPushButton{this};
+		button->setObjectName(buttonName);
 		button->resize(m_buttonSize);
 		button->setFocusPolicy(Qt::NoFocus);
 		button->setCursor(Qt::ArrowCursor);
@@ -76,16 +73,16 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 		button->setToolTip(tooltip);
 		return button;
 	};
-	m_closeBtn = createButton("close", tr("Close"));
+	m_closeBtn = createButton("btn-close", tr("Close"));
 	connect(m_closeBtn, &QPushButton::clicked, this, &QWidget::close);
 
-	m_maximizeBtn = createButton("maximize", tr("Maximize"));
+	m_maximizeBtn = createButton("btn-maximize", tr("Maximize"));
 	connect(m_maximizeBtn, &QPushButton::clicked, this, &QWidget::showMaximized);
 
-	m_restoreBtn = createButton("restore", tr("Restore"));
+	m_restoreBtn = createButton("btn-restore", tr("Restore"));
 	connect(m_restoreBtn, &QPushButton::clicked, this, &QWidget::showNormal);
 
-	m_detachBtn = createButton("detach", tr("Detach"));
+	m_detachBtn = createButton("btn-detach", tr("Detach"));
 	connect(m_detachBtn, &QPushButton::clicked, this, &SubWindow::detach);
 
 	// QLabel for the window title and the shadow effect
@@ -117,19 +114,22 @@ void SubWindow::paintEvent( QPaintEvent * )
 	if (isMaximized()) { return; }
 
 	QPainter p( this );
-	QRect rect( 0, 0, width(), m_titleBarHeight );
+	p.setRenderHint(QPainter::Antialiasing);
 
 	const bool isActive = windowState() & Qt::WindowActive;
 
-	p.fillRect( rect, isActive ? activeColor() : p.pen().brush() );
+	//Create the titlebar with 2 overlapping rectangles, with one rounded.
+	QPainterPath path;
+	path.setFillRule(Qt::WindingFill);
+	path.addRoundedRect(QRect(0, 0, width(), 20), m_topRadius, m_topRadius);
+	path.addRect(0, 10, width(), m_titleBarHeight-10);
 
-	// window border
-	p.setPen( borderColor() );
+	p.fillPath(path, isActive ? activeColor() : p.pen().brush());
 
-	// bottom, left, and right lines
-	p.drawLine( 0, height() - 1, width(), height() - 1 );
-	p.drawLine( 0, m_titleBarHeight, 0, height() - 1 );
-	p.drawLine( width() - 1, m_titleBarHeight, width() - 1, height() - 1 );
+	//Border
+	p.fillRect(0, m_titleBarHeight, width(), height() - m_titleBarHeight, borderColor());
+	//Main window body below the titlebar
+	p.fillRect(1, m_titleBarHeight, width() - 2, height() - m_titleBarHeight - 1, m_backgroundColor);
 
 	// window icon
 	if( widget() )
