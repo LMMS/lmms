@@ -381,7 +381,7 @@ bool Knob::updateAngle()
 void Knob::drawKnob( QPainter * _p )
 {
 	auto scale = devicePixelRatioF();
-	_p->scale(1.0/scale, 1.0/scale);
+	_p->scale(1.0 / scale, 1.0 / scale);
 	bool enabled = this->isEnabled();
 	QColor currentArcColor = enabled ? m_arcActiveColor : m_arcInactiveColor;
 	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
@@ -391,7 +391,7 @@ void Knob::drawKnob( QPainter * _p )
 		_p->drawImage( 0, 0, m_cache );
 		return;
 	}
-	m_cache = QImage( size()*scale, QImage::Format_ARGB32 );
+	m_cache = QImage(size() * scale, QImage::Format_ARGB32);
 	m_cache.fill( qRgba( 0, 0, 0, 0 ) );
 
 	QPainter p( &m_cache );
@@ -432,7 +432,7 @@ void Knob::drawKnob( QPainter * _p )
 	// Old-skool knobs
 	auto const szKnob = embed::logicalSize(*m_knobPixmap);
 	const float radius = szKnob.width() / 2.0f - 1;
-	mid = QPoint( width() / 2, szKnob.height() / 2 );
+	mid = QPoint(width() / 2, szKnob.height() / 2);
 
 	p.drawPixmap( static_cast<int>(
 				width() / 2 - szKnob.width() / 2 ), 0,
