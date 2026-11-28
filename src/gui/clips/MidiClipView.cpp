@@ -486,9 +486,9 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
 	const auto pos = we->position().toPoint();
-	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
-				(fixedClips() || pixelsPerBar() >= 96) &&
-				pos.y() > height() - m_stepBtnOff.height())
+	const bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
+	if (m_clip->m_clipType == MidiClip::Type::BeatClip && displayPattern
+		&& pos.y() > BeatStepButtonOffset && pos.y() < BeatStepButtonOffset + m_stepBtnOff.height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
