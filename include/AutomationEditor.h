@@ -163,6 +163,7 @@ protected slots:
 	void setTension();
 
 	void updatePosition();
+	void updatePositionAccompany();
 
 	void zoomingXChanged();
 	void zoomingYChanged();
@@ -241,6 +242,7 @@ private:
 	QPointer<MidiClip> m_ghostNotes = nullptr; 
 	QPointer<SampleClip> m_ghostSample = nullptr;
 	bool m_renderSample = false;
+	TimePos m_detuningNoteOffset = TimePos{0};
 
 	void centerTopBottomScroll();
 	void updateTopBottomLevels();
@@ -249,6 +251,8 @@ private:
 	QScrollBar * m_topBottomScroll;
 
 	void adjustLeftRightScoll(int value);
+
+	void autoScroll(const TimePos& t);
 
 	TimePos m_currentPosition;
 
@@ -278,7 +282,6 @@ private:
 	bool m_mouseDownRight; //true if right click is being held down
 
 	TimeLineWidget * m_timeLine;
-	bool m_scrollBack;
 
 	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );

@@ -138,6 +138,8 @@ private:
 
 	void adjustLeftRightScoll(int value);
 
+	void autoScroll(const TimePos & t);
+
 	LcdSpinBox * m_tempoSpinBox;
 
 	TimeLineWidget* m_timeLine;
@@ -154,9 +156,6 @@ private:
 	IntModel* m_zoomingModel;
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
-
-	bool m_scrollBack;
-	bool m_smoothScroll;
 
 	EditMode m_mode;
 	EditMode m_ctrlMode; //!< Mode they were in before they hit ctrl
