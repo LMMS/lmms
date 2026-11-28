@@ -361,11 +361,17 @@ void SlicerT::loadSettings(const QDomElement& element)
 {
 	if (auto srcFile = element.attribute("src"); !srcFile.isEmpty())
 	{
-		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
+		const auto path = PathUtil::stringToPath(srcFile);
+
+		if (std::filesystem::exists(path))
 		{
-			if (auto buffer = SampleCache::instance().fetchBuffer(PathUtil::stringToPath(srcFile)))
+			auto buffer = SampleCache::instance().fetchBuffer(path);
+			auto sampleThumbnailCache = SampleCache::instance().fetchThumbnailCache(path);
+
+			if (buffer && sampleThumbnailCache)
 			{
 				m_originalSample = Sample{std::move(buffer)};
+				m_sampleThumbnailCache = SampleCache::instance().fetchThumbnailCache(path);
 			}
 			else
 			{
