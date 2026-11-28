@@ -41,6 +41,54 @@ namespace gui
 class MidiClipView;
 }
 
+//! Used in MidiClip to keep track of Note families
+class NoteFamilyAlbum : public SerializingObject
+{
+public:
+	NoteFamilyAlbum();
+	NoteFamilyAlbum(const NoteFamilyAlbum& album);
+
+	NoteFamilyAlbum& operator=(const NoteFamilyAlbum& album);
+
+	const QString& getFamilyName(const int family) const;
+	const QColor& getFamilyColor(const int family) const;
+
+	int addFamily(const QString& familyName, const QColor& familyColor);
+	bool setFamilyName(const int family, const QString& newName);
+	bool setFamilyColor(const int family, const QColor& newColor);
+
+	int deleteFamily(const int family);
+
+	bool familyExists(const int family) const;
+
+	int lastFamilyId() const;
+
+	static QString classNodeName()
+	{
+		return "notefamilyalbum";
+	}
+
+	inline QString nodeName() const override
+	{
+		return classNodeName();
+	}
+
+protected:
+	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
+	void loadSettings(const QDomElement& _this ) override;
+
+private:
+	friend class MidiClip;
+
+	std::vector<QString> m_familyNames = {};
+	std::vector<QColor> m_familyColors = {};
+
+	int m_lastFamily = -1;
+
+	const QString m_defaultName = {};
+	const QColor m_defaultColor = {};
+};
+
 
 class LMMS_EXPORT MidiClip : public Clip
 {
@@ -122,6 +170,8 @@ public:
 		return new MidiClip(*this);
 	}
 
+	NoteFamilyAlbum* noteFamilyAlbum();
+
 
 	using Model::dataChanged;
 
@@ -159,7 +209,7 @@ private:
 
 	friend class gui::MidiClipView;
 
-
+	NoteFamilyAlbum* m_familyAlbum = new NoteFamilyAlbum();
 signals:
 	void destroyedMidiClip( lmms::MidiClip* );
 } ;

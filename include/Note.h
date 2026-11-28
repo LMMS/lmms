@@ -149,6 +149,7 @@ public:
 	void setLength( const TimePos & length );
 	void setPos( const TimePos & pos );
 	void setKey( const int key );
+	void setFamily(const int family);
 	virtual void setVolume( volume_t volume );
 	virtual void setPanning( panning_t panning );
 	void quantizeLength( const int qGrid );
@@ -221,6 +222,11 @@ public:
 		return m_key;
 	}
 
+	inline int family() const
+	{
+		return m_family;
+	}
+
 	inline volume_t getVolume() const
 	{
 		return m_volume;
@@ -255,7 +261,6 @@ public:
 
 	void createDetuning();
 
-
 protected:
 	void saveSettings( QDomDocument & doc, QDomElement & parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -277,6 +282,8 @@ private:
 	std::shared_ptr<DetuningHelper> m_detuning;
 
 	Type m_type = Type::Regular;
+
+	int m_family = -1;
 };
 
 using NoteVector = std::vector<Note*>;

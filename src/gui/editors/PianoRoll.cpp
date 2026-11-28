@@ -29,6 +29,7 @@
 #include <QtMath>  // IWYU pragma: keep
 #include <QApplication>
 #include <QCheckBox>
+#include <QColorDialog>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QInputDialog>
@@ -36,6 +37,7 @@
 #include <QLabel>
 #include <QMargins>
 #include <QMessageBox>
+#include <QMenu>
 #include <QPainter>
 #include <QPointer>
 #include <QPushButton>
@@ -66,6 +68,7 @@
 #include "PatternStore.h"
 #include "PianoView.h"
 #include "PositionLine.h"
+#include "RenameDialog.h"
 #include "SimpleTextFloat.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
@@ -446,6 +449,11 @@ PianoRoll::PianoRoll() :
 	changeSnapMode();
 	connect(&m_snapModel, SIGNAL(dataChanged()),
 		this, SLOT(changeSnapMode()));
+
+	m_setFamilyMenu = new QMenu("Set family");
+	m_removeFamilyMenu = new QMenu("Remove family...");
+
+	resetNoteFamilyModel();
 
 	m_stepRecorder.initialize();
 
@@ -879,6 +887,9 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 		emit currentMidiClipChanged();
 		return;
 	}
+
+	// Initialize families widget
+	loadFamilyModelFromClip();
 
 	// Scroll horizontally to the start of the clip, minus a bar for aesthetics.
 	m_leftRightScroll->setValue(std::max(0, -m_midiClip->startTimeOffset() - TimePos::ticksPerBar()));
@@ -1694,6 +1705,24 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
+	if (m_editMode == EditMode::Paint && me->button() == Qt::LeftButton)
+	{
+		if (Note* note = noteUnderMouse(); note)
+		{
+			if (note->selected())
+			{
+				// Painting group of selected notes : Paint all notes in selection
+				for (Note *note : getSelectedNotes())
+				{
+					note->setFamily(m_noteFamily);
+				}
+			}
+			note->setFamily(m_noteFamily);
+			update();
+		}
+		return;
+	}
+
 	if (m_editMode == EditMode::Detuning)
 	{
 		// Let users access automation editor with shift-click, if they want the old functionality
@@ -1867,6 +1896,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					new_note.setPanning( m_lastNotePanning );
 					new_note.setVolume( m_lastNoteVolume );
 					created_new_note = m_midiClip->addNote( new_note );
+					
+					created_new_note->setFamily(m_noteFamily);
 
 					if (drawingNote) { m_drawingNewNote = created_new_note; }
 
@@ -3010,6 +3041,24 @@ void PianoRoll::setupSelectedChords()
 	m_selectedChords.push_back(currentChord);
 }
 
+void PianoRoll::addNoteFamily()
+{
+	QString s = "";
+	RenameDialog renameDlg(s);
+	renameDlg.setWindowTitle("Family name");
+	renameDlg.exec();
+
+	QColorDialog colD = QColorDialog(this);
+	colD.exec();
+	QColor color = colD.selectedColor();
+
+	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
+	int id = album->addFamily(s, color);
+	registerNoteFamily(s, color, id);
+
+	setNoteFamily(id);
+}
+
 /*
  * Perform the Strum
  *
@@ -3090,7 +3139,84 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 	m_midiClip->dataChanged();
 }
 
+void PianoRoll::registerNoteFamily(const QString& name, const QColor& color, int id)
+{
+	{
+		auto fam = new QAction(name, m_setFamilyMenu);
+		m_setFamilyMenu->addAction(fam);
+		connect(fam, &QAction::triggered, this, [this, id]() {
+				setNoteFamily(id);
+		});
+	}
+	if (id > -1) // Avoid "No family"
+	{
+		auto fam = new QAction(name, m_removeFamilyMenu);
+		m_removeFamilyMenu->addAction(fam);
+		connect(fam, &QAction::triggered, this, [this, id]() {
+				deleteNoteFamily(id);
+		});
+	}
+}
 
+void PianoRoll::setNoteFamily(int family)
+{
+	m_noteFamily = family;
+
+	auto icon = QPixmap(embed::getIconPixmap("edit_draw")); // TODO Icon
+
+	if (family != -1)
+	{
+		// auto icon = m_notePaintAction.icon();
+
+		QPainter painter(&icon);
+		painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+
+		QColor color = m_midiClip->noteFamilyAlbum()->getFamilyColor(family);
+		painter.setBrush(color);
+		painter.setPen(color);
+
+		painter.drawRect(icon.rect());
+	}
+	m_notePaintAction->setIcon(icon);
+}
+
+void PianoRoll::deleteNoteFamily(int family)
+{
+	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
+
+	int idShifted = album->deleteFamily(family);
+	m_noteFamily = -1;
+
+	// One family has been shifted to fill the gap : Set all notes to the correct family
+	for (Note *note : m_midiClip->notes())
+	{
+		if (note->family() == family)
+		{
+			note->setFamily(-1);
+		}
+		else if ((idShifted != -1) && (note->family() == idShifted))
+		{
+			note->setFamily(family);
+		}
+	}
+
+	{
+		QAction* act = m_setFamilyMenu->actions()[family + 1];
+		m_setFamilyMenu->removeAction(act);
+		act = m_setFamilyMenu->actions()[idShifted + 1];
+
+		disconnect(act, SIGNAL(triggered()), this, nullptr);
+		connect(act, &QAction::triggered, this, [this, family]() { setNoteFamily(family); });
+	}
+	{
+		auto act = m_removeFamilyMenu->actions()[family];
+		m_removeFamilyMenu->removeAction(act);
+		act = m_removeFamilyMenu->actions()[idShifted];
+
+		disconnect(act, SIGNAL(triggered()), this, nullptr);
+		connect(act, &QAction::triggered, this, [this, family]() { deleteNoteFamily(family); });
+	}
+}
 
 void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 {
@@ -3809,7 +3935,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				// We've done and checked all, let's draw the note with
 				// the appropriate color
-				const auto fillColor = note->type() == Note::Type::Regular ? m_noteColor : m_stepNoteColor;
+				const auto regularColor = (note->family() == -1)
+					? m_noteColor
+					: m_midiClip->noteFamilyAlbum()->getFamilyColor(note->family());
+				const auto fillColor = note->type() == Note::Type::Regular ? regularColor : m_stepNoteColor;
 
 				drawNoteRect(
 					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
@@ -4021,6 +4150,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				break;
 			case EditMode::Knife:
 				cursor = &m_toolKnife;
+				break;
+			case EditMode::Paint:
+				cursor = &m_toolPaint;
 				break;
 			case EditMode::Strum:
 				cursor = &m_toolStrum;
@@ -4814,7 +4946,9 @@ void PianoRoll::pasteNotes()
 			cur_note.setSelected( true );
 
 			// add to MIDI clip
-			m_midiClip->addNote( cur_note, false );
+			auto added = m_midiClip->addNote( cur_note, false );
+			if (m_noteFamily != -1)
+				added->setFamily(m_noteFamily);
 		}
 
 		// we only have to do the following lines if we pasted at
@@ -5189,6 +5323,24 @@ void PianoRoll::changeSnapMode()
 	m_gridMode = static_cast<GridMode>(m_snapModel.value());
 }
 
+void PianoRoll::resetNoteFamilyModel()
+{
+	m_setFamilyMenu->clear();
+	m_removeFamilyMenu->clear();
+	registerNoteFamily("No family", QColor(), -1);
+}
+
+void PianoRoll::loadFamilyModelFromClip()
+{
+	resetNoteFamilyModel();
+
+	NoteFamilyAlbum* album = m_midiClip->noteFamilyAlbum();
+	for (int i = 0; i <= album->lastFamilyId(); i++)
+	{
+		registerNoteFamily(album->getFamilyName(i), album->getFamilyColor(i), i);
+	}
+}
+
 PianoRollWindow::PianoRollWindow() :
 	Editor(true, true),
 	m_editor(new PianoRoll())
@@ -5210,12 +5362,27 @@ PianoRollWindow::PianoRollWindow() :
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
 	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch Bend mode (Shift+T)" ) );
 
+	m_editor->m_notePaintAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Note paint mode (Shift+P)")); // TODO Icon
+
+	auto notePaintMenu = new QMenu("Note family management");
+
+	m_editor->m_notePaintAction->setMenu(notePaintMenu);
+
+	auto addFamilyAction = new QAction(embed::getIconPixmap("add"), tr("Add family..."), notePaintMenu); // TODO Icon
+
+	notePaintMenu->addMenu(m_editor->m_setFamilyMenu);
+	notePaintMenu->addAction(addFamilyAction);
+	notePaintMenu->addMenu(m_editor->m_removeFamilyMenu);
+
+	connect(addFamilyAction, SIGNAL(triggered()), this, SLOT(addNoteFamily()));
+
 	drawAction->setChecked( true );
 
 	drawAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_D ));
 	eraseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_E));
 	selectAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_S));
 	pitchBendAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_T));
+	m_editor->m_notePaintAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_P));
 
 	connect( editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
@@ -5241,6 +5408,7 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
 	notesActionsToolBar->addAction( pitchBendAction );
+	notesActionsToolBar->addAction(m_editor->m_notePaintAction);
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addWidget(quantizeButton);
 
@@ -5408,6 +5576,16 @@ PianoRollWindow::PianoRollWindow() :
 	m_snapComboBox->setFixedSize(96, ComboBox::DEFAULT_HEIGHT);
 	m_snapComboBox->setToolTip(tr("Snap mode"));
 
+	// setup family-stuff
+	/* TODO Remove
+	auto familyLbl = new QLabel(m_toolBar);
+	familyLbl->setPixmap(embed::getIconPixmap("colorize")); // TODO Icon
+
+	m_familyComboBox = new ComboBox(m_toolBar);
+	m_familyComboBox->setModel(&m_editor->m_familyModel);
+	m_familyComboBox->setFixedSize(96, ComboBox::DEFAULT_HEIGHT);
+	m_familyComboBox->setToolTip(tr("Note family"));*/
+
 	// -- Clear ghost MIDI clip button
 	m_clearGhostButton = new QPushButton( m_toolBar );
 	m_clearGhostButton->setIcon( embed::getIconPixmap( "clear_ghost_note" ) );
@@ -5483,6 +5661,17 @@ PianoRollWindow::PianoRollWindow() :
 	snapWidget->setLayout(snapHbox);
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget(snapWidget);
+
+	/* TODO Remove
+	auto familyWidget = new QWidget();
+	auto familyHBox = new QHBoxLayout();
+	familyHBox->setContentsMargins(0, 0, 0, 0);
+	familyHBox->addWidget(familyLbl);
+	familyHBox->addWidget(m_familyComboBox);
+	familyWidget->setLayout(familyHBox);
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget(familyWidget);
+	*/
 
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
@@ -5874,8 +6063,10 @@ void PianoRollWindow::importMidiClip()
 	}
 }
 
-
-
+void PianoRollWindow::addNoteFamily()
+{
+	m_editor->addNoteFamily();
+}
 
 void PianoRollWindow::focusInEvent( QFocusEvent * event )
 {

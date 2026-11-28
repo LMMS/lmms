@@ -39,6 +39,142 @@
 namespace lmms
 {
 
+NoteFamilyAlbum::NoteFamilyAlbum()
+{}
+
+NoteFamilyAlbum::NoteFamilyAlbum(const NoteFamilyAlbum& album)
+{
+	if (album.m_lastFamily == -1)
+		return; // Only bother assigning if the other album contains at least 1 family
+
+	m_familyNames = album.m_familyNames;
+	m_familyColors = album.m_familyColors;
+
+	m_lastFamily = album.m_lastFamily;
+}
+
+NoteFamilyAlbum& NoteFamilyAlbum::operator=(const NoteFamilyAlbum& album)
+{
+	m_familyNames = album.m_familyNames;
+	m_familyColors = album.m_familyColors;
+
+	m_lastFamily = album.m_lastFamily;
+
+	return *this;
+}
+
+const QString& NoteFamilyAlbum::getFamilyName(const int family) const
+{
+	return familyExists(family) ? m_familyNames[family] : m_defaultName;
+}
+
+const QColor& NoteFamilyAlbum::getFamilyColor(const int family) const
+{
+	return familyExists(family) ? m_familyColors[family] : m_defaultColor;
+}
+
+int NoteFamilyAlbum::addFamily(const QString& familyName, const QColor& familyColor)
+{
+	m_lastFamily++;
+	if (m_lastFamily < static_cast<int>(m_familyNames.size()))
+	{
+		m_familyNames[m_lastFamily] = familyName;
+		m_familyColors[m_lastFamily] = familyColor;
+	}
+	else
+	{
+		m_familyNames.push_back(familyName);
+		m_familyColors.push_back(familyColor);
+	}
+
+	return m_lastFamily;
+}
+
+bool NoteFamilyAlbum::setFamilyName(const int family, const QString& newName)
+{
+	if (!familyExists(family)) return false;
+
+	m_familyNames[family] = newName;
+	return true;
+}
+
+bool NoteFamilyAlbum::setFamilyColor(const int family, const QColor& newColor)
+{
+	if (!familyExists(family)) return false;
+
+	m_familyColors[family] = newColor;
+	return true;
+}
+
+int NoteFamilyAlbum::deleteFamily(const int family)
+{
+	if (!familyExists(family)) return -2;
+
+	int id = m_lastFamily;
+	m_lastFamily--;
+	m_familyNames[family] = m_familyNames[id];
+	m_familyColors[family] = m_familyColors[id];
+
+	return id;
+}
+
+bool NoteFamilyAlbum::familyExists(const int family) const
+{
+	return (family <= m_lastFamily);
+}
+
+int NoteFamilyAlbum::lastFamilyId() const
+{
+	return m_lastFamily;
+}
+
+void NoteFamilyAlbum::saveSettings(QDomDocument& doc, QDomElement& parent)
+{
+	if (m_lastFamily == -1) // No data to write
+		return;
+
+	for (int i = 0; i <= m_lastFamily; i++)
+	{
+		QDomElement el = doc.createElement("family-data");
+		parent.appendChild(el);
+		el.setAttribute("familyName", m_familyNames[i]);
+		el.setAttribute("familyColor", m_familyColors[i].name(QColor::HexArgb));
+		el.setAttribute("familyId", i);
+	}
+	parent.setAttribute("familiesCount", m_lastFamily + 1);
+}
+
+void NoteFamilyAlbum::loadSettings(const QDomElement& _this )
+{
+	if (!_this.hasAttribute("familiesCount")) return; // Doesn't have the data
+
+	int familiesCount = _this.attribute("familiesCount").toInt();
+
+	if (familiesCount == 0) return; // Nothing to load
+
+	int i = 0;
+
+	QDomNode node = _this.firstChild();
+	while (!node.isNull()) {
+		if (node.isElement())
+		{
+			QDomElement el = node.toElement();
+			if (el.hasAttribute("familyName")) {
+				addFamily(el.attribute("familyName"), QColor(el.attribute("familyColor")));
+			}
+		}
+		if ((i + 1) == familiesCount) // Finished
+			break;
+		node = node.nextSibling();
+	}
+
+	if ((i + 1) != familiesCount)
+	{
+		printf("Failed to retrieve all %i note families from MidiClip XML data ! (Got : %i)", familiesCount, i + 1);
+	}
+}
+
+
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
@@ -451,6 +587,8 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 	midiClipElement.setAttribute("steps", m_steps);
 	midiClipElement.setAttribute("len", length());
 
+	m_familyAlbum->saveSettings(doc, midiClipElement);
+
 	// now save settings of all notes
 	for (auto& note : m_notes)
 	{
@@ -490,6 +628,9 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		toggleMute();
 	}
 
+	*m_familyAlbum = NoteFamilyAlbum();
+	m_familyAlbum->loadSettings(_this);
+
 	clearNotes();
 
 	QDomNode node = _this.firstChild();
@@ -503,7 +644,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 			m_notes.push_back( n );
 		}
 		node = node.nextSibling();
-        }
+    }
 
 	m_steps = _this.attribute( "steps" ).toInt();
 	if( m_steps == 0 )
@@ -564,6 +705,13 @@ void MidiClip::clear()
 {
 	addJournalCheckPoint();
 	clearNotes();
+}
+
+
+
+NoteFamilyAlbum* MidiClip::noteFamilyAlbum()
+{
+	return m_familyAlbum;
 }
 
 

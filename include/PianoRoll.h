@@ -109,6 +109,7 @@ public:
 		Erase,
 		Select,
 		Detuning,
+		Paint,
 		Knife,
 		Strum
 	};
@@ -249,6 +250,8 @@ protected slots:
 
 	void changeSnapMode();
 
+	void resetNoteFamilyModel();
+	void loadFamilyModelFromClip();
 
 signals:
 	void currentMidiClipChanged();
@@ -354,6 +357,7 @@ private:
 	QPixmap m_toolOpen = embed::getIconPixmap("automation");
 	QPixmap m_toolKnife = embed::getIconPixmap("edit_knife");
 	QPixmap m_toolStrum = embed::getIconPixmap("arp_free");
+	QPixmap m_toolPaint = embed::getIconPixmap("file"); // TODO Icon
 
 	static std::array<KeyType, 12> prKeyOrder;
 
@@ -400,6 +404,7 @@ private:
 	Action m_action;
 	NoteEditMode m_noteEditMode;
 	GridMode m_gridMode;
+	int m_noteFamily = -1;
 
 	int m_selectStartTick;
 	int m_selectedTick;
@@ -501,6 +506,8 @@ private:
 	//! Computes which notes belong to which chords from the selection
 	void setupSelectedChords();
 
+	void addNoteFamily();
+
 	TimePos m_strumStartTime;
 	TimePos m_strumCurrentTime;
 	int m_strumStartVertical = 0;
@@ -510,6 +517,9 @@ private:
 	//! Handles updating all of the note positions when performing a strum
 	void updateStrumPos(QMouseEvent* me, bool initial, bool warp);
 
+	void registerNoteFamily(const QString& name, const QColor& color, int id);
+	void setNoteFamily(int family);
+	void deleteNoteFamily(int family);
 
 	friend class PianoRollWindow;
 
@@ -555,6 +565,10 @@ private:
 	QBrush m_blackKeyInactiveBackground;
 	QBrush m_blackKeyDisabledBackground;
 
+	QMenu* m_setFamilyMenu;
+	QMenu* m_removeFamilyMenu;
+
+	QAction* m_notePaintAction;
 	Note *m_drawingNewNote = nullptr;
 } ;
 
@@ -607,6 +621,7 @@ private slots:
 	void ghostClipSet( bool state );
 	void exportMidiClip();
 	void importMidiClip();
+	void addNoteFamily();
 
 private:
 	void clipRenamed();
@@ -628,7 +643,6 @@ private:
 	ComboBox * m_chordComboBox;
 	ComboBox* m_snapComboBox;
 	QPushButton * m_clearGhostButton;
-
 };
 
 
