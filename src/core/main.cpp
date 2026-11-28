@@ -851,9 +851,9 @@ int main( int argc, char * * argv )
 			getGUI()->mainWindow()->showMaximized();
 		}
 
-		// Handle macOS-style FileOpen QEvents
+		// Handle macOS-style FileOpen QEvents, unless the user chose to recover
 		QString queuedFile = static_cast<MainApplication *>( app )->queuedFile();
-		if ( !queuedFile.isEmpty() ) {
+		if (!queuedFile.isEmpty() && fileToLoad != recoveryFile) {
 			fileToLoad = queuedFile;
 		}
 
