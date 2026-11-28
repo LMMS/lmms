@@ -32,7 +32,7 @@ MixerChannelLcdModel::MixerChannelLcdModel(Model* parent)
 	: IntModel(0, 0, 0, parent, tr("Mixer channel"))
 {
 	const auto mixer = Engine::mixer();
-	setRange(0, mixer->numChannels() - 1, 1);
+	setRange(0, mixer->numChannels() - 1);
 
 	connect(mixer, &Mixer::channelsSwapped, this, &MixerChannelLcdModel::channelsSwapped);
 	connect(mixer, &Mixer::channelDeleted, this, &MixerChannelLcdModel::channelDeleted);
