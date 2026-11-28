@@ -327,7 +327,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 
 	we->accept();
 	const int deltaY = we->angleDelta().y();
-	float direction = deltaY > 0 ? 1 : -1;
+	float direction = deltaY > 0 ? 1 : deltaY < 0 ? -1 : 0;
 
 	auto * m = model();
 	const float step = m->step<float>();
@@ -367,6 +367,8 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 			}
 		}
 	}
+
+	if (direction == 0) { return; }
 
 	// Handle "natural" scrolling, which is common on trackpads and touch devices
 	if (we->inverted()) {

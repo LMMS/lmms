@@ -212,6 +212,8 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
+		event->accept();
+		if (event->angleDelta().y() == 0) { return; }
 		const int direction = (event->angleDelta().y() < 0 ? 1 : -1) * (event->inverted() ? -1 : 1);
 		model()->setValue(model()->value() + direction);
 		update();

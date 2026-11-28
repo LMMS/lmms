@@ -84,9 +84,6 @@ public:
 	//! File descriptors for unix socketpair, used to receive SIGINT
 	static inline int s_sigintFd[2];
 
-protected:
-	bool eventFilter(QObject* watched, QEvent* event) override;
-
 public slots:
 	void displayInitProgress(const QString &msg);
 

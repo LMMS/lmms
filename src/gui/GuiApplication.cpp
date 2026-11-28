@@ -49,7 +49,6 @@
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QSocketNotifier>
-#include <QWheelEvent>
 
 #ifdef LMMS_BUILD_WIN32
 #include <io.h>
@@ -91,8 +90,6 @@ GuiApplication::GuiApplication()
 {
 	// Immediately register our SIGINT handler
 	createSocketNotifier();
-
-	qApp->installEventFilter(this);
 
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
@@ -206,18 +203,6 @@ GuiApplication::~GuiApplication()
 	s_instance = nullptr;
 }
 
-
-bool GuiApplication::eventFilter(QObject* watched, QEvent* event)
-{
-	// Drop the zero-delta wheel events trackpads send at the start and end of a gesture,
-	// which widgets would treat as scrolling down. Skip non-widgets so QApplication still tracks the gesture.
-	if (event->type() == QEvent::Wheel && watched->isWidgetType()
-		&& static_cast<QWheelEvent*>(event)->angleDelta().isNull())
-	{
-		return true;
-	}
-	return QObject::eventFilter(watched, event);
-}
 
 void GuiApplication::displayInitProgress(const QString &msg)
 {

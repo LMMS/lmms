@@ -196,6 +196,7 @@ void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 	else { m_intStep = false; }
 
 	event->accept();
+	if (event->angleDelta().y() == 0) { return; }
 	model()->setValue(model()->value() + ((event->angleDelta().y() > 0) ? 1 : -1) * getStep());
 	emit manualChange();
 }

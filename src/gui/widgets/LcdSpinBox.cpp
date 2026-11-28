@@ -146,6 +146,7 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
+	if (we->angleDelta().y() == 0) { return; }
 	const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
 
 	model()->setValue(model()->value() + direction * model()->step<int>());

@@ -326,6 +326,11 @@ void TrackView::wheelEvent(QWheelEvent* we)
 	// Note: we add the values because one of them will be 0. If the alt modifier
 	// is pressed x is non-zero and otherwise y.
 	const int deltaY = we->angleDelta().x() + we->angleDelta().y();
+	if (deltaY == 0)
+	{
+		we->ignore();
+		return;
+	}
 	int const direction = deltaY < 0 ? -1 : 1;
 
 	auto const modKeys = we->modifiers();
