@@ -661,17 +661,8 @@ bool MidiClip::empty()
 
 void MidiClip::changeTimeSignature()
 {
-	TimePos last_pos = TimePos::ticksPerBar() - 1;
-	for (const auto& note : m_notes)
-	{
-		if (note->length() < 0 && note->pos() > last_pos)
-		{
-			last_pos = note->pos() + TimePos::ticksPerBar() / TimePos::stepsPerBar();
-		}
-	}
-	last_pos = last_pos.nextFullBar() * TimePos::ticksPerBar();
-	m_steps = std::max<tick_t>(TimePos::stepsPerBar(),
-				last_pos.getBar() * TimePos::stepsPerBar());
+	const auto lastNoteEnd = m_notes.empty() ? TimePos{0} : std::ranges::max(m_notes, {}, &Note::endPos)->endPos();
+	m_steps = std::max<bar_t>(lastNoteEnd.nextFullBar(), 1) * TimePos::stepsPerBar();
 	updateLength();
 }
 
