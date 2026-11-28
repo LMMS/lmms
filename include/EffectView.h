@@ -91,7 +91,6 @@ private:
 	LedCheckBox * m_bypass;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
-	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 	
 	bool m_dragging;

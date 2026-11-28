@@ -32,7 +32,9 @@ class QWidget;
 
 namespace lmms
 {
-
+namespace gui {
+class EffectControlDialog;
+}
 
 class PeakControllerEffect;
 
@@ -54,6 +56,7 @@ public:
 
 	static void initGetControllerBySetting();
 	static PeakController * getControllerBySetting( const QDomElement & _this );
+	gui::EffectControlDialog* getEffectControlDialog();
 
 	static PeakControllerEffectVector s_effects;
 
@@ -92,14 +95,12 @@ class PeakControllerDialog : public ControllerDialog
 public:
 	PeakControllerDialog( Controller * _controller, QWidget * _parent );
 	~PeakControllerDialog() override = default;
-
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;
 	void modelChanged() override;
 
 	PeakController * m_peakController;
-
 };
 
 

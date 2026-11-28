@@ -26,11 +26,14 @@
 
 
 
-#include <QHBoxLayout>
+#include <QLayout>
 #include <QVBoxLayout>
 
+#include "FontHelper.h"
 #include "PeakControllerEffectControlDialog.h"
 #include "PeakControllerEffectControls.h"
+#include "ControllerRackView.h"
+#include "GuiApplication.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "embed.h"
@@ -45,60 +48,95 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush(backgroundRole(), QBrush(embed::getIconPixmap("peak_controller_artwork")));
 	setPalette( pal );
+	setFixedSize(240, 80);
 
-	m_baseKnob = new Knob(KnobType::Bright26, tr("BASE"), this);
-	m_baseKnob->setModel( &_controls->m_baseModel );
-	m_baseKnob->setHintText( tr( "Base:" ) , "" );
+	auto knobContainer = new QWidget(this);
+	knobContainer->setContentsMargins(0, 0, 0, 0);
+	knobContainer->setFixedSize(240, 50);
 
-	m_amountKnob = new Knob(KnobType::Bright26, tr("AMNT"), this);
-	m_amountKnob->setModel( &_controls->m_amountModel );
-	m_amountKnob->setHintText( tr( "Modulation amount:" ) , "" );
+	auto ledContainer = new QWidget(this);
+	ledContainer->setContentsMargins(0, 0, 0, 0);
+	ledContainer->setFixedSize(240, 30);
 
-	m_amountMultKnob = new Knob(KnobType::Bright26, tr("MULT"), this);
-	m_amountMultKnob->setModel( &_controls->m_amountMultModel );
-	m_amountMultKnob->setHintText( tr( "Amount multiplicator:" ) , "" );
+	m_baseKnob = new Knob(KnobType::Bright26, tr("BASE"), SMALL_FONT_SIZE, knobContainer);
+	m_baseKnob->setModel(&_controls->m_baseModel);
+	m_baseKnob->setHintText(tr( "Base:" ), "");
 
-	m_attackKnob = new Knob(KnobType::Bright26, tr("ATCK"), this);
-	m_attackKnob->setModel( &_controls->m_attackModel );
-	m_attackKnob->setHintText( tr( "Attack:" ) , "" );
+	m_amountKnob = new Knob(KnobType::Bright26, tr("AMNT"), SMALL_FONT_SIZE, knobContainer);
+	m_amountKnob->setModel(&_controls->m_amountModel);
+	m_amountKnob->setHintText(tr("Modulation amount:" ), "");
 
-	m_decayKnob = new Knob(KnobType::Bright26, tr("DCAY"), this);
-	m_decayKnob->setModel( &_controls->m_decayModel );
-	m_decayKnob->setHintText( tr( "Release:" ) , "" );
-	
-	m_tresholdKnob = new Knob(KnobType::Bright26, tr("TRSH"), this);
-	m_tresholdKnob->setModel( &_controls->m_tresholdModel );
-	m_tresholdKnob->setHintText( tr( "Treshold:" ) , "" );
+	m_amountMultKnob = new Knob(KnobType::Bright26, tr("MULT"), SMALL_FONT_SIZE, knobContainer);
+	m_amountMultKnob->setModel(&_controls->m_amountMultModel);
+	m_amountMultKnob->setHintText(tr("Amount multiplicator:"), "");
 
-	m_muteLed = new LedCheckBox( tr( "Mute output" ), this );
-	m_muteLed->setModel( &_controls->m_muteModel );
+	m_attackKnob = new Knob(KnobType::Bright26, tr("ATCK"), SMALL_FONT_SIZE, knobContainer);
+	m_attackKnob->setModel(&_controls->m_attackModel);
+	m_attackKnob->setHintText(tr("Attack:"), "");
 
-	m_absLed = new LedCheckBox( tr( "Absolute value" ), this );
-	m_absLed->setModel( &_controls->m_absModel );
+	m_decayKnob = new Knob(KnobType::Bright26, tr("DCAY"), SMALL_FONT_SIZE, knobContainer);
+	m_decayKnob->setModel(&_controls->m_decayModel);
+	m_decayKnob->setHintText(tr("Release:"), "");
+
+	m_thresholdKnob = new Knob(KnobType::Bright26, tr("TRSH"), SMALL_FONT_SIZE, knobContainer);
+	m_thresholdKnob->setModel(&_controls->m_tresholdModel);
+	m_thresholdKnob->setHintText(tr("Threshold:") , "");
+
+	m_muteLed = new LedCheckBox(tr("Mute output"), ledContainer);
+	m_muteLed->setModel(&_controls->m_muteModel);
+
+	m_absLed = new LedCheckBox(tr("Absolute value"), ledContainer);
+	m_absLed->setModel(&_controls->m_absModel);
 
 	auto mainLayout = new QVBoxLayout();
+	mainLayout->setSpacing(0);
+	mainLayout->setContentsMargins(0, 0, 0, 10);
+
 	auto knobLayout = new QHBoxLayout();
+	knobLayout->setSizeConstraint(QLayout::SetMaximumSize);
+	knobLayout->setContentsMargins(10, 0, 10, 0);
+
 	auto ledLayout = new QHBoxLayout();
+	ledLayout->setSizeConstraint(QLayout::SetMinimumSize);
+	ledLayout->setContentsMargins(10, 0, 10, 0);
 
-	knobLayout->addWidget( m_baseKnob );
-	knobLayout->addWidget( m_amountKnob );
-	knobLayout->addWidget( m_amountMultKnob );
-	knobLayout->addWidget( m_attackKnob );
-	knobLayout->addWidget( m_decayKnob );
-	knobLayout->addWidget( m_tresholdKnob );
+	knobLayout->addWidget(m_baseKnob);
+	knobLayout->addWidget(m_amountKnob);
+	knobLayout->addWidget(m_amountMultKnob);
+	knobLayout->addWidget(m_attackKnob);
+	knobLayout->addWidget(m_decayKnob);
+	knobLayout->addWidget(m_thresholdKnob);
 
-	ledLayout->addWidget( m_muteLed );
-	ledLayout->addWidget( m_absLed );
+	ledLayout->addWidget(m_muteLed);
+	ledLayout->addWidget(m_absLed);
 
-	mainLayout->addLayout( knobLayout );
-	mainLayout->addLayout( ledLayout );
+	mainLayout->addWidget(knobContainer);
+	mainLayout->addWidget(ledContainer);
 
-	mainLayout->setSizeConstraint(QLayout::SetFixedSize);
+	knobContainer->setLayout(knobLayout);
+	ledContainer->setLayout(ledLayout);
 
-	setLayout( mainLayout );
+	setLayout(mainLayout);
 }
 
+
+void PeakControllerEffectControlDialog::showDialog()
+{
+	auto* controllerRack = getGUI()->getControllerRackView();
+	controllerRack->show();
+	controllerRack->subWin()->show();
+	controllerRack->subWin()->raise();
+	controllerRack->setFocus();
+	emit dynamic_cast<PeakControllerEffectControls*>(m_effectControls)->controlsClicked();
+	m_effectControls->setViewVisible(true);
+}
+
+
+void PeakControllerEffectControlDialog::toggleView()
+{
+	showDialog();
+}
 
 } // namespace lmms::gui

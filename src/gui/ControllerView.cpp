@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2019 Steffen Baranowsky <BaraMGB/at/freenet.de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,22 +24,25 @@
  *
  */
 
-
-#include <QLabel>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QMdiArea>
-#include <QInputDialog>
-#include <QVBoxLayout>
-
 #include "ControllerView.h"
 
+#include <QInputDialog>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPainter>
+#include <QPushButton>
+
 #include "CaptionMenu.h"
+#include "ControllerConnection.h"
 #include "ControllerDialog.h"
-#include "embed.h"
+#include "ControllerRackView.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
+#include "LmmsStyle.h"
 #include "MainWindow.h"
-#include "SubWindow.h"
+#include "ProjectJournal.h"
+#include "StringPairDrag.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -47,68 +51,76 @@ namespace lmms::gui
 ControllerView::ControllerView(Controller* model, QWidget* parent)
 	: QFrame{parent}
 	, ModelView{model, this}
-	, m_subWindow{nullptr}
 	, m_controllerDlg{nullptr}
+    , m_titleBarHeight{24}
+    , m_modelC(model)
 {
+	const QSize buttonsize(17, 17);
 	setFrameStyle(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Raised);
 	setFocusPolicy(Qt::StrongFocus);
+	setLineWidth(0);
+	setContentsMargins(0, 0, 0, 0);
 
-	auto vBoxLayout = new QVBoxLayout(this);
+	m_controllerDlg = getController()->createDialog(this);
+	m_controllerDlg->move(1, m_titleBarHeight);
 
-	auto hBox = new QHBoxLayout();
-	vBoxLayout->addLayout(hBox);
-
-	auto label = new QLabel("<b>" + model->displayName() + "</b>", this);
-	QSizePolicy sizePolicy = label->sizePolicy();
-	sizePolicy.setHorizontalStretch(1);
-	label->setSizePolicy(sizePolicy);
-
-	hBox->addWidget(label);
-
-	auto controlsButton = new QPushButton(tr("Controls"), this);
-	connect( controlsButton, SIGNAL(clicked()), SLOT(editControls()));
-
-	hBox->addWidget(controlsButton);
+	controllerTypeLabel = new QLabel(this);
+	controllerTypeLabel->setText(QString(getController()->type() == Controller::ControllerType::Lfo
+		? QString("LFO: ")
+		: QString("PEAK: ")));
+	controllerTypeLabel->setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
+	controllerTypeLabel->move(3, 3);
+	controllerTypeLabel->show();
 
 	m_nameLabel = new QLabel(model->name(), this);
-	vBoxLayout->addWidget(m_nameLabel);
+	m_nameLabel->setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
+	m_nameLabel->move(controllerTypeLabel->sizeHint().width() + 3, 3);
 
+	setFixedWidth(m_controllerDlg->width() + 2);
+	setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
 
-	m_controllerDlg = getController()->createDialog(getGUI()->mainWindow()->workspace());
+	m_collapseButton = new QPushButton(QString(), this );
+	m_collapseButton->setObjectName("btn-stepper-down");
+	m_collapseButton->resize(buttonsize);
+	m_collapseButton->setFocusPolicy(Qt::NoFocus);
+	m_collapseButton->setCursor(Qt::ArrowCursor);
+	m_collapseButton->setAttribute(Qt::WA_NoMousePropagation);
+	m_collapseButton->setToolTip(tr("collapse"));
+	m_collapseButton->move(width() - buttonsize.width() - 3, 3);
+	connect(m_collapseButton, SIGNAL(clicked()), this, SLOT(toggleCollapseController()));
 
-	m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_controllerDlg);
-	m_subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
-	m_subWindow->hide();
-
+	setAcceptDrops(true);
 	setModel(model);
 }
 
 
 
-
-ControllerView::~ControllerView()
+bool ControllerView::isCollapsed() const
 {
-	if (m_subWindow)
-	{
-		delete m_subWindow;
-	}
+	return m_controllerDlg->isHidden();
 }
 
 
 
 
-void ControllerView::editControls()
+void ControllerView::collapseController(bool collapse)
 {
-	if (!m_controllerDlg->isVisible())
+	if (collapse)
 	{
-		m_subWindow->show();
-		m_subWindow->raise();
+		m_collapseButton->setObjectName("btn-stepper-left");
+		m_controllerDlg->hide();
+		setFixedHeight(m_titleBarHeight);
+		emit controllerCollapsed();
 	}
 	else
 	{
-		m_subWindow->hide();
+		m_controllerDlg->show();
+		setFixedHeight(m_controllerDlg->height() + m_titleBarHeight + 1);
+		m_collapseButton->setObjectName("btn-stepper-down");
 	}
+	m_collapseButton->style()->unpolish(m_collapseButton);
+	m_collapseButton->style()->polish(m_collapseButton);
 }
 
 
@@ -119,6 +131,15 @@ void ControllerView::moveUp() { emit movedUp(this); }
 void ControllerView::moveDown() { emit movedDown(this); }
 
 void ControllerView::removeController() { emit removedController(this); }
+
+
+
+
+void ControllerView::toggleCollapseController()
+{
+	collapseController(!m_controllerDlg->isHidden());
+}
+
 
 void ControllerView::renameController()
 {
@@ -131,19 +152,59 @@ void ControllerView::renameController()
 	if( ok && !new_name.isEmpty() )
 	{
 		c->setName( new_name );
-		if( getController()->type() == Controller::ControllerType::Lfo )
-		{
-			m_controllerDlg->setWindowTitle( tr( "LFO" ) + " (" + new_name + ")" );
-		}
 		m_nameLabel->setText( new_name );
 	}
 }
 
 
-void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
+void ControllerView::mouseDoubleClickEvent(QMouseEvent* me)
 {
-	renameController();
+	if (me->y() <= m_titleBarHeight)
+	{
+		toggleCollapseController();
+	}
 }
+
+
+
+
+void ControllerView::dragEnterEvent(QDragEnterEvent* dee)
+{
+	StringPairDrag::processDragEnterEvent(dee, "automatable_model" );
+}
+
+
+
+
+void ControllerView::dropEvent(QDropEvent* de)
+{
+	QString type = StringPairDrag::decodeKey(de);
+	QString val = StringPairDrag::decodeValue(de);
+	if (type == "automatable_model")
+	{
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
+		if (mod != nullptr)
+		{
+			if (m_modelC->hasModel(mod))
+			{
+				QMessageBox::warning(this, tr("LMMS"), tr("Cycle Detected."));
+			}
+			else
+			{
+				if (mod->controllerConnection())
+				{
+					mod->controllerConnection()->setController(getController());
+				}
+				else
+				{
+					ControllerConnection* cc = new ControllerConnection(getController());
+					mod->setControllerConnection(cc);
+				}
+			}
+		}
+	}
+}
+
 
 
 
@@ -157,16 +218,35 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	Controller* c = castModel<Controller>();
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(c->name(), this);
-	contextMenu->addAction(embed::getIconPixmap("arp_up"), tr("Move &up"), this, &ControllerView::moveUp);
-	contextMenu->addAction(embed::getIconPixmap("arp_down"), tr("Move &down"), this, &ControllerView::moveDown);
+	auto moveUpAction = contextMenu->addAction(embed::getIconPixmap("arp_up"), tr("Move &up"), this, &ControllerView::moveUp);
+	moveUpAction->setDisabled(getGUI()->getControllerRackView()->controllerViews().first() == this);
+
+	auto moveDownAction = contextMenu->addAction(embed::getIconPixmap("arp_down"), tr("Move &down"), this, &ControllerView::moveDown);
+	moveDownAction->setDisabled(getGUI()->getControllerRackView()->controllerViews().last() == this);
+
 	contextMenu->addSeparator();
 	contextMenu->addAction(
 		embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, &ControllerView::removeController);
 	contextMenu->addAction( tr("Re&name this controller"), this, SLOT(renameController()));
+
+	contextMenu->addSeparator();
+	auto collapseAction = contextMenu->addAction(embed::getIconPixmap("arrow-left"), tr("&Collapse all controllers"), this, SIGNAL(collapseAll()));
+	collapseAction->setDisabled(getGUI()->getControllerRackView()->allCollapsed());
+
+	auto expandAction = contextMenu->addAction(embed::getIconPixmap("arrow-down"), tr("&Expand all controllers"), this, SIGNAL(expandAll()));
+	expandAction->setDisabled(getGUI()->getControllerRackView()->allExpanded());
+
 	contextMenu->addSeparator();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
 
+
+void ControllerView::paintEvent(QPaintEvent*)
+{
+	QPainter p(this);
+	QRect rect(1, 1, width() - 2, m_titleBarHeight);
+	p.fillRect(rect, p.background());
+}
 
 } // namespace lmms::gui

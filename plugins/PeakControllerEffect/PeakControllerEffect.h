@@ -49,6 +49,11 @@ public:
 		return &m_peakControls;
 	}
 
+	gui::EffectControlDialog* dialog()
+	{
+		return m_dialog;
+	}
+
 	float lastSample()
 	{
 		return m_lastSample;
@@ -71,12 +76,17 @@ public:
 
 	int m_effectId;
 
+public slots:
+	void scrollAndFocusController();
+
 private:
 	PeakControllerEffectControls m_peakControls;
 
 	float m_lastSample;
 
 	PeakController * m_autoController;
+
+	gui::EffectControlDialog* m_dialog;
 
 	friend class PeakControllerEffectControls;
 

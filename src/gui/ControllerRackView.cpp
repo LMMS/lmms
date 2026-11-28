@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2010-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2019 Steffen Baranowsky <BaraMGB/at/freenet.de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,23 +26,25 @@
 
 #include "ControllerRackView.h"
 
-#include <QApplication>
 #include <QAction>
+#include <QApplication>
+#include <QMdiSubWindow>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QMessageBox>
+#include <QScrollBar>
 #include <QVBoxLayout>
 
 #include <algorithm>
 
 #include "ControllerView.h"
 #include "DeprecationHelper.h"
-#include "embed.h"
 #include "GuiApplication.h"
 #include "LfoController.h"
 #include "MainWindow.h"
 #include "Song.h"
 #include "SubWindow.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -49,24 +52,29 @@ namespace lmms::gui
 
 ControllerRackView::ControllerRackView()
 	: QWidget{}
-	, m_nextIndex{0}
+	, m_collapsingStateOnLoad()
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
 
-	m_scrollArea = new QScrollArea( this );
-	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
-	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_subWin = getGUI()->mainWindow()->addWindowedWidget(this);
+
+	m_scrollArea = new QScrollArea(m_subWin);
+	m_scrollArea->setPalette(QApplication::palette(m_scrollArea));
+	m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
 	auto scrollAreaWidget = new QWidget(m_scrollArea);
 	m_scrollAreaLayout = new QVBoxLayout( scrollAreaWidget );
 	m_scrollAreaLayout->addStretch();
+	m_scrollAreaLayout->setContentsMargins(0, 0, 0, 0);
+	m_scrollAreaLayout->setSpacing(0);
 	scrollAreaWidget->setLayout( m_scrollAreaLayout );
 
 	m_scrollArea->setWidget( scrollAreaWidget );
 	m_scrollArea->setWidgetResizable( true );
 
-	m_addButton = new QPushButton( this );
+	m_addButton = new QPushButton(m_subWin);
 	m_addButton->setText( tr( "Add" ) );
 
 	connect( m_addButton, SIGNAL(clicked()),
@@ -79,37 +87,47 @@ ControllerRackView::ControllerRackView()
 	auto layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
+	layout->setContentsMargins(0, 0, 0, 0);
 	this->setLayout( layout );
 
-	SubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget(this);
-
-	setFixedWidth(350);
+	setFixedWidth(254);
+	resize(254, 400);
 	setMinimumHeight(200);
 
-	// No maximize button
-	Qt::WindowFlags flags = subWin->windowFlags();
+	Qt::WindowFlags flags = m_subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags( flags );
-	
-	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
-	subWin->move( 680, 310 );
+	m_subWin->setWindowFlags(flags);
+
+	m_subWin->setAttribute(Qt::WA_DeleteOnClose, false);
+	m_subWin->move(680, 60);
 }
 
 
 
 
-void ControllerRackView::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void ControllerRackView::saveSettings(QDomDocument&, QDomElement& parent)
 {
-	MainWindow::saveWidgetState( this, _this );
+	parent.setAttribute(QString("controllerCount"), m_controllerViews.size());
+	for (auto i = 1; i <= m_controllerViews.size(); i++)
+	{
+		bool collapsed = m_controllerViews.at(i - 1)->isCollapsed();
+		parent.setAttribute(QString("controllerView") + QString::number(i), collapsed);
+	}
+	MainWindow::saveWidgetState(this, parent);
 }
 
 
 
 
-void ControllerRackView::loadSettings( const QDomElement & _this )
+void ControllerRackView::loadSettings(const QDomElement& _this)
 {
-	MainWindow::restoreWidgetState( this, _this );
+	int controllerCount = _this.attribute(QString("controllerCount")).toInt();
+	for (auto i = 1; i <= controllerCount; i++)
+	{
+		bool collapsingState = _this.attribute(QString("controllerView") + QString::number(i)).toInt();
+		m_collapsingStateOnLoad.append(collapsingState);
+	}
+	MainWindow::restoreWidgetState(this, _this);
 }
 
 
@@ -139,25 +157,27 @@ void ControllerRackView::deleteController( ControllerView * _view )
 
 void ControllerRackView::moveUp(ControllerView* view)
 {
-	if (view == m_controllerViews.first()) { return; }
-
-	const auto storedView = std::ranges::find(m_controllerViews, view);
-	assert(storedView != m_controllerViews.end());
-
-	const auto index = std::distance(m_controllerViews.begin(), storedView);
-
-	std::swap(m_controllerViews[index - 1], m_controllerViews[index]);
-	m_scrollAreaLayout->removeWidget(view);
-	m_scrollAreaLayout->insertWidget(index - 1, view);
+	if (view != m_controllerViews.first())
+	{
+		int index = m_controllerViews.indexOf(view);
+		m_scrollAreaLayout->removeWidget(view);
+		m_scrollAreaLayout->insertWidget(index - 1, view);
+		m_controllerViews.remove(index);
+		m_controllerViews.insert(index - 1, view);
+		Engine::getSong()->moveControllerUp(view->getController());
+	}
 }
+
+
+
 
 void ControllerRackView::moveDown(ControllerView* view)
 {
-	if (view == m_controllerViews.last()) { return; }
-
-	const auto storedView = std::ranges::find(m_controllerViews, view);
-	assert(storedView != m_controllerViews.end());
-	moveUp(*std::next(storedView));
+	if (view != m_controllerViews.last())
+	{
+		int index = m_controllerViews.indexOf(view);
+		moveUp(m_controllerViews.at(index + 1));
+	}
 }
 
 void ControllerRackView::addController(Controller* controller)
@@ -165,7 +185,9 @@ void ControllerRackView::addController(Controller* controller)
 	QWidget * scrollAreaWidget = m_scrollArea->widget();
 
 	auto controllerView = new ControllerView(controller, scrollAreaWidget);
-
+	connect(controllerView, &ControllerView::controllerCollapsed, this, &ControllerRackView::onControllerCollapsed);
+	connect(controllerView, &ControllerView::collapseAll, this, &ControllerRackView::collapsingAll);
+	connect(controllerView, &ControllerView::expandAll, this, &ControllerRackView::expandAll);
 	connect(controllerView, &ControllerView::movedUp, this, &ControllerRackView::moveUp);
 	connect(controllerView, &ControllerView::movedDown, this, &ControllerRackView::moveDown);
 	connect(controllerView, &ControllerView::removedController, this, &ControllerRackView::deleteController, Qt::QueuedConnection);
@@ -182,37 +204,43 @@ void ControllerRackView::addController(Controller* controller)
 	connect(moveDownAction, &QAction::triggered, controllerView, &ControllerView::moveDown);
 	controllerView->addAction(moveDownAction);
 
-
 	m_controllerViews.append( controllerView );
-	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );
+	int n = m_scrollAreaLayout->count() - 1;
+	m_scrollAreaLayout->insertWidget(n, controllerView);
 
-	++m_nextIndex;
-}
-
-
-
-
-void ControllerRackView::removeController(Controller* removedController)
-{
-	ControllerView * viewOfRemovedController = 0;
-
-	QVector<ControllerView *>::const_iterator end = m_controllerViews.end();
-	for ( QVector<ControllerView *>::const_iterator it = m_controllerViews.begin(); it != end; ++it)
+	if (Engine::getSong()->isLoadingProject())
 	{
-		ControllerView *currentControllerView = *it;
-		if ( currentControllerView->getController() == removedController )
+		if (!m_collapsingStateOnLoad.empty() && m_collapsingStateOnLoad.at(m_controllerViews.size() - 1))
 		{
-			viewOfRemovedController = currentControllerView;
-			break;
+			controllerView->collapseController(true);
 		}
 	}
 
-	if (viewOfRemovedController )
-	{
-		m_controllerViews.erase(std::ranges::find(m_controllerViews, viewOfRemovedController));
+	update();
 
-		delete viewOfRemovedController;
-		--m_nextIndex;
+	auto vBar = m_scrollArea->verticalScrollBar();
+	auto const connection = new QMetaObject::Connection;
+	*connection = connect(vBar, &QScrollBar::rangeChanged, [vBar, connection](int min, int max){
+		vBar->setValue(max);
+		disconnect(*connection);
+		delete connection;
+	});
+}
+
+void ControllerRackView::removeController(Controller* removedController)
+{
+	for (auto& it : m_controllerViews)
+	{
+		if (it->getController() == removedController)
+		{
+			ControllerView* viewOfRemovedController = it;
+			m_controllerViews.erase(std::find(m_controllerViews.begin(),
+						m_controllerViews.end(), viewOfRemovedController));
+
+			delete viewOfRemovedController;
+			update();
+			break;
+		}
 	}
 }
 
@@ -229,5 +257,90 @@ void ControllerRackView::addController()
 	// new controller
 	setFocus();
 }
+
+
+void ControllerRackView::collapsingAll()
+{
+	for (auto& it : m_controllerViews)
+	{
+		it->collapseController(true);
+	}
+}
+
+void ControllerRackView::expandAll()
+{
+	for (auto& it : m_controllerViews)
+	{
+		it->collapseController(false);
+	}
+}
+
+
+
+void ControllerRackView::onControllerCollapsed()
+{
+	update();
+}
+
+
+const QVector<ControllerView*> ControllerRackView::controllerViews() const
+{
+	return m_controllerViews;
+}
+
+
+
+
+bool ControllerRackView::allCollapsed() const
+{
+	for (auto& it : m_controllerViews)
+	{
+		if (!it->isCollapsed())
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
+
+bool ControllerRackView::allExpanded() const
+{
+	for (auto& it : m_controllerViews)
+	{
+		if (it->isCollapsed())
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
+void ControllerRackView::scrollAndFocus(Controller* c) const
+{
+	for (auto& it : m_controllerViews)
+	{
+		if (it->getController() == c)
+		{
+			it->collapseController(false);
+			// If the controllerview was collapsed, this may scroll to just the header.
+			m_scrollArea->ensureWidgetVisible(it, 50, 200);
+			return;
+		}
+	}
+}
+
+QMdiSubWindow* ControllerRackView::subWin() const
+{
+	return m_subWin;
+}
+
+
+
+
 
 } // namespace lmms::gui

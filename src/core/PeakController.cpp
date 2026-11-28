@@ -252,5 +252,9 @@ gui::ControllerDialog * PeakController::createDialog( QWidget * _parent )
 	return new gui::PeakControllerDialog( this, _parent );
 }
 
+gui::EffectControlDialog* PeakController::getEffectControlDialog()
+{
+	return m_peakEffect->dialog();
+}
 
 } // namespace lmms

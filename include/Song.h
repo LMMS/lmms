@@ -292,6 +292,7 @@ public:
 
 	void addController( Controller * c );
 	void removeController( Controller * c );
+	void moveControllerUp(Controller* c);
 
 
 	const ControllerVector & controllers() const
