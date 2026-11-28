@@ -526,6 +526,22 @@ QPushButton#btn-solo:checked {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5aa8d9, stop:0.1 #2696d1, stop:0.9 #2696d1, stop:1 #16638c);
 }
 
+QPushButton#btn-close {
+	image: url("resources:close.svg");
+}
+
+QPushButton#btn-maximize {
+	image: url("resources:maximize.svg");
+}
+
+QPushButton#btn-restore {
+	image: url("resources:restore.svg");
+}
+
+QPushButton#btn-detach {
+	image: url("resources:detach.svg");
+}
+
 /* font sizes */
 
 lmms--gui--Sf2InstrumentView > QLabel {
@@ -702,14 +718,12 @@ lmms--gui--TrackLabelButton:pressed {
 lmms--gui--TrackLabelButton:checked {
 	border: 1px solid #485059;
 	background: #1C1F24;
-	background-image: url("resources:track_shadow_p.png");
 	border-radius: none;
 }
 
 lmms--gui--TrackLabelButton:checked:pressed {
 	border: 1px solid #2f353b;
 	background: #0e1012;
-	background-image: url("resources:track_shadow_p.png");
 	font-weight: solid;
 }
 
@@ -895,10 +909,15 @@ lmms--gui--PatternClipView {
 
 /* Subwindows in MDI-Area */
 lmms--gui--SubWindow {
+    /* Qt renders its own pixellated header. This can't be easily disabled.
+        Hide it by making it invisible via style. */
+    background-color: #00000000;
 	color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #090909, stop:0.05 #3D454F, stop:1 #262B30);
 	qproperty-activeColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1 stop:0 #090909, stop:0.05 #636c7a, stop:1 #343840);
+    qproperty-backgroundColor: #262B30;
 	qproperty-textShadowColor: #000;
 	qproperty-borderColor: #5c6b7a;
+	qproperty-topRadius: 10;
 }
 
 /* Subwindow title text */
@@ -922,6 +941,8 @@ lmms--gui--SubWindow > QPushButton:hover{
 	border-color: rgba( 0, 0, 0, 20% );
 	border-style: solid;
 	border-radius: 2px;
+    /* Adding a border shrinks the icon. By padding -1, the icon can expand back to its unhovered size. */
+    padding: -1px;
 }
 
 /* Instrument */
