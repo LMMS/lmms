@@ -144,8 +144,6 @@ public:
 		return (std::round(v) != 0);
 	}
 
-	float oldValue() const { return m_oldValue; }
-
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
@@ -424,6 +422,7 @@ private:
 	bool m_useControllerValue;
 
 signals:
+	void valueChanged(float newValue, float previousValue);
 	void initValueChanged( float val );
 	void destroyed( lmms::jo_id_t id );
 

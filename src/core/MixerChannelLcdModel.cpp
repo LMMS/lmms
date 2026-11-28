@@ -38,13 +38,9 @@ MixerChannelLcdModel::MixerChannelLcdModel(Model* parent)
 	connect(mixer, &Mixer::channelDeleted, this, &MixerChannelLcdModel::channelDeleted);
 	connect(mixer, &Mixer::channelCreated, this, &MixerChannelLcdModel::channelCreated);
 
-	connect(this, &MixerChannelLcdModel::dataChanged, mixer, [this, mixer] {
-		// both channels must exist so we know the channel was actually changed to another
-		if (oldValue() < 0 || oldValue() >= mixer->numChannels()) { return; }
-		if (value() < 0 || value() >= mixer->numChannels()) { return; }
-
-		mixer->mixerChannel(oldValue())->decrementUseCount();
-		mixer->mixerChannel(value())->incrementUseCount();
+	connect(this, &MixerChannelLcdModel::valueChanged, mixer, [mixer](float newValue, float previousValue) {
+		mixer->mixerChannel(previousValue)->decrementUseCount();
+		mixer->mixerChannel(newValue)->incrementUseCount();
 	});
 
 	mixer->mixerChannel(0)->incrementUseCount();
@@ -53,7 +49,6 @@ MixerChannelLcdModel::MixerChannelLcdModel(Model* parent)
 MixerChannelLcdModel::~MixerChannelLcdModel()
 {
 	const auto mixer = Engine::mixer();
-	if (value() < 0 || value() >= mixer->numChannels()) { return; }
 	mixer->mixerChannel(value())->decrementUseCount();
 }
 
