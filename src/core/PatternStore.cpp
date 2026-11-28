@@ -116,7 +116,7 @@ void PatternStore::removePattern(int pattern)
 	for (Track * t : tl)
 	{
 		delete t->getClip(pattern);
-		t->removeBar(pattern * DefaultTicksPerBar);
+		t->removeBar(TimePos(pattern, 0));
 	}
 	if (pattern <= currentPattern())
 	{
@@ -142,7 +142,7 @@ void PatternStore::swapPattern(int pattern1, int pattern2)
 
 void PatternStore::updatePatternTrack(Clip* clip)
 {
-	PatternTrack * t = PatternTrack::findPatternTrack(clip->startPosition() / DefaultTicksPerBar);
+	PatternTrack * t = PatternTrack::findPatternTrack(clip->startPosition().getBar());
 	if (t != nullptr)
 	{
 		t->dataChanged();
