@@ -139,7 +139,7 @@ void Knob::onKnobNumUpdated()
 		{
 			convertPixmapToGrayScale(*m_knobPixmap.get());
 		}
-		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
+		setFixedSize(embed::logicalSize(*m_knobPixmap));
 	}
 }
 
@@ -175,12 +175,13 @@ void Knob::updateFixedSize()
 	{
 		if (m_knobPixmap)
 		{
+			const auto szKnob = embed::logicalSize(*m_knobPixmap);
 			// In legacy mode only the width of the label is taken into account while the height is not
 			const int labelWidth = QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)).horizontalAdvance(m_label);
-			const int width = std::max(m_knobPixmap->width(), labelWidth);
+			const int width = std::max(szKnob.width(), labelWidth);
 
 			// Legacy mode assumes that the label will fit into 10 pixels plus some of the pixmap area
-			setFixedSize(width, m_knobPixmap->height() + 10);
+			setFixedSize(width, szKnob.height() + 10);
 		}
 	}
 	else
@@ -193,7 +194,7 @@ void Knob::updateFixedSize()
 			return;
 		}
 
-		QSize pixmapSize = m_knobPixmap ? m_knobPixmap->size() : QSize(0, 0);
+		QSize pixmapSize = m_knobPixmap ? embed::logicalSize(*m_knobPixmap) : QSize(0, 0);
 
 		auto fm = QFontMetrics(font());
 
@@ -379,6 +380,8 @@ bool Knob::updateAngle()
 
 void Knob::drawKnob( QPainter * _p )
 {
+	auto scale = devicePixelRatioF();
+	_p->scale(1.0 / scale, 1.0 / scale);
 	bool enabled = this->isEnabled();
 	QColor currentArcColor = enabled ? m_arcActiveColor : m_arcInactiveColor;
 	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
@@ -388,11 +391,11 @@ void Knob::drawKnob( QPainter * _p )
 		_p->drawImage( 0, 0, m_cache );
 		return;
 	}
-
-	m_cache = QImage( size(), QImage::Format_ARGB32 );
+	m_cache = QImage(size() * scale, QImage::Format_ARGB32);
 	m_cache.fill( qRgba( 0, 0, 0, 0 ) );
 
 	QPainter p( &m_cache );
+	p.scale(scale, scale);
 
 	QPoint mid;
 
@@ -427,19 +430,18 @@ void Knob::drawKnob( QPainter * _p )
 
 
 	// Old-skool knobs
-	const float radius = m_knobPixmap->width() / 2.0f - 1;
-	mid = QPoint( width() / 2, m_knobPixmap->height() / 2 );
+	auto const szKnob = embed::logicalSize(*m_knobPixmap);
+	const float radius = szKnob.width() / 2.0f - 1;
+	mid = QPoint(width() / 2, szKnob.height() / 2);
 
-	p.drawPixmap( static_cast<int>(
-				width() / 2 - m_knobPixmap->width() / 2 ), 0,
-				*m_knobPixmap );
+	p.drawPixmap(width() / 2 - szKnob.width() / 2, 0, *m_knobPixmap);
 
 	p.setRenderHint( QPainter::Antialiasing );
 
 	const int centerAngle = angleFromValue( model()->inverseScaledValue( model()->centerValue() ), model()->minValue(), model()->maxValue(), m_totalAngle );
 
 	const int arcLineWidth = 2;
-	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
+	const int arcRectSize = szKnob.width() - arcLineWidth;
 
 	p.setPen(QPen(currentArcColor, 2));
 	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, 315*16, 16*m_totalAngle );
@@ -505,8 +507,8 @@ void Knob::paintEvent(QPaintEvent*)
 {
 	QPainter p(this);
 
-	drawKnob(&p);
 	drawLabel(p);
+	drawKnob(&p);
 }
 
 void Knob::changeEvent(QEvent * ev)
