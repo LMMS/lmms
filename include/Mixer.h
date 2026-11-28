@@ -88,9 +88,15 @@ public:
 	void incrementDeps();
 	void processed();
 
+	int useCount() const { return m_useCount; }
+
+	void incrementUseCount() { ++m_useCount; }
+	void decrementUseCount() { --m_useCount; }
+
 private:
 	void doProcessing() override;
 	int m_channelIndex;
+	int m_useCount;
 	std::optional<QColor> m_color;
 };
 
@@ -213,6 +219,11 @@ public:
 	}
 
 	MixerRouteVector m_mixerRoutes;
+
+signals:
+	void channelCreated(int index);
+	void channelDeleted(int index);
+	void channelsSwapped(int fromIndex, int toIndex);
 
 private:
 	// the mixer channels in the mixer. index 0 is always master.

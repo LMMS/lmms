@@ -436,6 +436,7 @@ private:
 	bool m_useControllerValue;
 
 signals:
+	void valueChanged(float newValue, float previousValue);
 	void initValueChanged( float val );
 	void destroyed( lmms::jo_id_t id );
 
