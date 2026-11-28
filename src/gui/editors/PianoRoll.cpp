@@ -1860,6 +1860,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 					TimePos note_len = drawingNote ? TimePos(0, quantization()) : newNoteLen();
 
+					m_minResizeLen = 1;
+
 					Note new_note( note_len, note_pos, key_num );
 					new_note.setSelected( true );
 					new_note.setPanning( m_lastNotePanning );
@@ -3285,8 +3287,6 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 		{
 			// shift is not pressed (or note is being drawn); stretch length of selected notes but not their position
 			int minLength = alt ? 1 : m_minResizeLen.getTicks();
-
-			if (m_drawingNewNote) { minLength = quantization(); } // For some reason drawn notes can be zeroed otherwise
 
 			if (m_gridMode == GridMode::Snap)
 			{
