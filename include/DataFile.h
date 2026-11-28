@@ -159,6 +159,7 @@ private:
 	void upgrade_fixBassLoopsTypo();
 	void findProblematicLadspaPlugins();
 	void upgrade_noHiddenAutomationTracks();
+	void upgrade_patternStepsFromNotes();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
