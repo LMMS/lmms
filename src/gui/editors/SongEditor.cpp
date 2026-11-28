@@ -549,7 +549,9 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// move zoom slider (pixelsPerBar will change automatically)
 		int step = we->modifiers() & Qt::ShiftModifier ? 1 : 5;
 		// when Alt is pressed, wheelEvent returns delta for x coordinate (mimics horizontal mouse wheel)
-		int direction = (we->angleDelta().y() + we->angleDelta().x()) > 0 ? 1 : -1;
+		const int delta = we->angleDelta().y() + we->angleDelta().x();
+		if (delta == 0) { return; }
+		int direction = delta > 0 ? 1 : -1;
 		m_zoomingModel->incValue(step * direction);
 
 		// scroll to zooming around cursor's tick

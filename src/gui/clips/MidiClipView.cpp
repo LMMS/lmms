@@ -502,6 +502,12 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 			return;
 		}
 
+		if (we->angleDelta().y() == 0)
+		{
+			we->accept();
+			return;
+		}
+
 		Note * n = m_clip->noteAtStep( step );
 		const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
 		if(!n && direction > 0)

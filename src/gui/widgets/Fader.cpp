@@ -269,13 +269,14 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 
 void Fader::wheelEvent (QWheelEvent* ev)
 {
+	ev->accept();
+	if (ev->angleDelta().y() == 0) { return; }
+
 	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
 	const float increment = determineAdjustmentDelta(ev->modifiers()) * direction;
 
 	adjustByDecibelDelta(increment);
-
-	ev->accept();
 }
 
 float Fader::determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) const
