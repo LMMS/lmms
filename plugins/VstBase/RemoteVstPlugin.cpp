@@ -246,9 +246,15 @@ public:
 	// determine name of current program
 	const char * programName();
 
-	void getParameterDisplays();
+	void loadAllParameterDisplays();
 
-	void getParameterLabels();
+	void loadAllParameterLabels();
+
+	//! Updates a parameter display that has already been loaded
+	void updateParameterDisplay(int index);
+
+	//! Updates a parameter label that has already been loaded
+	void updateParameterLabel(int index);
 
 	// send name of current program back to host
 	void sendCurrentProgramName();
@@ -670,14 +676,21 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			//sendMessage( IdVstSetParameter );
 			break;
 
-		case IdVstParameterDisplays:
-			getParameterDisplays();
+		case IdVstLoadAllParameterDisplays:
+			loadAllParameterDisplays();
 			break;
 
-		case IdVstParameterLabels:
-			getParameterLabels();
+		case IdVstLoadAllParameterLabels:
+			loadAllParameterLabels();
 			break;
 
+		case IdVstUpdateParameterDisplay:
+			updateParameterDisplay(_m.getInt());
+			break;
+
+		case IdVstUpdateParameterLabel:
+			updateParameterLabel(_m.getInt());
+			break;
 
 		case IdVstIdleUpdate:
 		{
@@ -1202,7 +1215,7 @@ const char * RemoteVstPlugin::programName()
 
 
 // join the ParameterDisplays (stringified values without units) and send them to host
-void RemoteVstPlugin::getParameterDisplays()
+void RemoteVstPlugin::loadAllParameterDisplays()
 {
 	std::string paramDisplays;
 	static char buf[9]; // buffer for getting string
@@ -1217,13 +1230,13 @@ void RemoteVstPlugin::getParameterDisplays()
 		paramDisplays += buf;
 	}
 
-	sendMessage( message( IdVstParameterDisplays ).addString( paramDisplays.c_str() ) );
+	sendMessage(message(IdVstLoadAllParameterDisplays).addString(std::move(paramDisplays)));
 }
 
 
 
 // join the ParameterLabels (units) and send them to host
-void RemoteVstPlugin::getParameterLabels()
+void RemoteVstPlugin::loadAllParameterLabels()
 {
 	std::string paramLabels;
 	static char buf[9]; // buffer for getting string
@@ -1238,7 +1251,35 @@ void RemoteVstPlugin::getParameterLabels()
 		paramLabels += buf;
 	}
 
-	sendMessage( message( IdVstParameterLabels ).addString( paramLabels.c_str() ) );
+	sendMessage(message(IdVstLoadAllParameterLabels).addString(std::move(paramLabels)));
+}
+
+
+
+
+void RemoteVstPlugin::updateParameterDisplay(int index)
+{
+	assert(index < m_plugin->numParams);
+
+	static char display[9] = {};
+	pluginDispatch(effGetParamDisplay, index, 0, display);
+	display[8] = '\0';
+
+	sendMessage(message(IdVstUpdateParameterDisplay).addInt(index).addString(display));
+}
+
+
+
+
+void RemoteVstPlugin::updateParameterLabel(int index)
+{
+	assert(index < m_plugin->numParams);
+
+	static char label[9] = {};
+	pluginDispatch(effGetParamLabel, index, 0, label);
+	label[8] = '\0';
+
+	sendMessage(message(IdVstUpdateParameterLabel).addInt(index).addString(label));
 }
 
 

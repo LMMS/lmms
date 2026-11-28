@@ -32,6 +32,8 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 #include "ControllerView.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
@@ -139,7 +141,7 @@ void ControllerRackView::moveUp(ControllerView* view)
 {
 	if (view == m_controllerViews.first()) { return; }
 
-	const auto storedView = std::find(m_controllerViews.begin(), m_controllerViews.end(), view);
+	const auto storedView = std::ranges::find(m_controllerViews, view);
 	assert(storedView != m_controllerViews.end());
 
 	const auto index = std::distance(m_controllerViews.begin(), storedView);
@@ -153,7 +155,7 @@ void ControllerRackView::moveDown(ControllerView* view)
 {
 	if (view == m_controllerViews.last()) { return; }
 
-	const auto storedView = std::find(m_controllerViews.begin(), m_controllerViews.end(), view);
+	const auto storedView = std::ranges::find(m_controllerViews, view);
 	assert(storedView != m_controllerViews.end());
 	moveUp(*std::next(storedView));
 }
@@ -207,8 +209,7 @@ void ControllerRackView::removeController(Controller* removedController)
 
 	if (viewOfRemovedController )
 	{
-		m_controllerViews.erase( std::find( m_controllerViews.begin(),
-					m_controllerViews.end(), viewOfRemovedController ) );
+		m_controllerViews.erase(std::ranges::find(m_controllerViews, viewOfRemovedController));
 
 		delete viewOfRemovedController;
 		--m_nextIndex;

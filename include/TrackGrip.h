@@ -33,16 +33,16 @@ class QPixmap;
 namespace lmms
 {
 
-class Track;
-
 namespace gui
 {
+
+class TrackView;
 
 class TrackGrip : public QWidget
 {
 	Q_OBJECT
 public:
-	TrackGrip(Track* track, QWidget* parent = 0);
+	TrackGrip(TrackView* trackView, QWidget* parent = nullptr);
 	~TrackGrip() override = default;
 
 signals:
@@ -55,7 +55,7 @@ protected:
 	void paintEvent(QPaintEvent*) override;
 
 private:
-	Track* m_track = nullptr;
+	TrackView* m_trackView = nullptr;
 	bool m_isGrabbed = false;
 	static QPixmap* s_grabbedPixmap;
 	static QPixmap* s_releasedPixmap;

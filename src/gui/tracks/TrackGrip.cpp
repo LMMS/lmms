@@ -24,8 +24,12 @@
 
 #include "TrackGrip.h"
 
+#include "DataFile.h"
 #include "embed.h"
+#include "KeyboardShortcuts.h"
+#include "StringPairDrag.h"
 #include "Track.h"
+#include "TrackView.h"
 
 #include <QPainter>
 #include <QPixmap>
@@ -40,9 +44,9 @@ QPixmap* TrackGrip::s_releasedPixmap = nullptr;
 
 constexpr int c_margin = 2;
 
-TrackGrip::TrackGrip(Track* track, QWidget* parent) :
+TrackGrip::TrackGrip(TrackView* trackView, QWidget* parent) :
 	QWidget(parent),
-	m_track(track)
+	m_trackView(trackView)
 {
 	if (!s_grabbedPixmap)
 	{
@@ -63,14 +67,31 @@ TrackGrip::TrackGrip(Track* track, QWidget* parent) :
 
 void TrackGrip::mousePressEvent(QMouseEvent* m)
 {
-	m->accept();
+	// Allow the user to Ctrl-drag copy the track if it is not a pattern track
+	if (m->button() == Qt::LeftButton
+		&& m->modifiers() & KBD_COPY_MODIFIER
+		&& m_trackView->getTrack()->type() != Track::Type::Pattern)
+	{
+		m->accept();
+		DataFile dataFile(DataFile::Type::DragNDropData);
+		m_trackView->getTrack()->saveState(dataFile, dataFile.content());
+		new StringPairDrag(
+			QString("track_%1").arg(static_cast<int>(m_trackView->getTrack()->type())),
+			dataFile.toString(),
+			m_trackView->getTrackSettingsWidget()->grab(),
+			this
+		);
+	}
+	else
+	{
+		m->accept();
 
-	m_isGrabbed = true;
-	setCursor(Qt::ClosedHandCursor);
+		m_isGrabbed = true;
+		setCursor(Qt::ClosedHandCursor);
 
-	emit grabbed();
-
-	update();
+		emit grabbed();
+		update();
+	}
 }
 
 void TrackGrip::mouseReleaseEvent(QMouseEvent* m)
@@ -90,8 +111,8 @@ void TrackGrip::paintEvent(QPaintEvent*)
 	QPainter p(this);
 
 	// Check if the color of the track should be used for the background
-	const auto color = m_track->color();
-	const auto muted = m_track->getMutedModel()->value();
+	const auto color = m_trackView->getTrack()->color();
+	const auto muted = m_trackView->getTrack()->getMutedModel()->value();
 
 	if (color.has_value() && !muted) 
 	{

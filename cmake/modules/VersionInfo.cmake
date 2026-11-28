@@ -1,5 +1,5 @@
 FIND_PACKAGE(Git)
-IF(GIT_FOUND AND NOT FORCE_VERSION)
+IF(Git_FOUND AND NOT FORCE_VERSION)
 	SET(MAJOR_VERSION 0)
 	SET(MINOR_VERSION 0)
 	SET(PATCH_VERSION 0)
@@ -75,7 +75,7 @@ IF(GIT_FOUND AND NOT FORCE_VERSION)
 		LIST(GET TAG_LIST 1 VERSION_STAGE)
 		LIST(GET TAG_LIST 2 EXTRA_COMMITS)
 		# Prefer PR hash from above if present
-        if(NOT COMMIT_HASH)
+		if(NOT COMMIT_HASH)
 			list(GET TAG_LIST 3 COMMIT_HASH)
 			# Mimic github's hash style
 			string(SUBSTRING "${COMMIT_HASH}" 1 7 COMMIT_HASH)
@@ -120,7 +120,7 @@ ELSEIF(FORCE_VERSION)
 	ENDIF()
 
 	SET(VERSION             "${FORCE_VERSION}")
-ELSEIF(GIT_FOUND)
+ELSEIF(Git_FOUND)
 	MESSAGE(
 "Could not get project version.  Using release info from /CMakeLists.txt"
 	)
@@ -139,7 +139,7 @@ MESSAGE("\n"
 	"*   Release version           : ${VERSION_RELEASE}\n"
 	"*   Stage version             : ${VERSION_STAGE}\n"
 	"*   Build version             : ${VERSION_BUILD}\n"
-        "*\n\n"
+	"*\n\n"
 	"Optional Version Usage:\n"
 	"--------------------------\n"
 	"*   Override version:           -DFORCE_VERSION=x.x.x-x\n"

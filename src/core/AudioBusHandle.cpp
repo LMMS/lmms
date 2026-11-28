@@ -27,6 +27,8 @@
 
 #include <QMutexLocker>
 
+#include <algorithm>
+
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "EffectChain.h"
@@ -230,7 +232,8 @@ void AudioBusHandle::doProcessing()
 		// so they stay in sync
 		toPlanar(buffer, m_buffer.groupBuffers(0));
 
-		m_buffer.sanitizeAll();
+		const auto sanitized = Engine::audioEngine()->sanitizationEnabled() ? m_buffer.sanitizeAll() : false;
+		m_corrupted.store(sanitized, std::memory_order_relaxed);
 
 		// Update silence status of all channels for instrument output
 		m_buffer.updateAllSilenceFlags();
@@ -259,8 +262,7 @@ void AudioBusHandle::addPlayHandle(PlayHandle* handle)
 void AudioBusHandle::removePlayHandle(PlayHandle* handle)
 {
 	QMutexLocker lockGuard(&m_playHandleLock);
-	PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), handle);
-	if (it != m_playHandles.end())
+	if (auto it = std::ranges::find(m_playHandles, handle); it != m_playHandles.end())
 	{
 		m_playHandles.erase(it);
 	}

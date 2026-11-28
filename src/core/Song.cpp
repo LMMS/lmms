@@ -351,6 +351,11 @@ void Song::processNextBuffer()
 	m_vstSyncController.setPlaybackJumped(false);
 }
 
+void Song::removeOldAutomatedValue(AutomatableModel* am)
+{
+	// Get rid of object inside Song.m_oldAutomatedValues #8571
+	m_oldAutomatedValues.remove(am);
+}
 
 void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_cnt_t)
 {
@@ -1168,9 +1173,8 @@ void Song::loadProject( const QString & fileName )
 	ControllerConnection::finalizeConnections();
 
 	// Remove dummy controllers that was added for correct connections
-	m_controllers.erase(std::remove_if(m_controllers.begin(), m_controllers.end(),
-		[](Controller* c){return c->type() == Controller::ControllerType::Dummy;}),
-		m_controllers.end());
+	std::erase_if(m_controllers,
+		[](Controller* c){return c->type() == Controller::ControllerType::Dummy;});
 
 	// resolve all IDs so that autoModels are automated
 	AutomationClip::resolveAllIDs();
@@ -1216,6 +1220,13 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 {
 	using gui::getGUI;
 
+	// ensure property order in file is consistent across saves
+#if QT_VERSION < QT_VERSION_CHECK(6, 6, 0)
+	qSetGlobalQHashSeed(0);
+#else
+	QHashSeed::setDeterministicGlobalSeed();
+#endif
+
 	DataFile dataFile( DataFile::Type::SongProject );
 	m_savingProject = true;
 
@@ -1243,7 +1254,16 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 
 	m_savingProject = false;
 
-	return dataFile.writeFile(filename, withResources);
+	bool writeStatus = dataFile.writeFile(filename, withResources);
+
+	// revert to a randomized global seed for Qt
+#if QT_VERSION < QT_VERSION_CHECK(6, 6, 0)
+	qSetGlobalQHashSeed(-1);
+#else
+	QHashSeed::resetRandomGlobalSeed();
+#endif
+
+	return writeStatus;
 }
 
 
@@ -1379,7 +1399,7 @@ void Song::restoreKeymapStates(const QDomElement &element)
 }
 
 
-void Song::exportProjectMidi(QString const & exportFileName) const
+void Song::exportProjectMidi(const std::filesystem::path& filePath) const
 {
 	// instantiate midi export plugin
 	TrackContainer::TrackList const & tracks = this->tracks();
@@ -1388,7 +1408,7 @@ void Song::exportProjectMidi(QString const & exportFileName) const
 	ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", nullptr, nullptr));
 	if (exf)
 	{
-		exf->tryExport(tracks, patternStoreTracks, getTempo(), m_masterPitchModel.value(), exportFileName);
+		exf->tryExport(tracks, patternStoreTracks, getTempo(), m_masterPitchModel.value(), filePath);
 	}
 	else
 	{
@@ -1426,7 +1446,7 @@ void Song::setProjectFileName(QString const & projectFileName)
 
 void Song::addController( Controller * controller )
 {
-	bool containsController = std::find(m_controllers.begin(), m_controllers.end(), controller) != m_controllers.end();
+	const bool containsController = std::ranges::find(m_controllers, controller) != m_controllers.end();
 	if (controller && !containsController)
 	{
 		m_controllers.push_back(controller);
@@ -1441,7 +1461,7 @@ void Song::addController( Controller * controller )
 
 void Song::removeController( Controller * controller )
 {
-	auto it = std::find(m_controllers.begin(), m_controllers.end(), controller);
+	auto it = std::ranges::find(m_controllers, controller);
 	if (it != m_controllers.end())
 	{
 		m_controllers.erase(it);

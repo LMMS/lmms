@@ -27,6 +27,7 @@
 
 #include <atomic>  // IWYU pragma: keep
 #include <vector>
+#include <clocale> // IWYU pragma: keep
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -45,10 +46,6 @@
 #include <unistd.h>
 #endif
 #endif // !(LMMS_HAVE_SYS_IPC_H && LMMS_HAVE_SEMAPHORE_H)
-
-#ifdef LMMS_HAVE_LOCALE_H
-#include <clocale>  // IWYU pragma: keep
-#endif
 
 #ifdef LMMS_HAVE_PTHREAD_H
 #include <pthread.h>
@@ -204,19 +201,17 @@ public:
 		write( &_i, sizeof( _i ) );
 	}
 
-	inline std::string readString()
+	std::string readString()
 	{
+		std::string ret;
 		const int len = readInt();
-		if( len )
+		if (len > 0)
 		{
-			char * sc = new char[len + 1];
-			read( sc, len );
-			sc[len] = 0;
-			std::string s( sc );
-			delete[] sc;
-			return s;
+			ret.resize(static_cast<std::size_t>(len));
+			read(ret.data(), len);
+			ret[len] = '\0';
 		}
-		return std::string();
+		return ret;
 	}
 
 
@@ -370,9 +365,10 @@ public:
 		{
 		}
 
-		inline message & addString( const std::string & _s )
+		template<class... Args>
+		message& addString(Args&&... args)
 		{
-			data.push_back( _s );
+			data.emplace_back(std::forward<Args>(args)...);
 			return *this;
 		}
 
@@ -480,19 +476,17 @@ public:
 		write( &_i, sizeof( _i ) );
 	}
 
-	inline std::string readString()
+	std::string readString()
 	{
+		std::string ret;
 		const int len = readInt();
-		if( len )
+		if (len > 0)
 		{
-			char * sc = new char[len + 1];
-			read( sc, len );
-			sc[len] = 0;
-			std::string s( sc );
-			delete[] sc;
-			return s;
+			ret.resize(static_cast<std::size_t>(len));
+			read(ret.data(), len);
+			ret[len] = '\0';
 		}
-		return std::string();
+		return ret;
 	}
 
 

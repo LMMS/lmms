@@ -216,11 +216,13 @@ void PatternEditor::updateMaxSteps()
 	m_maxClipLength = 0;
 	for (const auto& track : tl)
 	{
-		if (track->type() == Track::Type::Instrument)
+		auto clip = track->getClip(m_ps->currentPattern());
+		if (track->type() == Track::Type::Automation || track->type() == Track::Type::Sample)
 		{
-			auto mClip = static_cast<MidiClip*>(track->getClip(m_ps->currentPattern()));
-			m_maxClipLength = std::max(m_maxClipLength, static_cast<tick_t>(mClip->length()));
+			// The length of automation and sample clips is updated to match the pattern length.
+			clip->updateLength();
 		}
+		m_maxClipLength = std::max(m_maxClipLength, static_cast<tick_t>(clip->length()));
 	}
 	updatePixelsPerBar();
 }

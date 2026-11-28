@@ -22,18 +22,22 @@
  *
  */
 
+#include "Mixer.h"
+
 #include <QDomElement>
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
 #include "Mixer.h"
-#include "MixHelpers.h"
 #include "Song.h"
 
 #include "InstrumentTrack.h"
+#include "MixHelpers.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
+
+#include <algorithm>
 
 namespace lmms
 {
@@ -187,21 +191,21 @@ void MixerChannel::doProcessing()
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
 				{
 					const float v = sender->m_volumeModel.value() * sendModel->value();
-					MixHelpers::addSanitizedMultiplied(buffer.data(), ch_buf.data(), v, fpp);
+					MixHelpers::addMultiplied(buffer.data(), ch_buf.data(), v, fpp);
 				}
 				else if( volBuf && sendBuf ) // both volume and send have sample-exact data
 				{
-					MixHelpers::addSanitizedMultipliedByBuffers(buffer.data(), ch_buf.data(), volBuf, sendBuf, fpp);
+					MixHelpers::addMultipliedByBuffers(buffer.data(), ch_buf.data(), volBuf, sendBuf, fpp);
 				}
 				else if( volBuf ) // volume has sample-exact data but send does not
 				{
 					const float v = sendModel->value();
-					MixHelpers::addSanitizedMultipliedByBuffer(buffer.data(), ch_buf.data(), v, volBuf, fpp);
+					MixHelpers::addMultipliedByBuffer(buffer.data(), ch_buf.data(), v, volBuf, fpp);
 				}
 				else // vice versa
 				{
 					const float v = sender->m_volumeModel.value();
-					MixHelpers::addSanitizedMultipliedByBuffer(buffer.data(), ch_buf.data(), v, sendBuf, fpp);
+					MixHelpers::addMultipliedByBuffer(buffer.data(), ch_buf.data(), v, sendBuf, fpp);
 				}
 				toPlanar(m_buffer.interleavedBuffer(), m_buffer.groupBuffers(0));
 				m_buffer.mixSilenceFlags(sender->m_buffer);
@@ -481,8 +485,7 @@ void Mixer::deleteChannelSend( MixerRoute * route )
 
 	auto removeFromMixerRoute = [route](MixerRouteVector& routeVec)
 	{
-		auto it = std::find(routeVec.begin(), routeVec.end(), route);
-		if (it != routeVec.end()) { routeVec.erase(it); }
+		if (auto it = std::ranges::find(routeVec, route); it != routeVec.end()) { routeVec.erase(it); }
 	};
 
 	// remove us from from's sends
@@ -649,7 +652,7 @@ void Mixer::masterMix( SampleFrame* _buf )
 	const float v = volBuf
 		? 1.0f
 		: m_mixerChannels[0]->m_volumeModel.value();
-	MixHelpers::addSanitizedMultiplied(_buf, buffer.data(), v, fpp);
+	MixHelpers::addMultiplied(_buf, buffer.data(), v, fpp);
 
 	// clear all channel buffers and
 	// reset channel process state
