@@ -22,6 +22,8 @@
  *
  */
 
+#include <QFileIconProvider>
+#include <QFileSystemModel>
 #include <QList>
 #include <QUrl>
 #include <QListView>
@@ -32,10 +34,25 @@
 #include "ConfigManager.h"
 #include "PathUtil.h"
 #include "SampleDecoder.h"
+#include "FileBrowser.h"
+#include "embed.h"
+
 #include "FileDialog.h"
 
 namespace lmms::gui
 {
+
+// Definitions after FileDialog functions
+class LMMSFileIconProvider : public QFileIconProvider
+{
+public:
+	LMMSFileIconProvider();
+	
+	QIcon icon(const QFileInfo& info) const;
+
+private:
+	QIcon m_directoryIcon;
+};
 
 
 FileDialog::FileDialog( QWidget *parent, const QString &caption,
@@ -44,6 +61,8 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 {
 	setOption( QFileDialog::DontUseCustomDirectoryIcons );
 	setOption( QFileDialog::DontUseNativeDialog );
+
+	setIconProvider(new LMMSFileIconProvider());
 
 #ifdef LMMS_BUILD_LINUX
 	QList<QUrl> urls;
@@ -196,5 +215,15 @@ QString FileDialog::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
+LMMSFileIconProvider::LMMSFileIconProvider() : QFileIconProvider(),
+	m_directoryIcon(embed::getIconPixmap("folder"))
+{}
+
+QIcon LMMSFileIconProvider::icon(const QFileInfo& info) const
+{
+	if (info.isDir()) { return m_directoryIcon; }
+	FileItem fileItem = FileItem(info.fileName(), info.dir().path());
+	return fileItem.icon(0);
+}
 
 } // namespace lmms::gui
