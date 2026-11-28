@@ -56,18 +56,17 @@ public:
 	//! The default channel count
 	static constexpr auto DefaultChannels = ch_cnt_t{2};
 
-	//! Creats an empty buffer with a sample rate and channel count of @a DefaultSampleRate and @a DefaultChannels
-	//! respetively.
+	//! Creates an empty buffer with the default number of channels and sample rate.
 	SampleBuffer() = default;
 
 	/**
-	 * @brief Creates a buffer with @a channels channels, @a frames frames, and a sample rate of @a sampleRate.
+	 * @brief Creates a @a channels channel buffer with @a frames frames, and a sample rate of @a sampleRate.
 	 *
-	 * @param channels The number of channels
 	 * @param frames The number of frames
+	 * @param channels The number of channels
 	 * @param sampleRate The sample rate
 	 */
-	SampleBuffer(ch_cnt_t channels, f_cnt_t frames, sample_rate_t sampleRate = DefaultSampleRate);
+	SampleBuffer(f_cnt_t frames, ch_cnt_t channels = DefaultChannels, sample_rate_t sampleRate = DefaultSampleRate);
 
 	//! @returns A pointer to the frame at the given frame index
 	auto operator[](f_cnt_t frameIndex) -> float* { return &m_data[frameIndex * m_channels]; }

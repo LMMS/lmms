@@ -33,7 +33,7 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(ch_cnt_t channels, f_cnt_t frames, sample_rate_t sampleRate)
+SampleBuffer::SampleBuffer(f_cnt_t frames, ch_cnt_t channels, sample_rate_t sampleRate)
 	: m_data(frames * channels)
 	, m_channels{channels}
 	, m_sampleRate{sampleRate}
@@ -75,7 +75,7 @@ auto SampleBuffer::fromBase64(const QString& str, ch_cnt_t channels, sample_rate
 	if (!result || result.decoded.size() % channels != 0) { return std::nullopt; }
 
 	const auto frames = result.decoded.size() / (sizeof(float) * channels);
-	auto buffer = SampleBuffer{channels, frames, sampleRate};
+	auto buffer = SampleBuffer{frames, channels, sampleRate};
 	std::memcpy(buffer.data(), result.decoded.data(), result.decoded.size());
 	return buffer;
 }

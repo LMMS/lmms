@@ -68,7 +68,7 @@ auto decodeSampleSF(const std::filesystem::path& path) -> std::optional<SampleBu
 
 	if (!sndfile || sf_error(sndfile) != 0) { return std::nullopt; }
 
-	auto buffer = SampleBuffer{static_cast<ch_cnt_t>(sfinfo.channels), static_cast<f_cnt_t>(sfinfo.frames),
+	auto buffer = SampleBuffer{static_cast<f_cnt_t>(sfinfo.frames), static_cast<ch_cnt_t>(sfinfo.channels),
 		static_cast<sample_rate_t>(sfinfo.samplerate)};
 
 	sf_readf_float(sndfile, buffer.data(), buffer.frames());
@@ -90,7 +90,7 @@ auto decodeSampleDS(const std::filesystem::path& path) -> std::optional<SampleBu
 
 	if (frames <= 0 || !data) { return std::nullopt; }
 
-	auto result = SampleBuffer{2, static_cast<f_cnt_t>(frames), engineRate};
+	auto result = SampleBuffer{static_cast<f_cnt_t>(frames), 2, engineRate};
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
 	return result;
@@ -118,7 +118,7 @@ auto decodeSampleOggVorbis(const std::filesystem::path& path) -> std::optional<S
 	const auto numFrames = ov_pcm_total(&vorbisFile, 0);
 
 	auto buffer = SampleBuffer{
-		static_cast<ch_cnt_t>(numChannels), static_cast<f_cnt_t>(numFrames), static_cast<sample_rate_t>(sampleRate)};
+		static_cast<f_cnt_t>(numFrames), static_cast<ch_cnt_t>(numChannels), static_cast<sample_rate_t>(sampleRate)};
 	auto output = static_cast<float**>(nullptr);
 
 	int currentSection = 0;
