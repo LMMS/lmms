@@ -96,6 +96,8 @@ public:
 
 	//! @brief Create a track based on the given track type and container.
 	//!
+	//! New tracks in the song or pattern editor get a linked mixer channel if enabled in the settings.
+	//!
 	//! @param tt The type of track to create
 	//! @param tc The track container to attach to
 	static Track* create(Type tt, TrackContainer* tc);
@@ -126,6 +128,9 @@ public:
 
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
+
+	// the mixer channel this track sends its audio to, if it has one
+	virtual IntModel* mixerChannelModel() { return nullptr; }
 
 	// Saving and loading of presets which do not necessarily contain all the track information
 	void savePreset(QDomDocument & doc, QDomElement & element);
@@ -304,6 +309,8 @@ private:
 	void loadTrack(const QDomElement& element, bool presetMode);
 
 private:
+	static Track* instantiate(Type tt, TrackContainer* tc);
+
 	TrackContainer* m_trackContainer;
 	Type m_type;
 	QString m_name;

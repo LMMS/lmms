@@ -172,6 +172,26 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 	}
 
 	contextMenu->addAction(tr("Rename &channel"), this, &MixerChannelView::renameChannel);
+
+	if (!isMasterChannel())
+	{
+		const auto mixer = Engine::mixer();
+		if (mixer->linkedTrack(m_channelIndex))
+		{
+			contextMenu->addAction(tr("Unlink from track"), this, [this, mixer] {
+				mixer->unlinkChannel(m_channelIndex);
+				Engine::getSong()->setModified();
+			});
+		}
+		else
+		{
+			const auto linkAction = contextMenu->addAction(tr("Link to track"), this, [this, mixer] {
+				mixer->linkChannel(m_channelIndex);
+				Engine::getSong()->setModified();
+			});
+			linkAction->setEnabled(mixer->canLinkChannel(m_channelIndex));
+		}
+	}
 	contextMenu->addSeparator();
 
 	if (!isMasterChannel()) // no remove-option in master
@@ -220,6 +240,14 @@ void MixerChannelView::paintEvent(QPaintEvent*)
 	// outer border
 	painter.setPen(isActive ? strokeOuterActive() : strokeOuterInactive());
 	painter.drawRect(0, 0, width - outerBorderSize, height - outerBorderSize);
+
+	// mark channels that follow their track
+	if (Engine::mixer()->linkedTrack(m_channelIndex))
+	{
+		static constexpr auto linkMarkerHeight = 3;
+		painter.fillRect(innerBorderSize - 1, innerBorderSize - 1, width - 2 * (innerBorderSize - 1),
+			linkMarkerHeight, palette().color(QPalette::Highlight));
+	}
 }
 
 void MixerChannelView::mousePressEvent(QMouseEvent*)
@@ -245,6 +273,15 @@ void MixerChannelView::keyPressEvent(QKeyEvent* ke)
 	{
 		ke->ignore();
 	}
+}
+
+void MixerChannelView::updateName()
+{
+	if (m_inRename) { return; }
+
+	const auto& name = mixerChannel()->m_name;
+	setToolTip(Engine::mixer()->linkedTrack(m_channelIndex) ? tr("%1 (follows its track)").arg(name) : name);
+	m_renameLineEdit->setText(elideName(name));
 }
 
 void MixerChannelView::setChannelIndex(int index)
@@ -283,19 +320,17 @@ void MixerChannelView::renameFinished()
 	const auto mc = mixerChannel();
 	if (!newName.isEmpty() && mc->m_name != newName)
 	{
-		mc->m_name = newName;
-		m_renameLineEdit->setText(elideName(newName));
+		Engine::mixer()->setChannelName(m_channelIndex, newName);
 		Engine::getSong()->setModified();
 	}
 
-	setToolTip(mc->m_name);
+	updateName();
 }
 
 void MixerChannelView::resetColor()
 {
-	mixerChannel()->setColor(std::nullopt);
+	Engine::mixer()->setChannelColor(m_channelIndex, std::nullopt);
 	Engine::getSong()->setModified();
-	update();
 }
 
 void MixerChannelView::selectColor()
@@ -308,18 +343,16 @@ void MixerChannelView::selectColor()
 
 	if (!newColor.isValid()) { return; }
 
-	channel->setColor(newColor);
+	Engine::mixer()->setChannelColor(m_channelIndex, newColor);
 
 	Engine::getSong()->setModified();
-	update();
 }
 
 void MixerChannelView::randomizeColor()
 {
-	auto channel = mixerChannel();
-	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(48)]);
+	Engine::mixer()->setChannelColor(m_channelIndex,
+		ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(48)]);
 	Engine::getSong()->setModified();
-	update();
 }
 
 bool MixerChannelView::confirmRemoval(int index)

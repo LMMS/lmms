@@ -34,12 +34,14 @@
 #include <atomic>
 #include <optional>
 #include <QColor>
+#include <QPointer>
 
 namespace lmms
 {
 
 
 class MixerRoute;
+class Track;
 using MixerRouteVector = std::vector<MixerRoute*>;
 
 class MixerChannel : public ThreadableJob
@@ -70,6 +72,8 @@ public:
 
 	// pointers to other channels that send to this one
 	MixerRouteVector m_receives;
+
+	QPointer<Track> m_linkedTrack;
 
 	int index() const { return m_channelIndex; }
 	void setIndex(int index) { m_channelIndex = index; }
@@ -186,12 +190,45 @@ public:
 	// delete a channel from the mixer.
 	void deleteChannel(int index);
 
+	// add a new channel linked to the track and route the track to it.
+	// a linked channel follows the track's name, color and position and is deleted along with it
+	// returns the index of the channel, which is placed in the order of its track
+	int createLinkedChannel(Track& track);
+
+	// link the channel the track is routed to, unless it is master or already linked
+	void linkChannel(Track& track);
+
+	// the channel the track is routed to, if it is linked to the track
+	MixerChannel* linkedChannel(Track& track);
+
+	// the track the channel is linked to, if that track is still routed to it
+	Track* linkedTrack(int index);
+
+	// a channel can be linked if it isn't master or linked and exactly one track is routed to it
+	bool canLinkChannel(int index);
+	// link the channel to the track routed to it, taking the track's name and color
+	void linkChannel(int index);
+	void unlinkChannel(int index);
+
+	void updateLinkedChannel(Track& track);
+
+	// set the channel's name, through its track if the channel is linked so both change
+	void setChannelName(int index, const QString& name);
+	// set the channel's color, through its track if the channel is linked so both change
+	void setChannelColor(int index, const std::optional<QColor>& color);
+
 	// delete all the mixer channels except master and remove all effects
 	void clear();
 
 	// re-arrange channels
 	void moveChannelLeft(int index);
 	void moveChannelRight(int index);
+	void swapChannels(int first, int second);
+
+	// put linked channels in the order of their tracks, Pattern Editor tracks first.
+	// a channel out of order moves next to its neighbour and the channels it passes shift over,
+	// so unlinked channels keep their neighbours
+	void sortLinkedChannels();
 
 	// reset a channel's name, fx, sends, etc
 	void clearChannel(mix_ch_t channelIndex);
@@ -214,7 +251,18 @@ public:
 
 	MixerRouteVector m_mixerRoutes;
 
+signals:
+	void channelAdded(int index);
+	void channelRemoved(int index);
+	void channelsSwapped(int first, int second);
+	void channelChanged(int index);
+	// a track was routed to another channel, which may link or unlink channels
+	void trackRoutingChanged();
+
 private:
+	void updateTrackChannelRanges();
+	void moveChannel(int from, int to);
+
 	// the mixer channels in the mixer. index 0 is always master.
 	std::vector<MixerChannel*> m_mixerChannels;
 

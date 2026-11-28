@@ -984,6 +984,8 @@ void Song::createNewProject()
 	updateLength();
 	Engine::patternStore()->updateAfterTrackAdd();
 
+	assignNewMixerChannels();
+
 	Engine::projectJournal()->setJournalling( true );
 
 	QCoreApplication::sendPostedEvents();
@@ -998,12 +1000,40 @@ void Song::createNewProject()
 void Song::createNewProjectFromTemplate( const QString & templ )
 {
 	loadProject( templ );
+
+	// skip if the template failed to load
+	if (m_fileName == templ)
+	{
+		Engine::projectJournal()->setJournalling(false);
+		assignNewMixerChannels();
+		Engine::projectJournal()->setJournalling(true);
+		setModified(false);
+	}
+
 	// clear file-name so that user doesn't overwrite template when
 	// saving...
 	m_oldFileName = "";
 	setProjectFileName("");
 	// update window title
 	m_loadOnLaunch = false;
+}
+
+
+
+
+void Song::assignNewMixerChannels()
+{
+	if (!ConfigManager::inst()->value("app", "autoassignmixerchannel", "0").toInt()) { return; }
+
+	// only for tracks routed to master
+	for (const auto container : std::array<TrackContainer*, 2>{Engine::patternStore(), this})
+	{
+		for (const auto track : container->tracks())
+		{
+			const auto model = track->mixerChannelModel();
+			if (model && model->value() == 0) { Engine::mixer()->createLinkedChannel(*track); }
+		}
+	}
 }
 
 

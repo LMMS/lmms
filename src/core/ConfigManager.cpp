@@ -393,6 +393,7 @@ void ConfigManager::setValue(const QString & cls,
 	}
 	// not in map yet, so we have to add it...
 	m_settings[cls].push_back(qMakePair(attribute, value));
+	emit valueChanged(cls, attribute, value);
 }
 
 
