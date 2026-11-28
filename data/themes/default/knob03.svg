@@ -1,48 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   width="19"
-   height="19"
-   viewBox="0 0 19 19.000001"
-   version="1.1"
-   id="svg1"
-   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
-   sodipodi:docname="knob03.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview1"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="px"
-     inkscape:zoom="24.578947"
-     inkscape:cx="9.5"
-     inkscape:cy="9.4796574"
-     inkscape:window-width="1920"
-     inkscape:window-height="993"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
-  <defs
-     id="defs1" />
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1">
-    <circle
-       style="fill:#256546;fill-opacity:1"
-       id="path1"
-       cx="9.5"
-       cy="9.5"
-       r="5.5" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" xmlns:svg="http://www.w3.org/2000/svg" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<metadata>
+		<rdf:RDF>
+			<cc:Work>
+				<dc:title>Knob 03</dc:title>
+				<dc:creator><cc:Agent><dc:title>Rebecca Noel Ati</dc:title></cc:Agent></dc:creator>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+	<circle cx="9.5" cy="9.5" r="5.5" fill="#256546" fill-opacity="1"/>
 </svg>
+
