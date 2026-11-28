@@ -434,9 +434,7 @@ void Knob::drawKnob( QPainter * _p )
 	const float radius = szKnob.width() / 2.0f - 1;
 	mid = QPoint(width() / 2, szKnob.height() / 2);
 
-	p.drawPixmap( static_cast<int>(
-				width() / 2 - szKnob.width() / 2 ), 0,
-				*m_knobPixmap );
+	p.drawPixmap(width() / 2 - szKnob.width() / 2, 0, *m_knobPixmap);
 
 	p.setRenderHint( QPainter::Antialiasing );
 
