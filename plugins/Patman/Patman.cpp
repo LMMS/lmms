@@ -342,7 +342,7 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			}
 		}
 
-		auto buffer = SampleBuffer{1, frames, sample_rate};
+		auto buffer = SampleBuffer{frames, 1, sample_rate};
 
 		for (f_cnt_t frame = 0; frame < frames; ++frame)
 		{
