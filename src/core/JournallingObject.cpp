@@ -139,9 +139,8 @@ void JournallingObject::changeID( jo_id_t _id )
 {
 	if( id() != _id )
 	{
-		JournallingObject * jo = Engine::projectJournal()->
-											journallingObject( _id );
-		if( jo != nullptr )
+		JournallingObject* jo = Engine::projectJournal()->tryChangeID(this, _id);
+		if(jo != this)
 		{
 			QString used_by = jo->nodeName();
 			if( used_by == "automatablemodel" &&
@@ -156,8 +155,6 @@ void JournallingObject::changeID( jo_id_t _id )
 			return;
 		}
 
-		Engine::projectJournal()->freeID( m_id );
-		Engine::projectJournal()->reallocID( _id, this );
 		m_id = _id;
 	}
 }

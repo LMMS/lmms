@@ -57,7 +57,11 @@ void ProjectJournal::undo()
 	while( !m_undoCheckPoints.isEmpty() )
 	{
 		CheckPoint c = m_undoCheckPoints.pop();
-		JournallingObject *jo = m_joIDs[c.joID];
+		JournallingObject *jo = nullptr;
+		{
+			std::shared_lock lock{m_joIdMutex};
+			jo = m_joIDs[c.joID];
+		}
 
 		if( jo )
 		{
@@ -88,7 +92,11 @@ void ProjectJournal::redo()
 	while( !m_redoCheckPoints.isEmpty() )
 	{
 		CheckPoint c = m_redoCheckPoints.pop();
-		JournallingObject *jo = m_joIDs[c.joID];
+		JournallingObject *jo = nullptr;
+		{
+			std::shared_lock lock{m_joIdMutex};
+			jo = m_joIDs[c.joID];
+		}
 
 		if( jo )
 		{
@@ -138,13 +146,14 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 
 jo_id_t ProjectJournal::allocID(JournallingObject* obj)
 {
-	jo_id_t id = generateId();
+	std::unique_lock lock{m_joIdMutex};
+	jo_id_t id = locklessGenerateId();
 	m_unregisteredIds.erase(id);
 	m_joIDs[id] = obj;
 	return id;
 }
 
-jo_id_t ProjectJournal::generateId()
+jo_id_t ProjectJournal::locklessGenerateId()
 {
 	jo_id_t id;
 	for (jo_id_t tid = fastRand();
@@ -154,8 +163,15 @@ jo_id_t ProjectJournal::generateId()
 	return id;
 }
 
+jo_id_t ProjectJournal::generateId()
+{
+	std::unique_lock lock{m_joIdMutex};
+	return locklessGenerateId();
+}
+
 void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 {
+	std::unique_lock lock{m_joIdMutex};
 	//printf("realloc %d %d\n", _id, _obj );
 //	if( m_joIDs.contains( _id ) )
 	{
@@ -182,6 +198,7 @@ jo_id_t ProjectJournal::idFromSave( jo_id_t id )
 
 void ProjectJournal::clearJournal()
 {
+	std::unique_lock lock{m_joIdMutex};
 	m_undoCheckPoints.clear();
 	m_redoCheckPoints.clear();
 
@@ -200,6 +217,7 @@ void ProjectJournal::clearJournal()
 
 void ProjectJournal::stopAllJournalling()
 {
+	std::shared_lock lock{m_joIdMutex};
 	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it)
 	{
 		if( it.value() != nullptr )
@@ -208,6 +226,32 @@ void ProjectJournal::stopAllJournalling()
 		}
 	}
 	setJournalling(false);
+}
+
+JournallingObject* ProjectJournal::journallingObject(const jo_id_t _id)
+{
+	std::shared_lock lock{m_joIdMutex};
+	if(m_joIDs.contains(_id))
+	{
+		return m_joIDs[_id];
+	}
+	return nullptr;
+}
+
+
+JournallingObject* ProjectJournal::tryChangeID(JournallingObject* obj, const jo_id_t _id)
+{
+	std::unique_lock lock{m_joIdMutex};
+	if(m_joIDs.contains(_id))
+	{
+		return m_joIDs[_id];
+	}
+	m_unregisteredIds.erase(obj->id());
+	m_joIDs[obj->id()] = nullptr;
+
+	m_unregisteredIds.erase(_id);
+	m_joIDs[_id] = obj;
+	return obj;
 }
 
 

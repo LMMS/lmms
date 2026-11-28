@@ -28,6 +28,7 @@
 #include <QHash>
 #include <QStack>
 #include <set>
+#include <shared_mutex>
 
 #include "LmmsTypes.h"
 #include "DataFile.h"
@@ -70,7 +71,7 @@ public:
 	// alloc new ID and register object _obj to it
 	jo_id_t allocID( JournallingObject * _obj );
 
-	//Create a new id without registering any object
+	//Call locklessGenerateId with the joIdMutex acquired
 	jo_id_t generateId();
 
 	// if there's already something known about ID _id, but it is currently
@@ -93,14 +94,11 @@ public:
 
 	void clearJournal();
 	void stopAllJournalling();
-	JournallingObject * journallingObject( const jo_id_t _id )
-	{
-		if( m_joIDs.contains( _id ) )
-		{
-			return m_joIDs[_id];
-		}
-		return nullptr;
-	}
+	JournallingObject* journallingObject(jo_id_t _id);
+
+	// Tries to change obj's jo_id to _id if nothing else is using _id.
+	// Returns the final object currently using _id.
+	JournallingObject* tryChangeID(JournallingObject* obj, jo_id_t _id);
 
 
 private:
@@ -118,6 +116,7 @@ private:
 	} ;
 	using CheckPointStack = QStack<CheckPoint>;
 
+	std::shared_mutex m_joIdMutex;
 	JoIdMap m_joIDs;
 	std::set<jo_id_t> m_unregisteredIds;
 
@@ -126,6 +125,8 @@ private:
 
 	bool m_journalling;
 
+	//Create a new id without registering any object
+	jo_id_t locklessGenerateId();
 } ;
 
 
