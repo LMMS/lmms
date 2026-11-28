@@ -146,24 +146,27 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 
 jo_id_t ProjectJournal::allocID(JournallingObject* obj)
 {
-	jo_id_t id = generateId();
-	{
-		std::unique_lock lock{m_joIdMutex};
-		m_unregisteredIds.erase(id);
-		m_joIDs[id] = obj;
-	}
+	std::unique_lock lock{m_joIdMutex};
+	jo_id_t id = locklessGenerateId();
+	m_unregisteredIds.erase(id);
+	m_joIDs[id] = obj;
 	return id;
 }
 
-jo_id_t ProjectJournal::generateId()
+jo_id_t ProjectJournal::locklessGenerateId()
 {
-	std::unique_lock lock{m_joIdMutex};
 	jo_id_t id;
 	for (jo_id_t tid = fastRand();
 		m_joIDs.contains(id = tid % EO_ID_MSB | EO_ID_MSB) || m_unregisteredIds.contains(id);
 		tid++) {}
 	m_unregisteredIds.insert(id);
 	return id;
+}
+
+jo_id_t ProjectJournal::generateId()
+{
+	std::unique_lock lock{m_joIdMutex};
+	return locklessGenerateId();
 }
 
 void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )

@@ -71,7 +71,7 @@ public:
 	// alloc new ID and register object _obj to it
 	jo_id_t allocID( JournallingObject * _obj );
 
-	//Create a new id without registering any object
+	//Call locklessGenerateId with the joIdMutex acquired
 	jo_id_t generateId();
 
 	// if there's already something known about ID _id, but it is currently
@@ -128,6 +128,8 @@ private:
 
 	bool m_journalling;
 
+	//Create a new id without registering any object
+	jo_id_t locklessGenerateId();
 } ;
 
 
