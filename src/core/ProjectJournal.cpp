@@ -228,6 +228,32 @@ void ProjectJournal::stopAllJournalling()
 	setJournalling(false);
 }
 
+JournallingObject* ProjectJournal::journallingObject(const jo_id_t _id)
+{
+	std::shared_lock lock{m_joIdMutex};
+	if(m_joIDs.contains(_id))
+	{
+		return m_joIDs[_id];
+	}
+	return nullptr;
+}
+
+
+JournallingObject* ProjectJournal::tryChangeID(JournallingObject* obj, const jo_id_t _id)
+{
+	std::unique_lock lock{m_joIdMutex};
+	if(m_joIDs.contains(_id))
+	{
+		return m_joIDs[_id];
+	}
+	m_unregisteredIds.erase(obj->id());
+	m_joIDs[obj->id()] = nullptr;
+
+	m_unregisteredIds.erase(_id);
+	m_joIDs[_id] = obj;
+	return obj;
+}
+
 
 
 } // namespace lmms

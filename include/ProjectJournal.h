@@ -94,14 +94,11 @@ public:
 
 	void clearJournal();
 	void stopAllJournalling();
-	JournallingObject * journallingObject( const jo_id_t _id )
-	{
-		if( m_joIDs.contains( _id ) )
-		{
-			return m_joIDs[_id];
-		}
-		return nullptr;
-	}
+	JournallingObject* journallingObject(jo_id_t _id);
+
+	// Tries to change obj's jo_id to _id if nothing else is using _id.
+	// Returns the final object currently using _id.
+	JournallingObject* tryChangeID(JournallingObject* obj, jo_id_t _id);
 
 
 private:
