@@ -309,7 +309,7 @@ private:
 
 	void autoScroll(const TimePos & t );
 
-	TimePos newNoteLen() const;
+	TimePos newNoteLen() const; //!< Will return -1 for drawing note lengths
 
 	void shiftPos(int amount);
 	void shiftPos(const NoteVector& notes, int amount);
@@ -569,6 +569,7 @@ private:
 	QMenu* m_removeFamilyMenu;
 
 	QAction* m_notePaintAction;
+	Note *m_drawingNewNote = nullptr;
 } ;
 
 
