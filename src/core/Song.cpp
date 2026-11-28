@@ -185,6 +185,7 @@ void Song::setTempo()
 void Song::setTimeSignature()
 {
 	TimePos::setTicksPerBar( ticksPerBar() );
+	if (!m_loadingProject) { Engine::patternStore()->fixIncorrectPositions(); }
 	emit timeSignatureChanged( m_oldTicksPerBar, ticksPerBar() );
 	emit dataChanged();
 	m_oldTicksPerBar = ticksPerBar();
