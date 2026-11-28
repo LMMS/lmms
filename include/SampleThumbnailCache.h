@@ -153,12 +153,15 @@ public:
 
 	/**
 	 * @brief Get a thumbnail of the requested width.
+	 *
 	 * If no thumbnail of the requested width exists, the nearest larger thumbnail is returned.
+	 * If there are no thumbnails, @c nullptr is returned.
+	 *
 	 * @param width The requested thumbnail width.
 	 * @pre @a width is in the range [1, N] where N is the number of frames in the original buffer.
 	 * @note This function is not thread safe.
 	 */
-	auto nearestThumbnailForWidth(f_cnt_t width) const -> const Thumbnail&;
+	auto nearestThumbnailForWidth(f_cnt_t width) const -> const Thumbnail*;
 
 	//! @returns The number of samples in the original audio buffer.
 	auto sampleCount() const -> f_cnt_t { return m_sampleCount; }

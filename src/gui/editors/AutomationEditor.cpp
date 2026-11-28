@@ -1211,18 +1211,19 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 			p.setPen(m_ghostSampleColor);
 
-			const auto& sample = m_ghostSample->sample();
+			if (m_ghostSample->sampleThumbnailCache())
+			{
+				const auto& sample = m_ghostSample->sample();
+				const auto param = SampleThumbnailRenderer::VisualizeParameters{
+					.rect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+					.sampleStart = static_cast<double>(sample.startFrame()) / sample.sampleSize(),
+					.sampleEnd = static_cast<double>(sample.endFrame()) / sample.sampleSize(),
+					.amplification = sample.amplification(),
+					.reversed = sample.reversed()
+				};
 
-			const auto param = SampleThumbnailRenderer::VisualizeParameters{
-				.cache = m_ghostSample->sampleThumbnailCache(),
-				.rect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
-				.sampleStart = static_cast<double>(sample.startFrame()) / sample.sampleSize(),
-				.sampleEnd = static_cast<double>(sample.endFrame()) / sample.sampleSize(),
-				.amplification = sample.amplification(),
-				.reversed = sample.reversed()
-			};
-
-			SampleThumbnailRenderer::visualize(param, p);
+				SampleThumbnailRenderer::visualize(p, *m_ghostSample->sampleThumbnailCache(), param);
+			}
 		}
 
 		// draw ghost notes
