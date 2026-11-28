@@ -804,6 +804,7 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_volumeModel.saveSettings( _doc, mixch, "volume" );
 		ch->m_muteModel.saveSettings( _doc, mixch, "muted" );
 		ch->m_soloModel.saveSettings( _doc, mixch, "soloed" );
+		mixch.setAttribute("mutedBeforeSolo", static_cast<int>(ch->m_muteBeforeSolo));
 		mixch.setAttribute("num", static_cast<qulonglong>(i));
 		mixch.setAttribute( "name", ch->m_name );
 		if (const auto& color = ch->color()) { mixch.setAttribute("color", color->name()); }
@@ -852,6 +853,9 @@ void Mixer::loadSettings( const QDomElement & _this )
 		m_mixerChannels[num]->m_volumeModel.loadSettings( mixch, "volume" );
 		m_mixerChannels[num]->m_muteModel.loadSettings( mixch, "muted" );
 		m_mixerChannels[num]->m_soloModel.loadSettings( mixch, "soloed" );
+		// Older projects don't have this attribute. Assume the channel wasn't muted before the solo
+		m_mixerChannels[num]->m_muteBeforeSolo = mixch.attribute("mutedBeforeSolo", "0").toInt();
+		if (m_mixerChannels[num]->m_soloModel.value()) { m_lastSoloed = num; }
 		m_mixerChannels[num]->m_name = mixch.attribute( "name" );
 		if (mixch.hasAttribute("color"))
 		{

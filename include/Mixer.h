@@ -56,7 +56,7 @@ public:
 	float m_peakLeft;
 	float m_peakRight;
 	AudioBuffer m_buffer;
-	bool m_muteBeforeSolo;
+	bool m_muteBeforeSolo = false;
 	BoolModel m_muteModel;
 	BoolModel m_soloModel;
 	FloatModel m_volumeModel;
