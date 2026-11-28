@@ -109,6 +109,8 @@ public:
 		return fluid_voice_get_id(m_voice) == m_id && fluid_voice_is_playing(m_voice);
 	}
 
+	unsigned int id() const { return m_id; }
+
 private:
 	fluid_voice_t* m_voice;
 	unsigned int m_id;
@@ -162,7 +164,9 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	m_settings = new_fluid_settings();
 
-	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::audioEngine()->framesPerPeriod() );
+	// This option speeds up loading the same soundfont in multiple tracks, but must be
+	// disabled when bank or patch is automated, as it is not realtime safe in those conditions.
+	fluid_settings_setint(m_settings, "synth.dynamic-sample-loading", 1);
 
 	// This sets up m_synth and updates reverb/chorus/gain
 	reloadSynth();
@@ -198,6 +202,8 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
+	connect(&m_bankNum, SIGNAL(automated()), this, SLOT(disableDynamicSampleLoading()));
+	connect(&m_patchNum, SIGNAL(automated()), this, SLOT(disableDynamicSampleLoading()));
 
 	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(reloadSynth()));
 
@@ -238,6 +244,7 @@ Sf2Instrument::~Sf2Instrument()
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::Type::NotePlayHandle
 				| PlayHandle::Type::InstrumentPlayHandle );
+	const auto guard = std::lock_guard{m_synthMutex};
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
@@ -381,20 +388,22 @@ QString Sf2Instrument::nodeName() const
 
 void Sf2Instrument::freeFont()
 {
-	m_synthMutex.lock();
-
 	if (m_font != nullptr)
 	{
 		fluid_synth_sfunload(m_synth, m_fontId, true);
 		m_font = nullptr;
 	}
-
-	m_synthMutex.unlock();
 }
 
 
 
 void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
+{
+	const auto guard = std::lock_guard{m_synthMutex};
+	loadSfFile(_sf2File, updateTrackName);
+}
+
+void Sf2Instrument::loadSfFile(const QString& _sf2File, bool updateTrackName)
 {
 	emit fileLoading();
 
@@ -404,8 +413,6 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	// free the soundfont if one is selected
 	freeFont();
 
-	m_synthMutex.lock();
-
 	bool loaded = false;
 	if (fluid_is_soundfont(filePath.c_str()))
 	{
@@ -413,6 +420,7 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 		if (fluid_synth_sfcount(m_synth) > 0)
 		{
+			m_fontPath = filePath;
 			// Grab this sf from the top of the stack and add to list
 			m_font = fluid_synth_get_sfont(m_synth, 0);
 			loaded = true;
@@ -423,8 +431,6 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	{
 		collectErrorForUI(Sf2Instrument::tr("A soundfont %1 could not be loaded.").arg(QFileInfo(_sf2File).baseName()));
 	}
-
-	m_synthMutex.unlock();
 
 	if( m_fontId >= 0 )
 	{
@@ -567,6 +573,7 @@ void Sf2Instrument::updateTuning()
 
 void Sf2Instrument::reloadSynth()
 {
+	const auto guard = std::lock_guard{m_synthMutex};
 	double tempRate;
 
 	// Set & get, returns the true sample rate
@@ -578,15 +585,14 @@ void Sf2Instrument::reloadSynth()
 
 	if( m_font )
 	{
+		m_validVoices.clear();
+
 		// Now, delete the old one and replace
-		m_synthMutex.lock();
-		fluid_synth_remove_sfont( m_synth, m_font );
-		delete_fluid_synth( m_synth );
+		delete_fluid_synth(m_synth);
 
 		// New synth
 		m_synth = new_fluid_synth( m_settings );
-		m_fontId = fluid_synth_add_sfont( m_synth, m_font );
-		m_synthMutex.unlock();
+		loadSfFile(QString::fromStdString(m_fontPath), false);
 
 		// synth program change (set bank and patch)
 		updatePatch();
@@ -594,16 +600,12 @@ void Sf2Instrument::reloadSynth()
 	else
 	{
 		// Recreate synth with no soundfonts
-		m_synthMutex.lock();
 		if (m_synth != nullptr)
 		{
 			delete_fluid_synth(m_synth);
 		}
 		m_synth = new_fluid_synth( m_settings );
-		m_synthMutex.unlock();
 	}
-
-	m_synthMutex.lock();
 
 	if (m_internalSampleRate != Engine::audioEngine()->outputSampleRate())
 	{
@@ -614,8 +616,6 @@ void Sf2Instrument::reloadSynth()
 		// supporting only up to 96 kHZ (though that may be a problem if theres a strong need for 192 kHZ).
 		fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_LINEAR);
 	}
-
-	m_synthMutex.unlock();
 
 	updateReverb();
 	updateChorus();
@@ -631,6 +631,16 @@ void Sf2Instrument::reloadSynth()
 }
 
 
+void Sf2Instrument::disableDynamicSampleLoading()
+{
+	int currentValue = 1;
+	fluid_settings_getint(m_settings, "synth.dynamic-sample-loading", &currentValue);
+	if (currentValue == 1)
+	{
+		fluid_settings_setint(m_settings, "synth.dynamic-sample-loading", 0);
+		reloadSynth();
+	}
+}
 
 
 void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
@@ -683,9 +693,10 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 
 	// Update the pitch of all the voices
 	if (const auto data = static_cast<Sf2PluginData*>(_n->m_pluginData)) {
+		const auto guard = std::lock_guard(m_synthMutex);
 		const auto detuning = _n->currentDetuning();
 		for (const auto& voice : data->fluidVoices) {
-			if (voice.isValid()) {
+			if (m_validVoices.contains(voice.id()) && voice.isValid()) {
 				fluid_voice_gen_set(voice.get(), GEN_COARSETUNE, voice.coarseTune() + detuning);
 				fluid_voice_update_param(voice.get(), GEN_COARSETUNE);
 			}
@@ -696,8 +707,6 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 
 void Sf2Instrument::noteOn( Sf2PluginData * n )
 {
-	m_synthMutex.lock();
-
 	// get list of current voice IDs so we can easily spot the new
 	// voice after the fluid_synth_noteon() call
 	const int poly = fluid_synth_get_polyphony( m_synth );
@@ -721,6 +730,7 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 			&& fluid_voice_is_on(voice)
 		) {
 			n->fluidVoices.emplace_back(voices[i]);
+			m_validVoices.insert(n->fluidVoices.end()->id());
 		}
 	}
 
@@ -736,13 +746,11 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 	);
 	// Set note panning on all the voices
 	for (const auto& voice : n->fluidVoices) {
-		if (voice.isValid()) {
+		if (m_validVoices.contains(voice.id()) && voice.isValid()) {
 			fluid_voice_gen_set(voice.get(), GEN_CUSTOM_BALANCE, balance);
 			fluid_voice_update_param(voice.get(), GEN_CUSTOM_BALANCE);
 		}
 	}
-
-	m_synthMutex.unlock();
 
 	m_notesRunningMutex.lock();
 	++m_notesRunning[ n->midiNote ];
@@ -759,15 +767,14 @@ void Sf2Instrument::noteOff( Sf2PluginData * n )
 
 	if( notes <= 0 )
 	{
-		m_synthMutex.lock();
 		fluid_synth_noteoff( m_synth, m_channel, n->midiNote );
-		m_synthMutex.unlock();
 	}
 }
 
 
 void Sf2Instrument::play( SampleFrame* _working_buffer )
 {
+	const auto guard = std::lock_guard{m_synthMutex};
 	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	// set midi pitch for this period
@@ -775,18 +782,14 @@ void Sf2Instrument::play( SampleFrame* _working_buffer )
 	if( m_lastMidiPitch != currentMidiPitch )
 	{
 		m_lastMidiPitch = currentMidiPitch;
-		m_synthMutex.lock();
 		fluid_synth_pitch_bend( m_synth, m_channel, m_lastMidiPitch );
-		m_synthMutex.unlock();
 	}
 
 	const int currentMidiPitchRange = instrumentTrack()->midiPitchRange();
 	if( m_lastMidiPitchRange != currentMidiPitchRange )
 	{
 		m_lastMidiPitchRange = currentMidiPitchRange;
-		m_synthMutex.lock();
 		fluid_synth_pitch_wheel_sens( m_synth, m_channel, m_lastMidiPitchRange );
-		m_synthMutex.unlock();
 	}
 	// if we have no new noteons/noteoffs, just render a period and call it a day
 	if( m_playingNotes.isEmpty() )
@@ -854,8 +857,6 @@ void Sf2Instrument::play( SampleFrame* _working_buffer )
 
 void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 {
-	const auto guard = std::lock_guard{m_synthMutex};
-
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
 	if (m_internalSampleRate == Engine::audioEngine()->outputSampleRate()) {

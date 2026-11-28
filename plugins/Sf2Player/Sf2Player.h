@@ -31,6 +31,7 @@
 #include <fluidsynth/types.h>
 #include <QMutex>
 #include <samplerate.h>
+#include <set>
 
 #include "AudioEngine.h"
 #include "AudioResampler.h"
@@ -43,7 +44,7 @@ class QLabel;
 
 namespace lmms
 {
-
+class FluidVoice;
 
 struct Sf2PluginData;
 class NotePlayHandle;
@@ -96,6 +97,7 @@ public slots:
 	void openFile( const QString & _sf2File, bool updateTrackName = true );
 	void updatePatch();
 	void reloadSynth();
+	void disableDynamicSampleLoading();
 	
 	// We can't really support sample-exact with the way IPH and FS work.
 	// So, sig/slots work just fine for the synth settings right now.
@@ -114,6 +116,8 @@ private:
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 
+	std::set<unsigned int> m_validVoices;
+	std::string m_fontPath;
 	fluid_sfont_t* m_font;
 
 	int m_fontId;
@@ -153,6 +157,7 @@ private:
 	QMutex m_playingNotesMutex;
 
 private:
+	void loadSfFile(const QString& _sf2File, bool updateTrackName = true);
 	void freeFont();
 	void noteOn( Sf2PluginData * n );
 	void noteOff( Sf2PluginData * n );
