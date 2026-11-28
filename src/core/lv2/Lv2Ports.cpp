@@ -221,6 +221,16 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 			}
 
 			// visualization
+			if (m_vis == Vis::Enumeration)
+			{
+				// no scale points (e.g. lilv failed to read their labels)
+				// would leave us with an empty combo box
+				AutoLilvScalePoints scalePoints(lilv_port_get_scale_points(plugin, lilvPort));
+				if (lilv_scale_points_size(scalePoints.get()) == 0)
+				{
+					m_vis = hasProperty(LV2_CORE__integer) ? Vis::Integer : Vis::Generic;
+				}
+			}
 			if (!m_min_set() ||
 				!m_max_set() ||
 				// if we get here, min and max are set, so max-min should not overflow:
