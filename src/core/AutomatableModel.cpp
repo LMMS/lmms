@@ -322,7 +322,7 @@ void AutomatableModel::setValueInternal(const float value)
 	{
 		m_valueChanged = true;
 		emit dataChanged();
-		emit valueChanged(m_oldValue, m_value);
+		emit valueChanged(m_value, m_oldValue);
 	}
 }
 
